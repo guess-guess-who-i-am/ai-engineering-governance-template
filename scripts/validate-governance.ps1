@@ -27,11 +27,11 @@ foreach ($authority in @('CONTEXT.md', 'DESIGN.md', '.agents/skills')) {
     }
 }
 
-$gitignore = Get-Content -LiteralPath (Join-Path $Root '.gitignore') -Raw
-if ($gitignore -notmatch '(?m)^upstreams/$') {
+$ignoreProbe = 'upstreams/__governance_probe__.txt'
+git -C $Root check-ignore --quiet --no-index -- $ignoreProbe
+if ($LASTEXITCODE -ne 0) {
     throw 'upstreams/ must remain excluded from the template repository.'
 }
 
 & (Join-Path $Root 'scripts/scan-secrets.ps1') -Root $Root
 Write-Output 'Governance validation passed.'
-

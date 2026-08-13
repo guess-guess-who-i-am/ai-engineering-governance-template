@@ -17,5 +17,4 @@ Skills 是按需加载的专项工作流，不是常驻规则集合。
 - `SKILL.md` 只保留核心流程；长参考放 `references/`，重复且确定性的动作放 `scripts/`，输出资源放 `assets/`。
 - `agents/openai.yaml` 提供 UI metadata，字符串全部加引号，`default_prompt` 必须显式引用 `$skill-name`。
 - 不在 Skill 内创建额外 README、安装指南或 changelog。
-- 新增或修改后运行 `scripts/validate-skills.ps1`，并以真实任务 forward-test 复杂 Skill。
-
+- 新增或修改后运行 `scripts/validate-skills.ps1`，并以真实任务 forward-test 复杂 Skill。仓库校验器复现 Codex `quick_validate.py` 当前公开约束，但不依赖某台机器的 Codex 安装路径或 Python 包。
