@@ -1,0 +1,26 @@
+# Local upstream mirrors are reference material, not vendored source.
+upstreams/
+
+# Generated reports and local tool state.
+.reports/
+.kest/history.db
+.kest/config.local.yaml
+.kest/logs/
+.kest/reports/
+
+# Secrets and machine-local configuration.
+.env
+.env.*
+!.env.example
+*.local
+
+# Common build artifacts.
+node_modules/
+.tools/
+dist/
+build/
+coverage/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

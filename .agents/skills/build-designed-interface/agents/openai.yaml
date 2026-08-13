@@ -1,0 +1,4 @@
+interface:
+  display_name: "设计化界面实现"
+  short_description: "依据 brief 与 DESIGN.md 构建一致可用的界面"
+  default_prompt: "使用 $build-designed-interface 按项目设计系统实现这个界面。"

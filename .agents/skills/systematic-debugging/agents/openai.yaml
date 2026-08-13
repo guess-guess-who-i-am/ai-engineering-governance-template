@@ -1,0 +1,5 @@
+interface:
+  display_name: "系统化调试"
+  short_description: "沿信息流定位首个偏差，以可证伪实验完成修复与回归验证"
+  default_prompt: "使用 $systematic-debugging 定位并修复这个问题的首个偏差。"
+

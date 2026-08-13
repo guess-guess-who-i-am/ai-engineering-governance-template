@@ -1,0 +1,30 @@
+# AI Engineering Governance Template
+
+一个面向 Codex 和其他 Agent Skills 兼容工具的工程治理起点，将常驻规则、领域语义、设计上下文、按需 Skills、确定性门禁和可执行 Flow 分层组织。
+
+## 已包含
+
+- `AGENTS.md`：任务路由、权威顺序和验证预算。
+- `CONTEXT.md`：稳定术语、关系与歧义裁决。
+- `DESIGN.md`：工程工具默认视觉系统。
+- `.agents/skills/`：首批五个核心工作流。
+- `scripts/`：治理、Skills、敏感文件和整体检查。
+- `.kest/flow/`：Markdown-native Flow 示例。
+- `UPSTREAMS.md`：第三方研究仓库与更新机制。
+- `.github/`：CI、Issue 和 PR 模板。
+
+## 快速开始
+
+```powershell
+./scripts/update-upstreams.ps1
+./scripts/check.ps1
+```
+
+创建下游项目时，首先修改 `CONTEXT.md` 和 `DESIGN.md`，删除不需要的 Skills，再加入项目自己的 contracts、tests 和部署门禁。
+
+详细流程见 [WORKFLOW.md](WORKFLOW.md)。研究依据见 [外部工程规范与Agent技能调研.md](外部工程规范与Agent技能调研.md)。
+
+## GitHub 模式
+
+本仓库只存自有治理体系。完整第三方仓库存放在本地 `upstreams/`；若需要在 GitHub 长期跟踪上游，使用 GitHub fork。只有真正成为项目依赖时才使用 submodule 或包管理器接入。
+

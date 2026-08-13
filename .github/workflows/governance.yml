@@ -1,0 +1,16 @@
+name: governance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate governance and skills
+        shell: pwsh
+        run: ./scripts/check.ps1
+

@@ -1,0 +1,26 @@
+name: Bug
+description: 报告一个可观察的失败
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: textarea
+    id: signal
+    attributes:
+      label: Failure signal
+      description: 实际输出、错误和环境。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: 最小可靠步骤或命令。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+

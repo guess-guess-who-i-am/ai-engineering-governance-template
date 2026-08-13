@@ -1,0 +1,19 @@
+version: 1
+profiles:
+  local:
+    include: [".kest/flow/**/*.flow.md"]
+    env: public
+    base_url: "https://api.github.com"
+    strict: true
+    fail_fast: true
+    sync: false
+  ci:
+    include: [".kest/flow/**/*.flow.md"]
+    env: public
+    base_url: "https://api.github.com"
+    strict: true
+    fail_fast: true
+    sync: false
+    reports:
+      json: ".kest/reports/flow-results.json"
+      junit: ".kest/reports/flow-results.xml"

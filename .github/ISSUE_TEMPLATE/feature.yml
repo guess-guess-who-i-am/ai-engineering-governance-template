@@ -1,0 +1,25 @@
+name: Capability
+description: 提议一个可独立验证的能力
+title: "[Capability] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: 用户完成后能够做什么？
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Acceptance evidence
+      description: 哪些消费者行为或门禁能证明确实完成？
+    validations:
+      required: true
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints and risks
+      description: 安全、契约、数据、设计或不可逆限制。
+

@@ -1,0 +1,37 @@
+[CmdletBinding()]
+param(
+    [string]$Root = (Split-Path -Parent $PSScriptRoot)
+)
+
+$ErrorActionPreference = 'Stop'
+$required = @(
+    'README.md',
+    'AGENTS.md',
+    'CONTEXT.md',
+    'DESIGN.md',
+    'WORKFLOW.md',
+    'UPSTREAMS.md',
+    '.agents/skills/README.md',
+    '.github/workflows/governance.yml'
+)
+
+$missing = @($required | Where-Object { -not (Test-Path -LiteralPath (Join-Path $Root $_)) })
+if ($missing.Count -gt 0) {
+    throw "Missing governance files: $($missing -join ', ')"
+}
+
+$agents = Get-Content -LiteralPath (Join-Path $Root 'AGENTS.md') -Raw
+foreach ($authority in @('CONTEXT.md', 'DESIGN.md', '.agents/skills')) {
+    if ($agents -notmatch [regex]::Escape($authority)) {
+        throw "AGENTS.md does not route to $authority"
+    }
+}
+
+$gitignore = Get-Content -LiteralPath (Join-Path $Root '.gitignore') -Raw
+if ($gitignore -notmatch '(?m)^upstreams/$') {
+    throw 'upstreams/ must remain excluded from the template repository.'
+}
+
+& (Join-Path $Root 'scripts/scan-secrets.ps1') -Root $Root
+Write-Output 'Governance validation passed.'
+

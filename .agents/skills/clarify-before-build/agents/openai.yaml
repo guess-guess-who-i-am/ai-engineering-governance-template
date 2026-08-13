@@ -1,0 +1,5 @@
+interface:
+  display_name: "构建前澄清"
+  short_description: "在高影响实现前冻结目标、边界、风险与可验证的完成证据"
+  default_prompt: "使用 $clarify-before-build 在实现前澄清这个高影响需求。"
+

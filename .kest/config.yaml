@@ -1,0 +1,9 @@
+version: 1
+active_env: public
+
+environments:
+  public:
+    base_url: https://api.github.com
+
+log_enabled: true
+

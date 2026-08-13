@@ -1,0 +1,5 @@
+interface:
+  display_name: "契约演进"
+  short_description: "统一修改跨组件接口、数据语义、消费者实现与端到端证据"
+  default_prompt: "使用 $evolve-contracts 安全地演进这个跨组件契约。"
+

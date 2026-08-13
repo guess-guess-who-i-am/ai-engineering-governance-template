@@ -1,0 +1,5 @@
+interface:
+  display_name: "完成前验证"
+  short_description: "把完成声明映射到真实消费者，并执行足够且可证伪的证据门禁"
+  default_prompt: "使用 $verify-before-completion 为这个改动建立并执行完成证据。"
+
