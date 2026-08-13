@@ -12,6 +12,7 @@
 - `.kest/flow/`：Markdown-native Flow 示例。
 - `UPSTREAMS.md`：第三方研究仓库与更新机制。
 - `.github/`：CI、Issue 和 PR 模板。
+- `qualitative/`：带正反样例校准的 LLM 定性门禁。
 
 ## 快速开始
 
@@ -24,7 +25,8 @@
 
 详细流程见 [WORKFLOW.md](WORKFLOW.md)。研究依据见 [外部工程规范与Agent技能调研.md](外部工程规范与Agent技能调研.md)。
 
+定性门禁通过 OpenAI-compatible Responses API 运行。配置与本地命令见 [qualitative/README.md](qualitative/README.md)；GitHub Actions 只需要 `LLM_API_KEY`、`LLM_BASE_URL` 两个 repository secrets，模型留空并由远程网关选择。
+
 ## GitHub 模式
 
 本仓库只存自有治理体系。完整第三方仓库存放在本地 `upstreams/`；若需要在 GitHub 长期跟踪上游，使用 GitHub fork。只有真正成为项目依赖时才使用 submodule 或包管理器接入。
-

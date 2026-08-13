@@ -1,0 +1,43 @@
+{
+  "schema": "qualitative-gate-manifest/v1",
+  "criteria": [
+    {
+      "id": "actionable",
+      "description": "A reader can identify the ordered actions and the evidence required to finish the workflow."
+    },
+    {
+      "id": "authority",
+      "description": "The text distinguishes human intent, repository authority, model judgment, and deterministic checks."
+    },
+    {
+      "id": "trustworthy",
+      "description": "Claims are bounded, concrete, and do not present unverified or subjective assertions as facts."
+    }
+  ],
+  "cases": [
+    {
+      "id": "calibration-known-good",
+      "role": "calibration",
+      "expected_verdict": "pass",
+      "artifacts": [
+        "qualitative/fixtures/known-good.md"
+      ]
+    },
+    {
+      "id": "calibration-deliberately-degraded",
+      "role": "calibration",
+      "expected_verdict": "fail",
+      "artifacts": [
+        "qualitative/fixtures/deliberately-degraded.md"
+      ]
+    },
+    {
+      "id": "workflow-target",
+      "role": "target",
+      "expected_verdict": "pass",
+      "artifacts": [
+        "WORKFLOW.md"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+name: qualitative-gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "WORKFLOW.md"
+      - "DESIGN.md"
+      - "qualitative/**"
+      - "scripts/invoke-qualitative-gate.ps1"
+      - "scripts/validate-qualitative-result.ps1"
+  push:
+    branches: [main]
+    paths:
+      - "WORKFLOW.md"
+      - "DESIGN.md"
+      - "qualitative/**"
+      - "scripts/invoke-qualitative-gate.ps1"
+      - "scripts/validate-qualitative-result.ps1"
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: windows-latest
+    env:
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run deterministic repository checks
+        shell: pwsh
+        run: ./scripts/check.ps1
+      - name: Require endpoint credentials
+        shell: pwsh
+        run: |
+          $missing = @('LLM_API_KEY', 'LLM_BASE_URL') | Where-Object {
+            [string]::IsNullOrWhiteSpace((Get-Item "Env:$_" -ErrorAction SilentlyContinue).Value)
+          }
+          if ($missing) {
+            throw "Missing GitHub Actions repository secrets: $($missing -join ', ')"
+          }
+      - name: Run calibrated qualitative gate
+        shell: pwsh
+        run: ./scripts/invoke-qualitative-gate.ps1
+      - name: Upload qualitative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualitative-gate-results
+          path: .reports/qualitative/*.json
+          if-no-files-found: warn
