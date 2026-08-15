@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [string]$Root = (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)))
+    [string]$Root = (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))))
 )
 
 $ErrorActionPreference = 'Stop'
@@ -15,4 +15,3 @@ foreach ($script in $scripts) {
 }
 
 Write-Output 'Repository verification passed.'
-
