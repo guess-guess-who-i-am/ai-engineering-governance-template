@@ -1,0 +1,4 @@
+interface:
+  display_name: "Start New Project"
+  short_description: "Guide a brief and bootstrap a private project repo"
+  default_prompt: "Use $start-new-project to turn my idea into a project brief and initialize a private repository."

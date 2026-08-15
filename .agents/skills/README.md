@@ -9,6 +9,7 @@ Skills 是按需加载的专项工作流，不是常驻规则集合。
 | `evolve-contracts` | 统一演进跨组件契约、实现与端到端证据 |
 | `build-designed-interface` | 依据 brief 与 `DESIGN.md` 实现完整界面 |
 | `verify-before-completion` | 将完成声明映射到真实消费者与充分证据 |
+| `start-new-project` | 与用户逐项冻结 brief，并生成独立的本地及私有 GitHub 项目 |
 
 ## 编写规则
 

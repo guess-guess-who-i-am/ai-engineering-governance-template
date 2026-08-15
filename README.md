@@ -21,6 +21,14 @@
 ./scripts/check.ps1
 ```
 
+创建一个独立的新项目时，可让 Codex 使用 `$start-new-project` 逐项填写 brief；也可直接运行交互式向导：
+
+```powershell
+./scripts/new-project.ps1
+```
+
+向导默认把项目建立在本模板的同级目录，先运行治理检查并初始化 Git；只有明确确认后才创建私有 GitHub 仓库。
+
 创建下游项目时，首先修改 `CONTEXT.md` 和 `DESIGN.md`，删除不需要的 Skills，再加入项目自己的 contracts、tests 和部署门禁。
 
 详细流程见 [WORKFLOW.md](WORKFLOW.md)。研究依据见 [外部工程规范与Agent技能调研.md](外部工程规范与Agent技能调研.md)。
