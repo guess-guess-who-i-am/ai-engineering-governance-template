@@ -1,0 +1,4 @@
+interface:
+  display_name: "Evaluation Gates Method"
+  short_description: "Design justified metrics and calibrated quality gates"
+  default_prompt: "Use $method-evaluation-gates to define and verify acceptance criteria."

@@ -15,6 +15,7 @@
 - `TESTING.md`：功能、契约、E2E、可访问性、性能、安全、供应链和发布证据体系。
 - `UPSTREAMS.md`：第三方研究仓库与更新机制。
 - `.github/`：CI、Issue 和 PR 模板。
+- `codex-profile/`：可迁移的全局 Codex Hook、中文方法论源、英文生成物、推荐器、发布器和自建方法 Skills；不含任何登录态或密钥。
 - `qualitative/`：带正反样例校准的 LLM 定性门禁。
 - `quality/findings.json`：P0–P3 问题、稳定 fingerprint、责任人和生命周期契约。
 - `design/catalog.json`：74 条固定 commit、许可证和来源路径的设计参考。
@@ -37,6 +38,14 @@
 ```
 
 向导默认把项目建立在本模板的同级目录，先运行治理检查并初始化 Git；只有明确确认后才创建私有 GitHub 仓库。
+
+在另一台 Windows 电脑复用本机的全局 Codex 配置时，克隆本私有仓库并运行：
+
+```powershell
+./scripts/install-codex-profile.ps1
+```
+
+安装器会先备份目标电脑的既有配置，再按该电脑的用户目录生成 Hook 路径、安装6个自建方法 Skills，并校验55条方法论。详细说明见 [可迁移 Codex 全局配置](codex-profile/README.zh.md)。GitHub 与 Codex 登录态不会跨电脑复制，需要在每台电脑上单独登录。
 
 创建下游项目时，首先修改 `CONTEXT.md` 和 `DESIGN.md`，再用 `$establish-test-strategy` 把 `quality/gates.json` 中的 `planned` 门禁替换为真实命令。PR 检查允许尚在建设中的明确计划；发布检查会拒绝任何仍未配置的必需门禁。
 

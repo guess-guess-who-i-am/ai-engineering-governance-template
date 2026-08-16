@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Delivery Method"
+  short_description: "Deliver authorized project changes safely to GitHub"
+  default_prompt: "Use $method-github-delivery to prepare this project for authorized GitHub delivery."

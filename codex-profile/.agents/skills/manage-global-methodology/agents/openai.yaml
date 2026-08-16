@@ -1,0 +1,4 @@
+interface:
+  display_name: "Global Methodology Manager"
+  short_description: "Edit and publish routed global methodologies"
+  default_prompt: "Use $manage-global-methodology to update and publish my global methodology rules."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Task Tree Governance Method"
+  short_description: "Operate llm-task-tree state and evidence correctly"
+  default_prompt: "Use $method-task-tree to work with this project task graph."

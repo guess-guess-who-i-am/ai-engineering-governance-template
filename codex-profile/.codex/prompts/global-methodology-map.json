@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "methodology-partition/3",
+  "source": "global-every-turn.en.md",
+  "chineseReviewSource": "global-every-turn.zh.md",
+  "chineseEditorSource": "global-methodology-source.zh.md",
+  "chineseReviewDocument": "global-methodology-routing-review.zh.md",
+  "ruleCount": 55,
+  "translationPolicy": "Each routed rule must be an exact line from the English translation source; summaries do not substitute for source wording.",
+  "routes": {
+    "alwaysOn": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "method-research-evidence": [
+      22,
+      23,
+      24,
+      25,
+      26
+    ],
+    "method-engineering-execution": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38
+    ],
+    "method-evaluation-gates": [
+      39,
+      40,
+      41,
+      42,
+      43,
+      44
+    ],
+    "method-github-delivery": [
+      45
+    ],
+    "method-task-tree": [
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55
+    ]
+  }
+}
