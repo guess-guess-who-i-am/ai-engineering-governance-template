@@ -1,20 +1,38 @@
-name: Capability
-description: 提议一个可独立验证的能力
-title: "[Capability] "
+name: User Story
+description: 用用户故事、验收条件和证据计划提议一项能力
+title: "[Story] "
 labels: [enhancement]
 body:
   - type: textarea
-    id: outcome
+    id: story
     attributes:
-      label: Outcome
-      description: 用户完成后能够做什么？
+      label: User story
+      description: 谁需要什么结果，以及为什么有价值？使用 Actor / Need / Value。
+      placeholder: |
+        Actor:
+        Need:
+        Value:
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: 使用 AC-001 等稳定 ID；每条写 Type、Given、When、Then，并至少包含主路径和相关失败/边界路径。
     validations:
       required: true
   - type: textarea
     id: evidence
     attributes:
-      label: Acceptance evidence
-      description: 哪些消费者行为或门禁能证明确实完成？
+      label: Evidence plan
+      description: 每个 AC 将由哪些单元、集成、契约、E2E、性能、安全或可访问性证据证明？
+    validations:
+      required: true
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk
+      options: [low, medium, high, critical]
     validations:
       required: true
   - type: textarea
@@ -22,4 +40,3 @@ body:
     attributes:
       label: Constraints and risks
       description: 安全、契约、数据、设计或不可逆限制。
-

@@ -1,0 +1,162 @@
+{
+  "schema": "quality-gates/v1",
+  "projectKind": "governance-template",
+  "requiredCategories": [
+    "requirements",
+    "governance",
+    "functional",
+    "unit",
+    "integration",
+    "contract",
+    "e2e",
+    "accessibility",
+    "performance",
+    "security",
+    "dependency-security",
+    "container-security",
+    "compatibility",
+    "deployment",
+    "qualitative",
+    "data-quality"
+  ],
+  "gates": [
+    {
+      "id": "governance-structure",
+      "category": "governance",
+      "state": "active",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/validate-governance.ps1"]
+      }
+    },
+    {
+      "id": "skill-packages",
+      "category": "governance",
+      "state": "active",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/validate-skills.ps1"]
+      }
+    },
+    {
+      "id": "story-traceability",
+      "category": "requirements",
+      "state": "active",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/validate-user-stories.ps1"]
+      }
+    },
+    {
+      "id": "template-bootstrap",
+      "category": "functional",
+      "state": "active",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/test-new-project.ps1"]
+      }
+    },
+    {
+      "id": "security-baseline",
+      "category": "security",
+      "state": "active",
+      "profiles": ["pr", "release", "nightly"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/validate-security-baseline.ps1"]
+      }
+    },
+    {
+      "id": "application-security",
+      "category": "security",
+      "state": "not-applicable",
+      "rationale": "The template has no authentication, authorization, tenant, user-data, or application telemetry boundary."
+    },
+    {
+      "id": "llm-qualitative",
+      "category": "qualitative",
+      "state": "active",
+      "profiles": ["qualitative"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/invoke-qualitative-gate.ps1"]
+      }
+    },
+    {
+      "id": "unit-tests",
+      "category": "unit",
+      "state": "not-applicable",
+      "rationale": "This repository contains governance scripts rather than an application library. Generated projects must replace this decision after choosing a runtime."
+    },
+    {
+      "id": "integration-tests",
+      "category": "integration",
+      "state": "not-applicable",
+      "rationale": "The template has no database, message broker, browser runtime, or service integration."
+    },
+    {
+      "id": "public-contract-tests",
+      "category": "contract",
+      "state": "not-applicable",
+      "rationale": "The template does not publish an HTTP, event, database, or package contract."
+    },
+    {
+      "id": "product-e2e",
+      "category": "e2e",
+      "state": "not-applicable",
+      "rationale": "The template has no deployed product journey; its own bootstrap journey is covered by template-bootstrap."
+    },
+    {
+      "id": "accessibility-tests",
+      "category": "accessibility",
+      "state": "not-applicable",
+      "rationale": "The template does not ship a user interface."
+    },
+    {
+      "id": "performance-regression",
+      "category": "performance",
+      "state": "not-applicable",
+      "rationale": "The template has no runtime SLO, bundle, hot path, or load-bearing endpoint to measure."
+    },
+    {
+      "id": "dependency-vulnerability-scan",
+      "category": "dependency-security",
+      "state": "not-applicable",
+      "rationale": "The committed template has no package-manager lockfile. GitHub Actions dependencies are governed as immutable workflow inputs."
+    },
+    {
+      "id": "container-supply-chain",
+      "category": "container-security",
+      "state": "not-applicable",
+      "rationale": "The template does not build or publish a container image."
+    },
+    {
+      "id": "runtime-compatibility",
+      "category": "compatibility",
+      "state": "not-applicable",
+      "rationale": "Application runtime and datastore compatibility matrices belong to the generated project."
+    },
+    {
+      "id": "deployment-smoke",
+      "category": "deployment",
+      "state": "not-applicable",
+      "rationale": "The template has no deployment target."
+    },
+    {
+      "id": "research-data-quality",
+      "category": "data-quality",
+      "state": "not-applicable",
+      "rationale": "The template does not contain a research dataset or analytical pipeline."
+    }
+  ]
+}

@@ -9,9 +9,12 @@ $required = @(
     'AGENTS.md',
     'CONTEXT.md',
     'DESIGN.md',
+    'TESTING.md',
     'WORKFLOW.md',
     'UPSTREAMS.md',
     '.agents/skills/README.md',
+    'quality/gates.json',
+    'requirements/user-stories/TEMPLATE.md',
     '.github/workflows/governance.yml'
 )
 
@@ -33,5 +36,4 @@ if ($LASTEXITCODE -ne 0) {
     throw 'upstreams/ must remain excluded from the template repository.'
 }
 
-& (Join-Path $Root 'scripts/scan-secrets.ps1') -Root $Root
 Write-Output 'Governance validation passed.'

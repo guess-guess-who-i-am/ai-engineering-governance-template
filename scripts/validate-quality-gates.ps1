@@ -1,0 +1,69 @@
+[CmdletBinding()]
+param(
+    [string]$Root = (Split-Path -Parent $PSScriptRoot)
+)
+
+$ErrorActionPreference = 'Stop'
+$configPath = Join-Path $Root 'quality/gates.json'
+if (-not (Test-Path -LiteralPath $configPath)) { throw "Missing quality gate manifest: $configPath" }
+
+$config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json -Depth 20
+if ($config.schema -ne 'quality-gates/v1') { throw "Unsupported quality gate schema '$($config.schema)'." }
+if ([string]::IsNullOrWhiteSpace($config.projectKind)) { throw 'quality/gates.json requires projectKind.' }
+if (-not $config.requiredCategories -or -not $config.gates) { throw 'quality/gates.json requires requiredCategories and gates.' }
+
+$canonicalCategories = @(
+    'requirements', 'governance', 'functional', 'unit', 'integration', 'contract',
+    'e2e', 'accessibility', 'performance', 'security', 'dependency-security',
+    'container-security', 'compatibility', 'deployment', 'qualitative', 'data-quality'
+)
+foreach ($category in $canonicalCategories) {
+    if ($category -notin $config.requiredCategories) {
+        throw "Canonical quality category was removed from requiredCategories: $category"
+    }
+}
+
+$allowedStates = @('active', 'planned', 'not-applicable')
+$allowedProfiles = @('pr', 'release', 'nightly', 'qualitative', 'performance')
+$ids = @{}
+$categories = @{}
+
+foreach ($gate in $config.gates) {
+    if ([string]::IsNullOrWhiteSpace($gate.id) -or $gate.id -notmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$') {
+        throw "Invalid quality gate id '$($gate.id)'."
+    }
+    if ($ids.ContainsKey($gate.id)) { throw "Duplicate quality gate id '$($gate.id)'." }
+    $ids[$gate.id] = $true
+    if ([string]::IsNullOrWhiteSpace($gate.category)) { throw "$($gate.id): category is required." }
+    $categories[$gate.category] = $true
+    if ($gate.state -notin $allowedStates) { throw "$($gate.id): unsupported state '$($gate.state)'." }
+
+    if ($gate.state -eq 'active') {
+        if (-not $gate.profiles -or -not $gate.command) { throw "$($gate.id): active gates require profiles and command." }
+        foreach ($profile in $gate.profiles) {
+            if ($profile -notin $allowedProfiles) { throw "$($gate.id): unsupported profile '$profile'." }
+        }
+        if ([string]::IsNullOrWhiteSpace($gate.command.executable)) {
+            throw "$($gate.id): active gate command requires executable."
+        }
+        if ($null -ne $gate.command.arguments -and $gate.command.arguments -isnot [System.Array]) {
+            throw "$($gate.id): command.arguments must be an array."
+        }
+    }
+    else {
+        if ([string]::IsNullOrWhiteSpace($gate.rationale)) {
+            throw "$($gate.id): $($gate.state) gates require a rationale."
+        }
+        if ($gate.state -eq 'planned' -and $gate.requiredBeforeRelease -ne $true) {
+            throw "$($gate.id): planned gates must set requiredBeforeRelease=true."
+        }
+    }
+}
+
+foreach ($category in $config.requiredCategories) {
+    if (-not $categories.ContainsKey($category)) {
+        throw "Required quality category has no explicit decision: $category"
+    }
+}
+
+Write-Output "Validated $($config.gates.Count) quality gate decisions across $($config.requiredCategories.Count) required categories."

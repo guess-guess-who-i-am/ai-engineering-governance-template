@@ -10,6 +10,7 @@ Skills 是按需加载的专项工作流，不是常驻规则集合。
 | `build-designed-interface` | 依据 brief 与 `DESIGN.md` 实现完整界面 |
 | `verify-before-completion` | 将完成声明映射到真实消费者与充分证据 |
 | `start-new-project` | 与用户逐项冻结 brief，并生成独立的本地及私有 GitHub 项目 |
+| `establish-test-strategy` | 把用户故事映射为完整、分层、可执行并阻止缺项发布的测试与 CI 体系 |
 
 ## 编写规则
 

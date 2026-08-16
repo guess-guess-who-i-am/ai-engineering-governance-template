@@ -11,6 +11,7 @@ param(
     [string]$GitHubOwner,
     [switch]$CreateGitHub,
     [switch]$IncludeQualitativeGate,
+    [switch]$UseWorkingTree,
     [switch]$NonInteractive,
     [string]$TemplateRoot = (Split-Path -Parent $PSScriptRoot)
 )
@@ -90,18 +91,22 @@ $archivePath = Join-Path $tempRoot 'template.zip'
 $extractPath = Join-Path $tempRoot 'source'
 
 try {
-    New-Item -ItemType Directory -Path $extractPath -Force | Out-Null
-    Invoke-CheckedCommand 'git' @('-C', $templatePath, 'archive', '--format=zip', "--output=$archivePath", 'HEAD') 'Could not export the committed governance template'
-    Expand-Archive -LiteralPath $archivePath -DestinationPath $extractPath -Force
+    $sourceRoot = $templatePath
+    if (-not $UseWorkingTree) {
+        New-Item -ItemType Directory -Path $extractPath -Force | Out-Null
+        Invoke-CheckedCommand 'git' @('-C', $templatePath, 'archive', '--format=zip', "--output=$archivePath", 'HEAD') 'Could not export the committed governance template'
+        Expand-Archive -LiteralPath $archivePath -DestinationPath $extractPath -Force
+        $sourceRoot = $extractPath
+    }
 
     $includedRoots = @(
-        '.agents', '.github', 'qualitative', 'scripts',
+        '.agents', '.github', 'qualitative', 'quality', 'requirements', 'scripts',
         '.gitignore', 'AGENTS.md', 'CONTEXT.md', 'DESIGN.md', 'LICENSE',
-        'README.md', 'UPSTREAMS.md', 'WORKFLOW.md'
+        'README.md', 'TESTING.md', 'UPSTREAMS.md', 'WORKFLOW.md'
     )
-    $sourceFiles = Get-ChildItem -LiteralPath $extractPath -Recurse -File -Force
+    $sourceFiles = Get-ChildItem -LiteralPath $sourceRoot -Recurse -File -Force
     foreach ($sourceFile in $sourceFiles) {
-        $relative = [IO.Path]::GetRelativePath($extractPath, $sourceFile.FullName)
+        $relative = [IO.Path]::GetRelativePath($sourceRoot, $sourceFile.FullName)
         $normalized = $relative.Replace('\', '/')
         $include = $false
         foreach ($root in $includedRoots) {
@@ -157,7 +162,8 @@ $FirstSlice
 
 - Domain terms and ownership in CONTEXT.md.
 - Technical architecture after inspecting the first slice's real constraints.
-- Product-specific checks, contracts, and deployment evidence.
+- Acceptance criteria and evidence mapping in requirements/user-stories/.
+- Product-specific gates in quality/gates.json; planned gates block release.
 - Visual language in DESIGN.md when the project has a user interface.
 "@
 Set-Content -LiteralPath (Join-Path $destinationPath 'PROJECT_BRIEF.md') -Value $brief -Encoding utf8
@@ -196,8 +202,9 @@ This repository implements **$DisplayName** for **$Audience**.
 2. Read PROJECT_BRIEF.md for product outcome and current scope.
 3. Read CONTEXT.md for domain terms, ownership, and boundaries.
 4. Read DESIGN.md only for user-interface work.
-5. Load one matching Skill from .agents/skills only when its description clearly applies.
-6. Put mechanically decidable rules in tests, scripts, schemas, or contracts.
+5. Read TESTING.md and the relevant user story when changing product behavior or test coverage.
+6. Load one matching Skill from .agents/skills only when its description clearly applies.
+7. Put mechanically decidable rules in tests, scripts, schemas, or contracts.
 
 ## Implementation Flow
 
@@ -231,8 +238,93 @@ $FirstSlice
 See PROJECT_BRIEF.md for scope and unresolved decisions.
 
 Run repository checks with: ./scripts/check.ps1
+Run release readiness with: ./scripts/invoke-quality-gates.ps1 -Profile release
 "@
 Set-Content -LiteralPath (Join-Path $destinationPath 'README.md') -Value $readme -Encoding utf8
+
+$storyRoot = Join-Path $destinationPath 'requirements/user-stories'
+Get-ChildItem -LiteralPath $storyRoot -File -Filter 'US-*.md' |
+    Where-Object { $_.Name -ne 'TEMPLATE.md' } |
+    ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force }
+$firstStory = @"
+---
+id: US-001
+status: ready
+risk: high
+---
+
+# US-001: $FirstSlice
+
+## 用户故事
+
+- Actor: $Audience
+- Need: $Outcome
+- Value: 通过一条真实的端到端路径获得可观察结果
+
+## 验收条件
+
+### AC-001: 第一条成功路径
+
+- Type: happy
+- Given: 项目依赖和运行环境已经按仓库说明准备
+- When: 用户执行 $FirstSlice
+- Then: 用户能够观察到 $Outcome
+
+### AC-002: 相关失败路径
+
+- Type: failure
+- Given: 输入、权限、依赖或环境不满足第一条路径的要求
+- When: 用户尝试执行同一能力
+- Then: 系统给出稳定、无敏感信息泄漏且可恢复的失败结果
+
+## 证据映射
+
+- AC-001: planned: 技术栈确定后选择穿过真实消费者边界的测试
+- AC-002: planned: 技术栈确定后加入失败语义和恢复路径测试
+
+## 非目标
+
+- 不包含 PROJECT_BRIEF.md 中未纳入第一条闭环的相邻能力。
+"@
+Set-Content -LiteralPath (Join-Path $storyRoot 'US-001-first-slice.md') -Value $firstStory -Encoding utf8
+
+$qualityPath = Join-Path $destinationPath 'quality/gates.json'
+$quality = Get-Content -LiteralPath $qualityPath -Raw | ConvertFrom-Json -Depth 20
+$quality.projectKind = $ProjectType
+$productCategories = @(
+    'unit', 'integration', 'contract', 'e2e', 'accessibility', 'performance',
+    'dependency-security', 'container-security', 'compatibility', 'deployment', 'data-quality'
+)
+foreach ($gate in $quality.gates) {
+    if ($gate.id -eq 'template-bootstrap') {
+        $gate.id = 'product-functional'
+        $gate.state = 'planned'
+        $gate | Add-Member -NotePropertyName requiredBeforeRelease -NotePropertyValue $true -Force
+        $gate | Add-Member -NotePropertyName rationale -NotePropertyValue 'Configure the first user-visible success and failure paths after choosing the application stack.' -Force
+        $gate.PSObject.Properties.Remove('profiles')
+        $gate.PSObject.Properties.Remove('workingDirectory')
+        $gate.PSObject.Properties.Remove('command')
+    }
+    elseif ($gate.category -in $productCategories -and $gate.state -eq 'not-applicable') {
+        $gate.state = 'planned'
+        $gate | Add-Member -NotePropertyName requiredBeforeRelease -NotePropertyValue $true -Force
+        $gate.rationale = "Configure the $($gate.category) gate for the selected $ProjectType stack, or replace this with a reviewed project-specific not-applicable decision."
+    }
+    elseif ($gate.id -eq 'application-security' -and $gate.state -eq 'not-applicable') {
+        $gate.state = 'planned'
+        $gate | Add-Member -NotePropertyName requiredBeforeRelease -NotePropertyValue $true -Force
+        $gate.rationale = 'Add product-specific authentication, authorization, privacy, abuse, and sensitive-telemetry tests.'
+    }
+    elseif ($gate.id -eq 'llm-qualitative' -and -not $IncludeQualitativeGate) {
+        $gate.state = 'planned'
+        $gate | Add-Member -NotePropertyName requiredBeforeRelease -NotePropertyValue $true -Force
+        $gate | Add-Member -NotePropertyName rationale -NotePropertyValue 'Configure LLM_BASE_URL and LLM_API_KEY, then restore the calibrated qualitative workflow.' -Force
+        $gate.PSObject.Properties.Remove('profiles')
+        $gate.PSObject.Properties.Remove('workingDirectory')
+        $gate.PSObject.Properties.Remove('command')
+    }
+}
+$quality | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $qualityPath -Encoding utf8
 
 Invoke-CheckedCommand 'git' @('-C', $destinationPath, 'init', '-b', 'main') 'Could not initialize Git'
 & (Join-Path $destinationPath 'scripts/check.ps1') -Root $destinationPath

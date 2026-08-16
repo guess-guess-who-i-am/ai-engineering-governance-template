@@ -1,34 +1,32 @@
-name: governance
+name: release-readiness
 
 on:
-  pull_request:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: governance-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: release-readiness-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  validate:
+  verify:
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           persist-credentials: false
-      - name: Run PR quality profile
+      - name: Run release quality profile
         shell: pwsh
-        run: ./scripts/check.ps1
-      - name: Upload quality evidence
+        run: ./scripts/invoke-quality-gates.ps1 -Profile release
+      - name: Upload release evidence
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: pr-quality-${{ github.sha }}
-          path: .reports/quality/pr.json
-          if-no-files-found: error
+          name: release-quality-${{ github.sha }}
+          path: .reports/quality/release.json
+          if-no-files-found: warn
           retention-days: 14

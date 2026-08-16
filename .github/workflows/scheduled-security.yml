@@ -1,19 +1,19 @@
-name: governance
+name: scheduled-security
 
 on:
-  pull_request:
-  push:
-    branches: [main]
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: governance-${{ github.workflow }}-${{ github.ref }}
+  group: scheduled-security-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  validate:
+  verify:
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -21,14 +21,14 @@ jobs:
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           persist-credentials: false
-      - name: Run PR quality profile
+      - name: Run nightly quality profile
         shell: pwsh
-        run: ./scripts/check.ps1
-      - name: Upload quality evidence
+        run: ./scripts/invoke-quality-gates.ps1 -Profile nightly
+      - name: Upload security evidence
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: pr-quality-${{ github.sha }}
-          path: .reports/quality/pr.json
+          name: nightly-security-${{ github.sha }}
+          path: .reports/quality/nightly.json
           if-no-files-found: error
           retention-days: 14

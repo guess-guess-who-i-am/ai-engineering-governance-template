@@ -4,7 +4,5 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-& (Join-Path $Root 'scripts/validate-governance.ps1') -Root $Root
-& (Join-Path $Root 'scripts/validate-skills.ps1') -Root $Root
-Write-Output 'All repository checks passed.'
-
+& (Join-Path $Root 'scripts/invoke-quality-gates.ps1') -Profile pr -Root $Root
+Write-Output 'All PR quality gates passed.'
