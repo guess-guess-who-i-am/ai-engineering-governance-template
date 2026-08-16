@@ -8,6 +8,7 @@ on:
       - "DESIGN.md"
       - "qualitative/**"
       - "scripts/invoke-qualitative-gate.ps1"
+      - "scripts/test-qualitative-gate.ps1"
       - "scripts/validate-qualitative-result.ps1"
   push:
     branches: [main]
@@ -16,6 +17,7 @@ on:
       - "DESIGN.md"
       - "qualitative/**"
       - "scripts/invoke-qualitative-gate.ps1"
+      - "scripts/test-qualitative-gate.ps1"
       - "scripts/validate-qualitative-result.ps1"
 
 permissions:
@@ -27,11 +29,13 @@ concurrency:
 
 jobs:
   evaluate:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.LLM_GATE_ENABLED == 'true' }}
     runs-on: windows-latest
     timeout-minutes: 20
     env:
       LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
       LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+      LLM_MODEL: ${{ vars.LLM_MODEL }}
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1

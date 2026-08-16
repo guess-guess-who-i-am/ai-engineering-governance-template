@@ -5,7 +5,9 @@ param(
     [string]$OutputDirectory = '.reports/qualitative',
     [string]$BaseUrl = $env:LLM_BASE_URL,
     [string]$ApiKey = $env:LLM_API_KEY,
-    [string]$Model = $env:LLM_MODEL
+    [string]$Model = $env:LLM_MODEL,
+    [ValidateRange(1, 600)]
+    [int]$RequestTimeoutSeconds = 60
 )
 
 $ErrorActionPreference = 'Stop'
@@ -111,7 +113,7 @@ UNTRUSTED_ARTIFACT_END
     $body = $body | ConvertTo-Json -Depth 20
 
     Write-Output "Evaluating $($case.id)..."
-    $response = Invoke-RestMethod -Method Post -Uri $endpoint -Headers $headers -Body $body
+    $response = Invoke-RestMethod -Method Post -Uri $endpoint -Headers $headers -Body $body -TimeoutSec $RequestTimeoutSeconds
     $outputText = if ($response.output_text) {
         $response.output_text
     }

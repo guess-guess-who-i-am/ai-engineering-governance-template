@@ -116,11 +116,9 @@ try {
             }
         }
         if (-not $include) { continue }
-        if (-not $IncludeQualitativeGate -and (
-            $normalized.StartsWith('qualitative/', [StringComparison]::Ordinal) -or
-            $normalized -eq '.github/workflows/qualitative-gate.yml' -or
-            $normalized -in @('scripts/invoke-qualitative-gate.ps1', 'scripts/validate-qualitative-result.ps1')
-        )) { continue }
+        if (-not $IncludeQualitativeGate -and $normalized -eq '.github/workflows/qualitative-gate.yml') {
+            continue
+        }
 
         $target = Join-Path $destinationPath $relative
         $targetParent = Split-Path -Parent $target
