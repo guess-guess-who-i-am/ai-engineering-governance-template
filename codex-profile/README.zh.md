@@ -4,7 +4,7 @@
 
 - 全局 `AGENTS.md`；
 - 每轮常驻提醒、方法论路由、Skill 推荐器和会话恢复 Hook；
-- 中文唯一编辑源、英文生成物、59条规则映射与完整性校验；
+- 中文唯一编辑源、英文生成物、63条规则映射与完整性校验；
 - 自动翻译和原子发布器；
 - `method-*` 五个方法 Skill 与 `manage-global-methodology`；
 - Skill 路由别名。
@@ -19,7 +19,7 @@
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-profile.ps1
 ```
 
-安装器会先把目标电脑上即将被覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`，再安装配置、按目标用户名生成 `hooks.json`、创建两个桌面编辑入口，并执行59条方法论完整性校验和 Skill 索引刷新。
+安装器会先把目标电脑上即将被覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`，再安装配置、按目标用户名生成 `hooks.json`、创建两个桌面编辑入口，并执行63条方法论完整性校验和 Skill 索引刷新。
 
 安装后重新启动 Codex，使用户级 `AGENTS.md` 和 Hook 重新加载。随后分别执行 `gh auth login` 和该电脑上的 Codex 登录流程。
 
