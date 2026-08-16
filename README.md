@@ -41,7 +41,7 @@
 
 ## 跨电脑复用 Codex 全局配置
 
-当前完整工程保存在私有仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是 `main`。`codex-profile/` 是本机全局 Codex 配置的可迁移版本，另一台 Windows 电脑克隆仓库后即可安装同一套方法论路由、Hook、发布器和自建 Skills。
+当前完整工程保存在公开仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是受保护的 `main`。`codex-profile/` 是本机全局 Codex 配置的可迁移版本，另一台 Windows 电脑克隆仓库后即可安装同一套方法论路由、Hook、发布器和自建 Skills。
 
 ### 仓库中具体保存了什么
 
@@ -57,7 +57,7 @@
 
 ### 不会上传什么
 
-仓库不会保存 API Key、token、cookie、`.env`、`auth.json`、GitHub 登录态、Codex 登录态、日志或机器本地备份。即使仓库是私有的，这些凭据也必须留在各自电脑的安全存储中。
+仓库不会保存 API Key、token、cookie、`.env`、`auth.json`、GitHub 登录态、Codex 登录态、日志或机器本地备份。无论仓库公开还是私有，这些凭据都必须留在各自电脑的安全存储中。
 
 远程 LLM 配置允许模型名留空，由远程网关选择模型；需要时只在目标电脑或 GitHub repository secrets 中设置 `LLM_BASE_URL` 和 `LLM_API_KEY`，不要写入仓库文件。
 
@@ -101,7 +101,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-prof
 ./scripts/check.ps1
 ```
 
-4. 检查 diff 和秘密扫描结果，再通过 PR 合并到私有 `main`。另一台电脑之后拉取最新 `main` 并重新运行安装脚本即可更新。
+4. 检查 diff 和秘密扫描结果，再通过 PR 合并到受保护的公开 `main`。另一台电脑之后拉取最新 `main` 并重新运行安装脚本即可更新。
 
 安装测试已经覆盖：仓库快照哈希一致、缺少源文件时拒绝发布、全新用户目录安装、旧配置备份、目标用户名路径生成、6个 Skills 安装和路由输入。完整仓库还通过秘密扫描、本地 PR 质量门禁和 GitHub CI。
 
