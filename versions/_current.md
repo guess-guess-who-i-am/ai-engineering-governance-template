@@ -13,7 +13,7 @@
 - Output: 可执行的新项目向导、项目 brief、私有仓库初始化结果。
 - Metrics: 向导可重复运行；缺少必填信息时停止；新目录可通过基础检查；GitHub 创建失败不丢失本地项目。
 - Notes: 第一次使用时，请让 Agent 拆成 3-7 个节点；节点不写代码、原始数据或复杂英文术语。
-- CurrentResult: 完整工程与可迁移 Codex 配置已通过 PR #4 合并到私有仓库 main，远端提交为 a470c4a；37个配置文件、55条方法论、6个自建方法 Skills 均已纳入，安装测试、秘密扫描、本地15项门禁及 GitHub CI 通过。“完整上传”目标已达到。
+- CurrentResult: 完整工程仍已在私有 main；根 README 现已补齐配置组成、55条归类、6个自建方法 Skills、凭据边界、跨电脑安装、其他项目继承和后续同步流程。文件计数、方法论解析、文档、治理与秘密扫描均通过，“完整说明写入 README”目标已达到。
 - RootCauseAnalysis: 生成器必须从已提交模板导出，才能隔离母仓库未提交内容；定性 LLM 门禁默认排除，避免缺少新仓库 Secrets 时首推失败。
 - CaseStudy:
 - NextIdea: 在另一台 Windows 电脑克隆私有仓库并运行安装脚本，再分别登录 GitHub 与 Codex。
