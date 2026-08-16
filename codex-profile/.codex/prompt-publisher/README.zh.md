@@ -12,7 +12,7 @@
 2. 把整条规则移动到另一个分类。
 3. 保存文件；等待翻译和发布完成提示。
 
-保存后自动完成：中文到英文逐行翻译、完整档案、常驻包、路由文件、五个 Skills、归类映射、Skill 索引、字符预算和59条完整性校验。所有目标先备份后统一更新；后置校验失败会回滚。
+保存后自动完成：中文到英文逐行翻译、完整档案、常驻包、路由文件、五个 Skills、归类映射、Skill 索引、字符预算和63条完整性校验。所有目标先备份后统一更新；后置校验失败会回滚。
 
 不要直接修改自动生成的 `global-every-turn.*`、`global-attention-anchor.*`、`global-methodology-router.*`、`global-methodology-routing-review.zh.md` 或五个方法 Skill 的规则正文，否则下一次发布会由中文唯一源覆盖。
 
