@@ -1,4 +1,4 @@
 interface:
-  display_name: "Éè¼Æ»¯½çÃæÊµÏÖ"
-  short_description: "ÒÀ¾İ brief Óë DESIGN.md ¹¹½¨Ò»ÖÂ¿ÉÓÃµÄ½çÃæ"
-  default_prompt: "Ê¹ÓÃ $build-designed-interface °´ÏîÄ¿Éè¼ÆÏµÍ³ÊµÏÖÕâ¸ö½çÃæ¡£"
+  display_name: "è®¾è®¡ç•Œé¢å®ç°"
+  short_description: "ä¾æ®äº§å“ç®€æŠ¥ä¸è§†è§‰è§„èŒƒå®ç°å“åº”å¼ã€å¯è®¿é—®ä¸”å¯éªŒè¯çš„å®Œæ•´ç•Œé¢"
+  default_prompt: "ä½¿ç”¨ $build-designed-interface ä¾æ®é¡¹ç›®è§†è§‰ç³»ç»Ÿå®ç°å¹¶éªŒè¯è¿™ä¸ªç•Œé¢ã€‚"

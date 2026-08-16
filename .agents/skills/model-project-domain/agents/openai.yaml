@@ -1,0 +1,4 @@
+interface:
+  display_name: "项目领域建模"
+  short_description: "从真实业务语言提取术语、边界、关系、不变量和公共契约所有权"
+  default_prompt: "使用 $model-project-domain 为这个项目建立最小且可执行的领域模型。"

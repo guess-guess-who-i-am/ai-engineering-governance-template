@@ -93,9 +93,26 @@ UI 项目至少组合静态 a11y lint、组件角色/标签测试、键盘导航
 
 报告写入 `.reports/quality/`。CI 应上传报告，即使门禁失败也保留诊断证据。
 
+## 8. Findings 与优先级修复
+
+每个 active / planned 门禁声明失败时的 `failurePriority`、`owner` 和 `remediation`。运行器将失败转换成 `quality-gate-report/v2` Finding；聚合器按 gate fingerprint 去重，因此重复失败更新同一问题。
+
+- P0：秘密泄漏、可利用安全问题、数据破坏或不可用，阻止 PR 和发布。
+- P1：核心旅程、公共契约或发布证据重大回归，阻止发布并默认阻止 PR。
+- P2：影响明确但有绕行方案，进入近期排期。
+- P3：体验、清晰度或维护性优化。
+
+优先级衡量影响，不衡量修复工作量。人工触发 `findings.yml` 后才可把开放的 P0–P2 同步为 GitHub Issue；不可信 PR 不具有 Issue 写权限。完整字段和状态转换见 `quality/FINDINGS.md`。
+
+## 9. 本模板当前的真实证据
+
+文档站由 PowerShell 静态门禁和 Playwright 浏览器门禁共同验证。静态层检查语义结构、相对链接、UTF-8、移动断点、focus、reduced motion、无外部脚本和 300 KB 总预算；浏览器层覆盖 1440px / 375px、目录搜索、首个 Tab 与 skip-link、axe 和截图。Pages 部署后还要验证实际 URL 返回预期内容。
+
+`package-lock.json` 出现后，依赖安全从不适用切换为 release/nightly 的 `npm audit`。固定上游通过 `upstreams.lock.json` 和周漂移检查管理。Kest `.flow.md` 是跨步骤 API 旅程证据；没有安装经许可证审查的 CLI 时，不把配置文件存在声称为 Flow 已执行。
+
 公开 GitHub 仓库使用 `scripts/configure-github-repository.ps1 -Apply` 建立远程治理：默认分支必须经 PR，`validate` 是严格 required check，管理员同样受保护，禁止强推和删除，要求线性历史与对话解决；同时启用 secret scanning、push protection、Dependabot 安全更新、私密漏洞报告、auto-merge 和合并后删分支。省略 `-Apply` 时脚本只审计当前远程状态。
 
-## 8. 上游方法如何被吸收
+## 10. 上游方法如何被吸收
 
 - LUAS：分层 CI、OpenAPI breaking gate、Go/Node/数据库矩阵、race detector、bundle 预算、Lighthouse 证据规则、OSV、SBOM、Trivy、容器 smoke 和 Action SHA 固定。
 - Kest：Markdown-native API Flow、捕获、跨步骤变量、状态/正文/响应头/时延断言和 JSON/JUnit 报告。Kest 适合作为业务 Flow 层，不替代语言原生测试或并发负载工具。

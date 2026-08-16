@@ -1,0 +1,4 @@
+interface:
+  display_name: "TDD修复回归"
+  short_description: "先复现回归并建立失败测试，再完成最小修复与充分回归验证"
+  default_prompt: "使用 $fix-regression-with-tdd 通过失败测试复现并修复这个回归。"

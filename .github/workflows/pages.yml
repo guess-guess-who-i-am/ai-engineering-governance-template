@@ -1,0 +1,66 @@
+name: pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'design/catalog.json'
+      - 'scripts/build-docs-site.ps1'
+      - 'scripts/test-docs-site.ps1'
+      - '.github/workflows/pages.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+      - name: Configure Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - name: Build and validate
+        shell: pwsh
+        run: |
+          ./scripts/build-docs-site.ps1
+          ./scripts/test-docs-site.ps1 -SitePath .reports/site-dist
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
+        with:
+          path: .reports/site-dist
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 10
+    steps:
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+      - name: Smoke deployed site
+        shell: pwsh
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          for ($attempt = 1; $attempt -le 6; $attempt++) {
+            try {
+              $response = Invoke-WebRequest -Uri $env:PAGE_URL -TimeoutSec 20
+              if ($response.StatusCode -eq 200 -and $response.Content.Contains('AI 工程治理模板')) { exit 0 }
+            } catch { if ($attempt -eq 6) { throw } }
+            Start-Sleep -Seconds 10
+          }
+          throw 'Deployed Pages site did not return the expected content.'

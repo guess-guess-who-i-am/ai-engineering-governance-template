@@ -16,8 +16,24 @@ foreach ($workflow in $workflows) {
     if ($body -notmatch '(?m)^permissions:\s*\r?\n(?:\s+[^\r\n]+\r?\n)*?\s+contents:\s*read\s*$') {
         throw "$($workflow.Name): declare top-level least-privilege permissions with contents: read."
     }
-    if ($body -match '(?m)^\s+[a-z-]+:\s*write\s*$') {
-        throw "$($workflow.Name): validation workflows may not request write permission."
+    $writePermissions = @([regex]::Matches($body, '(?m)^\s+(?<permission>[a-z-]+):\s*write\s*$'))
+    foreach ($writePermission in $writePermissions) {
+        $isGuardedIssueSync = $workflow.Name -eq 'findings.yml' -and
+            $writePermission.Groups['permission'].Value -eq 'issues' -and
+            $body -match '(?m)^\s{2}workflow_dispatch:\s*$' -and
+            $body -notmatch '(?m)^\s{2}(pull_request|push):'
+        $isGuardedPagesDeploy = $workflow.Name -eq 'pages.yml' -and
+            $writePermission.Groups['permission'].Value -in @('pages', 'id-token') -and
+            $body -notmatch '(?m)^\s{2}pull_request:' -and
+            $body.Contains('actions/deploy-pages@', [StringComparison]::Ordinal)
+        $isGuardedRelease = $workflow.Name -eq 'release.yml' -and
+            $writePermission.Groups['permission'].Value -eq 'contents' -and
+            $body -match "(?m)^\s{4}tags:\s*\['v\*\.\*\.\*'\]\s*$" -and
+            $body -notmatch '(?m)^\s{2}pull_request:' -and
+            $body.Contains('gh release create', [StringComparison]::Ordinal)
+        if (-not ($isGuardedIssueSync -or $isGuardedPagesDeploy -or $isGuardedRelease)) {
+            throw "$($workflow.Name): validation workflows may not request '$($writePermission.Groups['permission'].Value): write'."
+        }
     }
 
     $lines = Get-Content -LiteralPath $workflow.FullName
@@ -50,6 +66,23 @@ foreach ($workflow in $workflows) {
             if (-not $body.Contains($requiredText, [StringComparison]::Ordinal)) {
                 throw "$($workflow.Name): missing guarded qualitative-gate wiring '$requiredText'."
             }
+        }
+    }
+    if ($workflow.Name -eq 'findings.yml') {
+        foreach ($requiredText in @('workflow_dispatch:', 'issues: write', 'inputs.create_issues', 'sync-findings-to-github.ps1 -Apply')) {
+            if (-not $body.Contains($requiredText, [StringComparison]::Ordinal)) {
+                throw "$($workflow.Name): missing guarded findings wiring '$requiredText'."
+            }
+        }
+    }
+    if ($workflow.Name -eq 'pages.yml') {
+        foreach ($requiredText in @('actions/configure-pages@', 'actions/upload-pages-artifact@', 'actions/deploy-pages@', 'Smoke deployed site')) {
+            if (-not $body.Contains($requiredText, [StringComparison]::Ordinal)) { throw "$($workflow.Name): missing Pages evidence '$requiredText'." }
+        }
+    }
+    if ($workflow.Name -eq 'release.yml') {
+        foreach ($requiredText in @("tags: ['v*.*.*']", 'validate-release.ps1', 'invoke-quality-gates.ps1 -Profile release', 'gh release create')) {
+            if (-not $body.Contains($requiredText, [StringComparison]::Ordinal)) { throw "$($workflow.Name): missing release evidence '$requiredText'." }
         }
     }
 }

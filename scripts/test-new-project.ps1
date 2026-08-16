@@ -35,14 +35,27 @@ try {
         -ProjectType web `
         -Destination $destination `
         -TemplateRoot $Root `
-        -UseWorkingTree `
         -NonInteractive
 
     foreach ($relativePath in @(
         'PROJECT_BRIEF.md',
         'requirements/user-stories/US-001-first-slice.md',
         'quality/gates.json',
-        'TESTING.md'
+        'TESTING.md',
+        '.kest/flow/governance-smoke.flow.md',
+        '.kest/flow.config.yaml',
+        'CHANGELOG.md',
+        'DESIGN-SOURCES.md',
+        'VERSION',
+        'design/catalog.json',
+        'docs/AGENT_PLATFORM_BOUNDARY.md',
+        'docs/RELEASING.md',
+        'package.json',
+        'package-lock.json',
+        'site/index.html',
+        'site/styles.css',
+        'site/app.js',
+        'upstreams.lock.json'
     )) {
         if (-not (Test-Path -LiteralPath (Join-Path $destination $relativePath))) {
             throw "Generated project is missing $relativePath"

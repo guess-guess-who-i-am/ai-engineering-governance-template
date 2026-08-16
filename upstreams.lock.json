@@ -1,0 +1,45 @@
+{
+  "schema": "upstream-lock/v1",
+  "sources": [
+    {
+      "name": "awesome-design-md",
+      "url": "https://github.com/VoltAgent/awesome-design-md.git",
+      "branch": "main",
+      "commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "usage": "design-reference-catalog"
+    },
+    {
+      "name": "taste-skill",
+      "url": "https://github.com/Leonxlnx/taste-skill.git",
+      "branch": "main",
+      "commit": "e988add20dab0fa97d7a76781c48961c8184288e",
+      "license": "MIT",
+      "usage": "method-research"
+    },
+    {
+      "name": "emil-skills",
+      "url": "https://github.com/emilkowalski/skills.git",
+      "branch": "main",
+      "commit": "78761e1b57f97dce65b983d640c70a68f39e8163",
+      "license": "MIT",
+      "usage": "interaction-and-apple-design-research"
+    },
+    {
+      "name": "kest",
+      "url": "https://github.com/kest-labs/kest.git",
+      "branch": "main",
+      "commit": "bf73f655c1b7cabc106244605cded9e2dd326ffa",
+      "license": "unverified-at-pinned-commit",
+      "usage": "flow-interoperability-research-only"
+    },
+    {
+      "name": "luas",
+      "url": "https://github.com/agicto/luas.git",
+      "branch": "main",
+      "commit": "6a2b2c97c2017b1ad58b713d116eba561ef9305f",
+      "license": "MIT",
+      "usage": "governance-and-test-strategy-research"
+    }
+  ]
+}

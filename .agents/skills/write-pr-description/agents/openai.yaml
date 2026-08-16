@@ -1,0 +1,4 @@
+interface:
+  display_name: "编写PR说明"
+  short_description: "依据真实差异和验证证据编写结果、范围、风险与回滚清晰的说明"
+  default_prompt: "使用 $write-pr-description 根据当前分支证据编写可审查的 PR 说明。"

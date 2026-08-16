@@ -3,6 +3,28 @@ description: 报告一个可观察的失败
 title: "[Bug] "
 labels: [bug]
 body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: 按影响选择 P0-P3；修复难度不改变优先级。
+      options: [P0, P1, P2, P3]
+    validations:
+      required: true
+  - type: input
+    id: category
+    attributes:
+      label: Category and gate
+      description: 例如 security / security-baseline。
+    validations:
+      required: true
+  - type: input
+    id: requirement
+    attributes:
+      label: User story and acceptance criteria
+      description: 如果适用，填写 US-nnn 和 AC-nnn；否则写 N/A。
+    validations:
+      required: true
   - type: textarea
     id: signal
     attributes:
@@ -23,4 +45,17 @@ body:
       label: Expected behavior
     validations:
       required: true
-
+  - type: textarea
+    id: remediation
+    attributes:
+      label: Remediation direction
+      description: 描述可执行的修复方向与完成证据，不要求预先指定实现。
+    validations:
+      required: true
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      description: 负责推进闭环的 GitHub 用户或团队。
+    validations:
+      required: true

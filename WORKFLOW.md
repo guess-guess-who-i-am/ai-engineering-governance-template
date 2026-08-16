@@ -23,6 +23,11 @@
 - 界面：`build-designed-interface`
 - 高风险完成声明：`verify-before-completion`
 - 建立或修复完整测试体系：`establish-test-strategy`
+- 审查当前分支或 PR：`review-project-diff`
+- 审查规则、Skills、CI 和证据链：`review-governance-framework`
+- 修复已确认回归：`fix-regression-with-tdd`
+- 统一领域术语与不变量：`model-project-domain`
+- 交付前编写 PR 说明：`write-pr-description`
 
 一次默认只加载一个主 Skill。只有边界确实跨越多个独立问题时才顺序使用第二个。
 
@@ -31,6 +36,8 @@
 每完成一个独立单元就运行最窄、可证伪的检查。失败时按机制改变方案，不重复相同尝试。保持通过的未变检查，不为仪式重复运行。
 
 每条验收条件必须映射到真实测试文件。`quality/gates.json` 中每个必需类别都要显式标记 active、planned 或 not-applicable；planned 门禁允许项目逐步建设，但会阻止发布。详细分层和性能/安全证据边界见 `TESTING.md`。
+
+门禁失败不只保留日志：报告生成稳定 Finding，`collect-findings.ps1` 以 fingerprint 去重，并按 `open → in_progress → resolved → testing → closed` 推进；再次失败进入 `reopened`。P0/P1 阻断边界和 Issue 同步规则见 `quality/FINDINGS.md`。
 
 机械门禁先运行；只有清晰度、意图、层级或语气等不能稳定写成规则的判断才进入 LLM 定性门禁。定性门禁先用已知好/坏样例校准，再评价真实目标；模型只返回结构化证据，最终通过或失败由脚本按契约决定。
 
@@ -45,3 +52,4 @@
 - PR 描述包含 Outcome、Scope、Evidence、Risk 四部分。
 - PR CI 运行 `scripts/check.ps1`；发布前运行 `scripts/invoke-quality-gates.ps1 -Profile release`，不得保留必需的 planned 门禁。
 - 第三方项目优先 fork，在独立仓库维护；不要把所有上游源码复制到本模板主分支。
+- 发布通过 `VERSION`、`CHANGELOG.md` 和 `v<version>` tag 驱动；Pages 与 Release 都在远程完成部署后 smoke，详见 `docs/RELEASING.md`。
