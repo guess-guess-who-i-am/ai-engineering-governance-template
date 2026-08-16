@@ -80,6 +80,8 @@ UI 项目至少组合静态 a11y lint、组件角色/标签测试、键盘导航
 - `performance`：受控环境中的基准、负载和 bundle 证据。
 - `qualitative`：机械门禁通过后，由校准过的大模型检查清晰度、意图和可信表达。
 
+定性门禁分成两层。`qualitative-adapter-contract` 在 PR 和 release 中使用本地模拟 Responses API，验证鉴权头、请求结构、严格 JSON Schema、空模型字段省略、结果解析、校准样例和缺少 API key 的失败路径；它不调用外部模型。真实 `llm-qualitative` profile 只有在 GitHub 仓库变量 `LLM_GATE_ENABLED=true` 后才随相关 PR/push 自动运行，手动触发不受该变量限制，但仍严格要求 `LLM_BASE_URL` 和 `LLM_API_KEY` Secrets。可选 `LLM_MODEL` 留空时由网关选择默认模型。
+
 运行方式：
 
 ```powershell
@@ -90,6 +92,8 @@ UI 项目至少组合静态 a11y lint、组件角色/标签测试、键盘导航
 ```
 
 报告写入 `.reports/quality/`。CI 应上传报告，即使门禁失败也保留诊断证据。
+
+公开 GitHub 仓库使用 `scripts/configure-github-repository.ps1 -Apply` 建立远程治理：默认分支必须经 PR，`validate` 是严格 required check，管理员同样受保护，禁止强推和删除，要求线性历史与对话解决；同时启用 secret scanning、push protection、Dependabot 安全更新、私密漏洞报告、auto-merge 和合并后删分支。省略 `-Apply` 时脚本只审计当前远程状态。
 
 ## 8. 上游方法如何被吸收
 

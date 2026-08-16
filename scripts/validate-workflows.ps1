@@ -39,6 +39,19 @@ foreach ($workflow in $workflows) {
             }
         }
     }
+
+    if ($workflow.Name -eq 'qualitative-gate.yml') {
+        foreach ($requiredText in @(
+            'workflow_dispatch:',
+            "vars.LLM_GATE_ENABLED == 'true'",
+            'secrets.LLM_API_KEY',
+            'secrets.LLM_BASE_URL'
+        )) {
+            if (-not $body.Contains($requiredText, [StringComparison]::Ordinal)) {
+                throw "$($workflow.Name): missing guarded qualitative-gate wiring '$requiredText'."
+            }
+        }
+    }
 }
 
 Write-Output "Validated $($workflows.Count) GitHub Actions workflows."

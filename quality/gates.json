@@ -93,6 +93,17 @@
       }
     },
     {
+      "id": "qualitative-adapter-contract",
+      "category": "qualitative",
+      "state": "active",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/test-qualitative-gate.ps1"]
+      }
+    },
+    {
       "id": "unit-tests",
       "category": "unit",
       "state": "not-applicable",
