@@ -100,9 +100,12 @@ try {
     }
 
     $includedRoots = @(
-        '.agents', '.github', 'qualitative', 'quality', 'requirements', 'scripts',
+        '.agents', '.github', '.kest', 'design', 'docs', 'qualitative', 'quality',
+        'requirements', 'scripts', 'site',
         '.gitignore', 'AGENTS.md', 'CONTEXT.md', 'DESIGN.md', 'LICENSE',
-        'README.md', 'TESTING.md', 'UPSTREAMS.md', 'WORKFLOW.md'
+        'README.md', 'TESTING.md', 'UPSTREAMS.md', 'WORKFLOW.md',
+        'CHANGELOG.md', 'DESIGN-SOURCES.md', 'VERSION', 'package.json',
+        'package-lock.json', 'upstreams.lock.json'
     )
     $sourceFiles = Get-ChildItem -LiteralPath $sourceRoot -Recurse -File -Force
     foreach ($sourceFile in $sourceFiles) {
@@ -327,6 +330,28 @@ foreach ($gate in $quality.gates) {
         if ([string]::IsNullOrWhiteSpace($gate.remediation)) {
             $gate | Add-Member -NotePropertyName remediation -NotePropertyValue "Configure and pass the $($gate.id) gate before release." -Force
         }
+    }
+}
+
+# Template-level active gates prove that the governance platform works; they do
+# not prove that the generated product has implemented the same quality layer.
+# Keep an explicit release blocker for every product-facing category until the
+# new repository replaces it with a stack-specific executable gate.
+foreach ($category in $productCategories) {
+    $hasProductPlan = @($quality.gates | Where-Object {
+        $_.category -eq $category -and $_.state -eq 'planned'
+    }).Count -gt 0
+    if ($hasProductPlan) { continue }
+
+    $quality.gates += [pscustomobject]@{
+        id = "product-$category"
+        category = $category
+        state = 'planned'
+        rationale = "Configure the product-level $category gate for the selected $ProjectType stack. Template self-tests in this category do not verify product behavior."
+        requiredBeforeRelease = $true
+        failurePriority = 'P1'
+        owner = 'project-maintainers'
+        remediation = "Implement and pass the product-level $category gate before release."
     }
 }
 $quality | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $qualityPath -Encoding utf8
