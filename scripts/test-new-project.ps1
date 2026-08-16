@@ -35,7 +35,6 @@ try {
         -ProjectType web `
         -Destination $destination `
         -TemplateRoot $Root `
-        -UseWorkingTree `
         -NonInteractive
 
     foreach ($relativePath in @(
