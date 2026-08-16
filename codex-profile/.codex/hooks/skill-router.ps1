@@ -1,0 +1,173 @@
+$ErrorActionPreference = "Stop"
+$utf8 = New-Object System.Text.UTF8Encoding($false)
+[Console]::InputEncoding = $utf8
+[Console]::OutputEncoding = $utf8
+
+function Write-EmptyResult {
+  [Console]::Out.Write("{}")
+  exit 0
+}
+
+function Get-QueryTokens {
+  param([string]$Text, [string[]]$StopTokens)
+  $tokens = [Collections.Generic.List[string]]::new()
+  foreach ($match in [regex]::Matches($Text.ToLowerInvariant(), "[a-z][a-z0-9_-]{1,}|\d+")) {
+    if ($match.Value.Length -ge 2) { $tokens.Add($match.Value) }
+  }
+  foreach ($run in [regex]::Matches($Text, "[\u4e00-\u9fff]+")) {
+    $value = $run.Value
+    for ($index = 0; $index -lt $value.Length; $index++) {
+      if ($index + 1 -lt $value.Length) { $tokens.Add($value.Substring($index, 2)) }
+    }
+  }
+  return @($tokens | Where-Object { $StopTokens -notcontains $_ } | Select-Object -Unique)
+}
+
+function Get-LocalSkillEntries {
+  param([string]$StartDirectory)
+  if (-not $StartDirectory -or -not (Test-Path -LiteralPath $StartDirectory -PathType Container)) { return @() }
+  $current = [IO.DirectoryInfo]::new([IO.Path]::GetFullPath($StartDirectory))
+  $roots = [Collections.Generic.List[string]]::new()
+  while ($null -ne $current) {
+    foreach ($relative in @("skills", ".agents\skills", "llm-task-tree\skills")) {
+      $candidate = Join-Path $current.FullName $relative
+      if (Test-Path -LiteralPath $candidate -PathType Container) { $roots.Add($candidate) }
+    }
+    $current = $current.Parent
+  }
+  $entries = [Collections.Generic.List[object]]::new()
+  foreach ($root in ($roots | Select-Object -Unique)) {
+    foreach ($file in Get-ChildItem -LiteralPath $root -Filter "SKILL.md" -Recurse -File -ErrorAction SilentlyContinue) {
+      $text = [IO.File]::ReadAllText($file.FullName)
+      $nameMatch = [regex]::Match($text, '(?m)^name:\s*["'']?([^\r\n"'']+)')
+      $descMatch = [regex]::Match($text, "(?m)^description:\s*(.+)$")
+      $name = if ($nameMatch.Success) { $nameMatch.Groups[1].Value.Trim() } else { $file.Directory.Name }
+      $description = if ($descMatch.Success) { ($descMatch.Groups[1].Value.Trim() -replace "\s+", " ").Trim('"').Trim("'") } else { "" }
+      if (-not $name -or -not $description) { continue }
+      $entries.Add([pscustomobject]@{
+        id = "project:$($name.ToLowerInvariant())"
+        name = $name
+        description = $description.Substring(0, [Math]::Min(280, $description.Length))
+        keywords = @($name -split "[-_\s]+")
+        path = $file.FullName
+        source = "project"
+        rank = 0
+      })
+    }
+  }
+  return @($entries)
+}
+
+function Get-AliasRules {
+  param([string]$CodexHome)
+  $rulesPath = Join-Path $CodexHome "skill-registry\routing-rules.json"
+  if (-not (Test-Path -LiteralPath $rulesPath -PathType Leaf)) { return @{} }
+  $raw = [IO.File]::ReadAllText($rulesPath, $utf8)
+  $document = $raw | ConvertFrom-Json
+  $rules = @{}
+  foreach ($property in $document.PSObject.Properties) {
+    $rules[$property.Name.ToLowerInvariant()] = @($property.Value | ForEach-Object { ([string]$_).ToLowerInvariant() })
+  }
+  return $rules
+}
+
+function Get-PreferredSkills {
+  param([object[]]$Skills)
+  $preferred = [Collections.Generic.List[object]]::new()
+  foreach ($group in ($Skills | Group-Object { ([string]$_.name).ToLowerInvariant() })) {
+    $preferred.Add(($group.Group | Sort-Object @{Expression={ [int]($_.rank) }; Ascending=$true}, @{Expression={ [int]($_.path.Length) }; Ascending=$true} | Select-Object -First 1))
+  }
+  return @($preferred)
+}
+
+function Get-Score {
+  param([object]$Skill, [string[]]$Tokens, [string]$Query, [hashtable]$Aliases)
+  $name = ([string]$Skill.name).ToLowerInvariant()
+  $haystack = (([string]$Skill.name) + " " + ([string]$Skill.description) + " " + ((@($Skill.keywords) -join " "))).ToLowerInvariant()
+  $score = 0
+  $matches = [Collections.Generic.List[string]]::new()
+  foreach ($token in $Tokens) {
+    if ($haystack.Contains($token)) {
+      $score += if ($token.Length -ge 4) { 3 } else { 1 }
+      if ($matches.Count -lt 3) { $matches.Add($token) }
+    }
+  }
+  if ($Query.Contains($name)) { $score += 24; $matches.Add("exact name") }
+  if ($Aliases.ContainsKey($name)) {
+    foreach ($alias in $Aliases[$name]) {
+      if ($Query.Contains($alias.ToLowerInvariant())) {
+        $score += 12
+        if ($matches.Count -lt 3) { $matches.Add($alias) }
+      }
+    }
+  }
+  return [pscustomobject]@{ Skill = $Skill; Score = $score; Matches = @($matches | Select-Object -Unique | Select-Object -First 3) }
+}
+
+try {
+  $inputText = [Console]::In.ReadToEnd()
+  if (-not $inputText) { Write-EmptyResult }
+  $hookInput = $inputText | ConvertFrom-Json
+  if ([string]$hookInput.hook_event_name -ne "UserPromptSubmit") { Write-EmptyResult }
+  $prompt = @([string]$hookInput.prompt, [string]$hookInput.user_prompt, [string]$hookInput.message, [string]$hookInput.text) | Where-Object { $_ } | Select-Object -First 1
+  if (-not $prompt) { Write-EmptyResult }
+
+  $codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE ".codex" }
+  $registryPath = Join-Path $codexHome "skill-registry\skills-index.json"
+  if (-not (Test-Path -LiteralPath $registryPath -PathType Leaf)) { Write-EmptyResult }
+  $registry = ([IO.File]::ReadAllText($registryPath, $utf8)) | ConvertFrom-Json
+  $skills = @($registry.skills)
+  $query = ([string]$prompt).ToLowerInvariant()
+  $rcaPath = @(
+    (Join-Path $codexHome "skills\root-cause-analysis\SKILL.md"),
+    (Join-Path $env:USERPROFILE ".agents\skills\root-cause-analysis\SKILL.md"),
+    "D:\Codex\desktop\skills\root-cause-analysis\SKILL.md"
+  ) | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+  $rcaIntent = $query -match "根因分析|为什么失败|第一处分歧|实验效果不好|结果异常|反复失败|跑不通|root[ -]cause|why\s+(?:did\s+it\s+)?fail|unexpected failure"
+  if ($rcaPath -and $rcaIntent) {
+    $skills += [pscustomobject]@{
+      id = "automatic:root-cause-analysis"
+      name = "root-cause-analysis"
+      description = "Evidence-first RCA for unexpected Agent, tool, test, build, and experiment failures; confirm only with a unique passing minimal replay."
+      keywords = @("root", "cause", "failure", "diagnosis", "根因", "失败", "分歧")
+      path = $rcaPath
+      source = "automatic"
+      rank = -10
+    }
+  }
+  $skills = Get-PreferredSkills -Skills $skills
+  if (-not $skills.Count) { Write-EmptyResult }
+
+  $aliases = Get-AliasRules -CodexHome $codexHome
+  $stopTokens = @($aliases["_stopTokens"])
+  $aliases.Remove("_stopTokens")
+  $tokens = Get-QueryTokens -Text $query -StopTokens $stopTokens
+  $scored = @($skills | ForEach-Object { Get-Score -Skill $_ -Tokens $tokens -Query $query -Aliases $aliases } | Where-Object { $_.Score -gt 0 } | Sort-Object -Property @{Expression="Score";Descending=$true}, @{Expression={ [string]$_.Skill.name };Ascending=$true})
+  if (-not $scored.Count) { Write-EmptyResult }
+  $topScore = [int]$scored[0].Score
+  if ($topScore -lt 6) { Write-EmptyResult }
+  $minimum = [Math]::Max(6, [Math]::Floor($topScore * 0.45))
+  $selected = @($scored | Where-Object { $_.Score -ge $minimum } | Select-Object -First 4)
+  if (-not $selected.Count) { Write-EmptyResult }
+
+  $lines = [Collections.Generic.List[string]]::new()
+  $lines.Add("[CODEX_SKILL_ROUTER_V1]")
+  $lines.Add("Assistive routing only: read a full SKILL.md only when it directly applies to the latest request; do not load the whole Skill catalog.")
+  $lines.Add("Candidates:")
+  foreach ($item in $selected) {
+    $skill = $item.Skill
+    $reason = if (@($item.Matches).Count) { (@($item.Matches) -join ", ") } else { "description match" }
+    $description = (([string]$skill.description) -replace "\s+", " ").Trim()
+    $lines.Add("- $($skill.name) [score=$($item.Score); match=$reason]")
+    $lines.Add("  $description")
+    $lines.Add("  Read: $($skill.path)")
+  }
+  $lines.Add("If none is genuinely relevant, ignore this list and continue without a specialized Skill.")
+
+  $payload = [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = "UserPromptSubmit"; additionalContext = ($lines -join "`n") } }
+  [Console]::Out.Write(($payload | ConvertTo-Json -Depth 6 -Compress))
+  exit 0
+} catch {
+  [Console]::Error.WriteLine("Skill router skipped: $($_.Exception.Message)")
+  Write-EmptyResult
+}

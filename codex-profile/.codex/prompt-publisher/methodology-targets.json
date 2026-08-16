@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "displayName": "全局方法论",
+  "sourceFile": "../prompts/global-methodology-source.zh.md",
+  "sourceBackupDirectory": "../prompts/backups/methodology-source",
+  "publisherScript": "publish-methodology.mjs",
+  "stateFile": "methodology-state.json",
+  "translationCacheFile": "methodology-translation-cache.en.md",
+  "schemaFile": "translation.schema.json",
+  "model": "",
+  "translationTimeoutMs": 600000,
+  "translationAttempts": 3,
+  "translationRetryDelayMs": 2000,
+  "contextLimit": 8000,
+  "contextReserve": 500,
+  "validatorFile": "../hooks/validate-methodology-routing.ps1",
+  "refreshRegistryFile": "../hooks/refresh-skill-registry.ps1",
+  "outputs": {
+    "fullChinese": "../prompts/global-every-turn.zh.md",
+    "fullEnglish": "../prompts/global-every-turn.en.md",
+    "anchorChinese": "../prompts/global-attention-anchor.zh.md",
+    "anchorEnglish": "../prompts/global-attention-anchor.en.md",
+    "routerChinese": "../prompts/global-methodology-router.zh.md",
+    "routerEnglish": "../prompts/global-methodology-router.en.md",
+    "chineseReview": "../prompts/global-methodology-routing-review.zh.md",
+    "map": "../prompts/global-methodology-map.json"
+  },
+  "routes": [
+    {
+      "id": "alwaysOn",
+      "titleZh": "每轮常驻提醒",
+      "titleEn": "Always-on reminders"
+    },
+    {
+      "id": "method-research-evidence",
+      "titleZh": "研究与论文证据方法",
+      "titleEn": "Research evidence method",
+      "skillFile": "../../.agents/skills/method-research-evidence/SKILL.md"
+    },
+    {
+      "id": "method-engineering-execution",
+      "titleZh": "工程实现方法",
+      "titleEn": "Engineering execution method",
+      "skillFile": "../../.agents/skills/method-engineering-execution/SKILL.md"
+    },
+    {
+      "id": "method-evaluation-gates",
+      "titleZh": "评价与门禁方法",
+      "titleEn": "Evaluation gates method",
+      "skillFile": "../../.agents/skills/method-evaluation-gates/SKILL.md"
+    },
+    {
+      "id": "method-github-delivery",
+      "titleZh": "GitHub交付方法",
+      "titleEn": "GitHub delivery method",
+      "skillFile": "../../.agents/skills/method-github-delivery/SKILL.md"
+    },
+    {
+      "id": "method-task-tree",
+      "titleZh": "任务树方法",
+      "titleEn": "Task tree method",
+      "skillFile": "../../.agents/skills/method-task-tree/SKILL.md"
+    }
+  ]
+}
