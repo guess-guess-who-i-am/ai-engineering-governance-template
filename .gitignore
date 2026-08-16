@@ -30,6 +30,7 @@ Thumbs.db
 .task-tree-runs/
 llm-task-tree/widget-report.json
 llm-task-tree/api-bridge-log.txt
+llm-task-tree/https-log.txt
 model-agents.json
 model-agent-history.json
 model-agents/
