@@ -332,12 +332,12 @@ foreach ($gate in $quality.gates) {
 $quality | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $qualityPath -Encoding utf8
 
 Invoke-CheckedCommand 'git' @('-C', $destinationPath, 'init', '-b', 'main') 'Could not initialize Git'
+Invoke-CheckedCommand 'git' @('-C', $destinationPath, 'add', '--all') 'Could not stage generated files for validation'
 & (Join-Path $destinationPath 'scripts/check.ps1') -Root $destinationPath
 if ($LASTEXITCODE -ne 0) {
     throw 'Generated project failed repository checks.'
 }
 
-Invoke-CheckedCommand 'git' @('-C', $destinationPath, 'add', '--all') 'Could not stage generated files'
 Invoke-CheckedCommand 'git' @('-C', $destinationPath, 'commit', '-m', 'chore: initialize project') 'Could not create the initial commit'
 
 if (-not $CreateGitHub -and -not $NonInteractive) {
