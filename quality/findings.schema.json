@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/guess-guess-who-i-am/ai-engineering-governance-template/quality/findings.schema.json",
+  "title": "Quality findings",
+  "type": "object",
+  "required": ["schema", "updated_at", "findings"],
+  "properties": {
+    "schema": { "const": "quality-findings/v1" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id", "fingerprint", "priority", "category", "gate_id", "title",
+          "evidence", "remediation", "owner", "first_seen", "last_seen", "status"
+        ],
+        "properties": {
+          "id": { "type": "string", "pattern": "^F-[A-F0-9]{12}$" },
+          "fingerprint": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "priority": { "enum": ["P0", "P1", "P2", "P3"] },
+          "category": { "type": "string", "minLength": 1 },
+          "gate_id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+          "user_story": { "type": "string", "pattern": "^US-[0-9]{3}$" },
+          "acceptance_criteria": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^AC-[0-9]{3}$" }
+          },
+          "title": { "type": "string", "minLength": 1 },
+          "evidence": { "type": "string", "minLength": 1 },
+          "remediation": { "type": "string", "minLength": 1 },
+          "owner": { "type": "string", "minLength": 1 },
+          "first_seen": { "type": "string", "format": "date-time" },
+          "last_seen": { "type": "string", "format": "date-time" },
+          "status": { "enum": ["open", "in_progress", "resolved", "testing", "closed", "reopened"] },
+          "issue_url": { "type": "string", "pattern": "^https://github\\.com/[^/]+/[^/]+/issues/[0-9]+$" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

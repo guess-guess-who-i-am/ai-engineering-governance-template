@@ -27,3 +27,12 @@
 ## Risk
 
 说明剩余风险、不可逆影响、未验证环境或后续动作。
+
+## Findings
+
+- P0/P1 open findings: none / links
+- Accepted P2/P3 follow-up: priority + owner + Issue URL
+
+## Rollout / rollback
+
+涉及部署、数据、公共契约或不可逆状态时，写明启用顺序、观察信号和回滚边界；不适用时说明原因。

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Start New Project"
-  short_description: "Guide a brief and bootstrap a private project repo"
-  default_prompt: "Use $start-new-project to turn my idea into a project brief and initialize a private repository."
+  display_name: "启动新项目"
+  short_description: "逐项冻结项目简报并初始化独立、可治理且默认私有的代码仓库"
+  default_prompt: "使用 $start-new-project 把我的想法整理成项目简报并初始化独立仓库。"

@@ -1,4 +1,4 @@
 interface:
   display_name: "建立测试体系"
   short_description: "把用户故事映射到完整分层、可执行的测试与 CI 证据"
-  default_prompt: "Use $establish-test-strategy to build a complete, risk-based test system for this project."
+  default_prompt: "使用 $establish-test-strategy 为这个项目建立基于风险的完整测试与 CI 证据体系。"

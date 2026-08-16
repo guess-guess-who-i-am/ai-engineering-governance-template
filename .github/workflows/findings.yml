@@ -1,0 +1,57 @@
+name: findings
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_issues:
+        description: Create or update GitHub Issues for open P0-P2 findings
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: findings-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+      - name: Run release profile
+        id: quality
+        continue-on-error: true
+        shell: pwsh
+        run: ./scripts/invoke-quality-gates.ps1 -Profile release
+      - name: Collect findings
+        if: ${{ always() }}
+        shell: pwsh
+        run: ./scripts/collect-findings.ps1
+      - name: Synchronize selected findings
+        if: ${{ always() && inputs.create_issues }}
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./scripts/sync-findings-to-github.ps1 -Apply -Repository '${{ github.repository }}'
+      - name: Upload findings evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: findings-${{ github.sha }}
+          path: |
+            .reports/quality/release.json
+            .reports/findings*.json
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve gate result
+        if: ${{ steps.quality.outcome == 'failure' }}
+        shell: pwsh
+        run: throw 'Release quality profile failed; findings evidence was preserved.'

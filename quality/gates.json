@@ -24,6 +24,9 @@
       "id": "governance-structure",
       "category": "governance",
       "state": "active",
+      "failurePriority": "P1",
+      "owner": "governance-maintainers",
+      "remediation": "Restore the required governance structure and authority routing, then rerun the gate.",
       "profiles": ["pr", "release"],
       "workingDirectory": ".",
       "command": {
@@ -35,17 +38,121 @@
       "id": "skill-packages",
       "category": "governance",
       "state": "active",
+      "failurePriority": "P1",
+      "owner": "governance-maintainers",
+      "remediation": "Repair the reported Skill package or metadata contract and rerun Skill validation.",
       "profiles": ["pr", "release"],
       "workingDirectory": ".",
       "command": {
         "executable": "pwsh",
-        "arguments": ["-NoProfile", "-File", "scripts/validate-skills.ps1"]
+        "arguments": ["-NoProfile", "-File", "scripts/test-skill-validation.ps1"]
+      }
+    },
+    {
+      "id": "findings-contract",
+      "category": "governance",
+      "state": "active",
+      "failurePriority": "P1",
+      "owner": "governance-maintainers",
+      "remediation": "Repair the Finding schema, deduplication, priority, or lifecycle behavior and rerun its contract test.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/test-findings.ps1"]
+      }
+    },
+    {
+      "id": "quality-runner-contract",
+      "category": "governance",
+      "state": "active",
+      "failurePriority": "P1",
+      "owner": "governance-maintainers",
+      "remediation": "Restore all-gate execution, aggregate failure reporting, and per-gate Finding preservation.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/test-quality-gate-runner.ps1"]
+      }
+    },
+    {
+      "id": "design-reference-catalog",
+      "category": "functional",
+      "state": "active",
+      "failurePriority": "P2",
+      "owner": "design-maintainers",
+      "remediation": "Repair catalog completeness, search, install safety, or provenance and rerun the design-reference test.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/test-design-references.ps1"]
+      }
+    },
+    {
+      "id": "kest-flow-contract",
+      "category": "e2e",
+      "state": "active",
+      "failurePriority": "P2",
+      "owner": "test-maintainers",
+      "remediation": "Restore the Kest step, capture, assertion, edge, HTTPS, and report configuration contract.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/test-kest-flow-contract.ps1"]
+      }
+    },
+    {
+      "id": "document-integrity",
+      "category": "governance",
+      "state": "active",
+      "failurePriority": "P2",
+      "owner": "documentation-maintainers",
+      "remediation": "Repair invalid encoding, malformed JSON, terminology drift, or broken tracked links.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/validate-documents.ps1"]
+      }
+    },
+    {
+      "id": "release-contract",
+      "category": "governance",
+      "state": "active",
+      "failurePriority": "P1",
+      "owner": "release-maintainers",
+      "remediation": "Align VERSION, package metadata, changelog, tag policy, and release workflow before publishing.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/test-release-contract.ps1"]
+      }
+    },
+    {
+      "id": "upstream-drift",
+      "category": "dependency-security",
+      "state": "active",
+      "failurePriority": "P2",
+      "owner": "governance-maintainers",
+      "remediation": "Review the upstream comparison, license and adopted behavior, then deliberately update the pinned commit or document the hold.",
+      "profiles": ["nightly"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/check-upstream-drift.ps1", "-FailOnDrift"]
       }
     },
     {
       "id": "story-traceability",
       "category": "requirements",
       "state": "active",
+      "failurePriority": "P1",
+      "owner": "product-maintainers",
+      "remediation": "Restore stable user-story acceptance criteria and map each verified criterion to existing evidence.",
       "profiles": ["pr", "release"],
       "workingDirectory": ".",
       "command": {
@@ -57,6 +164,11 @@
       "id": "template-bootstrap",
       "category": "functional",
       "state": "active",
+      "failurePriority": "P1",
+      "owner": "template-maintainers",
+      "remediation": "Repair the generated-project journey and its failure semantics, then rerun the bootstrap test.",
+      "userStory": "US-001",
+      "acceptanceCriteria": ["AC-001", "AC-002"],
       "profiles": ["pr", "release"],
       "workingDirectory": ".",
       "command": {
@@ -68,6 +180,9 @@
       "id": "security-baseline",
       "category": "security",
       "state": "active",
+      "failurePriority": "P0",
+      "owner": "security-maintainers",
+      "remediation": "Remove the exposed secret or unsafe workflow condition before any merge or release.",
       "profiles": ["pr", "release", "nightly"],
       "workingDirectory": ".",
       "command": {
@@ -85,6 +200,9 @@
       "id": "llm-qualitative",
       "category": "qualitative",
       "state": "active",
+      "failurePriority": "P2",
+      "owner": "design-maintainers",
+      "remediation": "Review the cited qualitative evidence, correct the target artifact or calibration, and rerun the model gate.",
       "profiles": ["qualitative"],
       "workingDirectory": ".",
       "command": {
@@ -96,6 +214,11 @@
       "id": "qualitative-adapter-contract",
       "category": "qualitative",
       "state": "active",
+      "failurePriority": "P1",
+      "owner": "platform-maintainers",
+      "remediation": "Restore the Responses API request, strict output contract, credential guard, or calibration behavior.",
+      "userStory": "US-002",
+      "acceptanceCriteria": ["AC-001", "AC-002", "AC-003"],
       "profiles": ["pr", "release"],
       "workingDirectory": ".",
       "command": {
@@ -122,28 +245,46 @@
       "rationale": "The template does not publish an HTTP, event, database, or package contract."
     },
     {
-      "id": "product-e2e",
-      "category": "e2e",
-      "state": "not-applicable",
-      "rationale": "The template has no deployed product journey; its own bootstrap journey is covered by template-bootstrap."
-    },
-    {
       "id": "accessibility-tests",
       "category": "accessibility",
-      "state": "not-applicable",
-      "rationale": "The template does not ship a user interface."
+      "state": "active",
+      "failurePriority": "P1",
+      "owner": "design-maintainers",
+      "remediation": "Restore semantic structure, focus behavior, responsive rules, reduced motion, and automated accessibility evidence.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/test-docs-site.ps1"]
+      }
     },
     {
       "id": "performance-regression",
       "category": "performance",
-      "state": "not-applicable",
-      "rationale": "The template has no runtime SLO, bundle, hot path, or load-bearing endpoint to measure."
+      "state": "active",
+      "failurePriority": "P2",
+      "owner": "design-maintainers",
+      "remediation": "Reduce documentation assets or explicitly review and revise the measured budget with comparable evidence.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/validate-site-performance.ps1"]
+      }
     },
     {
       "id": "dependency-vulnerability-scan",
       "category": "dependency-security",
-      "state": "not-applicable",
-      "rationale": "The committed template has no package-manager lockfile. GitHub Actions dependencies are governed as immutable workflow inputs."
+      "state": "active",
+      "failurePriority": "P0",
+      "owner": "security-maintainers",
+      "remediation": "Upgrade or remove vulnerable locked dependencies and preserve the browser evidence contract.",
+      "profiles": ["release", "nightly"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "npm",
+        "arguments": ["audit", "--package-lock-only", "--audit-level=high"]
+      }
     },
     {
       "id": "container-supply-chain",
@@ -160,8 +301,16 @@
     {
       "id": "deployment-smoke",
       "category": "deployment",
-      "state": "not-applicable",
-      "rationale": "The template has no deployment target."
+      "state": "active",
+      "failurePriority": "P1",
+      "owner": "release-maintainers",
+      "remediation": "Restore the GitHub Pages build, environment URL, deployment action, and live post-deploy content smoke.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/validate-pages-deployment.ps1"]
+      }
     },
     {
       "id": "research-data-quality",

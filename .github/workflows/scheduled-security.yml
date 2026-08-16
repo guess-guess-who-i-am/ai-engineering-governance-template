@@ -32,3 +32,13 @@ jobs:
           path: .reports/quality/nightly.json
           if-no-files-found: error
           retention-days: 14
+      - name: Upload dependency and upstream evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: nightly-supply-chain-${{ github.sha }}
+          path: |
+            .reports/upstream-drift.json
+            package-lock.json
+          if-no-files-found: error
+          retention-days: 30

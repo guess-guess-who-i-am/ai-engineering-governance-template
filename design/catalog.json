@@ -1,0 +1,1072 @@
+{
+  "schema": "design-reference-catalog/v1",
+  "generated_at": "2026-07-31T15:32:38+03:00",
+  "source": {
+    "repository": "https://github.com/VoltAgent/awesome-design-md",
+    "commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+    "license": "MIT",
+    "entry_count": 74
+  },
+  "entries": [
+    {
+      "id": "airbnb",
+      "title": "Airbnb",
+      "category": "ecommerce-retail",
+      "description": "A warm, generous consumer marketplace anchored on a clean white canvas and Airbnb Rausch (#ff385c), the single brand voltage that carries every primary CTA, search-button orb, and rating dot. Type runs Airbnb Cereal VF at modest weights — display sits at 22–28px in weight 500/600 rather than the heavy 700+ that fintech and enterprise systems use; the brand trusts photography and generous whitespace over typographic muscle. Three product entries (Homes, Experiences, Services) sit in the top nav with hand-illustrated 32-icon glyphs and \"NEW\" badges, signaling a marketplace expansion rather than a feature dump. Pill-shaped search bars (`{rounded.full}`), softly rounded property cards (`{rounded.lg}` ~14px), and 32px button radii read as friendly and human — there is no hard corner anywhere except the body grid.",
+      "source_url": "https://getdesign.md/airbnb/design-md",
+      "source_path": "design-md/airbnb/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ecommerce-retail",
+        "airbnb"
+      ]
+    },
+    {
+      "id": "airtable",
+      "title": "Airtable",
+      "category": "design-creative",
+      "description": "A sober, editorial workflow-software interface anchored on white canvas and dark-ink type, where brand voltage comes from full-bleed signature cards in coral, dark green, peach, and dark navy that punctuate long-scroll explainer pages. Primary actions use a near-black pill CTA; secondary actions sit in a white outlined button. Type runs Haas Grotesk in modest weights — never bold for its own sake.",
+      "source_url": "https://getdesign.md/airtable/design-md",
+      "source_path": "design-md/airtable/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "design-creative",
+        "airtable"
+      ]
+    },
+    {
+      "id": "apple",
+      "title": "Apple",
+      "category": "media-consumer",
+      "description": "A photography-first interface that turns marketing into a museum gallery. Edge-to-edge product tiles alternate light and dark canvases, framed by SF Pro Display headlines with negative letter-spacing and a single Action Blue (#0066cc) interactive color. UI chrome recedes so the product can speak — no decorative gradients, no shadows on chrome, only the one signature drop-shadow under product imagery resting on a surface.",
+      "source_url": "https://getdesign.md/apple/design-md",
+      "source_path": "design-md/apple/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "apple"
+      ]
+    },
+    {
+      "id": "binance",
+      "title": "Binance",
+      "category": "fintech-crypto",
+      "description": "A confident financial-platform interface anchored on a deep near-black canvas, where Binance's iconic yellow (#FCD535) carries every primary CTA, brand accent, and value-claim moment. Type runs Binance's custom BinanceNova / BinancePlex stack at modest weights — the system trusts size and yellow voltage over bold weight. Marketing and product surfaces default to the dark theme; transactional surfaces (buy crypto, deposit, exchange) flip to a light theme that shares the same yellow CTAs and gray-blue hairlines. Trading green (up) and red (down) accents thread through both modes for price-direction signals.",
+      "source_url": "https://getdesign.md/binance/design-md",
+      "source_path": "design-md/binance/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "fintech-crypto",
+        "binance"
+      ]
+    },
+    {
+      "id": "bmw",
+      "title": "BMW",
+      "category": "automotive",
+      "description": "BMW's corporate site — distinct from BMW M's motorsport-bombastic variant, this is a measured and settled corporate-automotive interface. On a light (cream-tinted white) canvas, BMW corporate blue (#1c69d4) carries every primary CTA; dark navy hero bands frame model photography. BMW Type Next Latin sets the entire hierarchy on two weights — heavy 700 display and Light 300 body. Configuration and reservation flows ride a card-based 4-up grid, where each card holds a model render, a name, and a \"Learn More\" link.",
+      "source_url": "https://getdesign.md/bmw/design-md",
+      "source_path": "design-md/bmw/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "automotive",
+        "bmw"
+      ]
+    },
+    {
+      "id": "bmw-m",
+      "title": "BMW M",
+      "category": "automotive",
+      "description": "A motorsport-engineering interface anchored on a near-black canvas with white BMW Type Next Latin display headlines in confident UPPERCASE. The brand carries no decorative voltage — its energy comes from full-bleed automotive photography (cars on tracks, driver-cockpit shots, carbon-fiber detail) and the iconic M tricolor stripe (light blue → dark blue → red) used sparingly as a brand signature on logos, dividers, and motorsport chrome. Type stays light to medium weight to feel European-engineered, never American-bombastic.",
+      "source_url": "https://getdesign.md/bmw-m/design-md",
+      "source_path": "design-md/bmw-m/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "automotive",
+        "bmw-m"
+      ]
+    },
+    {
+      "id": "bugatti",
+      "title": "Bugatti",
+      "category": "automotive",
+      "description": "An austere luxury-automotive interface that uses near-pure black canvas, white uppercase letterspaced display, and full-bleed automotive photography as the only voltage. The system runs three custom Bugatti typefaces — Bugatti Display, Bugatti Text Regular, and Bugatti Monospace — and combines them at modest weights with wide tracking to feel European-engineered, hyper-minimal, and quietly expensive. There is no accent color, no decorative element, no chrome — only photography, typography, and the brand wordmark.",
+      "source_url": "https://getdesign.md/bugatti/design-md",
+      "source_path": "design-md/bugatti/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "automotive",
+        "bugatti"
+      ]
+    },
+    {
+      "id": "cal",
+      "title": "Cal.com",
+      "category": "productivity-saas",
+      "description": "A clean, calendar-software-first interface anchored on white canvas with black primary CTAs and custom Cal Sans display typography. The system reads as friendly modern SaaS — generous whitespace, soft-rounded cards (~12px), product UI fragments shown directly inside cards, and a dark navy footer that visually closes long-scroll pages. Brand voltage comes from the Cal Sans display headline (a custom geometric face) and from product UI artifacts shown in-card rather than from accent colors.",
+      "source_url": "https://getdesign.md/cal/design-md",
+      "source_path": "design-md/cal/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "productivity-saas",
+        "cal",
+        "cal.com"
+      ]
+    },
+    {
+      "id": "claude",
+      "title": "Claude",
+      "category": "ai-llm",
+      "description": "A warm-canvas editorial interface for Anthropic's Claude product. The system anchors on a tinted cream canvas with serif display headlines, warm coral CTAs, and dark navy product surfaces (code editor mockups, model showcase cards). Brand voltage comes from the cream/coral pairing — deliberately warm and humanist where most AI brands use cool blue + slate. Type voice runs a slab-serif display (\"Copernicus\" / Tiempos Headline) for h1/h2 and a humanist sans for body. The signature Anthropic black-radial-spike mark anchors the wordmark.",
+      "source_url": "https://getdesign.md/claude/design-md",
+      "source_path": "design-md/claude/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "claude"
+      ]
+    },
+    {
+      "id": "clay",
+      "title": "Clay",
+      "category": "design-creative",
+      "description": "A vibrant claymation-meets-data interface for Clay.com (GTM data-orchestration platform). Anchors on white canvas with dark-navy primary CTAs, custom rounded display type, and saturated single-color feature cards — hot pink, deep teal, lavender, peach, ochre — that punctuate long-scroll explainer pages. Brand voltage comes from 3D-rendered claymation illustrations (mountains, characters, mascots) used as full-bleed hero artifacts and the bright multi-color card surfaces showing product UI fragments.",
+      "source_url": "https://getdesign.md/clay/design-md",
+      "source_path": "design-md/clay/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "design-creative",
+        "clay"
+      ]
+    },
+    {
+      "id": "clickhouse",
+      "title": "ClickHouse",
+      "category": "backend-devops",
+      "description": "A high-performance database interface anchored on near-pure black canvas with electric yellow as the brand voltage. White typography in confident sans, yellow CTAs, and yellow-text stat numbers carry the brand voice across every page. Code blocks and product UI fragments embed directly in dark cards. The yellow + black pairing (and yellow used scarcely as accent) is the system's signature — brand identity without atmospheric decoration.",
+      "source_url": "https://getdesign.md/clickhouse/design-md",
+      "source_path": "design-md/clickhouse/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "backend-devops",
+        "clickhouse"
+      ]
+    },
+    {
+      "id": "cohere",
+      "title": "Cohere",
+      "category": "ai-llm",
+      "description": "Cohere's 2026 web system is a controlled enterprise AI interface built from stark white editorial space, deep green-black product bands, soft mineral surfaces, rounded media cards, and a distinctive type split between monospaced-feeling display headlines and precise Unica77 UI text.",
+      "source_url": "https://getdesign.md/cohere/design-md",
+      "source_path": "design-md/cohere/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "cohere"
+      ]
+    },
+    {
+      "id": "coinbase",
+      "title": "Coinbase",
+      "category": "fintech-crypto",
+      "description": "An institutional-grade crypto exchange whose marketing surfaces read like a quietly-confident financial-services brand. The base canvas is pure white; Coinbase Blue (`#0052ff`) is the single brand voltage, used scarcely on primary CTAs, signature glyphs, and inline accent moments. Type runs Coinbase's licensed CoinbaseDisplay (display) and CoinbaseSans (body) at modest weights — display sits at weight 400 not 700, signaling editorial calm rather than fintech-bombastic. Page rhythm rotates between bright white sections, soft gray elevation bands, and full-bleed dark editorial heroes (`#0a0b0d`) carrying product-ui mockup cards. Iconography is geometric and minimal; depth comes from card-on-card layering, never decorative shadows.",
+      "source_url": "https://getdesign.md/coinbase/design-md",
+      "source_path": "design-md/coinbase/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "fintech-crypto",
+        "coinbase"
+      ]
+    },
+    {
+      "id": "composio",
+      "title": "Composio",
+      "category": "backend-devops",
+      "description": "A developer-tools brand for AI-agent tool integration whose marketing surfaces lean into a dark, technical aesthetic with a single deep-electric-blue voltage (`#0007cd`). The page floor is near-black (`#0f0f0f`); cards float above on subtle gray-tinted surfaces. abcDiatype carries display and body in a single sans family with weights 400-600. The brand's strongest visual signature is a four-pane terminal-style mockup (a 2×2 grid of dark code/output panels) with a central blue spotlight glow — used as the homepage hero anchor.",
+      "source_url": "https://getdesign.md/composio/design-md",
+      "source_path": "design-md/composio/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "backend-devops",
+        "composio"
+      ]
+    },
+    {
+      "id": "cursor",
+      "title": "Cursor",
+      "category": "developer-tools",
+      "description": "An AI-first code editor whose marketing site reads like a quietly-confident developer-tools brand with a warm-cream editorial canvas (`#f7f7f4`) instead of the typical dark IDE atmosphere. Near-black warm ink (`#26251e`) carries body and display alike — display sits at weight 400 with negative letter-spacing for a magazine feel rather than a bold tech voice. The single brand voltage is **Cursor Orange** (`#f54e00`) reserved for primary CTAs and the wordmark. A signature pastel timeline palette (peach, mint, blue, lavender, gold) marks AI-action stages (Thinking / Reading / Editing / Grepping / Done) — only inside in-product timeline visualizations. Cards use minimal hairlines, no shadows, generous 80px section rhythm. CursorGothic for display/body, JetBrains Mono on every code surface (which is roughly half the page).",
+      "source_url": "https://getdesign.md/cursor/design-md",
+      "source_path": "design-md/cursor/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "developer-tools",
+        "cursor"
+      ]
+    },
+    {
+      "id": "dell-1996",
+      "title": "Dell 1996 Inspired",
+      "category": "retro-web",
+      "description": "An inspired interpretation of Dell.com's 1996 design language — a catalog-era enterprise web design built around a literal black page frame, vivid flat color-block \"ribbon cards\" tinted in sage, salmon, periwinkle, sky, peach and lime, chunky Helvetica-Black display titles, Times Roman body copy, and an entire visual vocabulary of pre-Photoshop hand-cut GIF stickers (NEW! bursts, award seals, beveled product photos).",
+      "source_url": "https://getdesign.md/dell-1996/design-md",
+      "source_path": "design-md/dell-1996/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "retro-web",
+        "dell-1996",
+        "dell-1996-inspired"
+      ]
+    },
+    {
+      "id": "elevenlabs",
+      "title": "ElevenLabs",
+      "category": "ai-llm",
+      "description": "A voice-AI brand whose marketing surfaces read like a quietly editorial print magazine. The base canvas is off-white (`#f5f5f5`) holding warm near-black ink (`#292524`); the brand voltage is photographic, not chromatic — soft pastel atmospheric gradient orbs (mint → peach → lavender → sky) drift through the page as the only \"color\" moments. Display runs Waldenburg Light at weight 300 — the editorial signature. Inter carries body, navigation, captions. CTAs are subtle: a near-black ink pill is the primary, a transparent outline is the secondary. The brand trusts atmospheric photography and modest type weights to do all of the brand work; there is no neon accent, no saturated CTA color, no developer-tools dark canvas.",
+      "source_url": "https://getdesign.md/elevenlabs/design-md",
+      "source_path": "design-md/elevenlabs/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "elevenlabs"
+      ]
+    },
+    {
+      "id": "expo",
+      "title": "Expo",
+      "category": "developer-tools",
+      "description": "A React Native developer-platform whose marketing site reads like a quietly-confident infrastructure brand. The base canvas is pure white with a soft sky-blue gradient atmospheric wash behind the hero; near-black ink (`#171717`) carries body and display alike. The single brand voltage is **pure black** (`#000000`) for primary CTAs — minimal and editorial-feeling, paired with a small blue text-link accent (`#0d74ce`) reserved for inline body links. Type pairs Inter at modest weights (display 600, body 400) with JetBrains Mono on every code surface. The brand's strongest visual signature is the **device-mockup hero** — a centered MacBook + iPhone composite showing real Expo dev surfaces — over the gradient sky wash.",
+      "source_url": "https://getdesign.md/expo/design-md",
+      "source_path": "design-md/expo/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "developer-tools",
+        "expo"
+      ]
+    },
+    {
+      "id": "ferrari",
+      "title": "Ferrari",
+      "category": "automotive",
+      "description": "A luxury-automotive brand whose marketing surfaces read as cinematic editorial. The base canvas is **near-black** (`#181818`) holding pure white display type; white-canvas bands appear only inside specific editorial contexts (preowned listings, pricing tables). The single brand voltage is **Rosso Corsa** (`#da291c`) — the iconic Ferrari racing red — used scarcely on primary CTAs, the Cavallino mark, and Formula 1 race-position highlights. Type runs **FerrariSans** at modest weights (display 500, body 400) — never bombastic. Spacing follows an explicit 8px token ladder (`xxxs` 4px through `super` 128px); generous editorial pacing throughout. The brand's strongest visual signature is the **full-bleed cinematic hero photograph** that fills the viewport top with car photography, model details, or trackside livery — followed by a tighter editorial body layout below.",
+      "source_url": "https://getdesign.md/ferrari/design-md",
+      "source_path": "design-md/ferrari/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "automotive",
+        "ferrari"
+      ]
+    },
+    {
+      "id": "figma",
+      "title": "Figma",
+      "category": "design-creative",
+      "description": "\"A confident black-and-white editorial frame interrupted by oversized, hand-cut pastel color blocks. The marketing canvas is rigorously monochrome — figmaSans variable type, pure white surfaces, pure black ink, pill-shaped CTAs — while each story section drops the page into a saturated lime, lavender, cream, mint, or pink panel that reads like a sticky note placed on a clean desk. The result is a design system that feels both technical and joyful — a tool for serious work, made by people who like color.\"",
+      "source_url": "https://getdesign.md/figma/design-md",
+      "source_path": "design-md/figma/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "design-creative",
+        "figma"
+      ]
+    },
+    {
+      "id": "framer",
+      "title": "Framer",
+      "category": "design-creative",
+      "description": "\"A confident dark-canvas builder marketing site that treats the page like a working artboard — pure black surfaces, white display type set in GT Walsheim Medium with aggressive negative tracking, and a single confident blue (#0099ff) reserved for hyperlinks and selection states. The page rhythm is broken by oversized vibrant gradient atmosphere panels — magenta, violet, orange spotlights — that act as living showcase tiles, not decoration. Every CTA is a white pill on dark; every card is a translucent or charcoal surface; every section title pulls letter-spacing tight enough to feel like a poster.\"",
+      "source_url": "https://getdesign.md/framer/design-md",
+      "source_path": "design-md/framer/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "design-creative",
+        "framer"
+      ]
+    },
+    {
+      "id": "hashicorp",
+      "title": "HashiCorp",
+      "category": "backend-devops",
+      "description": "\"An enterprise-infrastructure marketing canvas built around a near-black ground (#000000) and a system of per-product accent colors — Terraform purple, Vault yellow, Consul pink, Waypoint cyan, Vagrant blue — that act as identity tokens rather than decorative palette. Display type is hashicorpSans set in 600/700 with tight 1.17–1.21 line-heights; body type runs the same family at 500 weight with relaxed 1.50–1.71 line-heights. Cards live as charcoal surfaces with 1px translucent gray borders; product showcase cards lift into per-product chromatic gradients. The system reads as confident, technical, and intentionally multi-product — every section quietly signals which HashiCorp tool it represents.\"",
+      "source_url": "https://getdesign.md/hashicorp/design-md",
+      "source_path": "design-md/hashicorp/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "backend-devops",
+        "hashicorp"
+      ]
+    },
+    {
+      "id": "hp",
+      "title": "HP",
+      "category": "media-consumer",
+      "description": "An inspired interpretation of HP's design language — a white-paper enterprise-consumer system anchored by HP Electric Blue (`#024ad8`) as the lone signal CTA, near-black ink (`#1a1a1a`) for headlines, geometric Forma-DJR sans throughout, and angular blue-chevron decorations that nod to the HP wordmark's slashes. Cards round at 8–16px, photos sit in soft 16px frames, and dark navy slabs anchor the customer-story and \"how can we help\" closing bands.",
+      "source_url": "https://getdesign.md/hp/design-md",
+      "source_path": "design-md/hp/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "hp"
+      ]
+    },
+    {
+      "id": "ibm",
+      "title": "IBM",
+      "category": "media-consumer",
+      "description": "\"An enterprise-marketing canvas faithful to Carbon Design System: white surfaces, charcoal type, IBM Blue (#0f62fe) as the single confident accent, and a deliberately flat-square aesthetic where corners stay at 0–4px. Type runs IBM Plex Sans at light weight 300 for display sizes (a brand signature) and 400/600 for body and emphasis. Cards live as thin-bordered tiles with no shadow; sections separate via subtle gray rows. The chrome is square, the typography is light, and the only color in the system is one assertive blue — the result reads as old-world enterprise gravitas reframed for the cloud era.\"",
+      "source_url": "https://getdesign.md/ibm/design-md",
+      "source_path": "design-md/ibm/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "ibm"
+      ]
+    },
+    {
+      "id": "intercom",
+      "title": "Intercom",
+      "category": "productivity-saas",
+      "description": "\"An editorial customer-service marketing canvas built around a soft cream-white ground, charcoal type set in Saans (Intercom's proprietary geometric sans), and a single confident Fin Orange (#ff5600) reserved for the Fin AI brand. Cards live as floating white tiles with thin hairline borders and minimal radii (8–16px). Display headlines run Saans at weight 500 with measured negative tracking. The system reads as a careful, product-led publication: product screenshots dominate, ornament is rare, and the only place chromatic energy enters is the Fin Orange CTA.\"",
+      "source_url": "https://getdesign.md/intercom/design-md",
+      "source_path": "design-md/intercom/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "productivity-saas",
+        "intercom"
+      ]
+    },
+    {
+      "id": "kraken",
+      "title": "kraken",
+      "category": "fintech-crypto",
+      "description": "Pinned design-system reference for kraken.",
+      "source_url": "https://getdesign.md/kraken/design-md",
+      "source_path": "design-md/kraken/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "fintech-crypto",
+        "kraken"
+      ]
+    },
+    {
+      "id": "lamborghini",
+      "title": "lamborghini",
+      "category": "automotive",
+      "description": "Pinned design-system reference for lamborghini.",
+      "source_url": "https://getdesign.md/lamborghini/design-md",
+      "source_path": "design-md/lamborghini/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "automotive",
+        "lamborghini"
+      ]
+    },
+    {
+      "id": "linear.app",
+      "title": "Linear",
+      "category": "productivity-saas",
+      "description": "\"A near-black product-focused marketing canvas built around #010102 (the deepest dark surface of any tool in this collection), light gray text (#f7f8f8), and the signature Linear lavender-blue (#5e6ad2) used as the single chromatic accent. The system reads as software-craft documentation: dense, technical, and quietly luxurious. Display type is set in the Linear custom sans (SF Pro Display fallback) at 500–700 with measured negative tracking. Cards live as charcoal panels (#0f1011) with hairline borders. The accent lavender appears on the brand mark, focus rings, and a few intentional CTAs — never decoratively. Page rhythm leans on product UI screenshots framed in dark panels rather than atmospheric color.\"",
+      "source_url": "https://getdesign.md/linear.app/design-md",
+      "source_path": "design-md/linear.app/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "productivity-saas",
+        "linear.app",
+        "linear"
+      ]
+    },
+    {
+      "id": "lovable",
+      "title": "lovable",
+      "category": "developer-tools",
+      "description": "Pinned design-system reference for lovable.",
+      "source_url": "https://getdesign.md/lovable/design-md",
+      "source_path": "design-md/lovable/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "developer-tools",
+        "lovable"
+      ]
+    },
+    {
+      "id": "mastercard",
+      "title": "mastercard",
+      "category": "fintech-crypto",
+      "description": "Pinned design-system reference for mastercard.",
+      "source_url": "https://getdesign.md/mastercard/design-md",
+      "source_path": "design-md/mastercard/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "fintech-crypto",
+        "mastercard"
+      ]
+    },
+    {
+      "id": "meta",
+      "title": "Meta",
+      "category": "ecommerce-retail",
+      "description": "Meta's design system spans hardware commerce (Quest VR, Ray-Ban Meta AI glasses) and brand surfaces with a confident product-merchandising voice. The system pairs a stark white canvas with full-bleed photographic product cards, a confident Optimistic VF wordmark/headline face, dual-CTA hero patterns (black primary + outlined secondary), and a saturated cobalt blue (#0064E0) for in-product purchase actions. Pill-shaped 100px-radius buttons, generous 24-32px card rounding, and tight three-tier text hierarchy carry across homepage, product detail (PDP), buy-now configurator, and accessory subpages.",
+      "source_url": "https://getdesign.md/meta/design-md",
+      "source_path": "design-md/meta/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ecommerce-retail",
+        "meta"
+      ]
+    },
+    {
+      "id": "minimax",
+      "title": "MiniMax",
+      "category": "ai-llm",
+      "description": "MiniMax presents itself as a premium AI infrastructure brand through a striking duality — bold black-pill CTAs and stark white canvas for marketing, paired with vibrant gradient product cards (orange-red, magenta-pink, purple, blue) that turn each model release into a distinctive visual identity. The system uses DM Sans across all surfaces, employs an oversized 80px hero display, anchors major actions in deep near-black pills, and layers content density via a 3-column documentation grid with sidebar nav, prose body, and TOC. Coverage spans the marketing homepage, model showcase pages, developer documentation, and platform pricing surfaces.",
+      "source_url": "https://getdesign.md/minimax/design-md",
+      "source_path": "design-md/minimax/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "minimax"
+      ]
+    },
+    {
+      "id": "mintlify",
+      "title": "Mintlify",
+      "category": "productivity-saas",
+      "description": "Mintlify presents documentation infrastructure with a dual-mode aesthetic — atmospheric sky-gradient marketing heroes (cloud illustration backdrops, soft cream-to-blue washes) paired with dense developer-grade documentation surfaces. The system uses Inter for UI prose, Geist Mono for code, and a signature Mintlify green ({colors.brand-green}) reserved for accent CTAs and active states. Black-pill primary buttons dominate marketing, white-on-dark inversions appear on dark hero bands, and a 3-column documentation layout (sidebar / prose / TOC) anchors the developer experience. Coverage spans homepage, startups program, pricing comparison, and the live tabs documentation page.",
+      "source_url": "https://getdesign.md/mintlify/design-md",
+      "source_path": "design-md/mintlify/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "productivity-saas",
+        "mintlify"
+      ]
+    },
+    {
+      "id": "miro",
+      "title": "Miro",
+      "category": "design-creative",
+      "description": "Miro presents itself as the AI-powered visual workspace through a confident, almost playful brand voice — anchored by its signature canary yellow ({colors.brand-yellow}) wordmark over white canvas, broken open by colorful pastel feature tints (rose, teal, coral, orange, mint) that echo the actual sticky-note color palette used on the live whiteboard. Black-pill primary buttons dominate marketing, real Miro-board mockups serve as feature illustrations, and a 4-tier pricing grid leads into a dense comparison table. Roobert PRO carries display headlines; the system supports homepage, pricing, AI Workflows product page, agile vertical, and customer stories surfaces.",
+      "source_url": "https://getdesign.md/miro/design-md",
+      "source_path": "design-md/miro/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "design-creative",
+        "miro"
+      ]
+    },
+    {
+      "id": "mistral.ai",
+      "title": "Mistral AI",
+      "category": "ai-llm",
+      "description": "Mistral AI brands itself with a singular signature — atmospheric sunset gradients (mustard, orange, deep red) layered over photography of mountains, plus a horizontal \"sunset stripe\" bar that closes every page. The system pairs warm cream-yellow surfaces ({colors.cream}) with a saturated orange primary CTA ({colors.primary}) and uses an elegant near-serif voice for hero displays. Coverage spans homepage (Frontier AI hero), Le Studio product page, Coding solutions, news article surfaces, contact form, and services tier page — all anchored by the signature gradient closing band.",
+      "source_url": "https://getdesign.md/mistral.ai/design-md",
+      "source_path": "design-md/mistral.ai/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "mistral.ai",
+        "mistral-ai"
+      ]
+    },
+    {
+      "id": "mongodb",
+      "title": "MongoDB",
+      "category": "backend-devops",
+      "description": "MongoDB carries a strong dual-mode visual identity — dark deep-teal hero bands with bright MongoDB green ({colors.brand-green}) CTAs paired with stark white documentation surfaces. The signature green pill button is unmistakable across product, pricing, learning, and AI use-case surfaces. The system uses Euclid Circular A as its display face, anchors a 3-tier pricing comparison (Free / Flex / Dedicated), and presents extensive course catalogs in card grids with colored category tags. Coverage spans homepage, Atlas product page, Community Edition, MongoDB University, AI use cases, and pricing.",
+      "source_url": "https://getdesign.md/mongodb/design-md",
+      "source_path": "design-md/mongodb/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "backend-devops",
+        "mongodb"
+      ]
+    },
+    {
+      "id": "nike",
+      "title": "Nike",
+      "category": "ecommerce-retail",
+      "description": "|",
+      "source_url": "https://getdesign.md/nike/design-md",
+      "source_path": "design-md/nike/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ecommerce-retail",
+        "nike"
+      ]
+    },
+    {
+      "id": "nintendo-2001",
+      "title": "Nintendo.com (2001) Analysis",
+      "category": "retro-web",
+      "description": "An analysis of Nintendo.com's 2001 design language — a brushed-periwinkle \"console chrome\" interface where every panel is a beveled metal plate, navigation glows amber over a halftone-dotted carbon bar, and bold outlined display type sits on circuit-board hero fields. A Y2K hardware aesthetic that treats the web page like the faceplate of a game system.",
+      "source_url": "https://getdesign.md/nintendo-2001/design-md",
+      "source_path": "design-md/nintendo-2001/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "retro-web",
+        "nintendo-2001",
+        "nintendo.com-(2001)-analysis"
+      ]
+    },
+    {
+      "id": "notion",
+      "title": "Notion",
+      "category": "productivity-saas",
+      "description": "Notion presents itself as the all-in-one workspace through a confident, illustration-rich brand voice — anchored by a deep navy hero band ({colors.brand-navy}) decorated with brand-colored sticky-note dots and mesh wire illustrations, a signature purple pill primary CTA ({colors.primary}), and a rich palette of pastel-tinted feature cards that echo the colorful database properties of the live product. The system uses a Notion-Sans (Inter-based) typeface across every UI surface, anchors a 4-tier pricing comparison (Free / Plus / Business / Enterprise), and presents the live workspace UI mockup directly inside the hero band. Coverage spans homepage, Enterprise, Product AI, Product Agents, Startups, and Pricing surfaces.",
+      "source_url": "https://getdesign.md/notion/design-md",
+      "source_path": "design-md/notion/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "productivity-saas",
+        "notion"
+      ]
+    },
+    {
+      "id": "nvidia",
+      "title": "NVIDIA",
+      "category": "media-consumer",
+      "description": "|",
+      "source_url": "https://getdesign.md/nvidia/design-md",
+      "source_path": "design-md/nvidia/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "nvidia"
+      ]
+    },
+    {
+      "id": "ollama",
+      "title": "Ollama",
+      "category": "ai-llm",
+      "description": "|",
+      "source_url": "https://getdesign.md/ollama/design-md",
+      "source_path": "design-md/ollama/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "ollama"
+      ]
+    },
+    {
+      "id": "opencode.ai",
+      "title": "OpenCode",
+      "category": "ai-llm",
+      "description": "|",
+      "source_url": "https://getdesign.md/opencode.ai/design-md",
+      "source_path": "design-md/opencode.ai/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "opencode.ai",
+        "opencode"
+      ]
+    },
+    {
+      "id": "pinterest",
+      "title": "Pinterest",
+      "category": "media-consumer",
+      "description": "|",
+      "source_url": "https://getdesign.md/pinterest/design-md",
+      "source_path": "design-md/pinterest/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "pinterest"
+      ]
+    },
+    {
+      "id": "playstation",
+      "title": "PlayStation",
+      "category": "media-consumer",
+      "description": "|",
+      "source_url": "https://getdesign.md/playstation/design-md",
+      "source_path": "design-md/playstation/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "playstation"
+      ]
+    },
+    {
+      "id": "posthog",
+      "title": "PostHog",
+      "category": "backend-devops",
+      "description": "|",
+      "source_url": "https://getdesign.md/posthog/design-md",
+      "source_path": "design-md/posthog/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "backend-devops",
+        "posthog"
+      ]
+    },
+    {
+      "id": "raycast",
+      "title": "Raycast",
+      "category": "developer-tools",
+      "description": "|",
+      "source_url": "https://getdesign.md/raycast/design-md",
+      "source_path": "design-md/raycast/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "developer-tools",
+        "raycast"
+      ]
+    },
+    {
+      "id": "renault",
+      "title": "Renault",
+      "category": "automotive",
+      "description": "|",
+      "source_url": "https://getdesign.md/renault/design-md",
+      "source_path": "design-md/renault/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "automotive",
+        "renault"
+      ]
+    },
+    {
+      "id": "replicate",
+      "title": "Replicate",
+      "category": "ai-llm",
+      "description": "|",
+      "source_url": "https://getdesign.md/replicate/design-md",
+      "source_path": "design-md/replicate/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "replicate"
+      ]
+    },
+    {
+      "id": "resend",
+      "title": "Resend",
+      "category": "productivity-saas",
+      "description": "|",
+      "source_url": "https://getdesign.md/resend/design-md",
+      "source_path": "design-md/resend/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "productivity-saas",
+        "resend"
+      ]
+    },
+    {
+      "id": "revolut",
+      "title": "Revolut",
+      "category": "fintech-crypto",
+      "description": "|",
+      "source_url": "https://getdesign.md/revolut/design-md",
+      "source_path": "design-md/revolut/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "fintech-crypto",
+        "revolut"
+      ]
+    },
+    {
+      "id": "runwayml",
+      "title": "runwayml",
+      "category": "ai-llm",
+      "description": "Pinned design-system reference for runwayml.",
+      "source_url": "https://getdesign.md/runwayml/design-md",
+      "source_path": "design-md/runwayml/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "runwayml"
+      ]
+    },
+    {
+      "id": "sanity",
+      "title": "sanity",
+      "category": "backend-devops",
+      "description": "Pinned design-system reference for sanity.",
+      "source_url": "https://getdesign.md/sanity/design-md",
+      "source_path": "design-md/sanity/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "backend-devops",
+        "sanity"
+      ]
+    },
+    {
+      "id": "sentry",
+      "title": "Sentri Inspired",
+      "category": "backend-devops",
+      "description": "An inspired interpretation of Sentri's design language — a developer-tools brand built on a deep purple-violet midnight canvas, electric lime accents, and a slightly subversive illustrated personality. The system pairs a custom display sans (chunky, playful, near-condensed) with the open Rubik family for UI copy and Monaco for code, then leans on dark-on-light pricing surfaces, sticker-style mascots, and a single-color CTA hierarchy where black-violet buttons read as the primary action against either polarity.",
+      "source_url": "https://getdesign.md/sentry/design-md",
+      "source_path": "design-md/sentry/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "backend-devops",
+        "sentry",
+        "sentri-inspired"
+      ]
+    },
+    {
+      "id": "shopify",
+      "title": "Shopifi Inspired",
+      "category": "ecommerce-retail",
+      "description": "An inspired interpretation of Shopifi's design language — a cinematic commerce platform that runs two parallel design tracks. The marketing-hero and product-narrative pages live on near-black canvases with full-bleed photography of merchants, giant Neue Haas Grotesk display type at thin weights, and a single black-pill CTA stroked in white. The transactional pages (pricing, signup, dashboards) flip to a cream-mint canvas with pastel aloe and pistachio greens, the same pill button vocabulary, and Inter for UI body. The two tracks share typographic DNA but diverge sharply in canvas polarity — and that choice is the brand.",
+      "source_url": "https://getdesign.md/shopify/design-md",
+      "source_path": "design-md/shopify/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ecommerce-retail",
+        "shopify",
+        "shopifi-inspired"
+      ]
+    },
+    {
+      "id": "slack",
+      "title": "Slacc Inspired",
+      "category": "unclassified",
+      "description": "An inspired interpretation of Slacc's design language — a workplace messaging brand built on a deep aubergine primary, with cream-lavender hero gradients, blue inline links, and pill CTAs. The system pairs a proprietary humanist sans for display with a separate utility sans for body, and stages product UI mockups inside soft pastel-mesh hero composites that act as both decoration and feature explanation.",
+      "source_url": "https://getdesign.md/slack/design-md",
+      "source_path": "design-md/slack/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "unclassified",
+        "slack",
+        "slacc-inspired"
+      ]
+    },
+    {
+      "id": "spacex",
+      "title": "Spacex Inspired",
+      "category": "media-consumer",
+      "description": "An inspired interpretation of Spasex's design language — a mission-oriented aerospace brand built on pure black canvas, full-bleed photographic and video heroes of rockets and Mars landscapes, and uppercase D-DIN display type set in tight vertical leading. UI chrome is intentionally minimal a single ghost outlined pill button per band, all-caps eyebrow microtext, and a fixed top nav over photography. The system is unapologetically austere — black, white, and the imagery itself.",
+      "source_url": "https://getdesign.md/spacex/design-md",
+      "source_path": "design-md/spacex/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "spacex",
+        "spacex-inspired"
+      ]
+    },
+    {
+      "id": "spotify",
+      "title": "spotify",
+      "category": "media-consumer",
+      "description": "Pinned design-system reference for spotify.",
+      "source_url": "https://getdesign.md/spotify/design-md",
+      "source_path": "design-md/spotify/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "spotify"
+      ]
+    },
+    {
+      "id": "starbucks",
+      "title": "starbucks",
+      "category": "ecommerce-retail",
+      "description": "Pinned design-system reference for starbucks.",
+      "source_url": "https://getdesign.md/starbucks/design-md",
+      "source_path": "design-md/starbucks/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ecommerce-retail",
+        "starbucks"
+      ]
+    },
+    {
+      "id": "stripe",
+      "title": "Stripi Inspired",
+      "category": "fintech-crypto",
+      "description": "An inspired interpretation of Stripi's design language — a financial-infrastructure brand built on a deep navy ink, an electric indigo primary, and a recurring atmospheric gradient mesh that occupies the upper third of nearly every marketing page. The system pairs the proprietary Sohne family at thin (300) weights with negative letter-spacing for editorial-density display headlines, and uses tabular-figure body type where money and numerics matter. Buttons are tight-radius pills, cards live on near-white surfaces, and the dashboard track flips polarity to a familiar dark-app shell.",
+      "source_url": "https://getdesign.md/stripe/design-md",
+      "source_path": "design-md/stripe/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "fintech-crypto",
+        "stripe",
+        "stripi-inspired"
+      ]
+    },
+    {
+      "id": "supabase",
+      "title": "Supabaze Inspired",
+      "category": "backend-devops",
+      "description": "An inspired interpretation of Supabaze's design language — an open-source database platform built on a clean white-and-near-black system with a single signature emerald-green CTA, a custom humanist sans display tier, and dense product UI mockups composited above the hero. The brand reads as quietly technical: minimal chrome, a near-monochrome palette, and the green primary acting as the only chromatic event on the page.",
+      "source_url": "https://getdesign.md/supabase/design-md",
+      "source_path": "design-md/supabase/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "backend-devops",
+        "supabase",
+        "supabaze-inspired"
+      ]
+    },
+    {
+      "id": "superhuman",
+      "title": "Superhumon Inspired",
+      "category": "developer-tools",
+      "description": "An inspired interpretation of Superhumon's design language — a fast-email productivity brand split between an editorial dark hero (deep indigo navy with violet-sky atmospheric backdrop and a portrait subject) and a quiet white content body with off-warm-grey ink. The system uses a single proprietary variable display sans, heavy weight 460–540 with tight tracking, and a deep-teal closing CTA band that breaks the indigo/white rhythm with a warm dark interlude. Buttons are tight rounded rectangles, pricing is sober and dense, and the brand reads more like a high-end newsletter than a SaaS app.",
+      "source_url": "https://getdesign.md/superhuman/design-md",
+      "source_path": "design-md/superhuman/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "developer-tools",
+        "superhuman",
+        "superhumon-inspired"
+      ]
+    },
+    {
+      "id": "tesla",
+      "title": "tesla",
+      "category": "automotive",
+      "description": "Pinned design-system reference for tesla.",
+      "source_url": "https://getdesign.md/tesla/design-md",
+      "source_path": "design-md/tesla/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "automotive",
+        "tesla"
+      ]
+    },
+    {
+      "id": "theverge",
+      "title": "theverge",
+      "category": "media-consumer",
+      "description": "Pinned design-system reference for theverge.",
+      "source_url": "https://getdesign.md/theverge/design-md",
+      "source_path": "design-md/theverge/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "theverge"
+      ]
+    },
+    {
+      "id": "together.ai",
+      "title": "Together AI Inspired",
+      "category": "ai-llm",
+      "description": "An inspired interpretation of Together AI's design language — an AI infrastructure platform whose surface alternates between near-black hero bands (with a three-color orange-magenta-periwinkle gradient as the single piece of brand chrome) and bright white research / pricing / docs bands, knit together by a custom display sans and an uppercase mono eyebrow face.",
+      "source_url": "https://getdesign.md/together.ai/design-md",
+      "source_path": "design-md/together.ai/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "together.ai",
+        "together-ai-inspired"
+      ]
+    },
+    {
+      "id": "uber",
+      "title": "Uber Inspired",
+      "category": "media-consumer",
+      "description": "An inspired interpretation of Uber's design language — a transportation-and-delivery super-app brand whose web surface is a black-and-white duet, framed by a custom geometric display sans, accented by a single signature pill shape (radius 999px) on every interactive element, and decorated only by editorial 4:3 illustrations of riders, drivers, and city objects.",
+      "source_url": "https://getdesign.md/uber/design-md",
+      "source_path": "design-md/uber/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "uber",
+        "uber-inspired"
+      ]
+    },
+    {
+      "id": "vercel",
+      "title": "Vercel Inspired",
+      "category": "developer-tools",
+      "description": "An inspired interpretation of Vercel's design language — a developer-platform brand whose surface is a stark black-and-ink duet on near-white canvas, broken at hero scale by a multi-color mesh gradient (cyan / blue / magenta / amber) that acts as the entire decorative system, paired with a custom geometric sans for headlines and a monospaced caption face for technical labels.",
+      "source_url": "https://getdesign.md/vercel/design-md",
+      "source_path": "design-md/vercel/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "developer-tools",
+        "vercel",
+        "vercel-inspired"
+      ]
+    },
+    {
+      "id": "vodafone",
+      "title": "Vodafone Inspired",
+      "category": "media-consumer",
+      "description": "An inspired interpretation of Vodafone's design language — a telecom super-brand whose web surface alternates between editorial photography hero bands with massive uppercase display headlines and clean white content bands, anchored by the company's signature scarlet red CTA and the proprietary Vodafone display sans set at impossibly heavy 800 weight.",
+      "source_url": "https://getdesign.md/vodafone/design-md",
+      "source_path": "design-md/vodafone/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "vodafone",
+        "vodafone-inspired"
+      ]
+    },
+    {
+      "id": "voltagent",
+      "title": "Voltagent Inspired",
+      "category": "ai-llm",
+      "description": "An inspired interpretation of Voltagent's design language — a developer-focused AI agent engineering platform whose surface is an unrelenting near-black canvas broken only by a single electric-green brand accent, code-editor mockups inside the hero, and a precise grid of dark feature cards that read like a documentation site dressed as marketing.",
+      "source_url": "https://getdesign.md/voltagent/design-md",
+      "source_path": "design-md/voltagent/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "voltagent",
+        "voltagent-inspired"
+      ]
+    },
+    {
+      "id": "warp",
+      "title": "Warp Inspired",
+      "category": "developer-tools",
+      "description": "An inspired interpretation of Warp's design language — an agentic terminal-and-development-environment brand whose surface is a warm near-charcoal canvas (a tint warmer than pure black), broken only by clean Inter typography, the occasional Instrument Serif italic moment, and dense terminal-mockup imagery; CTAs are unusually understated, with shape geometry running tighter than most marketing sites.",
+      "source_url": "https://getdesign.md/warp/design-md",
+      "source_path": "design-md/warp/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "developer-tools",
+        "warp",
+        "warp-inspired"
+      ]
+    },
+    {
+      "id": "webflow",
+      "title": "Webflow Inspired",
+      "category": "design-creative",
+      "description": "An inspired interpretation of Webflow's design language — a visual web development platform whose surface contrasts a deep near-black `#080808` primary against a generous white canvas, broken by a five-stop chromatic accent system (purple / pink / blue / orange / green) that maps to the brand's product categories, and anchored by the proprietary WF Visual Sans family used at restrained 500 / 600 weights with negative tracking.",
+      "source_url": "https://getdesign.md/webflow/design-md",
+      "source_path": "design-md/webflow/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "design-creative",
+        "webflow",
+        "webflow-inspired"
+      ]
+    },
+    {
+      "id": "wired",
+      "title": "Wired Inspired",
+      "category": "media-consumer",
+      "description": "An inspired interpretation of Wired's design language — a flagship technology-magazine brand whose surface is a strict editorial duet of stark black wordmark on white canvas, anchored by a tall narrow custom display serif for hero headlines, a humanist serif body face for long-form reading, and a clean sans face for metadata; layout reads like a printed magazine ported to the web with very little marketing chrome.",
+      "source_url": "https://getdesign.md/wired/design-md",
+      "source_path": "design-md/wired/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "media-consumer",
+        "wired",
+        "wired-inspired"
+      ]
+    },
+    {
+      "id": "wise",
+      "title": "Wise Inspired",
+      "category": "fintech-crypto",
+      "description": "An inspired interpretation of Wise's design language — a global money-transfer brand whose surface combines an unusually heavy near-black display sans (weight 900 at 64–126 px) with a vivid lime-green brand accent, sage-tinted surface neutrals, and rounded white cards on a pale green-tinted canvas; the whole system reads more like a Scandinavian fintech magazine than a bank.",
+      "source_url": "https://getdesign.md/wise/design-md",
+      "source_path": "design-md/wise/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "fintech-crypto",
+        "wise",
+        "wise-inspired"
+      ]
+    },
+    {
+      "id": "x.ai",
+      "title": "xAI Inspired",
+      "category": "ai-llm",
+      "description": "An inspired interpretation of xAI's design language — Elon Musk's frontier-AI company whose web surface is a strict near-black canvas broken only by white pill outlines, occasional warm sunset / dusk gradient accents, a custom geometric sans (Universal Sans) for display, and an uppercase tracked monospace caption face; the whole system reads as engineered-cosmic, unmarketed.",
+      "source_url": "https://getdesign.md/x.ai/design-md",
+      "source_path": "design-md/x.ai/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "ai-llm",
+        "x.ai",
+        "xai-inspired"
+      ]
+    },
+    {
+      "id": "zapier",
+      "title": "Zapier Inspired",
+      "category": "productivity-saas",
+      "description": "An inspired interpretation of Zapier's design language — a workflow-automation platform whose surface combines warm-cream neutrals (`#fffefb` canvas, `#f8f4f0` soft cream) with deep coffee ink (`#201515`) and a single saturated orange CTA accent (`#ff4f00`); typography pairs the proprietary Degular Display family at hero scale with Inter for sub-displays and body, giving the brand a confident-warm rather than cool-tech voice.",
+      "source_url": "https://getdesign.md/zapier/design-md",
+      "source_path": "design-md/zapier/DESIGN.md",
+      "source_commit": "8147538b4226ae41e2487a9179e3bcc1f68e8554",
+      "license": "MIT",
+      "tags": [
+        "productivity-saas",
+        "zapier",
+        "zapier-inspired"
+      ]
+    }
+  ]
+}

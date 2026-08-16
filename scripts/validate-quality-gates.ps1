@@ -25,6 +25,7 @@ foreach ($category in $canonicalCategories) {
 
 $allowedStates = @('active', 'planned', 'not-applicable')
 $allowedProfiles = @('pr', 'release', 'nightly', 'qualitative', 'performance')
+$allowedPriorities = @('P0', 'P1', 'P2', 'P3')
 $ids = @{}
 $categories = @{}
 
@@ -40,6 +41,9 @@ foreach ($gate in $config.gates) {
 
     if ($gate.state -eq 'active') {
         if (-not $gate.profiles -or -not $gate.command) { throw "$($gate.id): active gates require profiles and command." }
+        if ($gate.failurePriority -notin $allowedPriorities) { throw "$($gate.id): active gates require failurePriority P0-P3." }
+        if ([string]::IsNullOrWhiteSpace($gate.owner)) { throw "$($gate.id): active gates require owner." }
+        if ([string]::IsNullOrWhiteSpace($gate.remediation)) { throw "$($gate.id): active gates require remediation." }
         foreach ($profile in $gate.profiles) {
             if ($profile -notin $allowedProfiles) { throw "$($gate.id): unsupported profile '$profile'." }
         }
@@ -56,6 +60,11 @@ foreach ($gate in $config.gates) {
         }
         if ($gate.state -eq 'planned' -and $gate.requiredBeforeRelease -ne $true) {
             throw "$($gate.id): planned gates must set requiredBeforeRelease=true."
+        }
+        if ($gate.state -eq 'planned') {
+            if ($gate.failurePriority -notin $allowedPriorities) { throw "$($gate.id): planned gates require failurePriority P0-P3." }
+            if ([string]::IsNullOrWhiteSpace($gate.owner)) { throw "$($gate.id): planned gates require owner." }
+            if ([string]::IsNullOrWhiteSpace($gate.remediation)) { throw "$($gate.id): planned gates require remediation." }
         }
     }
 }

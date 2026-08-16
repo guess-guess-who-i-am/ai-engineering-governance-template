@@ -1,0 +1,12 @@
+{
+  "name": "ai-engineering-governance-template",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "test:site": "node scripts/test-docs-site.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "4.10.3",
+    "playwright": "1.62.1"
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "审查项目改动"
+  short_description: "从用户目标、行为风险、证据充分性和回归可能性审查当前改动"
+  default_prompt: "使用 $review-project-diff 审查当前改动并按优先级报告可执行问题。"

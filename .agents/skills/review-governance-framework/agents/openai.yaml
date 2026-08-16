@@ -1,0 +1,4 @@
+interface:
+  display_name: "审查治理体系"
+  short_description: "审计规则、Skills、脚本、测试、流程和文档之间的治理闭环"
+  default_prompt: "使用 $review-governance-framework 审查这个项目的工程治理体系。"

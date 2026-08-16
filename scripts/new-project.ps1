@@ -321,6 +321,13 @@ foreach ($gate in $quality.gates) {
         $gate.PSObject.Properties.Remove('workingDirectory')
         $gate.PSObject.Properties.Remove('command')
     }
+    if ($gate.state -eq 'planned') {
+        if ($null -eq $gate.failurePriority) { $gate | Add-Member -NotePropertyName failurePriority -NotePropertyValue 'P1' -Force }
+        if ([string]::IsNullOrWhiteSpace($gate.owner)) { $gate | Add-Member -NotePropertyName owner -NotePropertyValue 'project-maintainers' -Force }
+        if ([string]::IsNullOrWhiteSpace($gate.remediation)) {
+            $gate | Add-Member -NotePropertyName remediation -NotePropertyValue "Configure and pass the $($gate.id) gate before release." -Force
+        }
+    }
 }
 $quality | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $qualityPath -Encoding utf8
 
