@@ -8,6 +8,10 @@ $fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) ("release-contract-" + [guid
 try {
     New-Item -ItemType Directory -Path $fixtureRoot -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $Root 'VERSION'), (Join-Path $Root 'package.json'), (Join-Path $Root 'CHANGELOG.md') -Destination $fixtureRoot
+    $changelogPath = Join-Path $fixtureRoot 'CHANGELOG.md'
+    $crlfChangelog = (Get-Content -LiteralPath $changelogPath -Raw) -replace "\r?\n", "`r`n"
+    [IO.File]::WriteAllText($changelogPath, $crlfChangelog, [Text.UTF8Encoding]::new($false))
+    & $validator -Root $fixtureRoot | Out-Null
     try {
         & $validator -Root $fixtureRoot -Tag 'v9.9.9' 2>&1 | Out-Null
         throw 'Expected a mismatched tag to fail.'
@@ -28,4 +32,4 @@ finally {
     $resolvedTemp = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
     if ($resolvedFixture.StartsWith($resolvedTemp, [StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $resolvedFixture)) { Remove-Item -LiteralPath $resolvedFixture -Recurse -Force }
 }
-Write-Output 'Release metadata success, mismatched tag, and mismatched package cases passed.'
+Write-Output 'Release metadata LF/CRLF success, mismatched tag, and mismatched package cases passed.'
