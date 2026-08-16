@@ -155,6 +155,7 @@ function Get-ExternalSkillScores {
         }
       }
       if ($score -le 0) { continue }
+      if (-not (Test-Path -LiteralPath $fields[6] -PathType Leaf)) { continue }
       $skill = [pscustomobject]@{
         id = "external:$normalizedName"
         name = $name

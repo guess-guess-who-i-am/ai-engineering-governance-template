@@ -89,7 +89,7 @@ function Update-ExternalSkillIndex {
     try {
       $manifest = [IO.File]::ReadAllText($manifestPath, $utf8) | ConvertFrom-Json
       $isCurrent = (
-        ([string]$manifest.schemaVersion -eq "codex-external-skill-index/1") -and
+        ([string]$manifest.schemaVersion -eq "codex-external-skill-index/2") -and
         ([string]$manifest.catalogPath -eq $catalogPath) -and
         ([string]$manifest.rootPath -eq $rootPath) -and
         ([int64]$manifest.sourceLength -eq [int64]$catalogFile.Length) -and
@@ -105,13 +105,18 @@ function Update-ExternalSkillIndex {
   $tempIndexPath = "$indexPath.tmp"
   $writer = New-Object IO.StreamWriter($tempIndexPath, $false, $utf8)
   $count = 0
+  $missingCount = 0
   try {
-    $writer.WriteLine("# codex-external-skill-index/1")
+    $writer.WriteLine("# codex-external-skill-index/2")
     foreach ($skill in @($catalog.skills)) {
       $name = ConvertTo-IndexField $skill.name
       $directory = ConvertTo-IndexField $skill.dir
       if (-not $name -or -not $directory) { continue }
       $skillPath = Join-Path (Join-Path $rootPath $directory) "SKILL.md"
+      if (-not (Test-Path -LiteralPath $skillPath -PathType Leaf)) {
+        $missingCount++
+        continue
+      }
       $fields = @(
         $name,
         (ConvertTo-IndexField $skill.description),
@@ -131,13 +136,14 @@ function Update-ExternalSkillIndex {
   Move-Item -LiteralPath $tempIndexPath -Destination $indexPath -Force
 
   $manifest = [ordered]@{
-    schemaVersion = "codex-external-skill-index/1"
+    schemaVersion = "codex-external-skill-index/2"
     generatedAt = [DateTime]::UtcNow.ToString("o")
     catalogPath = $catalogPath
     rootPath = $rootPath
     sourceLength = [int64]$catalogFile.Length
     sourceLastWriteUtc = $sourceLastWriteUtc
     skillCount = $count
+    missingSkillCount = $missingCount
     indexPath = $indexPath
   }
   $tempManifestPath = "$manifestPath.tmp"
