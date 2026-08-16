@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "publishedAt": "2026-08-16T05:18:12.067Z",
+  "runtimeSourceSha256": "557b46f1a5e736d674f289efbe6d5b8a893ca2f4dcb54165dce8477f5b37ba65",
+  "translationSha256": "406dfb7616983a888f45c9d1bc3b26bf7e374245aab60f1f605ac5445fa3020d",
+  "ruleCount": 55,
+  "routeCounts": {
+    "alwaysOn": 21,
+    "method-research-evidence": 5,
+    "method-engineering-execution": 12,
+    "method-evaluation-gates": 6,
+    "method-github-delivery": 1,
+    "method-task-tree": 10
+  }
+}
