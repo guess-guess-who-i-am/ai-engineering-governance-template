@@ -49,7 +49,7 @@
 - 中文唯一编辑源：`codex-profile/.codex/prompts/global-methodology-source.zh.md`，保留用户中文原文，是以后增删改方法论的唯一人工入口。
 - 英文运行文件：常驻提醒、完整方法论档案、方法论路由和映射文件；由中文源逐行翻译生成，不用润色摘要代替原文。
 - 每轮 Hook：每次用户提示重新注入英文常驻提醒和方法论路由；会话启动、恢复、清理和压缩时也会恢复这些内容。
-- Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。
+- Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。除本机约数百个 Skills 外，还会复用 `E:\skills\_catalog_cn.json`，把其中约1.5万个 Skills 编译为持久化行索引；不会递归预读这一万多个正文。
 - 方法论发布器：保存中文源后自动翻译、备份、生成中英文文件、更新 Skills 和索引；失败时回滚。
 - 6个自建方法 Skills：`manage-global-methodology`、`method-research-evidence`、`method-engineering-execution`、`method-evaluation-gates`、`method-github-delivery`、`method-task-tree`。
 - 63条已归类方法论：常驻21条、研究9条、工程12条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
@@ -81,6 +81,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-prof
 5. 校验63条方法论的中英文对应关系并刷新 Skill 索引。
 
 安装完成后，在该电脑单独完成 Codex 登录并重新启动 Codex，使全局 `AGENTS.md` 和 Hook 重新加载。完整说明见 [可迁移 Codex 全局配置](codex-profile/README.zh.md)。
+
+若外部 Skills 不在默认的 `E:\skills`，可在该电脑设置 `CODEX_EXTERNAL_SKILL_ROOT` 和 `CODEX_EXTERNAL_SKILL_CATALOG`。生成的 `external-skills.tsv` 与 manifest 只保存在 `~/.codex/skill-registry/`，不提交第三方 Skill 正文；源目录发生变化时才重建，普通会话启动只检查目录元数据。
 
 ### 其他项目如何使用
 

@@ -48,6 +48,104 @@ function Get-Sha256 {
   }
 }
 
+function ConvertTo-IndexField {
+  param([object]$Value)
+  if ($null -eq $Value) { return "" }
+  return ((([string]$Value) -replace "[`r`n`t]+", " ") -replace "\s+", " ").Trim()
+}
+
+function Get-ExternalSkillConfiguration {
+  $catalogPath = if ($env:CODEX_EXTERNAL_SKILL_CATALOG) {
+    [IO.Path]::GetFullPath($env:CODEX_EXTERNAL_SKILL_CATALOG)
+  } else {
+    "E:\skills\_catalog_cn.json"
+  }
+  $rootPath = if ($env:CODEX_EXTERNAL_SKILL_ROOT) {
+    [IO.Path]::GetFullPath($env:CODEX_EXTERNAL_SKILL_ROOT)
+  } elseif ($env:CODEX_EXTERNAL_SKILL_CATALOG) {
+    [IO.Path]::GetDirectoryName($catalogPath)
+  } else {
+    "E:\skills"
+  }
+  return [pscustomobject]@{ CatalogPath = $catalogPath; RootPath = $rootPath }
+}
+
+function Update-ExternalSkillIndex {
+  param([string]$RegistryDirectory)
+
+  $configuration = Get-ExternalSkillConfiguration
+  $catalogPath = $configuration.CatalogPath
+  $rootPath = $configuration.RootPath
+  $indexPath = Join-Path $RegistryDirectory "external-skills.tsv"
+  $manifestPath = Join-Path $RegistryDirectory "external-skills-manifest.json"
+  if (-not (Test-Path -LiteralPath $catalogPath -PathType Leaf) -or -not (Test-Path -LiteralPath $rootPath -PathType Container)) {
+    return $null
+  }
+
+  $catalogFile = Get-Item -LiteralPath $catalogPath
+  $sourceLastWriteUtc = $catalogFile.LastWriteTimeUtc.ToString("o")
+  $isCurrent = $false
+  if ((Test-Path -LiteralPath $indexPath -PathType Leaf) -and (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+    try {
+      $manifest = [IO.File]::ReadAllText($manifestPath, $utf8) | ConvertFrom-Json
+      $isCurrent = (
+        ([string]$manifest.schemaVersion -eq "codex-external-skill-index/1") -and
+        ([string]$manifest.catalogPath -eq $catalogPath) -and
+        ([string]$manifest.rootPath -eq $rootPath) -and
+        ([int64]$manifest.sourceLength -eq [int64]$catalogFile.Length) -and
+        ([string]$manifest.sourceLastWriteUtc -eq $sourceLastWriteUtc)
+      )
+    } catch {
+      $isCurrent = $false
+    }
+  }
+  if ($isCurrent) { return $manifest }
+
+  $catalog = [IO.File]::ReadAllText($catalogPath, $utf8) | ConvertFrom-Json
+  $tempIndexPath = "$indexPath.tmp"
+  $writer = New-Object IO.StreamWriter($tempIndexPath, $false, $utf8)
+  $count = 0
+  try {
+    $writer.WriteLine("# codex-external-skill-index/1")
+    foreach ($skill in @($catalog.skills)) {
+      $name = ConvertTo-IndexField $skill.name
+      $directory = ConvertTo-IndexField $skill.dir
+      if (-not $name -or -not $directory) { continue }
+      $skillPath = Join-Path (Join-Path $rootPath $directory) "SKILL.md"
+      $fields = @(
+        $name,
+        (ConvertTo-IndexField $skill.description),
+        (ConvertTo-IndexField $skill.problem_cn),
+        (ConvertTo-IndexField $skill.when_cn),
+        (ConvertTo-IndexField $skill.c1),
+        (ConvertTo-IndexField $skill.c2),
+        (ConvertTo-IndexField $skillPath),
+        (ConvertTo-IndexField $skill.key)
+      )
+      $writer.WriteLine(($fields -join "`t"))
+      $count++
+    }
+  } finally {
+    $writer.Dispose()
+  }
+  Move-Item -LiteralPath $tempIndexPath -Destination $indexPath -Force
+
+  $manifest = [ordered]@{
+    schemaVersion = "codex-external-skill-index/1"
+    generatedAt = [DateTime]::UtcNow.ToString("o")
+    catalogPath = $catalogPath
+    rootPath = $rootPath
+    sourceLength = [int64]$catalogFile.Length
+    sourceLastWriteUtc = $sourceLastWriteUtc
+    skillCount = $count
+    indexPath = $indexPath
+  }
+  $tempManifestPath = "$manifestPath.tmp"
+  [IO.File]::WriteAllText($tempManifestPath, ($manifest | ConvertTo-Json -Depth 4), $utf8)
+  Move-Item -LiteralPath $tempManifestPath -Destination $manifestPath -Force
+  return [pscustomobject]$manifest
+}
+
 try {
   $inputText = [Console]::In.ReadToEnd()
   $hookInput = if ($inputText) { try { $inputText | ConvertFrom-Json } catch { $null } } else { $null }
@@ -55,6 +153,12 @@ try {
   $registryDir = Join-Path $codexHome "skill-registry"
   $registryPath = Join-Path $registryDir "skills-index.json"
   New-Item -ItemType Directory -Path $registryDir -Force | Out-Null
+  $externalManifest = $null
+  try {
+    $externalManifest = Update-ExternalSkillIndex -RegistryDirectory $registryDir
+  } catch {
+    [Console]::Error.WriteLine("External Skill index refresh skipped: $($_.Exception.Message)")
+  }
 
   $roots = @(
     [pscustomobject]@{ source = "codex"; rank = 10; path = (Join-Path $codexHome "skills") },
@@ -95,10 +199,12 @@ try {
   }
 
   $payload = [ordered]@{
-    schemaVersion = "codex-skill-registry/1"
+    schemaVersion = "codex-skill-registry/2"
     generatedAt = [DateTime]::UtcNow.ToString("o")
     roots = @($roots | ForEach-Object { [ordered]@{ source = $_.source; rank = [int]$_.rank; path = $_.path } })
     skillCount = $skills.Count
+    externalSkillCount = if ($externalManifest) { [int]$externalManifest.skillCount } else { 0 }
+    externalIndexPath = if ($externalManifest) { [string]$externalManifest.indexPath } else { "" }
     skills = @($skills)
   }
   $tempPath = "$registryPath.tmp"
