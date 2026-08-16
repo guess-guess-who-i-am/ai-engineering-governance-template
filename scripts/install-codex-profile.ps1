@@ -76,7 +76,7 @@ $hooks = [ordered]@{
   hooks = [ordered]@{
     UserPromptSubmit = @([ordered]@{
       hooks = @(
-        [ordered]@{ type = "command"; command = $routerCommand; commandWindows = $routerCommand; timeout = 5; statusMessage = "Recommending relevant Codex Skills"; additionalContextLimit = 1800 },
+        [ordered]@{ type = "command"; command = $routerCommand; commandWindows = $routerCommand; timeout = 10; statusMessage = "Recommending relevant Codex Skills"; additionalContextLimit = 1800 },
         [ordered]@{ type = "command"; command = $contextCommand; commandWindows = $contextCommand; timeout = 5; statusMessage = "Refreshing original-wording reminders and methodology routes"; additionalContextLimit = 8000 }
       )
     })
@@ -84,7 +84,7 @@ $hooks = [ordered]@{
       matcher = "^(startup|resume|clear|compact)$"
       hooks = @(
         [ordered]@{ type = "command"; command = $contextCommand; commandWindows = $contextCommand; timeout = 5; statusMessage = "Restoring original-wording reminders and methodology routes"; additionalContextLimit = 8000 },
-        [ordered]@{ type = "command"; command = $registryCommand; commandWindows = $registryCommand; timeout = 20; statusMessage = "Refreshing Codex Skill index" }
+        [ordered]@{ type = "command"; command = $registryCommand; commandWindows = $registryCommand; timeout = 60; statusMessage = "Refreshing Codex Skill index" }
       )
     })
   }
