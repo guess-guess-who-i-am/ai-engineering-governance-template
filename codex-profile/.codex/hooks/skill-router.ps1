@@ -122,56 +122,88 @@ function Get-ExternalSkillScores {
   )
   if (-not (Test-Path -LiteralPath $IndexPath -PathType Leaf)) { return @() }
   $bestByName = @{}
-  $reader = New-Object IO.StreamReader($IndexPath, $utf8, $true)
-  try {
-    while (-not $reader.EndOfStream) {
-      $line = $reader.ReadLine()
-      if (-not $line -or $line[0] -eq '#') { continue }
-      $fields = $line.Split([char]9)
-      if ($fields.Count -lt 8) { continue }
-      $name = $fields[0]
-      $normalizedName = $name.ToLowerInvariant()
-      if ($ExcludedNames.ContainsKey($normalizedName)) { continue }
-      $haystack = (($fields[0..5] -join " ") + " " + $fields[7]).ToLowerInvariant()
-      $score = 0
-      $matches = [Collections.Generic.List[string]]::new()
-      foreach ($token in $Tokens) {
-        if ($haystack.Contains($token)) {
-          $score += if ($token.Length -ge 4) { 3 } else { 1 }
-          if ($normalizedName.Contains($token)) { $score += if ($token.Length -ge 4) { 6 } else { 2 } }
-          if ($matches.Count -lt 3) { $matches.Add($token) }
-        }
-      }
-      if (Test-ExactSkillName -Query $Query -Name $normalizedName) {
-        $score += 24
-        if ($matches.Count -lt 3) { $matches.Add("exact name") }
-      }
-      if ($Aliases.ContainsKey($normalizedName)) {
-        foreach ($alias in $Aliases[$normalizedName]) {
-          if ($Query.Contains($alias.ToLowerInvariant())) {
-            $score += 12
-            if ($matches.Count -lt 3) { $matches.Add($alias) }
-          }
-        }
-      }
-      if ($score -le 0) { continue }
-      if (-not (Test-Path -LiteralPath $fields[6] -PathType Leaf)) { continue }
-      $skill = [pscustomobject]@{
-        id = "external:$normalizedName"
-        name = $name
-        description = if ($fields[1]) { $fields[1] } elseif ($fields[2]) { $fields[2] } else { $fields[3] }
-        keywords = @($fields[4], $fields[5], $fields[7])
-        path = $fields[6]
-        source = "external-catalog"
-        rank = 100
-      }
-      $candidate = [pscustomobject]@{ Skill = $skill; Score = $score; Matches = @($matches | Select-Object -Unique | Select-Object -First 3) }
-      if (-not $bestByName.ContainsKey($normalizedName) -or $score -gt [int]$bestByName[$normalizedName].Score) {
-        $bestByName[$normalizedName] = $candidate
+  $patterns = [Collections.Generic.List[string]]::new()
+  foreach ($token in $Tokens) {
+    if ($token) { $patterns.Add($token) }
+  }
+  foreach ($entry in $Aliases.GetEnumerator()) {
+    foreach ($alias in @($entry.Value)) {
+      if ($alias -and $Query.Contains($alias.ToLowerInvariant())) {
+        $patterns.Add([string]$entry.Key)
+        break
       }
     }
-  } finally {
-    $reader.Dispose()
+  }
+
+  $candidateLines = $null
+  $rgCommand = Get-Command rg -ErrorAction SilentlyContinue | Select-Object -First 1
+  if ($rgCommand -and $patterns.Count -gt 0) {
+    $rgArgs = [Collections.Generic.List[string]]::new()
+    foreach ($argument in @("--ignore-case", "--fixed-strings", "--no-heading", "--color", "never")) { $rgArgs.Add($argument) }
+    foreach ($pattern in @($patterns | Select-Object -Unique)) {
+      $rgArgs.Add("-e")
+      $rgArgs.Add($pattern)
+    }
+    $rgArgs.Add("--")
+    $rgArgs.Add($IndexPath)
+    $candidateLines = @(& $rgCommand.Source @rgArgs 2>$null)
+    if ($LASTEXITCODE -notin @(0, 1)) { $candidateLines = $null }
+  }
+
+  if ($null -eq $candidateLines) {
+    $candidateLines = [Collections.Generic.List[string]]::new()
+    $reader = New-Object IO.StreamReader($IndexPath, $utf8, $true)
+    try {
+      while (-not $reader.EndOfStream) { $candidateLines.Add($reader.ReadLine()) }
+    } finally {
+      $reader.Dispose()
+    }
+  }
+
+  foreach ($line in $candidateLines) {
+    if (-not $line -or $line[0] -eq '#') { continue }
+    $fields = $line.Split([char]9)
+    if ($fields.Count -lt 8) { continue }
+    $name = $fields[0]
+    $normalizedName = $name.ToLowerInvariant()
+    if ($ExcludedNames.ContainsKey($normalizedName)) { continue }
+    $haystack = (($fields[0..5] -join " ") + " " + $fields[7]).ToLowerInvariant()
+    $score = 0
+    $matches = [Collections.Generic.List[string]]::new()
+    foreach ($token in $Tokens) {
+      if ($haystack.Contains($token)) {
+        $score += if ($token.Length -ge 4) { 3 } else { 1 }
+        if ($normalizedName.Contains($token)) { $score += if ($token.Length -ge 4) { 6 } else { 2 } }
+        if ($matches.Count -lt 3) { $matches.Add($token) }
+      }
+    }
+    if (Test-ExactSkillName -Query $Query -Name $normalizedName) {
+      $score += 24
+      if ($matches.Count -lt 3) { $matches.Add("exact name") }
+    }
+    if ($Aliases.ContainsKey($normalizedName)) {
+      foreach ($alias in $Aliases[$normalizedName]) {
+        if ($Query.Contains($alias.ToLowerInvariant())) {
+          $score += 12
+          if ($matches.Count -lt 3) { $matches.Add($alias) }
+        }
+      }
+    }
+    if ($score -le 0) { continue }
+    if (-not (Test-Path -LiteralPath $fields[6] -PathType Leaf)) { continue }
+    $skill = [pscustomobject]@{
+      id = "external:$normalizedName"
+      name = $name
+      description = if ($fields[1]) { $fields[1] } elseif ($fields[2]) { $fields[2] } else { $fields[3] }
+      keywords = @($fields[4], $fields[5], $fields[7])
+      path = $fields[6]
+      source = "external-catalog"
+      rank = 100
+    }
+    $candidate = [pscustomobject]@{ Skill = $skill; Score = $score; Matches = @($matches | Select-Object -Unique | Select-Object -First 3) }
+    if (-not $bestByName.ContainsKey($normalizedName) -or $score -gt [int]$bestByName[$normalizedName].Score) {
+      $bestByName[$normalizedName] = $candidate
+    }
   }
   return @($bestByName.Values)
 }
@@ -216,13 +248,24 @@ try {
   $tokens = Get-QueryTokens -Text $query -StopTokens $stopTokens
   $knownNames = @{}
   foreach ($skill in $skills) { $knownNames[([string]$skill.name).ToLowerInvariant()] = $true }
+  $localAliasMatch = $false
+  foreach ($entry in $aliases.GetEnumerator()) {
+    if (-not $knownNames.ContainsKey(([string]$entry.Key).ToLowerInvariant())) { continue }
+    foreach ($alias in @($entry.Value)) {
+      if ($alias -and $query.Contains($alias.ToLowerInvariant())) {
+        $localAliasMatch = $true
+        break
+      }
+    }
+    if ($localAliasMatch) { break }
+  }
   $allScored = [Collections.Generic.List[object]]::new()
   foreach ($item in @($skills | ForEach-Object { Get-Score -Skill $_ -Tokens $tokens -Query $query -Aliases $aliases } | Where-Object { $_.Score -gt 0 })) {
     $allScored.Add($item)
   }
   $externalIndexProperty = $registry.PSObject.Properties["externalIndexPath"]
   $externalIndexPath = if ($externalIndexProperty) { [string]$externalIndexProperty.Value } else { Join-Path $codexHome "skill-registry\external-skills.tsv" }
-  if ($externalIndexPath) {
+  if ($externalIndexPath -and -not $localAliasMatch) {
     foreach ($item in @(Get-ExternalSkillScores -IndexPath $externalIndexPath -Tokens $tokens -Query $query -Aliases $aliases -ExcludedNames $knownNames)) {
       $allScored.Add($item)
     }

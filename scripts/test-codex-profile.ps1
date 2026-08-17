@@ -69,6 +69,7 @@ try {
   $routerCommand = [string]$hooks.hooks.UserPromptSubmit[0].hooks[0].command
   if ($routerCommand -notlike "*$testRoot*") { throw "hooks.json does not use the target user profile path." }
   if ([int]$hooks.hooks.UserPromptSubmit[0].hooks[0].timeout -ne 10) { throw "The Skill router timeout is not configured for the external catalog." }
+  if ([int]$hooks.hooks.UserPromptSubmit[0].hooks[1].additionalContextLimit -ne 10000) { throw "The context hook does not reserve room for conditional tool batching instructions." }
   if ([int]$hooks.hooks.SessionStart[0].hooks[1].timeout -ne 60) { throw "The Skill refresh timeout is not configured for the first external index build." }
 
   $backup = Get-ChildItem -LiteralPath (Join-Path $testRoot ".codex\backups\portable-profile") -Filter "AGENTS.md" -Recurse -File | Select-Object -First 1
@@ -111,6 +112,20 @@ try {
   $unrelatedOutput = $unrelatedInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $router
   if (($unrelatedOutput | Out-String).Trim() -ne "{}") { throw "The Skill router recommended an external Skill for an unrelated prompt." }
 
+  $contextRefresh = Join-Path $testRoot ".codex\hooks\context-refresh.ps1"
+  $toolHeavyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "请高并发检查多个文件并运行测试"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
+  $toolHeavyOutput = $toolHeavyInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
+  $toolHeavyContext = [string](($toolHeavyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
+  if ($toolHeavyContext -notmatch '\[TOOL_BATCHING_EXECUTION_CONTRACT_V1\]' -or $toolHeavyContext -notmatch 'Promise\.all') {
+    throw "The context hook did not inject the tool batching execution contract for a tool-heavy prompt."
+  }
+  $simpleInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "你好"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
+  $simpleOutput = $simpleInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
+  $simpleContext = [string](($simpleOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
+  if ($simpleContext -match '\[TOOL_BATCHING_EXECUTION_CONTRACT_V1\]') {
+    throw "The context hook injected the tool batching contract for a simple greeting."
+  }
+
   $refresh = Join-Path $testRoot ".codex\hooks\refresh-skill-registry.ps1"
   $refreshInput = @{ hook_event_name = "SessionStart"; source = "startup"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $manifestBefore = Get-Content -LiteralPath $externalManifestPath -Raw | ConvertFrom-Json
@@ -137,7 +152,7 @@ try {
   $manifestUpdated = Get-Content -LiteralPath $externalManifestPath -Raw | ConvertFrom-Json
   if ([int]$manifestUpdated.skillCount -ne 2) { throw "The external index did not rebuild after its catalog changed." }
 
-  Write-Host "PASS: profile sync, clean install, backup, generated paths, 6 custom Skills, external indexing, cache invalidation, body isolation, and prompt routing."
+  Write-Host "PASS: profile sync, clean install, backup, generated paths, 6 custom Skills, external indexing, cache invalidation, body isolation, prompt routing, and conditional tool batching injection."
 } finally {
   $env:USERPROFILE = $previousUserProfile
   $env:CODEX_HOME = $previousCodexHome
