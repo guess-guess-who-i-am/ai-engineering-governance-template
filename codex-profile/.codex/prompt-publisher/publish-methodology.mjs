@@ -281,11 +281,23 @@ async function rollback(originals) {
 }
 
 async function runPostPublish(config) {
-  const powershell = path.join(process.env.SystemRoot || "C:\\Windows", "System32", "WindowsPowerShell", "v1.0", "powershell.exe");
-  const validate = await runProcess(powershell, ["-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", config.validatorFile], { timeoutMs: 30000 });
+  const invocation = (file) => {
+    const extension = path.extname(file).toLowerCase();
+    if ([".js", ".cjs", ".mjs"].includes(extension)) return { command: process.execPath, args: [file] };
+    if (extension === ".ps1") {
+      const command = process.platform === "win32"
+        ? path.join(process.env.SystemRoot || "C:\\Windows", "System32", "WindowsPowerShell", "v1.0", "powershell.exe")
+        : "pwsh";
+      return { command, args: ["-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", file] };
+    }
+    throw new Error(`不支持的发布后脚本类型：${file}`);
+  };
+  const validator = invocation(config.validatorFile);
+  const validate = await runProcess(validator.command, validator.args, { timeoutMs: 30000 });
   if (validate.code !== 0) throw new Error(`方法论完整性校验失败：${`${validate.stderr}\n${validate.stdout}`.trim()}`);
   const refreshInput = `${JSON.stringify({ hook_event_name: "SessionStart", source: "startup", cwd: path.dirname(config.sourceFile) })}\n`;
-  const refresh = await runProcess(powershell, ["-NoLogo", "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", config.refreshRegistryFile], { input: refreshInput, timeoutMs: 30000 });
+  const refresher = invocation(config.refreshRegistryFile);
+  const refresh = await runProcess(refresher.command, refresher.args, { input: refreshInput, timeoutMs: 30000 });
   if (refresh.code !== 0) throw new Error(`Skill 索引刷新失败：${`${refresh.stderr}\n${refresh.stdout}`.trim()}`);
   return validate.stdout.trim();
 }

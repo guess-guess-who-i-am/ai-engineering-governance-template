@@ -51,5 +51,6 @@ scripts/versions/
 codex-profile/**/logs/
 codex-profile/**/backups/
 codex-profile/**/auth.json
+codex-profile/**/config.toml
 codex-profile/**/.env
 codex-profile/**/.env.*

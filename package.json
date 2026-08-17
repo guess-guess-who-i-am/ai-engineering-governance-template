@@ -3,7 +3,9 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "test:site": "node scripts/test-docs-site.mjs"
+    "test:site": "node scripts/test-docs-site.mjs",
+    "test:codex-profile:linux": "node scripts/test-codex-profile-linux.mjs",
+    "check:codex-profile:linux": "node scripts/install-codex-profile-linux.mjs --check"
   },
   "devDependencies": {
     "axe-core": "4.10.3",
