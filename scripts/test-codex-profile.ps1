@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param()
 
 $ErrorActionPreference = "Stop"
@@ -116,7 +116,11 @@ try {
   $toolHeavyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "请高并发检查多个文件并运行测试"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $toolHeavyOutput = $toolHeavyInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
   $toolHeavyContext = [string](($toolHeavyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($toolHeavyContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V2\]' -or $toolHeavyContext -notmatch 'Promise\.all') {
+  if ($toolHeavyContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V2\]' -or
+      $toolHeavyContext -notmatch 'Promise\.all' -or
+      $toolHeavyContext -notmatch 'Let K = min\(8, that count\)' -or
+      $toolHeavyContext -notmatch 'a 2-4 call batch is noncompliant' -or
+      $toolHeavyContext -notmatch 'process every listed item in the first batch') {
     throw "The context hook did not inject the automatic tool batching contract."
   }
   $plainConcurrencyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "我不知道为什么，现在我感觉还是没有并发，你确定现在是可以并发了吗？"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
