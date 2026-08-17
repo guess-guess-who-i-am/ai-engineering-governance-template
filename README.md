@@ -87,7 +87,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-prof
 
 安装完成后，在该电脑单独完成 Codex 登录并重新启动 Codex，使全局 `AGENTS.md` 和 Hook 重新加载。完整说明见 [可迁移 Codex 全局配置](codex-profile/README.zh.md)。
 
-需要最小默认上下文时，再运行 `scripts/configure-lazy-capabilities.ps1`。它会备份并保留所有 Skill 正文，默认只启用 capability router；Codex Desktop 保留的内置 `node_repl` 注册会被明确设为禁用，task-tree、浏览器和文档插件改为 `-p task-tree`、`-p browser`、`-p documents` 等启动 profile。
+需要最小默认上下文时，再运行 `scripts/configure-lazy-capabilities.ps1`。它会备份并保留所有 Skill 正文，默认只启用 capability router；Codex Desktop 保留的内置 `node_repl` 注册会被明确设为禁用，插件能力与远程插件目录同步默认关闭，普通 `codex exec` 不再触发插件 401、403 或 GitHub 同步等待。task-tree、浏览器和文档插件改为 `-p task-tree`、`-p browser`、`-p documents` 等启动 profile；显式启用插件时，当前 Codex 版本仍可能校验已安装插件 bundle，这是上游运行时行为。
 
 修改过 `hooks.json` 的入口命令后，必须在 Codex 中重新批准两个 dispatcher。只看到 `user_prompt_submit:0:0` 的旧信任记录并不代表新命令已受信任；安装器不会复制或伪造 `trusted_hash`。
 

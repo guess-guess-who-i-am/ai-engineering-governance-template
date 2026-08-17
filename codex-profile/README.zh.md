@@ -23,7 +23,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\configure-lazy-cap
 
 脚本会先备份 `config.toml`、Hook 和 Skill 注册表，再把非核心 `~/.codex/skills` 移到 `~/.codex/deferred-skills/codex`，把非核心 `~/.agents/skills` 移到 `~/.agents/deferred-skills`。正文不会删除；`deferred-skills.tsv` 只保存名称、描述和真实路径，推荐命中后才读取完整 `SKILL.md`。项目自己的 `.agents/skills` 不受影响。
 
-默认只启用 capability router MCP。Codex Desktop 可能仍在 `config.toml` 中保留内置 `node_repl` 的注册信息，但迁移脚本会明确写入 `enabled = false`，所以它不会默认启动；`browser` 和 `full-tools` profile 会显式将它恢复为 `true`。以下 profile 在新任务启动时按需恢复重型能力：
+默认只启用 capability router MCP。Codex Desktop 可能仍在 `config.toml` 中保留内置 `node_repl` 的注册信息，但迁移脚本会明确写入 `enabled = false`，所以它不会默认启动。默认层同时设置 `features.plugins = false` 和 `features.remote_plugin = false`，阻止默认插件加载和远程目录同步；实测普通 `codex exec` 不再出现插件 401、403 或 GitHub 同步等待。按需插件 profile 会显式启用对应插件，当前 Codex 版本仍可能对已启用插件执行远程 bundle 校验，这是上游运行时行为，不能仅靠 `remote_plugin=false` 完全阻止。`browser` 和 `full-tools` profile 会显式恢复 `node_repl`。以下 profile 在新任务启动时按需恢复重型能力：
 
 ```powershell
 codex -p task-tree

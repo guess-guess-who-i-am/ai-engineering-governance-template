@@ -57,6 +57,23 @@ function Set-TomlSectionEnabled([string]$Text, [string]$Section, [bool]$Enabled)
   return $Text.Substring(0, $match.Index) + $sectionText + $Text.Substring($match.Index + $match.Length)
 }
 
+function Set-TomlFeature([string]$Text, [string]$Name, [bool]$Enabled) {
+  $match = [regex]::Match($Text, '(?ms)^\[features\][ \t]*\r?\n.*?(?=^\[|\z)')
+  if (-not $match.Success) { throw 'Codex config has no [features] section.' }
+
+  $escaped = [regex]::Escape($Name)
+  $value = $Enabled.ToString().ToLowerInvariant()
+  $sectionText = $match.Value
+  if ([regex]::IsMatch($sectionText, "(?m)^$escaped\s*=")) {
+    $sectionText = [regex]::Replace($sectionText, "(?m)^($escaped\s*=\s*).*$", "`${1}$value")
+  }
+  else {
+    $header = [regex]::Match($sectionText, '^\[features\][ \t]*\r?\n')
+    $sectionText = $sectionText.Insert($header.Length, "$Name = $value$([Environment]::NewLine)")
+  }
+  return $Text.Substring(0, $match.Index) + $sectionText + $Text.Substring($match.Index + $match.Length)
+}
+
 function Write-Utf8([string]$Path, [string]$Text) {
   New-Item -ItemType Directory -Path (Split-Path -Parent $Path) -Force | Out-Null
   [IO.File]::WriteAllText($Path, $Text, [Text.UTF8Encoding]::new($false))
@@ -88,13 +105,14 @@ function Write-Profiles([string]$ConfigText, [string]$ProfileRoot) {
   $pluginSections = ($plugins | ForEach-Object {
     "[plugins.`"$_`"]`n`nenabled = true`n"
   }) -join "`n"
+  $pluginFeatures = "[features]`nplugins = true`nremote_plugin = false`n"
 
-  Write-Utf8 (Join-Path $ProfileRoot 'task-tree.config.toml') ("[features]`nenable_mcp_apps = true`n`n" + $tree + "`n[plugins.`"task-tree@llm-task-tree`"]`n`nenabled = true`n")
+  Write-Utf8 (Join-Path $ProfileRoot 'task-tree.config.toml') ("[features]`nenable_mcp_apps = true`nremote_plugin = false`n`n" + $tree)
   Write-Utf8 (Join-Path $ProfileRoot 'browser.config.toml') ("[features]`nenable_mcp_apps = true`n`n" + $node)
-  Write-Utf8 (Join-Path $ProfileRoot 'full-tools.config.toml') ("[features]`nenable_mcp_apps = true`nmulti_agent = true`n`n" + $node + "`n" + $tree + "`n" + $pluginSections)
+  Write-Utf8 (Join-Path $ProfileRoot 'full-tools.config.toml') ("[features]`nenable_mcp_apps = true`nmulti_agent = true`nplugins = true`nremote_plugin = false`n`n" + $node + "`n" + $tree + "`n" + $pluginSections)
   foreach ($plugin in @($plugins | Where-Object { $_ -ne 'task-tree@llm-task-tree' })) {
     $fileName = ($plugin -replace '@.*$', '') + '.config.toml'
-    Write-Utf8 (Join-Path $ProfileRoot $fileName) ("[plugins.`"$plugin`"]`n`nenabled = true`n")
+    Write-Utf8 (Join-Path $ProfileRoot $fileName) ($pluginFeatures + "`n[plugins.`"$plugin`"]`n`nenabled = true`n")
   }
 
   $taskTreeProfile = [IO.File]::ReadAllText((Join-Path $ProfileRoot 'task-tree.config.toml'))
@@ -104,11 +122,13 @@ function Write-Profiles([string]$ConfigText, [string]$ProfileRoot) {
     Assert-TextMatch $taskTreeProfile '(?m)^\[mcp_servers\.task_tree\]$' 'The task-tree profile lost its MCP section.'
     Assert-TextMatch $taskTreeProfile '(?ms)^\[mcp_servers\.task_tree\].*?^enabled\s*=\s*true[ \t]*\r?$' 'The task-tree profile does not enable its MCP.'
     Assert-TextMatch $fullToolsProfile '(?m)^\[mcp_servers\.task_tree\]$' 'The full-tools profile lost the task-tree MCP section.'
+    Assert-TextMatch $taskTreeProfile '(?m)^remote_plugin\s*=\s*false[ \t]*\r?$' 'The task-tree profile allows remote plugin catalog sync.'
   }
   if ($nodeSection) {
     Assert-TextMatch $browserProfile '(?ms)^\[mcp_servers\.node_repl\].*?^enabled\s*=\s*true[ \t]*\r?$' 'The browser profile does not enable node_repl.'
     Assert-TextMatch $fullToolsProfile '(?ms)^\[mcp_servers\.node_repl\].*?^enabled\s*=\s*true[ \t]*\r?$' 'The full-tools profile does not enable node_repl.'
   }
+  Assert-TextMatch $fullToolsProfile '(?m)^remote_plugin\s*=\s*false[ \t]*\r?$' 'The full-tools profile allows remote plugin catalog sync.'
 }
 
 if ($Mode -eq 'Restore') {
@@ -162,6 +182,8 @@ foreach ($section in @('mcp_servers.task_tree')) {
 $configText = Set-TomlSectionEnabled $configText 'mcp_servers.node_repl' $false
 $configText = [regex]::Replace($configText, '(?m)^enable_mcp_apps\s*=\s*.*$', 'enable_mcp_apps = false')
 $configText = [regex]::Replace($configText, '(?m)^multi_agent\s*=\s*.*$', 'multi_agent = false')
+$configText = Set-TomlFeature $configText 'plugins' $false
+$configText = Set-TomlFeature $configText 'remote_plugin' $false
 foreach ($plugin in @('documents@openai-primary-runtime', 'pdf@openai-primary-runtime', 'spreadsheets@openai-primary-runtime', 'presentations@openai-primary-runtime', 'template-creator@openai-primary-runtime', 'task-tree@llm-task-tree')) {
   $header = [regex]::Escape("[plugins.`"$plugin`"]")
   $configText = [regex]::Replace($configText, "(?ms)(^$header.*?^enabled\s*=\s*)true", '$1false')
@@ -175,6 +197,8 @@ if (Get-TomlSection $savedConfigText 'mcp_servers.node_repl') {
 if (Get-TomlSection $savedConfigText 'mcp_servers.task_tree') {
   throw 'The default config still contains the task-tree MCP section.'
 }
+Assert-TextMatch $savedConfigText '(?m)^plugins\s*=\s*false[ \t]*\r?$' 'The default config did not disable plugins.'
+Assert-TextMatch $savedConfigText '(?m)^remote_plugin\s*=\s*false[ \t]*\r?$' 'The default config did not disable remote plugin catalog sync.'
 
 $movedCodex = Move-DeferredSkills (Join-Path $codexHome 'skills') $deferredCodex @('.system')
 $movedAgents = Move-DeferredSkills (Join-Path $agentsHome 'skills') $deferredAgents $coreAgentSkills
