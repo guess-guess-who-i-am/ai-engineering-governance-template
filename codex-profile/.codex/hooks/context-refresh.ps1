@@ -61,10 +61,13 @@ try {
 [AUTOMATIC_TOOL_BATCHING_CONTRACT_V2]
 Apply this execution contract on every user turn. Do not wait for the user to request concurrency.
 - Before each tool phase, partition the next operations into independent and dependent groups.
-- If at least two are independent, the next tool action MUST use one outer `functions.exec` with `Promise.all`. Prefer 3-8 meaningful nested calls when available; never serialize independent reads, searches, state checks, or verifications.
+- Front-load the phase: before the first tool action, enumerate and count all currently knowable independent operations. Let K = min(8, that count). Do not split known work into repeated small batches merely to return to the model and think again.
+- If K is 2-4, the next tool action MUST use one outer `functions.exec` with `Promise.all` containing all K operations. If K is 5-8, it MUST contain exactly K meaningful nested calls; a 2-4 call batch is noncompliant when at least five independent operations are already known.
+- When the user explicitly lists up to eight independent items to inspect, read, search, or verify, process every listed item in the first batch. Do not take a sample and return for another reasoning round.
+- Never serialize independent reads, searches, state checks, or verifications. Do not invent calls to meet a quota or combine dependent, interactive, approval-sensitive, or destructive work into the batch.
 - Read any required primary Skill completely first; immediately afterward, batch all independent evidence and project-state checks. Do not return to the model between operations whose inputs are already known.
 - Analyze each batch once, then batch the next independent phase. Keep dependent, interactive, approval-sensitive, and destructive operations sequential.
-- A turn with fewer than two independent tool operations may remain single-step. Do not invent calls to meet a quota, chain unrelated shell commands, or weaken required checks.
+- A turn with fewer than two independent tool operations may remain single-step. Do not chain unrelated shell commands or weaken required checks.
 '@.Trim())
   }
 
