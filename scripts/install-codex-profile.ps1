@@ -77,7 +77,7 @@ $hooks = [ordered]@{
     UserPromptSubmit = @([ordered]@{
       hooks = @(
         [ordered]@{ type = "command"; command = $routerCommand; commandWindows = $routerCommand; timeout = 10; statusMessage = "Recommending relevant Codex Skills"; additionalContextLimit = 1800 },
-        [ordered]@{ type = "command"; command = $contextCommand; commandWindows = $contextCommand; timeout = 5; statusMessage = "Refreshing original-wording reminders and methodology routes"; additionalContextLimit = 8000 }
+        [ordered]@{ type = "command"; command = $contextCommand; commandWindows = $contextCommand; timeout = 5; statusMessage = "Refreshing original-wording reminders, methodology routes, and execution scheduling"; additionalContextLimit = 10000 }
       )
     })
     SessionStart = @([ordered]@{
