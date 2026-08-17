@@ -1,5 +1,5 @@
 ﻿[CmdletBinding()]
-param()
+param([switch]$SkipSourceSyncCheck)
 
 $ErrorActionPreference = "Stop"
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
@@ -10,8 +10,10 @@ $previousCodexHome = $env:CODEX_HOME
 $previousExternalCatalog = $env:CODEX_EXTERNAL_SKILL_CATALOG
 $previousExternalRoot = $env:CODEX_EXTERNAL_SKILL_ROOT
 
-& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $syncScript -Check
-if ($LASTEXITCODE -ne 0) { throw "The committed profile differs from the installed source profile." }
+if (-not $SkipSourceSyncCheck) {
+  & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $syncScript -Check
+  if ($LASTEXITCODE -ne 0) { throw "The committed profile differs from the installed source profile." }
+}
 
 $missingHome = Join-Path $env:TEMP ("codex-profile-missing-" + [guid]::NewGuid().ToString("N"))
 $previousErrorPreference = $ErrorActionPreference
@@ -66,11 +68,12 @@ try {
 
   $hooksPath = Join-Path $testRoot ".codex\hooks.json"
   $hooks = Get-Content -Raw -LiteralPath $hooksPath | ConvertFrom-Json
-  $routerCommand = [string]$hooks.hooks.UserPromptSubmit[0].hooks[0].command
-  if ($routerCommand -notlike "*$testRoot*") { throw "hooks.json does not use the target user profile path." }
-  if ([int]$hooks.hooks.UserPromptSubmit[0].hooks[0].timeout -ne 10) { throw "The Skill router timeout is not configured for the external catalog." }
-  if ([int]$hooks.hooks.UserPromptSubmit[0].hooks[1].additionalContextLimit -ne 10000) { throw "The context hook does not reserve room for conditional tool batching instructions." }
-  if ([int]$hooks.hooks.SessionStart[0].hooks[1].timeout -ne 60) { throw "The Skill refresh timeout is not configured for the first external index build." }
+  if (@($hooks.hooks.UserPromptSubmit[0].hooks).Count -ne 1 -or @($hooks.hooks.SessionStart[0].hooks).Count -ne 1) { throw "hooks.json does not use one stable dispatcher per event." }
+  $dispatcherCommand = [string]$hooks.hooks.UserPromptSubmit[0].hooks[0].command
+  if ($dispatcherCommand -notlike "*$testRoot*" -or $dispatcherCommand -notlike "*hook-dispatch.mjs*") { throw "hooks.json does not use the target user profile dispatcher path." }
+  if ([int]$hooks.hooks.UserPromptSubmit[0].hooks[0].timeout -ne 20) { throw "The prompt dispatcher timeout is not configured." }
+  if ([int]$hooks.hooks.UserPromptSubmit[0].hooks[0].additionalContextLimit -ne 14000) { throw "The prompt dispatcher does not reserve room for reminders and routing." }
+  if ([int]$hooks.hooks.SessionStart[0].hooks[0].timeout -ne 70) { throw "The session dispatcher timeout is not configured for index refresh." }
 
   $backup = Get-ChildItem -LiteralPath (Join-Path $testRoot ".codex\backups\portable-profile") -Filter "AGENTS.md" -Recurse -File | Select-Object -First 1
   if (-not $backup -or (Get-Content -Raw -LiteralPath $backup.FullName) -ne "old-profile-marker") {
@@ -101,38 +104,38 @@ try {
     throw "The external index preloaded Skill body content."
   }
 
-  $router = Join-Path $testRoot ".codex\hooks\skill-router.ps1"
+  $router = Join-Path $testRoot ".codex\hooks\skill-router.mjs"
   $routeInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Analyze ZephyrQuartz billing costs"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
-  $routeOutput = $routeInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $router
+  $routeOutput = $routeInput | & node $router
   $routeContext = [string](($routeOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
   if ($routeContext -notmatch 'zephyrquartz-cost-tuning' -or $routeContext -notmatch [regex]::Escape((Join-Path $externalSkillDirectory "SKILL.md"))) {
     throw "The Skill router did not recommend the relevant external Skill. Output: $(($routeOutput | Out-String).Trim())"
   }
   $unrelatedInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Write a short greeting"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
-  $unrelatedOutput = $unrelatedInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $router
+  $unrelatedOutput = $unrelatedInput | & node $router
   if (($unrelatedOutput | Out-String).Trim() -ne "{}") { throw "The Skill router recommended an external Skill for an unrelated prompt." }
 
-  $contextRefresh = Join-Path $testRoot ".codex\hooks\context-refresh.ps1"
+  $contextRefresh = Join-Path $testRoot ".codex\hooks\hook-dispatch.mjs"
   $toolHeavyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "请高并发检查多个文件并运行测试"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
-  $toolHeavyOutput = $toolHeavyInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
+  $toolHeavyOutput = $toolHeavyInput | & node $contextRefresh
   $toolHeavyContext = [string](($toolHeavyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($toolHeavyContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V2\]' -or
+  if (-not $toolHeavyContext.StartsWith('[AUTOMATIC_TOOL_BATCHING_CONTRACT_V3]') -or
       $toolHeavyContext -notmatch 'Promise\.all' -or
-      $toolHeavyContext -notmatch 'Let K = min\(8, that count\)' -or
-      $toolHeavyContext -notmatch 'a 2-4 call batch is noncompliant' -or
-      $toolHeavyContext -notmatch 'process every listed item in the first batch') {
+      $toolHeavyContext -notmatch 'K = min\(8, the independent count\)' -or
+      $toolHeavyContext -notmatch 'mechanically determined follow-up waves' -or
+      $toolHeavyContext -notmatch 'process every listed item in the first wave') {
     throw "The context hook did not inject the automatic tool batching contract."
   }
   $plainConcurrencyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "我不知道为什么，现在我感觉还是没有并发，你确定现在是可以并发了吗？"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
-  $plainConcurrencyOutput = $plainConcurrencyInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
+  $plainConcurrencyOutput = $plainConcurrencyInput | & node $contextRefresh
   $plainConcurrencyContext = [string](($plainConcurrencyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($plainConcurrencyContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V2\]') {
+  if ($plainConcurrencyContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V3\]') {
     throw "The context hook did not inject automatic batching for the user's concurrency wording."
   }
   $simpleInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "你好"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
-  $simpleOutput = $simpleInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
+  $simpleOutput = $simpleInput | & node $contextRefresh
   $simpleContext = [string](($simpleOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($simpleContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V2\]') {
+  if ($simpleContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V3\]') {
     throw "The context hook did not inject automatic batching for a simple prompt."
   }
 

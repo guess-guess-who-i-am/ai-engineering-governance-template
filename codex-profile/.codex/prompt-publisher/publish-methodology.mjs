@@ -297,7 +297,10 @@ async function runPostPublish(config) {
   if (validate.code !== 0) throw new Error(`方法论完整性校验失败：${`${validate.stderr}\n${validate.stdout}`.trim()}`);
   const refreshInput = `${JSON.stringify({ hook_event_name: "SessionStart", source: "startup", cwd: path.dirname(config.sourceFile) })}\n`;
   const refresher = invocation(config.refreshRegistryFile);
-  const refresh = await runProcess(refresher.command, refresher.args, { input: refreshInput, timeoutMs: 30000 });
+  const refresh = await runProcess(refresher.command, refresher.args, {
+    input: refreshInput,
+    timeoutMs: Number(config.registryRefreshTimeoutMs || 120000)
+  });
   if (refresh.code !== 0) throw new Error(`Skill 索引刷新失败：${`${refresh.stderr}\n${refresh.stdout}`.trim()}`);
   return validate.stdout.trim();
 }

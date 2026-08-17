@@ -13,8 +13,10 @@ $agentsHome = Join-Path $UserHome ".agents"
 
 $codexFiles = @(
   "AGENTS.md",
+  "hooks/hook-dispatch.mjs",
   "hooks/context-refresh.ps1",
   "hooks/refresh-skill-registry.ps1",
+  "hooks/skill-router.mjs",
   "hooks/skill-router.ps1",
   "hooks/validate-methodology-routing.ps1",
   "prompts/global-attention-anchor.en.md",
