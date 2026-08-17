@@ -157,6 +157,8 @@ try {
   }
   assert(configuredText.includes('[plugins."documents@openai-primary-runtime"]\nenabled = false'), "lazy config did not disable an existing plugin section");
   assert(configuredText.includes('[mcp_servers."task_tree"]\nenabled = false\ncommand = "node"'), "lazy config did not disable an existing MCP server section");
+  const taskTreeProfile = await readFile(path.join(home, ".codex", "task-tree.config.toml"), "utf8");
+  assert(taskTreeProfile.includes("[mcp_servers.task_tree]\nenabled = true"), "task-tree profile did not re-enable its MCP server");
   const deferredIndex = await readFile(path.join(registryDirectory, "deferred-skills.tsv"), "utf8");
   assert(deferredIndex.includes("fixture-codex-extra") && deferredIndex.includes("fixture-agent-extra"), "lazy config did not index both deferred Skill roots");
   const backupMatch = configured.stdout.match(/Backup: (.+)/);

@@ -136,13 +136,13 @@ function pluginProfile(plugin) {
 
 async function writeProfiles(codexHome, taskTreeEntry) {
   if (await exists(taskTreeEntry)) {
-    await atomicWrite(path.join(codexHome, "task-tree.config.toml"), `[features]\nenable_mcp_apps = true\nremote_plugin = false\n\n[mcp_servers.task_tree]\ncommand = '${process.execPath}'\nargs = ['${taskTreeEntry}']\nstartup_timeout_sec = 30\n`);
+    await atomicWrite(path.join(codexHome, "task-tree.config.toml"), `[features]\nenable_mcp_apps = true\nremote_plugin = false\n\n[mcp_servers.task_tree]\nenabled = true\ncommand = '${process.execPath}'\nargs = ['${taskTreeEntry}']\nstartup_timeout_sec = 30\n`);
   }
   for (const plugin of PLUGINS) {
     await atomicWrite(path.join(codexHome, `${plugin.split("@")[0]}.config.toml`), pluginProfile(plugin));
   }
   const taskTree = await exists(taskTreeEntry)
-    ? `\n[mcp_servers.task_tree]\ncommand = '${process.execPath}'\nargs = ['${taskTreeEntry}']\nstartup_timeout_sec = 30\n`
+    ? `\n[mcp_servers.task_tree]\nenabled = true\ncommand = '${process.execPath}'\nargs = ['${taskTreeEntry}']\nstartup_timeout_sec = 30\n`
     : "";
   const pluginSections = PLUGINS.map((plugin) => `\n[plugins."${plugin}"]\nenabled = true\n`).join("");
   await atomicWrite(path.join(codexHome, "full-tools.config.toml"), `[features]\nenable_mcp_apps = true\nmulti_agent = false\nplugins = true\nremote_plugin = false\n${taskTree}${pluginSections}`);
