@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const INSTALLER = path.join(SCRIPT_DIR, "install-codex-profile-linux.mjs");
+const LAZY_CONFIGURATOR = path.join(SCRIPT_DIR, "configure-lazy-capabilities-linux.mjs");
 const REPOSITORY_ROOT = path.dirname(SCRIPT_DIR);
 
 function hash(data) { return createHash("sha256").update(data).digest("hex"); }
@@ -88,6 +89,19 @@ try {
   const unrelated = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n` });
   assert(unrelated.status === 0 && unrelated.stdout.trim() === "{}", "unrelated prompt received a methodology recommendation");
 
+  const deferredSkill = path.join(home, ".agents", "deferred-skills", "fixture-deferred", "SKILL.md");
+  await mkdir(path.dirname(deferredSkill), { recursive: true });
+  await writeFile(deferredSkill, "---\nname: zephyrquartz-linux-tuning\ndescription: Diagnose ZephyrQuartz Linux latency.\n---\n");
+  const refreshInput = `${JSON.stringify({ hook_event_name: "SessionStart", source: "startup", cwd: REPOSITORY_ROOT })}\n`;
+  const refresh = run(path.join(home, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { ...envArgs, input: refreshInput });
+  assert(refresh.status === 0, `Linux deferred registry refresh failed: ${refresh.stderr || refresh.stdout}`);
+  const deferredRouteInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Diagnose ZephyrQuartz Linux latency", cwd: REPOSITORY_ROOT })}\n`;
+  const deferredRoute = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: deferredRouteInput });
+  const deferredRouteContext = deferredRoute.status === 0
+    ? String(JSON.parse(deferredRoute.stdout).hookSpecificOutput?.additionalContext || "")
+    : "";
+  assert(deferredRoute.status === 0 && deferredRouteContext.includes("zephyrquartz-linux-tuning") && deferredRouteContext.includes(deferredSkill), `Linux deferred Skill route did not match: ${deferredRoute.stderr || deferredRoute.stdout}`);
+
   const fixtureDirectory = path.join(root, "dispatcher-fixtures");
   await mkdir(fixtureDirectory, { recursive: true });
   const fixtureFiles = [];
@@ -116,6 +130,48 @@ try {
   const check = run(INSTALLER, ["--home", home, "--check", "--json"], { home });
   assert(check.status === 0 && JSON.parse(check.stdout).status === "current", `--check failed: ${check.stderr || check.stdout}`);
 
+  const lazyConfig = `[features]\nenable_mcp_apps = true\nmulti_agent = true\nplugins = true\nremote_plugin = true\n\n[plugins."documents@openai-primary-runtime"]\nenabled = true\n`;
+  await writeFile(configFile, lazyConfig);
+  const originalProfile = path.join(home, ".codex", "documents.config.toml");
+  await writeFile(originalProfile, "sentinel = 'ORIGINAL_PROFILE'\n");
+  const registryDirectory = path.join(home, ".codex", "skill-registry");
+  await mkdir(registryDirectory, { recursive: true });
+  const registrySentinels = new Map([
+    ["skills-index.json", "ORIGINAL_SKILL_INDEX\n"],
+    ["deferred-skills.tsv", "ORIGINAL_DEFERRED_INDEX\n"],
+    ["routing-rules.json", "ORIGINAL_ROUTING_RULES\n"]
+  ]);
+  for (const [name, content] of registrySentinels) await writeFile(path.join(registryDirectory, name), content);
+  const codexExtra = path.join(home, ".codex", "skills", "fixture-codex-extra", "SKILL.md");
+  const agentExtra = path.join(home, ".agents", "skills", "fixture-agent-extra", "SKILL.md");
+  await mkdir(path.dirname(codexExtra), { recursive: true });
+  await mkdir(path.dirname(agentExtra), { recursive: true });
+  await writeFile(codexExtra, "---\nname: fixture-codex-extra\ndescription: Deferred Codex fixture.\n---\n");
+  await writeFile(agentExtra, "---\nname: fixture-agent-extra\ndescription: Deferred Agent fixture.\n---\n");
+
+  const configured = run(LAZY_CONFIGURATOR, ["--home", home], { home });
+  assert(configured.status === 0, `lazy capability configuration failed: ${configured.stderr || configured.stdout}`);
+  const configuredText = await readFile(configFile, "utf8");
+  for (const feature of ["enable_mcp_apps", "multi_agent", "plugins", "remote_plugin"]) {
+    assert((configuredText.match(new RegExp(`^${feature} = false$`, "gm")) || []).length === 1, `lazy config did not set ${feature}=false exactly once`);
+  }
+  assert(configuredText.includes('[plugins."documents@openai-primary-runtime"]\nenabled = false'), "lazy config did not disable an existing plugin section");
+  const deferredIndex = await readFile(path.join(registryDirectory, "deferred-skills.tsv"), "utf8");
+  assert(deferredIndex.includes("fixture-codex-extra") && deferredIndex.includes("fixture-agent-extra"), "lazy config did not index both deferred Skill roots");
+  const backupMatch = configured.stdout.match(/Backup: (.+)/);
+  assert(backupMatch, `lazy config did not report its backup: ${configured.stdout}`);
+
+  const restored = run(LAZY_CONFIGURATOR, ["--home", home, "--restore", backupMatch[1].trim()], { home });
+  assert(restored.status === 0, `lazy capability restore failed: ${restored.stderr || restored.stdout}`);
+  assert(await readFile(configFile, "utf8") === lazyConfig, "lazy restore did not restore config.toml");
+  assert(await readFile(originalProfile, "utf8") === "sentinel = 'ORIGINAL_PROFILE'\n", "lazy restore did not restore an existing profile");
+  assert(!await readFile(path.join(home, ".codex", "task-tree.config.toml")).then(() => true, () => false), "lazy restore left a generated profile behind");
+  assert(await readFile(codexExtra, "utf8").then(() => true, () => false), "lazy restore did not restore a Codex Skill");
+  assert(await readFile(agentExtra, "utf8").then(() => true, () => false), "lazy restore did not restore an Agent Skill");
+  for (const [name, content] of registrySentinels) {
+    assert(await readFile(path.join(registryDirectory, name), "utf8") === content, `lazy restore did not restore ${name}`);
+  }
+
   const failureHome = path.join(root, "rollback-home");
   await seedHome(failureHome, "ROLLBACK_SENTINEL");
   const oldAgents = await readFile(path.join(failureHome, ".codex", "AGENTS.md"));
@@ -126,7 +182,7 @@ try {
   assert((await readFile(path.join(failureHome, ".codex", "hooks.json"))).equals(oldHooks), "rollback did not restore hooks.json");
   assert(!await readFile(path.join(failureHome, ".codex", "prompts", "global-every-turn.en.md")).then(() => true, () => false), "rollback left a newly installed prompt behind");
 
-  console.log("PASS: Linux portable profile install, merge, manifest backup, credential isolation, 63-rule validation, routing, batching, idempotent update, check mode, and rollback.");
+  console.log("PASS: Linux portable profile install, routing, deferred indexing, lazy capability apply/restore, batching, idempotent update, check mode, and rollback.");
 } finally {
   await rm(root, { recursive: true, force: true });
 }

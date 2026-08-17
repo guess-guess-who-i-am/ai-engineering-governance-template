@@ -67,6 +67,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-prof
 ./scripts/install-codex-profile-linux.sh --check
 ```
 
+Linux 主机安装 profile 后，可运行轻量能力迁移：
+
+```bash
+node ./scripts/configure-lazy-capabilities-linux.mjs
+```
+
+脚本备份 `config.toml` 与按需 profile，默认关闭插件和远程插件目录，把非核心 Skills 移入 deferred 目录并刷新轻量索引；存在仓库内 `llm-task-tree/mcp-server.mjs` 时生成纯 MCP 的 `task-tree` profile。恢复命令使用脚本输出的备份目录：`node ./scripts/configure-lazy-capabilities-linux.mjs --restore <备份目录>`。
+
 Linux 安装器使用 `.mjs` Hook 和当前 Node 的绝对路径，不依赖非交互 shell 的 `PATH`。它只维护 `~/.codex/AGENTS.md` 中带标记的模板块，不覆盖用户自己的其他内容；每次实际变更前都会生成带 SHA-256 的 manifest 备份，失败自动回滚。
 
 安装器不会读取或改写 `auth.json`、`config.toml` 和任何密钥。首次安装或 `hooks.json` 改变后，必须在 Codex TUI 中逐项批准 Hook；不能从其他电脑复制信任哈希。完整错误清单和恢复方法见 `docs/CODEX_PROFILE_LINUX.md`。
