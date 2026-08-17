@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { access, copyFile, mkdir, readFile, readdir, rename, unlink, writeFile } from "node:fs/promises";
+import { access, copyFile, lstat, mkdir, readFile, readdir, rename, unlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -110,14 +110,23 @@ async function backupFile(source, backupRoot, home, manifest) {
 
 async function moveDeferred(sourceRoot, destinationRoot, keep, manifest) {
   if (!await exists(sourceRoot)) return;
+  if ((await lstat(sourceRoot)).isSymbolicLink()) {
+    manifest.skippedSkillRoots.push({ source: sourceRoot, reason: "symbolic-link-root" });
+    return;
+  }
   await mkdir(destinationRoot, { recursive: true, mode: 0o700 });
   for (const entry of await readdir(sourceRoot, { withFileTypes: true })) {
     if (!entry.isDirectory() || keep.has(entry.name)) continue;
     const source = path.join(sourceRoot, entry.name);
     const destination = path.join(destinationRoot, entry.name);
     if (await exists(destination)) throw new Error(`Deferred Skill destination already exists: ${destination}`);
-    await rename(source, destination);
-    manifest.movedSkills.push({ source, destination });
+    try {
+      await rename(source, destination);
+      manifest.movedSkills.push({ source, destination });
+    } catch (error) {
+      if (error.code !== "EXDEV") throw error;
+      manifest.skippedSkills.push({ source, destination, reason: "cross-device-boundary" });
+    }
   }
 }
 
@@ -173,7 +182,14 @@ async function apply(options) {
   if (!await exists(configPath)) throw new Error(`Codex config not found: ${configPath}`);
   const timestamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
   const backupRoot = path.join(codexHome, "backups", "lazy-capabilities", timestamp);
-  const manifest = { schemaVersion: "codex-lazy-capabilities-linux/1", createdAt: new Date().toISOString(), files: [], movedSkills: [] };
+  const manifest = {
+    schemaVersion: "codex-lazy-capabilities-linux/1",
+    createdAt: new Date().toISOString(),
+    files: [],
+    movedSkills: [],
+    skippedSkills: [],
+    skippedSkillRoots: []
+  };
   await mkdir(backupRoot, { recursive: true, mode: 0o700 });
   await backupFile(configPath, backupRoot, options.home, manifest);
   for (const profile of PROFILE_NAMES) await backupFile(path.join(codexHome, `${profile}.config.toml`), backupRoot, options.home, manifest);
@@ -201,6 +217,7 @@ async function apply(options) {
   }
   console.log(`Applied Linux lazy capability loading. Backup: ${backupRoot}`);
   console.log(`Moved Skills: ${manifest.movedSkills.length}`);
+  console.log(`Skipped Skills: ${manifest.skippedSkills.length}; skipped roots: ${manifest.skippedSkillRoots.length}`);
 }
 
 const options = parseArgs(process.argv.slice(2));
