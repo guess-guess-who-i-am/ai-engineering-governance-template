@@ -119,6 +119,12 @@ try {
   if ($toolHeavyContext -notmatch '\[TOOL_BATCHING_EXECUTION_CONTRACT_V1\]' -or $toolHeavyContext -notmatch 'Promise\.all') {
     throw "The context hook did not inject the tool batching execution contract for a tool-heavy prompt."
   }
+  $plainConcurrencyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "我不知道为什么，现在我感觉还是没有并发，你确定现在是可以并发了吗？"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
+  $plainConcurrencyOutput = $plainConcurrencyInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
+  $plainConcurrencyContext = [string](($plainConcurrencyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
+  if ($plainConcurrencyContext -notmatch '\[TOOL_BATCHING_EXECUTION_CONTRACT_V1\]') {
+    throw "The context hook did not recognize the user's plain concurrency wording."
+  }
   $simpleInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "你好"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $simpleOutput = $simpleInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
   $simpleContext = [string](($simpleOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
