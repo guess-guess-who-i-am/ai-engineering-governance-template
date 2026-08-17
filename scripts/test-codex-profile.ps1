@@ -116,20 +116,20 @@ try {
   $toolHeavyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "请高并发检查多个文件并运行测试"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $toolHeavyOutput = $toolHeavyInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
   $toolHeavyContext = [string](($toolHeavyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($toolHeavyContext -notmatch '\[TOOL_BATCHING_EXECUTION_CONTRACT_V1\]' -or $toolHeavyContext -notmatch 'Promise\.all') {
-    throw "The context hook did not inject the tool batching execution contract for a tool-heavy prompt."
+  if ($toolHeavyContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V2\]' -or $toolHeavyContext -notmatch 'Promise\.all') {
+    throw "The context hook did not inject the automatic tool batching contract."
   }
   $plainConcurrencyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "我不知道为什么，现在我感觉还是没有并发，你确定现在是可以并发了吗？"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $plainConcurrencyOutput = $plainConcurrencyInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
   $plainConcurrencyContext = [string](($plainConcurrencyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($plainConcurrencyContext -notmatch '\[TOOL_BATCHING_EXECUTION_CONTRACT_V1\]') {
-    throw "The context hook did not recognize the user's plain concurrency wording."
+  if ($plainConcurrencyContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V2\]') {
+    throw "The context hook did not inject automatic batching for the user's concurrency wording."
   }
   $simpleInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "你好"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $simpleOutput = $simpleInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $contextRefresh
   $simpleContext = [string](($simpleOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($simpleContext -match '\[TOOL_BATCHING_EXECUTION_CONTRACT_V1\]') {
-    throw "The context hook injected the tool batching contract for a simple greeting."
+  if ($simpleContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V2\]') {
+    throw "The context hook did not inject automatic batching for a simple prompt."
   }
 
   $refresh = Join-Path $testRoot ".codex\hooks\refresh-skill-registry.ps1"
@@ -158,7 +158,7 @@ try {
   $manifestUpdated = Get-Content -LiteralPath $externalManifestPath -Raw | ConvertFrom-Json
   if ([int]$manifestUpdated.skillCount -ne 2) { throw "The external index did not rebuild after its catalog changed." }
 
-  Write-Host "PASS: profile sync, clean install, backup, generated paths, 6 custom Skills, external indexing, cache invalidation, body isolation, prompt routing, and conditional tool batching injection."
+  Write-Host "PASS: profile sync, clean install, backup, generated paths, 6 custom Skills, external indexing, cache invalidation, body isolation, prompt routing, and automatic per-turn tool batching injection."
 } finally {
   $env:USERPROFILE = $previousUserProfile
   $env:CODEX_HOME = $previousCodexHome
