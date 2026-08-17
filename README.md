@@ -41,7 +41,7 @@
 
 ## 跨电脑复用 Codex 全局配置
 
-当前完整工程保存在公开仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是受保护的 `main`。`codex-profile/` 是本机全局 Codex 配置的可迁移版本，另一台 Windows 电脑克隆仓库后即可安装同一套方法论路由、Hook、发布器和自建 Skills。
+当前完整工程保存在公开仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是受保护的 `main`。`codex-profile/` 是本机全局 Codex 配置的可迁移版本，另一台 Windows 或 Linux 电脑克隆仓库后即可安装同一套方法论路由、Hook、发布器和自建 Skills。
 
 ### 仓库中具体保存了什么
 
@@ -81,6 +81,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-prof
 5. 校验63条方法论的中英文对应关系并刷新 Skill 索引。
 
 安装完成后，在该电脑单独完成 Codex 登录并重新启动 Codex，使全局 `AGENTS.md` 和 Hook 重新加载。完整说明见 [可迁移 Codex 全局配置](codex-profile/README.zh.md)。
+
+### 在另一台 Linux 电脑安装
+
+```bash
+git clone https://github.com/guess-guess-who-i-am/ai-engineering-governance-template.git
+cd ai-engineering-governance-template
+./scripts/install-codex-profile-linux.sh
+./scripts/install-codex-profile-linux.sh --check
+```
+
+Linux 安装器保留已有 `~/.codex/AGENTS.md` 的用户内容，生成带目标机绝对 Node 路径的 `hooks.json`，并在写入前创建 manifest 备份。安装、发布器校验或 Hook 验证任一步失败都会自动回滚。真实遇到的 PATH、PowerShell、Hook 信任、网络和并发配置错误见 [Linux 安装与故障排查](docs/CODEX_PROFILE_LINUX.md)。
 
 若外部 Skills 不在默认的 `E:\skills`，可在该电脑设置 `CODEX_EXTERNAL_SKILL_ROOT` 和 `CODEX_EXTERNAL_SKILL_CATALOG`。生成的 `external-skills.tsv` 与 manifest 只保存在 `~/.codex/skill-registry/`，不提交第三方 Skill 正文；源目录发生变化时才重建，普通会话启动只检查目录元数据。
 

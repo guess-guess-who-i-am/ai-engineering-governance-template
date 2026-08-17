@@ -13,6 +13,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  portable-profile-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+      - name: Test Linux portable Codex profile
+        run: node scripts/test-codex-profile-linux.mjs
+
   validate:
     runs-on: windows-latest
     timeout-minutes: 20

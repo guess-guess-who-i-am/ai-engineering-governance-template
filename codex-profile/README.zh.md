@@ -1,6 +1,6 @@
 # 可迁移 Codex 全局配置
 
-这个目录是当前全局方法论系统的可迁移快照。它包含：
+这个目录是当前全局方法论系统的可迁移快照，同时支持 Windows 和 Linux。它包含：
 
 - 全局 `AGENTS.md`；
 - 每轮常驻提醒、方法论路由、Skill 推荐器和会话恢复 Hook；
@@ -27,6 +27,17 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-prof
 安装器会先把目标电脑上即将被覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`，再安装配置、按目标用户名生成 `hooks.json`、创建两个桌面编辑入口，并执行63条方法论完整性校验和 Skill 索引刷新。
 
 安装后重新启动 Codex，使用户级 `AGENTS.md` 和 Hook 重新加载。随后分别执行 `gh auth login` 和该电脑上的 Codex 登录流程。
+
+## 在另一台 Linux 电脑安装
+
+```bash
+./scripts/install-codex-profile-linux.sh
+./scripts/install-codex-profile-linux.sh --check
+```
+
+Linux 安装器使用 `.mjs` Hook 和当前 Node 的绝对路径，不依赖非交互 shell 的 `PATH`。它只维护 `~/.codex/AGENTS.md` 中带标记的模板块，不覆盖用户自己的其他内容；每次实际变更前都会生成带 SHA-256 的 manifest 备份，失败自动回滚。
+
+安装器不会读取或改写 `auth.json`、`config.toml` 和任何密钥。首次安装或 `hooks.json` 改变后，必须在 Codex TUI 中逐项批准 Hook；不能从其他电脑复制信任哈希。完整错误清单和恢复方法见 `docs/CODEX_PROFILE_LINUX.md`。
 
 外部库不在默认路径时，在目标电脑设置：
 
