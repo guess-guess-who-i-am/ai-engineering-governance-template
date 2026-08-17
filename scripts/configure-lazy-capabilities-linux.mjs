@@ -76,6 +76,27 @@ function setPluginEnabled(text, plugin, enabled) {
   return text.slice(0, match.index) + replacement + text.slice(match.index + match[0].length);
 }
 
+function setMcpEnabled(text, server, enabled) {
+  const escaped = server.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const section = new RegExp(`^\\[mcp_servers(?:\\."${escaped}"|\\.${escaped})\\][ \\t]*\\n[\\s\\S]*?(?=^\\[|(?![\\s\\S]))`, "m");
+  const match = text.match(section);
+  if (!match) return text;
+  const enabledLine = /^enabled\s*=.*$/m;
+  const replacement = enabledLine.test(match[0])
+    ? match[0].replace(enabledLine, `enabled = ${enabled}`)
+    : match[0].replace(/^([^\n]+\n)/, `$1enabled = ${enabled}\n`);
+  return text.slice(0, match.index) + replacement + text.slice(match.index + match[0].length);
+}
+
+function directMcpServerNames(text) {
+  return [...text.matchAll(/^\[mcp_servers(?:\."([^"]+)"|\.([A-Za-z0-9_-]+))\][ \t]*$/gm)]
+    .map((match) => match[1] || match[2]);
+}
+
+function directPluginNames(text) {
+  return [...text.matchAll(/^\[plugins\."([^"]+)"\][ \t]*$/gm)].map((match) => match[1]);
+}
+
 async function backupFile(source, backupRoot, home, manifest) {
   const relative = path.relative(home, source);
   const destination = path.join(backupRoot, "files", relative);
@@ -165,7 +186,8 @@ async function apply(options) {
     for (const [name, value] of [["enable_mcp_apps", false], ["multi_agent", false], ["plugins", false], ["remote_plugin", false]]) {
       config = setFeature(config, name, value);
     }
-    for (const plugin of [...PLUGINS, "task-tree@llm-task-tree"]) config = setPluginEnabled(config, plugin, false);
+    for (const plugin of new Set([...PLUGINS, ...directPluginNames(config)])) config = setPluginEnabled(config, plugin, false);
+    for (const server of directMcpServerNames(config)) config = setMcpEnabled(config, server, false);
     await atomicWrite(configPath, config);
     await writeProfiles(codexHome, options.taskTreeEntry);
 

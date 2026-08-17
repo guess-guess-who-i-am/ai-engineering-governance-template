@@ -130,7 +130,7 @@ try {
   const check = run(INSTALLER, ["--home", home, "--check", "--json"], { home });
   assert(check.status === 0 && JSON.parse(check.stdout).status === "current", `--check failed: ${check.stderr || check.stdout}`);
 
-  const lazyConfig = `[features]\nenable_mcp_apps = true\nmulti_agent = true\nplugins = true\nremote_plugin = true\n\n[plugins."documents@openai-primary-runtime"]\nenabled = true\n`;
+  const lazyConfig = `[features]\nenable_mcp_apps = true\nmulti_agent = true\nplugins = true\nremote_plugin = true\n\n[plugins."documents@openai-primary-runtime"]\nenabled = true\n\n[mcp_servers."task_tree"]\ncommand = "node"\n`;
   await writeFile(configFile, lazyConfig);
   const originalProfile = path.join(home, ".codex", "documents.config.toml");
   await writeFile(originalProfile, "sentinel = 'ORIGINAL_PROFILE'\n");
@@ -156,6 +156,7 @@ try {
     assert((configuredText.match(new RegExp(`^${feature} = false$`, "gm")) || []).length === 1, `lazy config did not set ${feature}=false exactly once`);
   }
   assert(configuredText.includes('[plugins."documents@openai-primary-runtime"]\nenabled = false'), "lazy config did not disable an existing plugin section");
+  assert(configuredText.includes('[mcp_servers."task_tree"]\nenabled = false\ncommand = "node"'), "lazy config did not disable an existing MCP server section");
   const deferredIndex = await readFile(path.join(registryDirectory, "deferred-skills.tsv"), "utf8");
   assert(deferredIndex.includes("fixture-codex-extra") && deferredIndex.includes("fixture-agent-extra"), "lazy config did not index both deferred Skill roots");
   const backupMatch = configured.stdout.match(/Backup: (.+)/);
