@@ -7,10 +7,34 @@ import path from "node:path";
 import readline from "node:readline";
 import { createReadStream } from "node:fs";
 
+const debugEnabled = process.env.CODEX_SKILL_ROUTER_DEBUG === "1";
+function debug(label, value) {
+  if (!debugEnabled) return;
+  process.stderr.write(`[skill-router] ${label}: ${typeof value === "string" ? value : JSON.stringify(value)}\n`);
+}
+
 async function readInput() {
-  let raw = "";
-  for await (const chunk of process.stdin) raw += chunk;
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  const raw = decodeInput(Buffer.concat(chunks));
   try { return JSON.parse(raw || "{}"); } catch { return {}; }
+}
+
+function decodeInput(bytes) {
+  if (!bytes.length) return "";
+  if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) return bytes.subarray(2).toString("utf16le");
+  if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
+    const swapped = Buffer.from(bytes.subarray(2, bytes.length - (bytes.length % 2)));
+    swapped.swap16();
+    return swapped.toString("utf16le");
+  }
+  const pairs = Math.min(Math.floor(bytes.length / 2), 128);
+  let oddZeros = 0;
+  for (let index = 0; index < pairs; index += 1) {
+    if (bytes[index * 2 + 1] === 0) oddZeros += 1;
+  }
+  if (pairs >= 4 && oddZeros / pairs >= 0.4) return bytes.toString("utf16le");
+  return bytes.toString("utf8").replace(/^\uFEFF/, "");
 }
 
 function queryTokens(text, stopTokens) {
@@ -61,12 +85,22 @@ function rgCandidates(indexPath, patterns) {
     args.push("--", indexPath);
     const child = spawn("rg", args, { windowsHide: true, stdio: ["ignore", "pipe", "ignore"] });
     let output = "";
-    const timer = setTimeout(() => child.kill(), 3000);
+    let timedOut = false;
+    const configuredTimeout = Number.parseInt(process.env.CODEX_SKILL_ROUTER_RG_TIMEOUT_MS || "3000", 10);
+    const timeoutMs = Number.isFinite(configuredTimeout) && configuredTimeout > 0 ? configuredTimeout : 3000;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill();
+    }, timeoutMs);
     child.stdout.on("data", (chunk) => { output += chunk.toString("utf8"); });
     child.on("error", () => { clearTimeout(timer); resolve(null); });
     child.on("close", (code) => {
       clearTimeout(timer);
-      resolve([0, 1].includes(Number(code)) ? output.split(/\r?\n/).filter(Boolean).slice(0, 300) : null);
+      if (timedOut || code === null) {
+        resolve(null);
+        return;
+      }
+      resolve([0, 1].includes(code) ? output.split(/\r?\n/).filter(Boolean).slice(0, 300) : null);
     });
   });
 }
@@ -84,10 +118,14 @@ async function streamedCandidates(indexPath, patterns) {
 }
 
 async function externalScores(indexPath, tokens, query, aliases, excludedNames) {
-  if (!indexPath || !existsSync(indexPath)) return [];
+  if (!indexPath || !existsSync(indexPath)) {
+    debug("missing index", indexPath || "<empty>");
+    return [];
+  }
   const patterns = [...new Set(tokens.filter((token) => token.length >= 3).sort((a, b) => b.length - a.length))].slice(0, 16);
   if (!patterns.length) return [];
   const lines = await rgCandidates(indexPath, patterns) || await streamedCandidates(indexPath, patterns);
+  debug("index candidates", { indexPath, patterns, lines: lines.length });
   const best = new Map();
   for (const line of lines) {
     if (!line || line.startsWith("#")) continue;
@@ -108,7 +146,9 @@ async function externalScores(indexPath, tokens, query, aliases, excludedNames) 
     if (candidate.score <= 0) continue;
     if (!best.has(normalized) || candidate.score > best.get(normalized).score) best.set(normalized, candidate);
   }
-  return [...best.values()];
+  const results = [...best.values()];
+  debug("index scores", results.map((item) => ({ name: item.skill.name, score: item.score })));
+  return results;
 }
 
 try {
@@ -133,16 +173,20 @@ try {
   const knownNames = new Set(skills.map((skill) => String(skill.name || "").toLocaleLowerCase()));
   const localAliasMatch = [...knownNames].some((name) => (aliases[name] || []).some((alias) => query.includes(alias)));
   const scored = skills.map((skill) => scoreSkill(skill, tokens, query, aliases)).filter((item) => item.score > 0);
+  debug("request", { prompt, codexRoot, tokens, localAliasMatch, localScores: scored.length });
   if (!localAliasMatch) {
-    scored.push(...await externalScores(
+    const indexPaths = [
       registry.externalIndexPath || path.join(codexRoot, "skill-registry", "external-skills.tsv"),
-      tokens,
-      query,
-      aliases,
-      knownNames
-    ));
+      registry.deferredIndexPath || path.join(codexRoot, "skill-registry", "deferred-skills.tsv")
+    ].filter((value, index, values) => value && values.indexOf(value) === index);
+    debug("index paths", indexPaths);
+    const indexed = await Promise.all(indexPaths.map((indexPath) => externalScores(
+      indexPath, tokens, query, aliases, knownNames
+    )));
+    scored.push(...indexed.flat());
   }
   scored.sort((a, b) => b.score - a.score || Number(a.skill.rank || 0) - Number(b.skill.rank || 0) || String(a.skill.name).localeCompare(String(b.skill.name)));
+  debug("top scores", scored.slice(0, 6).map((item) => ({ name: item.skill.name, score: item.score })));
   if (!scored.length || scored[0].score < 6) {
     process.stdout.write("{}");
     process.exit(0);

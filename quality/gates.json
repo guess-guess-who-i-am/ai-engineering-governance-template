@@ -119,6 +119,20 @@
       }
     },
     {
+      "id": "document-validator-contract",
+      "category": "governance",
+      "state": "active",
+      "failurePriority": "P1",
+      "owner": "documentation-maintainers",
+      "remediation": "Restore coverage for governed untracked files and invalid JSON rejection, then rerun the validator contract test.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/test-document-validation.ps1"]
+      }
+    },
+    {
       "id": "release-contract",
       "category": "governance",
       "state": "active",

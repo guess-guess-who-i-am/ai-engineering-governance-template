@@ -109,7 +109,25 @@ try {
   $routeOutput = $routeInput | & node $router
   $routeContext = [string](($routeOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
   if ($routeContext -notmatch 'zephyrquartz-cost-tuning' -or $routeContext -notmatch [regex]::Escape((Join-Path $externalSkillDirectory "SKILL.md"))) {
-    throw "The Skill router did not recommend the relevant external Skill. Output: $(($routeOutput | Out-String).Trim())"
+    $previousDebug = $env:CODEX_SKILL_ROUTER_DEBUG
+    try {
+      $env:CODEX_SKILL_ROUTER_DEBUG = "1"
+      $diagnosticOutput = $routeInput | & node $router 2>&1
+    } finally {
+      $env:CODEX_SKILL_ROUTER_DEBUG = $previousDebug
+    }
+    throw "The Skill router did not recommend the relevant external Skill. Input: $routeInput Output: $(($routeOutput | Out-String).Trim()) Diagnostic: $(($diagnosticOutput | Out-String).Trim())"
+  }
+  $previousRouterTimeout = $env:CODEX_SKILL_ROUTER_RG_TIMEOUT_MS
+  try {
+    $env:CODEX_SKILL_ROUTER_RG_TIMEOUT_MS = "1"
+    $timeoutRouteOutput = $routeInput | & node $router
+    $timeoutRouteContext = [string](($timeoutRouteOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
+    if ($timeoutRouteContext -notmatch 'zephyrquartz-cost-tuning') {
+      throw "The Skill router did not fall back to streamed index search after rg timed out. Output: $(($timeoutRouteOutput | Out-String).Trim())"
+    }
+  } finally {
+    $env:CODEX_SKILL_ROUTER_RG_TIMEOUT_MS = $previousRouterTimeout
   }
   $unrelatedInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Write a short greeting"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $unrelatedOutput = $unrelatedInput | & node $router

@@ -8,9 +8,13 @@
 
 对产品能力建立或更新 `requirements/user-stories/US-nnn-*.md`：Actor / Need / Value 定义意图，`AC-nnn` 用 Given / When / Then 定义可证伪的成功、失败和边界结果。
 
+当一个最终结果跨多个 Story、模块或阶段时，先建立 `requirements/user-journeys/UJ-nnn-*.md`。只有高影响歧义、跨边界实现、数据迁移、复杂发布或回滚需要时才建立 `requirements/plans/US-nnn-*.md`；可逆局部修改直接执行。
+
 ## 2. Authority routing
 
 按 `AGENTS.md` 找到权威：术语看 `CONTEXT.md`，UI 看 `DESIGN.md`，公共行为看 contract，局部实现看最近代码与测试。
+
+事实归属或文档联动不清楚时读 `docs/DOCUMENTATION_AUTHORITY.md`；项目开工、Story 交付、集成或发布判断读 `docs/PROJECT_LIFECYCLE.md`；新增长期服务、数据、模型、GPU、付费 API 或共享环境时读 `docs/RESOURCE_REGISTRY.md`。
 
 ## 3. First vertical slice
 
@@ -44,6 +48,8 @@
 ## 6. Delivery
 
 交付说明必须包含：用户现在能做什么、改动边界、实际运行的证据、未验证内容和下一项真实风险。GitHub Issues/PR 应链接对应 contract、Flow 或验证日志。
+
+完成声明按 Gate 0–4 使用真实候选、提交、环境和制品证据。Hotfix 从已部署标签或精确提交建立，不用含有未部署内容的新 `main` 替代生产事实。
 
 ## GitHub 协作建议
 

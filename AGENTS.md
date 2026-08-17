@@ -8,8 +8,11 @@ This repository stores reusable AI engineering-governance templates. The objecti
 2. For an ordinary local change, read only the nearest code and tests; do not preload every document or Skill.
 3. Read `CONTEXT.md` when the task changes global terminology, ownership, or boundaries.
 4. Read `DESIGN.md` when the task changes the UI visual system.
-5. Load one primary Skill only when its trigger description clearly matches. `Pair with` text and reference links are not automatic chaining commands.
-6. Rules that can be judged mechanically must be enforced by scripts, tests, contracts, or Flow, not by model self-report alone.
+5. Read `docs/DOCUMENTATION_AUTHORITY.md` only when fact ownership or required document linkage is unclear.
+6. Read `docs/PROJECT_LIFECYCLE.md` when starting a project or Story, preparing integration, or making a release claim.
+7. Read `docs/RESOURCE_REGISTRY.md` when adding persistent, scarce, paid, privileged, or data-bearing resources.
+8. Load one primary Skill only when its trigger description clearly matches. `Pair with` text and reference links are not automatic chaining commands.
+9. Rules that can be judged mechanically must be enforced by scripts, tests, contracts, or Flow, not by model self-report alone.
 
 ## Authority order
 
@@ -18,6 +21,8 @@ This repository stores reusable AI engineering-governance templates. The objecti
 | User objective and definition of success | The user's latest request |
 | Global terminology and ownership | `CONTEXT.md` |
 | Visual language | `DESIGN.md` |
+| Document ownership and lifecycle gates | `docs/DOCUMENTATION_AUTHORITY.md`, `docs/PROJECT_LIFECYCLE.md` |
+| Persistent or shared resources | `docs/RESOURCE_REGISTRY.md` |
 | Public interface behavior | Owning contract / schema |
 | Local implementation rules | Nearest `AGENTS.md` and existing code |
 | Specialized workflow | Triggered `.agents/skills/<name>/SKILL.md` |
@@ -38,6 +43,7 @@ When authorities conflict, the authority closest to the real behavior and with e
 - Put complete third-party mirrors in `upstreams/` and do not commit them to this repository. Record sources and pinned versions in `UPSTREAMS.md` and `.reports/upstreams.json`.
 - Do not copy upstream source with unclear licensing into the core templates.
 - Skills follow `.agents/skills/README.md`; keep bodies concise and put deterministic logic in `scripts/`.
+- Register persistent, scarce, paid, privileged, or data-bearing resources with an owner, review condition, and cleanup action.
 - Do not commit tokens, cookies, API keys, `.env` files, or machine-local configuration.
 - Preserve unrelated user changes and avoid destructive Git operations.
 - Without evidence, do not claim “completed,” “fixed,” or “passed.”

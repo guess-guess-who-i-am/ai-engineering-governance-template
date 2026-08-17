@@ -5,11 +5,29 @@ import os from "node:os";
 import path from "node:path";
 
 async function readInput() {
-  let raw = "";
-  for await (const chunk of process.stdin) raw += chunk;
+  const chunks = [];
+  for await (const chunk of process.stdin) chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  const raw = decodeInput(Buffer.concat(chunks));
   let parsed = {};
   try { parsed = JSON.parse(raw || "{}"); } catch { /* Individual handlers will receive the original input. */ }
   return { raw: raw || "{}", parsed };
+}
+
+function decodeInput(bytes) {
+  if (!bytes.length) return "";
+  if (bytes.length >= 2 && bytes[0] === 0xff && bytes[1] === 0xfe) return bytes.subarray(2).toString("utf16le");
+  if (bytes.length >= 2 && bytes[0] === 0xfe && bytes[1] === 0xff) {
+    const swapped = Buffer.from(bytes.subarray(2, bytes.length - (bytes.length % 2)));
+    swapped.swap16();
+    return swapped.toString("utf16le");
+  }
+  const pairs = Math.min(Math.floor(bytes.length / 2), 128);
+  let oddZeros = 0;
+  for (let index = 0; index < pairs; index += 1) {
+    if (bytes[index * 2 + 1] === 0) oddZeros += 1;
+  }
+  if (pairs >= 4 && oddZeros / pairs >= 0.4) return bytes.toString("utf16le");
+  return bytes.toString("utf8").replace(/^\uFEFF/, "");
 }
 
 function invocation(file) {

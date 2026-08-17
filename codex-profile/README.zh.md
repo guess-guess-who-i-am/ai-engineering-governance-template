@@ -13,6 +13,35 @@
 
 推荐器同时支持大型外部 Skill 库。默认读取 `E:\skills\_catalog_cn.json`，将约1.5万条名称、描述、中文问题、使用条件、分类和真实路径编译到 `~/.codex/skill-registry/external-skills.tsv`。它不会递归读取或注入这些 `SKILL.md` 正文；每轮只流式检索轻量索引，最多推荐4个候选，模型确认相关后才读取对应正文。
 
+## 默认轻量加载
+
+Windows 主机可运行以下命令，把大量用户 Skills、插件和重型 MCP 从“每个任务自动加载”改为“索引发现、按需启用”：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\configure-lazy-capabilities.ps1
+```
+
+脚本会先备份 `config.toml`、Hook 和 Skill 注册表，再把非核心 `~/.codex/skills` 移到 `~/.codex/deferred-skills/codex`，把非核心 `~/.agents/skills` 移到 `~/.agents/deferred-skills`。正文不会删除；`deferred-skills.tsv` 只保存名称、描述和真实路径，推荐命中后才读取完整 `SKILL.md`。项目自己的 `.agents/skills` 不受影响。
+
+默认只启用 capability router MCP。Codex Desktop 可能仍在 `config.toml` 中保留内置 `node_repl` 的注册信息，但迁移脚本会明确写入 `enabled = false`，所以它不会默认启动；`browser` 和 `full-tools` profile 会显式将它恢复为 `true`。以下 profile 在新任务启动时按需恢复重型能力：
+
+```powershell
+codex -p task-tree
+codex -p browser
+codex -p documents
+codex -p pdf
+codex -p spreadsheets
+codex -p presentations
+codex -p template-creator
+codex -p full-tools
+```
+
+恢复时使用脚本输出的备份目录：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\configure-lazy-capabilities.ps1 -Mode Restore -BackupPath <备份目录>
+```
+
 原始的“通常直接5到8个工具调用或者进程的并发”仍逐轮注入且没有改写。除此之外，`context-refresh.ps1` 会把英文自动执行契约放在每次用户提示附加上下文的最前面，不再判断用户是否提到“并发”。该契约要求只要存在两个以上真实独立的操作就批量提交；能根据上一波结果机械确定的后续操作继续留在同一个工具编排中。简单单步任务仍可单步执行，也不会把存在语义依赖、交互确认、审批或破坏性的步骤伪装成并发。
 
 曾经出现过的退化根因是：新增 capability router 后，`context-refresh` 从 `user_prompt_submit:0:1` 移到 `0:2`，而 `config.toml` 只保留了 `0:0` 的信任记录，所以新任务没有执行并发契约。同时旧 PowerShell Skill 推荐器会用宽泛中文二元词扫描15471条外部索引，单次最坏约80秒。当前 dispatcher 固定每个事件只有一个入口，Skill 推荐器改用 Node、三元词和最多300条候选；本机实测推荐约0.3–0.4秒。

@@ -46,6 +46,11 @@ subtrees/
 skill-routing-log.md
 scripts/versions/
 .task-tree-maintenance/
+.task-tree-threads.json
+
+# Machine caches and local reference imports.
+/Microsoft/
+/开发规范/
 
 # Portable profile contains generated state, but never local credentials or logs.
 codex-profile/**/logs/

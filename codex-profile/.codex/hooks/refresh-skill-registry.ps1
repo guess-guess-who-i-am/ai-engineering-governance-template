@@ -152,6 +152,48 @@ function Update-ExternalSkillIndex {
   return [pscustomobject]$manifest
 }
 
+function Update-DeferredSkillIndex {
+  param([string]$RegistryDirectory, [string]$CodexHome)
+
+  $roots = @(
+    (Join-Path $CodexHome "deferred-skills\codex"),
+    (Join-Path $env:USERPROFILE ".agents\deferred-skills")
+  ) | Where-Object { Test-Path -LiteralPath $_ -PathType Container }
+  $indexPath = Join-Path $RegistryDirectory "deferred-skills.tsv"
+  $manifestPath = Join-Path $RegistryDirectory "deferred-skills-manifest.json"
+  $tempIndexPath = "$indexPath.tmp"
+  $writer = New-Object IO.StreamWriter($tempIndexPath, $false, $utf8)
+  $count = 0
+  try {
+    $writer.WriteLine("# codex-deferred-skill-index/1")
+    foreach ($root in $roots) {
+      foreach ($file in @(Get-ChildItem -LiteralPath $root -Filter "SKILL.md" -Recurse -File -ErrorAction SilentlyContinue)) {
+        $text = [IO.File]::ReadAllText($file.FullName)
+        $name = ConvertTo-IndexField (Get-SkillName -Text $text -FilePath $file.FullName)
+        $description = ConvertTo-IndexField (Get-SkillDescription -Text $text)
+        if (-not $name -or -not $description) { continue }
+        $fields = @($name, $description, "", "", "", "", (ConvertTo-IndexField $file.FullName), "deferred")
+        $writer.WriteLine(($fields -join "`t"))
+        $count++
+      }
+    }
+  } finally {
+    $writer.Dispose()
+  }
+  Move-Item -LiteralPath $tempIndexPath -Destination $indexPath -Force
+  $manifest = [ordered]@{
+    schemaVersion = "codex-deferred-skill-index/1"
+    generatedAt = [DateTime]::UtcNow.ToString("o")
+    roots = @($roots)
+    skillCount = $count
+    indexPath = $indexPath
+  }
+  $tempManifestPath = "$manifestPath.tmp"
+  [IO.File]::WriteAllText($tempManifestPath, ($manifest | ConvertTo-Json -Depth 4), $utf8)
+  Move-Item -LiteralPath $tempManifestPath -Destination $manifestPath -Force
+  return [pscustomobject]$manifest
+}
+
 try {
   $inputText = [Console]::In.ReadToEnd()
   $hookInput = if ($inputText) { try { $inputText | ConvertFrom-Json } catch { $null } } else { $null }
@@ -165,12 +207,12 @@ try {
   } catch {
     [Console]::Error.WriteLine("External Skill index refresh skipped: $($_.Exception.Message)")
   }
+  $deferredManifest = Update-DeferredSkillIndex -RegistryDirectory $registryDir -CodexHome $codexHome
 
   $roots = @(
     [pscustomobject]@{ source = "codex"; rank = 10; path = (Join-Path $codexHome "skills") },
     [pscustomobject]@{ source = "agents"; rank = 20; path = (Join-Path $env:USERPROFILE ".agents\skills") },
-    [pscustomobject]@{ source = "orchestra"; rank = 30; path = (Join-Path $env:USERPROFILE ".orchestra\skills") },
-    [pscustomobject]@{ source = "plugin-cache"; rank = 40; path = "D:\Codex\desktop\plugins\cache" }
+    [pscustomobject]@{ source = "orchestra"; rank = 30; path = (Join-Path $env:USERPROFILE ".orchestra\skills") }
   )
   $projectCwd = [string]$hookInput.cwd
   if ($projectCwd -and (Test-Path -LiteralPath $projectCwd -PathType Container)) {
@@ -211,6 +253,7 @@ try {
     skillCount = $skills.Count
     externalSkillCount = if ($externalManifest) { [int]$externalManifest.skillCount } else { 0 }
     externalIndexPath = if ($externalManifest) { [string]$externalManifest.indexPath } else { "" }
+    deferredIndexPath = if ($deferredManifest) { [string]$deferredManifest.indexPath } else { "" }
     skills = @($skills)
   }
   $tempPath = "$registryPath.tmp"

@@ -164,6 +164,9 @@ $FirstSlice
 - Domain terms and ownership in CONTEXT.md.
 - Technical architecture after inspecting the first slice's real constraints.
 - Acceptance criteria and evidence mapping in requirements/user-stories/.
+- Cross-Story journeys in requirements/user-journeys/ only when the result spans multiple boundaries.
+- High-impact implementation and rollback decisions in requirements/plans/ only when needed.
+- Persistent, scarce, paid, privileged, or data-bearing resources in docs/RESOURCE_REGISTRY.md.
 - Product-specific gates in quality/gates.json; planned gates block release.
 - Visual language in DESIGN.md when the project has a user interface.
 "@
@@ -204,8 +207,9 @@ This repository implements **$DisplayName** for **$Audience**.
 3. Read CONTEXT.md for domain terms, ownership, and boundaries.
 4. Read DESIGN.md only for user-interface work.
 5. Read TESTING.md and the relevant user story when changing product behavior or test coverage.
-6. Load one matching Skill from .agents/skills only when its description clearly applies.
-7. Put mechanically decidable rules in tests, scripts, schemas, or contracts.
+6. Read docs/DOCUMENTATION_AUTHORITY.md when fact ownership is unclear, docs/PROJECT_LIFECYCLE.md for project or release gates, and docs/RESOURCE_REGISTRY.md for persistent or shared resources.
+7. Load one matching Skill from .agents/skills only when its description clearly applies.
+8. Put mechanically decidable rules in tests, scripts, schemas, or contracts.
 
 ## Implementation Flow
 
@@ -288,6 +292,43 @@ risk: high
 - 不包含 PROJECT_BRIEF.md 中未纳入第一条闭环的相邻能力。
 "@
 Set-Content -LiteralPath (Join-Path $storyRoot 'US-001-first-slice.md') -Value $firstStory -Encoding utf8
+
+$planRoot = Join-Path $destinationPath 'requirements/plans'
+Get-ChildItem -LiteralPath $planRoot -File -Filter 'US-*.md' -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -ne 'TEMPLATE.md' } |
+    ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force }
+$firstPlan = @"
+# US-001 Build Plan
+
+Use this plan only while the first slice still has high-impact ambiguity, crosses a contract or data boundary, or needs rollout and recovery decisions. Delete it when none of those conditions apply.
+
+## Outcome
+
+$Audience can $Outcome through: $FirstSlice
+
+## Scope
+
+- Included: the first end-to-end slice and its observable success and failure behavior.
+- Excluded: adjacent features and abstractions not required by US-001.
+
+## Information Flow
+
+input -> validation -> product behavior -> consumer-visible result -> evidence
+
+## Contracts, Data, And Resources
+
+- Fill only the boundaries and RES-nnn resources actually used by this slice.
+
+## Verification
+
+- AC-001: run through the real consumer boundary.
+- AC-002: verify stable, non-sensitive, recoverable failure behavior.
+
+## Risk And Rollback
+
+- Record irreversible effects, activation order, observation signals, and recovery only when applicable.
+"@
+Set-Content -LiteralPath (Join-Path $planRoot 'US-001-first-slice.md') -Value $firstPlan -Encoding utf8
 
 $qualityPath = Join-Path $destinationPath 'quality/gates.json'
 $quality = Get-Content -LiteralPath $qualityPath -Raw | ConvertFrom-Json -Depth 20

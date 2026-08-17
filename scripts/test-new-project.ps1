@@ -35,11 +35,15 @@ try {
         -ProjectType web `
         -Destination $destination `
         -TemplateRoot $Root `
+        -UseWorkingTree `
         -NonInteractive
 
     foreach ($relativePath in @(
         'PROJECT_BRIEF.md',
         'requirements/user-stories/US-001-first-slice.md',
+        'requirements/user-journeys/TEMPLATE.md',
+        'requirements/plans/TEMPLATE.md',
+        'requirements/plans/US-001-first-slice.md',
         'quality/gates.json',
         'TESTING.md',
         '.kest/flow/governance-smoke.flow.md',
@@ -49,6 +53,9 @@ try {
         'VERSION',
         'design/catalog.json',
         'docs/AGENT_PLATFORM_BOUNDARY.md',
+        'docs/DOCUMENTATION_AUTHORITY.md',
+        'docs/PROJECT_LIFECYCLE.md',
+        'docs/RESOURCE_REGISTRY.md',
         'docs/RELEASING.md',
         'package.json',
         'package-lock.json',

@@ -16,6 +16,9 @@ Skills 是按需加载的专项工作流，不是常驻规则集合。
 | `fix-regression-with-tdd` | 先建立失败测试，再最小修复已确认回归 |
 | `model-project-domain` | 从真实业务语言建立术语、边界、不变量与契约所有权 |
 | `write-pr-description` | 依据真实差异、证据、风险和回滚信息编写 PR 说明 |
+| `design-data-boundary` | 设计数据所有权、结构、查询索引、并发、生命周期与迁移边界 |
+| `review-data-migration` | 上线前审查数据迁移的兼容、锁、回填、顺序与恢复风险 |
+| `test-api-business-flow` | 对真实运行入口执行跨接口多步骤 API 业务 Flow |
 
 ## 编写规则
 

@@ -16,7 +16,8 @@ Ask one question at a time. Reuse answers already present in the conversation or
 3. Define the first end-to-end slice as `input -> behavior -> user-visible result`.
 4. Classify the project as `web`, `api`, `cli`, `research`, or `other`.
 5. Turn the first slice into `US-001` with a happy and relevant failure acceptance criterion.
-6. Show the resulting brief and ask whether to create the private GitHub repository now.
+6. Decide whether the outcome crosses multiple Stories or boundaries and therefore needs a User Journey. Record persistent, scarce, paid, privileged, or data-bearing resources without collecting secret values.
+7. Show the resulting brief and ask whether to create the private GitHub repository now.
 
 Do not ask for API keys in chat or write secrets to files. Repository creation is an external action: run it only after explicit confirmation.
 
@@ -44,8 +45,9 @@ The generated repository always carries the full quality-category manifest. Prod
 
 1. Confirm the script reports a successful repository check and initial commit.
 2. Read the generated `PROJECT_BRIEF.md`, `CONTEXT.md`, `AGENTS.md`, `requirements/user-stories/US-001-first-slice.md`, and `quality/gates.json`.
-3. Use `$establish-test-strategy` after choosing the stack; replace planned gates with commands before release.
-4. Report the local path and GitHub URL when created.
-5. Continue in the new repository with its first end-to-end slice. Do not keep product implementation inside the governance-template repository.
+3. Use `docs/PROJECT_LIFECYCLE.md` for Gate 0 and `docs/DOCUMENTATION_AUTHORITY.md` to place later facts. Use the generated Build Plan only when its high-impact conditions apply.
+4. Use `$establish-test-strategy` after choosing the stack; replace planned gates with commands before release.
+5. Report the local path and GitHub URL when created.
+6. Continue in the new repository with its first end-to-end slice. Do not keep product implementation inside the governance-template repository.
 
 If remote creation fails, preserve the completed local repository and report the exact retry command instead of rebuilding it.
