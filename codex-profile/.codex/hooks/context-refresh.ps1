@@ -36,10 +36,10 @@ function Get-HookPrompt {
 function Test-ToolHeavyPrompt {
   param([string]$Prompt)
   if ([string]::IsNullOrWhiteSpace($Prompt)) { return $false }
-  if ($Prompt -match "\u4E0D\u8981\u8C03\u7528\u5DE5\u5177|\u65E0\u9700\u5DE5\u5177|\u53EA\u56DE\u7B54|\u53EA\u89E3\u91CA|\u9010\u6B65\u786E\u8BA4|\u6BCF\u4E00\u6B65.{0,8}\u786E\u8BA4|do not use tools|without tools|confirm each step") {
+  if ($Prompt -match "\u4E0D\u8981\u8C03\u7528\u5DE5\u5177|\u65E0\u9700\u5DE5\u5177|\u4E0D\u8981\u5E76\u53D1|\u505C\u6B62\u5E76\u53D1|\u5173\u95ED\u5E76\u53D1|\u53EA\u56DE\u7B54|\u53EA\u89E3\u91CA|\u9010\u6B65\u786E\u8BA4|\u6BCF\u4E00\u6B65.{0,8}\u786E\u8BA4|do not use tools|without tools|disable concurrency|stop parallel|confirm each step") {
     return $false
   }
-  if ($Prompt -match "\u9AD8\u5E76\u53D1|\u5E76\u53D1\u8C03\u7528|\u6279\u91CF\u5DE5\u5177|\u5DE5\u5177\u8C03\u7528|\u5DE5\u5177\u5F80\u8FD4|Promise\.all|parallel(?:ize|ism| tool calls?)?|concurren(?:cy|t)") {
+  if ($Prompt -match "\u5E76\u53D1|\u6279\u91CF\u5DE5\u5177|\u5DE5\u5177\u8C03\u7528|\u5DE5\u5177\u5F80\u8FD4|Promise\.all|parallel(?:ize|ism| tool calls?)?|concurren(?:cy|t)") {
     return $true
   }
   return $Prompt -match "\u4FEE\u6539|\u5B9E\u73B0|\u4FEE\u590D|\u642D\u5EFA|\u914D\u7F6E|\u91CD\u6784|\u4E0A\u4F20|\u4E0B\u8F7D|\u8FD0\u884C|\u6D4B\u8BD5|\u9A8C\u8BC1|\u68C0\u67E5|\u641C\u7D22|\u8C03\u7814|\u5BA1\u8BA1|\u6279\u91CF|\u590D\u73B0|\u5B89\u88C5|\u90E8\u7F72|\u63D0\u4EA4|\u63A8\u9001|\u6784\u5EFA|\u6392\u67E5|edit|implement|fix|build|configure|refactor|upload|download|run|test|verify|inspect|search|research|audit|reproduce|install|deploy|commit|push|debug"

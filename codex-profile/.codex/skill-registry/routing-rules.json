@@ -26,7 +26,7 @@
   "method-github-delivery": ["GitHub", "提交代码", "推送仓库", "创建仓库", "私有仓库", "pull request", "commit", "push"],
   "method-task-tree": ["任务树", "任务图", "task-tree", "task tree", "GraphState", "task_tree_focus"],
   "manage-global-methodology": ["编辑方法论", "修改方法论", "新增方法论", "删除方法论", "移动方法论", "发布方法论", "全局方法论", "编辑全局prompt", "methodology editor", "methodology publisher"],
-  "tool-call-batching": ["高并发", "并发调用", "工具调用", "工具往返", "批量工具", "执行慢", "运行慢", "Promise.all", "tool batching", "parallel tool calls"],
+  "tool-call-batching": ["并发", "高并发", "并发调用", "工具调用", "工具往返", "批量工具", "执行慢", "运行慢", "Promise.all", "tool batching", "parallel tool calls"],
   "pdf": ["\u8bfb\u53d6 PDF", "PDF", "pdf"],
   "docx": ["Word \u6587\u6863", "docx", "word document"]
 }
