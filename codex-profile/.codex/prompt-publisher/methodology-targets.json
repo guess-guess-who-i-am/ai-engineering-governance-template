@@ -11,6 +11,7 @@
   "translationTimeoutMs": 600000,
   "translationAttempts": 3,
   "translationRetryDelayMs": 2000,
+  "registryRefreshTimeoutMs": 120000,
   "contextLimit": 8000,
   "contextReserve": 500,
   "validatorFile": "../hooks/validate-methodology-routing.ps1",

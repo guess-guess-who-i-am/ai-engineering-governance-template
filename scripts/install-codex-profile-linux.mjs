@@ -76,15 +76,13 @@ function mergeManagedBlock(current, managed) {
 function hooksDocument(codexHome) {
   const command = (name) => `${shellQuote(process.execPath)} ${shellQuote(path.join(codexHome, "hooks", name))}`;
   return {
-    description: "English original-wording reminders, intent-based user Skill routing, and unconditional automatic tool batching on Linux.",
+    description: "One stable dispatcher per event keeps Hook trust indices fixed while internally batching reminders, Skill routing, capability routing, and refresh work.",
     hooks: {
       UserPromptSubmit: [{ hooks: [
-        { type: "command", command: command("skill-router.mjs"), timeout: 10, statusMessage: "Recommending relevant user-owned Skills", additionalContextLimit: 2400 },
-        { type: "command", command: command("context-refresh.mjs"), timeout: 5, statusMessage: "Refreshing methodology routes and execution scheduling", additionalContextLimit: 10000 }
+        { type: "command", command: command("hook-dispatch.mjs"), timeout: 20, statusMessage: "Loading reminders and routing in parallel", additionalContextLimit: 14000 }
       ] }],
       SessionStart: [{ matcher: "^(startup|resume|clear|compact)$", hooks: [
-        { type: "command", command: command("context-refresh.mjs"), timeout: 5, statusMessage: "Restoring original-wording reminders and methodology routes", additionalContextLimit: 10000 },
-        { type: "command", command: command("refresh-skill-registry.mjs"), timeout: 20, statusMessage: "Refreshing the user-owned Skill index" }
+        { type: "command", command: command("hook-dispatch.mjs"), timeout: 70, statusMessage: "Restoring reminders and refreshing indexes in parallel", additionalContextLimit: 10000 }
       ] }]
     }
   };
@@ -109,6 +107,20 @@ async function buildOperations(home) {
     (source) => !source.endsWith("methodology-targets.json") && !source.endsWith(".ps1") && !source.endsWith(".vbs")
   );
   await addTree(path.join(PROFILE_ROOT, "linux", "hooks"), path.join(codexHome, "hooks"));
+  const dispatcherSource = path.join(PROFILE_ROOT, ".codex", "hooks", "hook-dispatch.mjs");
+  operations.set(path.join(codexHome, "hooks", "hook-dispatch.mjs"), {
+    destination: path.join(codexHome, "hooks", "hook-dispatch.mjs"),
+    content: await readFile(dispatcherSource),
+    mode: 0o700,
+    source: dispatcherSource
+  });
+  const routerSource = path.join(PROFILE_ROOT, ".codex", "hooks", "skill-router.mjs");
+  operations.set(path.join(codexHome, "hooks", "skill-router.mjs"), {
+    destination: path.join(codexHome, "hooks", "skill-router.mjs"),
+    content: await readFile(routerSource),
+    mode: 0o700,
+    source: routerSource
+  });
   for (const name of OWNED_SKILLS) {
     await addTree(path.join(PROFILE_ROOT, ".agents", "skills", name), path.join(agentsHome, "skills", name));
   }
@@ -240,8 +252,8 @@ async function verifyInstallation(home, codexHome, operations) {
   try { publication = JSON.parse(publisher.stdout); }
   catch { throw new Error(`Methodology publisher returned invalid JSON: ${publisher.stdout.trim()}`); }
   const hookInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
-  const context = await run(process.execPath, [path.join(codexHome, "hooks", "context-refresh.mjs")], { env, input: hookInput });
-  if (context.code !== 0 || !context.stdout.includes("AUTOMATIC_TOOL_BATCHING_CONTRACT_V2")) throw new Error("Context Hook did not emit the automatic batching contract");
+  const context = await run(process.execPath, [path.join(codexHome, "hooks", "hook-dispatch.mjs")], { env, input: hookInput });
+  if (context.code !== 0 || !context.stdout.includes("AUTOMATIC_TOOL_BATCHING_CONTRACT_V3")) throw new Error("Hook dispatcher did not emit the automatic batching contract");
   return { validation: publication.validation, trust: await inspectHookTrust(codexHome) };
 }
 
@@ -250,10 +262,10 @@ async function inspectHookTrust(codexHome) {
   if (!await exists(configFile)) return { status: "action-required", reason: "config.toml is absent, so Hook trust cannot be confirmed" };
   const config = await readFile(configFile, "utf8");
   const hookFile = path.join(codexHome, "hooks.json");
-  const identifiers = ["session_start:0:0", "session_start:0:1", "user_prompt_submit:0:0", "user_prompt_submit:0:1"];
+  const identifiers = ["session_start:0:0", "user_prompt_submit:0:0"];
   const present = identifiers.filter((id) => config.includes(`${hookFile}:${id}`) && config.slice(config.indexOf(`${hookFile}:${id}`)).slice(0, 300).includes("trusted_hash"));
   return present.length === identifiers.length
-    ? { status: "recorded", reason: "all four Hook entries have persisted trust records; Codex still decides whether hashes remain current" }
+    ? { status: "recorded", reason: "both stable dispatcher entries have persisted trust records; Codex still decides whether hashes remain current" }
     : { status: "action-required", reason: "start Codex interactively and approve each Hook when prompted" };
 }
 
