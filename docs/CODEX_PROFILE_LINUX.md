@@ -16,7 +16,7 @@ cd ai-engineering-governance-template
 
 已有的 `~/.codex/AGENTS.md` 不会被整体覆盖。安装器只维护两个 HTML 标记之间的模板块，用户自己的其他内容会保留。Hook 命令使用目标机当前 Node 的绝对路径，避免 SSH、systemd 或非交互 shell 找不到 `node`。
 
-安装后启动一次 Codex TUI，逐项确认新 Hook。安装器不会伪造或直接写入 Hook 信任哈希，因为信任记录应由 Codex 根据实际 `hooks.json` 生成。
+安装后启动一次 Codex TUI，确认 `UserPromptSubmit` 和 `SessionStart` 两个 dispatcher。每个事件只有一个稳定入口，新增内部路由不会再移动 Hook 索引。安装器不会伪造或直接写入 Hook 信任哈希，因为信任记录应由 Codex 根据实际 `hooks.json` 生成。
 
 ## 验证与恢复
 

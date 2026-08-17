@@ -18,6 +18,7 @@ function Get-QueryTokens {
     $value = $run.Value
     for ($index = 0; $index -lt $value.Length; $index++) {
       if ($index + 1 -lt $value.Length) { $tokens.Add($value.Substring($index, 2)) }
+      if ($index + 2 -lt $value.Length) { $tokens.Add($value.Substring($index, 3)) }
     }
   }
   return @($tokens | Where-Object { $StopTokens -notcontains $_ } | Select-Object -Unique | Select-Object -First 80)
@@ -123,7 +124,7 @@ function Get-ExternalSkillScores {
   if (-not (Test-Path -LiteralPath $IndexPath -PathType Leaf)) { return @() }
   $bestByName = @{}
   $patterns = [Collections.Generic.List[string]]::new()
-  foreach ($token in $Tokens) {
+  foreach ($token in @($Tokens | Where-Object { $_.Length -ge 3 } | Sort-Object Length -Descending | Select-Object -Unique -First 16)) {
     if ($token) { $patterns.Add($token) }
   }
   foreach ($entry in $Aliases.GetEnumerator()) {
@@ -137,9 +138,10 @@ function Get-ExternalSkillScores {
 
   $candidateLines = $null
   $rgCommand = Get-Command rg -ErrorAction SilentlyContinue | Select-Object -First 1
-  if ($rgCommand -and $patterns.Count -gt 0) {
+  if ($patterns.Count -eq 0) { return @() }
+  if ($rgCommand) {
     $rgArgs = [Collections.Generic.List[string]]::new()
-    foreach ($argument in @("--ignore-case", "--fixed-strings", "--no-heading", "--color", "never")) { $rgArgs.Add($argument) }
+    foreach ($argument in @("--ignore-case", "--fixed-strings", "--no-heading", "--color", "never", "--max-count", "300")) { $rgArgs.Add($argument) }
     foreach ($pattern in @($patterns | Select-Object -Unique)) {
       $rgArgs.Add("-e")
       $rgArgs.Add($pattern)
@@ -154,7 +156,11 @@ function Get-ExternalSkillScores {
     $candidateLines = [Collections.Generic.List[string]]::new()
     $reader = New-Object IO.StreamReader($IndexPath, $utf8, $true)
     try {
-      while (-not $reader.EndOfStream) { $candidateLines.Add($reader.ReadLine()) }
+      while (-not $reader.EndOfStream -and $candidateLines.Count -lt 300) {
+        $line = $reader.ReadLine()
+        $lower = $line.ToLowerInvariant()
+        if (@($patterns | Where-Object { $lower.Contains($_.ToLowerInvariant()) }).Count) { $candidateLines.Add($line) }
+      }
     } finally {
       $reader.Dispose()
     }

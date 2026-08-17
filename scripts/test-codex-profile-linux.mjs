@@ -61,8 +61,9 @@ try {
   assert(agents.includes("KEEP_CUSTOM_CONFIGURATION"), "existing AGENTS.md content was lost");
   assert((agents.match(/ai-engineering-governance-template:begin/g) || []).length === 1, "managed AGENTS.md block is missing or duplicated");
   const hooks = JSON.parse(await readFile(path.join(home, ".codex", "hooks.json"), "utf8"));
-  const hookCommand = hooks.hooks.UserPromptSubmit[0].hooks[1].command;
-  assert(hookCommand.includes(process.execPath) && hookCommand.includes("context-refresh.mjs"), "hooks.json does not pin the absolute Node executable and Hook path");
+  assert(hooks.hooks.UserPromptSubmit[0].hooks.length === 1 && hooks.hooks.SessionStart[0].hooks.length === 1, "hooks.json does not use one stable dispatcher per event");
+  const hookCommand = hooks.hooks.UserPromptSubmit[0].hooks[0].command;
+  assert(hookCommand.includes(process.execPath) && hookCommand.includes("hook-dispatch.mjs"), "hooks.json does not pin the absolute Node executable and dispatcher path");
   const targets = JSON.parse(await readFile(path.join(home, ".codex", "prompt-publisher", "methodology-targets.json"), "utf8"));
   assert(targets.validatorFile.endsWith("validate-methodology-routing.mjs"), "Linux publisher still targets the PowerShell validator");
   assert(targets.refreshRegistryFile.endsWith("refresh-skill-registry.mjs"), "Linux publisher still targets the PowerShell registry refresher");
@@ -76,13 +77,37 @@ try {
   const validator = run(path.join(home, ".codex", "hooks", "validate-methodology-routing.mjs"), [], envArgs);
   assert(validator.status === 0 && validator.stdout.includes("PASS: 63 English rules"), `63-rule validation failed: ${validator.stderr || validator.stdout}`);
   const contextInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
-  const context = run(path.join(home, ".codex", "hooks", "context-refresh.mjs"), [], { ...envArgs, input: contextInput });
-  assert(context.status === 0 && context.stdout.includes("AUTOMATIC_TOOL_BATCHING_CONTRACT_V2") && context.stdout.includes("exactly K meaningful nested calls"), "automatic batching contract is absent or weakened");
+  const dispatcher = path.join(home, ".codex", "hooks", "hook-dispatch.mjs");
+  const context = run(dispatcher, [], { ...envArgs, input: contextInput });
+  const contextPayload = JSON.parse(context.stdout);
+  const contextText = String(contextPayload.hookSpecificOutput.additionalContext);
+  assert(context.status === 0 && contextText.startsWith("[AUTOMATIC_TOOL_BATCHING_CONTRACT_V3]") && contextText.includes("mechanically determined follow-up waves"), "automatic batching contract is absent, not first, or weakened");
   const routeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Please push this release to GitHub", cwd: REPOSITORY_ROOT })}\n`;
-  const routed = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: routeInput });
+  const routed = run(dispatcher, [], { ...envArgs, input: routeInput });
   assert(routed.status === 0 && routed.stdout.includes("method-github-delivery"), `GitHub methodology route did not match: ${routed.stderr || routed.stdout}`);
   const unrelated = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n` });
   assert(unrelated.status === 0 && unrelated.stdout.trim() === "{}", "unrelated prompt received a methodology recommendation");
+
+  const fixtureDirectory = path.join(root, "dispatcher-fixtures");
+  await mkdir(fixtureDirectory, { recursive: true });
+  const fixtureFiles = [];
+  for (const name of ["alpha", "beta"]) {
+    const file = path.join(fixtureDirectory, `${name}.mjs`);
+    await writeFile(file, `const started=Date.now(); await new Promise((resolve) => setTimeout(resolve, 600)); const ended=Date.now(); process.stdout.write(JSON.stringify({hookSpecificOutput:{hookEventName:"UserPromptSubmit",additionalContext:"${name}:"+started+":"+ended}}));\n`);
+    fixtureFiles.push(file);
+  }
+  const parallel = run(dispatcher, [], {
+    ...envArgs,
+    input: contextInput,
+    extraEnv: {
+      CODEX_HOOK_DISPATCH_TEST_MODE: "1",
+      CODEX_HOOK_DISPATCH_HANDLERS_JSON: JSON.stringify(fixtureFiles)
+    }
+  });
+  assert(parallel.status === 0 && parallel.stdout.includes("alpha") && parallel.stdout.includes("beta"), "dispatcher did not merge both fixture Hooks");
+  const intervals = [...parallel.stdout.matchAll(/(?:alpha|beta):(\d+):(\d+)/g)].map((match) => ({ start: Number(match[1]), end: Number(match[2]) }));
+  assert(intervals.length === 2, `dispatcher did not expose two timing intervals: ${parallel.stdout}`);
+  assert(Math.max(...intervals.map((item) => item.start)) < Math.min(...intervals.map((item) => item.end)), `dispatcher child intervals did not overlap: ${JSON.stringify(intervals)}`);
 
   const reinstall = run(INSTALLER, ["--home", home, "--json"], { home });
   assert(reinstall.status === 0, `repeat install failed: ${reinstall.stderr || reinstall.stdout}`);

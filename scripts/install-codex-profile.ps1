@@ -64,28 +64,21 @@ foreach ($entry in $managedFiles) {
 }
 
 function New-HookCommand([string]$ScriptName) {
+  $nodePath = (Get-Command node -ErrorAction Stop | Select-Object -First 1).Source
   $scriptPath = Join-Path $codexHome ("hooks\" + $ScriptName)
-  return 'powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "' + $scriptPath + '"'
+  return '"' + $nodePath + '" "' + $scriptPath + '"'
 }
 
-$routerCommand = New-HookCommand "skill-router.ps1"
-$contextCommand = New-HookCommand "context-refresh.ps1"
-$registryCommand = New-HookCommand "refresh-skill-registry.ps1"
+$dispatchCommand = New-HookCommand "hook-dispatch.mjs"
 $hooks = [ordered]@{
-  description = "English original-wording reminders plus intent-based Skill routing; the full methodology archive is never injected as one block."
+  description = "One stable dispatcher per event keeps Hook trust indices fixed while internally batching reminders, Skill routing, capability routing, and refresh work."
   hooks = [ordered]@{
     UserPromptSubmit = @([ordered]@{
-      hooks = @(
-        [ordered]@{ type = "command"; command = $routerCommand; commandWindows = $routerCommand; timeout = 10; statusMessage = "Recommending relevant Codex Skills"; additionalContextLimit = 1800 },
-        [ordered]@{ type = "command"; command = $contextCommand; commandWindows = $contextCommand; timeout = 5; statusMessage = "Refreshing original-wording reminders, methodology routes, and execution scheduling"; additionalContextLimit = 10000 }
-      )
+      hooks = @([ordered]@{ type = "command"; command = $dispatchCommand; commandWindows = $dispatchCommand; timeout = 20; statusMessage = "Loading reminders and routing in parallel"; additionalContextLimit = 14000 })
     })
     SessionStart = @([ordered]@{
       matcher = "^(startup|resume|clear|compact)$"
-      hooks = @(
-        [ordered]@{ type = "command"; command = $contextCommand; commandWindows = $contextCommand; timeout = 5; statusMessage = "Restoring original-wording reminders and methodology routes"; additionalContextLimit = 8000 },
-        [ordered]@{ type = "command"; command = $registryCommand; commandWindows = $registryCommand; timeout = 60; statusMessage = "Refreshing Codex Skill index" }
-      )
+      hooks = @([ordered]@{ type = "command"; command = $dispatchCommand; commandWindows = $dispatchCommand; timeout = 70; statusMessage = "Restoring reminders and refreshing indexes in parallel"; additionalContextLimit = 10000 })
     })
   }
 }
