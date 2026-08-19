@@ -91,6 +91,12 @@ try {
   if ($routingText -notmatch '"method-github-delivery"\s*:\s*\[[^\]]*"GitHub"') {
     throw "The installed routing aliases are missing the GitHub trigger."
   }
+  if ($routingText -notmatch '"apple-design"\s*:\s*\[[^\]]*"draggable bottom sheet"') {
+    throw "The installed routing aliases are missing the apple-design gesture trigger."
+  }
+  if ($routingText -notmatch '"build-designed-interface"\s*:\s*\[[^\]]*"responsive frontend landing page"') {
+    throw "The installed routing aliases are missing the designed-interface trigger."
+  }
 
   $registry = $registryText | ConvertFrom-Json
   if ([int]$registry.externalSkillCount -ne 1) { throw "Expected one indexed external Skill." }
@@ -118,6 +124,12 @@ try {
     }
     throw "The Skill router did not recommend the relevant external Skill. Input: $routeInput Output: $(($routeOutput | Out-String).Trim()) Diagnostic: $(($diagnosticOutput | Out-String).Trim())"
   }
+  if ($routeContext -match 'Optimize ZephyrQuartz billing costs and usage') {
+    throw "The Skill router injected an unfiltered external Skill description."
+  }
+  if (($routeContext -split '(?m)^\s*Read:\s*').Count -ne 2) {
+    throw "The Skill router emitted more than one selected Skill. Output: $routeContext"
+  }
   $previousRouterTimeout = $env:CODEX_SKILL_ROUTER_RG_TIMEOUT_MS
   try {
     $env:CODEX_SKILL_ROUTER_RG_TIMEOUT_MS = "1"
@@ -132,8 +144,29 @@ try {
   $unrelatedInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Write a short greeting"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $unrelatedOutput = $unrelatedInput | & node $router
   if (($unrelatedOutput | Out-String).Trim() -ne "{}") { throw "The Skill router recommended an external Skill for an unrelated prompt." }
+  $ambiguousInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Design a web page"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
+  $ambiguousOutput = $ambiguousInput | & node $router
+  if (($ambiguousOutput | Out-String).Trim() -ne "{}") { throw "The Skill router selected a Skill for an ambiguous generic prompt." }
+
+  $frontendInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Build a responsive frontend landing page for an AI product"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
+  $frontendOutput = $frontendInput | & node $router
+  $frontendContext = [string](($frontendOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
+  if ($frontendContext -notmatch 'build-designed-interface' -or $frontendContext -notmatch [regex]::Escape((Join-Path $repositoryRoot '.agents\skills\build-designed-interface\SKILL.md'))) {
+    throw "The Skill router did not recommend the nearest project build-designed-interface Skill. Output: $(($frontendOutput | Out-String).Trim())"
+  }
+
+  $gestureInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Design a draggable bottom sheet with spring physics and interruption"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
+  $gestureOutput = $gestureInput | & node $router
+  $gestureContext = [string](($gestureOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
+  if ($gestureContext -notmatch 'apple-design' -or $gestureContext -notmatch [regex]::Escape((Join-Path $repositoryRoot '.agents\skills\apple-design\SKILL.md'))) {
+    throw "The Skill router did not recommend the nearest project apple-design Skill. Output: $(($gestureOutput | Out-String).Trim())"
+  }
 
   $contextRefresh = Join-Path $testRoot ".codex\hooks\hook-dispatch.mjs"
+  $dispatcherText = Get-Content -Raw -LiteralPath $contextRefresh
+  if ($dispatcherText -notmatch 'Promise\.all\(handlers\.map' -or $dispatcherText -notmatch 'CODEX_CAPABILITY_HOOK' -or $dispatcherText -notmatch 'own\("skill-router"') {
+    throw "The stable dispatcher no longer runs Skill routing and the capability/graph hook through the existing parallel architecture."
+  }
   $toolHeavyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "请高并发检查多个文件并运行测试"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $toolHeavyOutput = $toolHeavyInput | & node $contextRefresh
   $toolHeavyContext = [string](($toolHeavyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)

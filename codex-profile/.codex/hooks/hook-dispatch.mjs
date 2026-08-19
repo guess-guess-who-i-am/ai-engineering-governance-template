@@ -103,6 +103,27 @@ function defaultHandlers(eventName, codexRoot) {
   return handlers.filter((handler) => existsSync(handler.file));
 }
 
+function deduplicateSkillCandidates(context) {
+  const lines = context.split("\n");
+  const seenPaths = new Set();
+  const output = [];
+  for (let index = 0; index < lines.length; index += 1) {
+    const candidate = lines[index];
+    const description = lines[index + 1] || "";
+    const readLine = lines[index + 2] || "";
+    if (candidate.startsWith("- ") && description.trim() && readLine.trim().startsWith("Read: ")) {
+      const skillPath = readLine.trim().slice("Read: ".length);
+      if (seenPaths.has(skillPath)) {
+        index += 2;
+        continue;
+      }
+      seenPaths.add(skillPath);
+    }
+    output.push(lines[index]);
+  }
+  return output.join("\n");
+}
+
 try {
   const { raw, parsed } = await readInput();
   const eventName = String(parsed.hook_event_name || "");
@@ -121,7 +142,7 @@ try {
   const contexts = results.map((result) => result.context.trim()).filter(Boolean);
   if (!contexts.length) process.stdout.write("{}");
   else process.stdout.write(JSON.stringify({
-    hookSpecificOutput: { hookEventName: eventName, additionalContext: contexts.join("\n\n") }
+    hookSpecificOutput: { hookEventName: eventName, additionalContext: deduplicateSkillCandidates(contexts.join("\n\n")) }
   }));
 } catch (error) {
   process.stderr.write(`Hook dispatcher skipped: ${error.message}\n`);

@@ -311,6 +311,11 @@ export async function publishMethodology(config, { force = false, dryRun = false
   const chineseSections = parseRoutedSections(runtimeSource);
   const chineseRules = validateSourceSections(chineseSections, config.routes);
   if (check) {
+    const state = await readState(config.stateFile);
+    const currentSourceSha256 = sha256(runtimeSource);
+    if (state.runtimeSourceSha256 !== currentSourceSha256) {
+      throw new Error("当前中文方法论源已变化，发布结果过期；请先重新发布，再执行 --check。");
+    }
     const validation = await runPostPublish(config);
     return { status: "checked", translated: false, ruleCount: [...chineseRules.values()].reduce((sum, rules) => sum + rules.length, 0), validation };
   }

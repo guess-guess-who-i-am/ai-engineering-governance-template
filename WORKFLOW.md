@@ -24,7 +24,7 @@
 
 - 故障：`systematic-debugging`
 - 跨组件行为：`evolve-contracts`
-- 界面：`build-designed-interface`
+- 界面：`build-designed-interface`；落地页/作品集/改版再路由 `design-taste-frontend`，手势和流体交互再路由 `apple-design`
 - 高风险完成声明：`verify-before-completion`
 - 建立或修复完整测试体系：`establish-test-strategy`
 - 审查当前分支或 PR：`review-project-diff`

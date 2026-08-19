@@ -7,7 +7,7 @@
 - `AGENTS.md`：任务路由、权威顺序和验证预算。
 - `CONTEXT.md`：稳定术语、关系与歧义裁决。
 - `DESIGN.md`：工程工具默认视觉系统。
-- `.agents/skills/`：15 个按需加载且命名统一的专项工作流。
+- `.agents/skills/`：17 个按需加载且命名统一的专项工作流。
 - `scripts/`：治理、Skills、敏感文件和整体检查。
 - `.kest/flow/`：Markdown-native Flow 示例。
 - `requirements/user-stories/`：带稳定验收条件 ID 和证据映射的用户故事。
@@ -33,7 +33,10 @@
 ./scripts/check.ps1
 ./scripts/invoke-quality-gates.ps1 -Profile release
 ./scripts/search-design-references.ps1 -Query voice
+./scripts/route-design-references.ps1 -Query voice -ProductType ai-llm
 ```
+
+前端任务先加载 `$build-designed-interface`。它只查一次轻量设计目录并返回最多 5 个候选；落地页、作品集或改版再按需加载 `$design-taste-frontend`，手势和弹簧交互再按需加载 `$apple-design`。需要真实 Flow 证据时，在已审查 Kest CLI 可执行文件存在的电脑上设置 `KEST_BIN`，运行 `./scripts/run-kest-flow.ps1`；这不会进入每个 PR 的默认负载。
 
 创建一个独立的新项目时，可让 Codex 使用 `$start-new-project` 逐项填写 brief；也可直接运行交互式向导：
 
@@ -57,7 +60,7 @@
 - Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。`scripts/configure-lazy-capabilities.ps1` 可把本机数百个用户 Skills 迁入 deferred 索引；另会复用 `E:\skills\_catalog_cn.json`，把其中约1.5万个 Skills 编译为持久化行索引，不递归预读正文。
 - 方法论发布器：保存中文源后自动翻译、备份、生成中英文文件、更新 Skills 和索引；失败时回滚。
 - 6个自建方法 Skills：`manage-global-methodology`、`method-research-evidence`、`method-engineering-execution`、`method-evaluation-gates`、`method-github-delivery`、`method-task-tree`。
-- 63条已归类方法论：常驻21条、研究9条、工程12条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
+- 71条已归类方法论：常驻29条、研究9条、工程12条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
 - 迁移工具：37个受管配置文件，以及安装、同步和安装测试脚本。`codex-profile/README.zh.md` 提供独立说明。
 
 ### 不会上传什么
@@ -83,7 +86,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-prof
 2. 安装全局 `AGENTS.md`、Hook、中文源、英文生成物、发布器、路由配置和6个自建 Skills。
 3. 根据目标电脑的用户目录生成 `hooks.json`，不会沿用原电脑的绝对路径。
 4. 创建“编辑并发布全局 Prompt”和“编辑并发布全局方法论”两个桌面入口。
-5. 校验63条方法论的中英文对应关系并刷新 Skill 索引。
+5. 校验71条方法论的中英文对应关系并刷新 Skill 索引。
 
 安装完成后，在该电脑单独完成 Codex 登录并重新启动 Codex，使全局 `AGENTS.md` 和 Hook 重新加载。完整说明见 [可迁移 Codex 全局配置](codex-profile/README.zh.md)。
 
