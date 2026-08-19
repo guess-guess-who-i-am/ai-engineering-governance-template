@@ -11,4 +11,4 @@ Apply the rule below when this Skill is selected. This is the user's original ru
 
 ## User's original wording — English translation
 
-- After every modification is completed, such as code changes, update it to GitHub, large or small, except for datasets. Organize repositories according to the current project; if there is no repository, create one, then set the current project's repository to private.
+- After every modification, such as code changes, update it to GitHub, whether large or small, except for datasets. Divide GitHub repositories according to the current project. If there is no repository, create one, and then set the current project's repository to private.

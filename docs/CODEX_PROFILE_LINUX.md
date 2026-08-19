@@ -25,7 +25,7 @@ node scripts/test-codex-profile-linux.mjs
 ./scripts/install-codex-profile-linux.sh --check
 ```
 
-`--check` 会比较所有受管文件，运行71条方法论完整性校验、刷新 Skill 索引，并真实调用上下文 Hook 检查自动并发契约。
+`--check` 会比较所有受管文件，运行72条方法论完整性校验、刷新 Skill 索引，并真实调用上下文 Hook 检查自动并发契约。
 
 需要手工恢复时，打开最近备份目录的 `manifest.json`，其中列出了每个目标、原文件是否存在、安装前后 SHA-256 和备份路径。自动失败回滚已经覆盖正常安装事务；手工恢复用于安装成功后用户主动撤销。
 

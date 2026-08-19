@@ -76,7 +76,7 @@ try {
 
   const envArgs = { home };
   const validator = run(path.join(home, ".codex", "hooks", "validate-methodology-routing.mjs"), [], envArgs);
-  assert(validator.status === 0 && validator.stdout.includes("PASS: 71 English rules"), `71-rule validation failed: ${validator.stderr || validator.stdout}`);
+  assert(validator.status === 0 && validator.stdout.includes("PASS: 72 English rules"), `72-rule validation failed: ${validator.stderr || validator.stdout}`);
   const contextInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const dispatcher = path.join(home, ".codex", "hooks", "hook-dispatch.mjs");
   const context = run(dispatcher, [], { ...envArgs, input: contextInput });

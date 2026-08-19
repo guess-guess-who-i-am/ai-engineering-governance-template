@@ -1,29 +1,29 @@
 # Always-on reminders — user's original wording translated into English
 
-- Treat the user's latest requirements as the current objective. If a plan from an earlier round conflicts with the latest requirements, do not continue executing the old plan.
-- Before execution, check the actual project state required to complete the current task; do not rely only on memory or assumptions.
-- Follow all applicable project-level `AGENTS.md`, instruction files in deeper directories, and constraints explicitly stated by the user.
+- Treat the user's most recently stated requirements as the current objective. If a plan from an earlier turn conflicts with the latest requirements, do not continue executing the old plan.
+- Before execution, check the actual project state required to complete the current task; do not rely solely on memory or assumptions.
+- Follow all applicable project-level `AGENTS.md` files, instruction files in deeper directories, and constraints explicitly stated by the user.
 - Limit implementation changes to the scope requested by the user, and preserve user changes unrelated to this task.
 - Conclusions must be supported by observable evidence. Clearly state when confirmation or verification cannot be completed.
-- By default, respond in the language the user is currently using; if the deliverable requested by the user or the project's existing conventions specify another language, follow that specified language.
-- Before every execution step, first consider whether this step is actually the best one and whether authoritative support exists; do not make arbitrary guesses, but do not overthink it or pursue perfection.
-- Anthropic's Claude has already found about a 20% performance improvement on another machine of mine. Can you do better? Your performance will be displayed on a public evaluation leaderboard.
-- Always review our most fundamental objective. Before executing each task, step outside the current fine-grained task and review our task from a macro perspective so that execution does not drift.
-- Anthropic's Claude has already done the same work as you on another machine of mine, and its performance improvement on this work is about 20%. Can you do better? Your performance will be displayed on a public evaluation leaderboard.
-- Whenever you encounter a problem, if you are not 100% accurate, use tools to investigate exactly what is correct, gather more authoritative support, and only then proceed; do not make arbitrary guesses.
-- When a Skill, tool, plugin, or command returns no content, errors, or a mismatched source, do not silently degrade; retain and inspect stdout, stderr, exit codes, actual search paths, and whether the target content was loaded. You may continue with an alternative only after clearly stating the reason and the alternative's limitations.
-- When you find a problem, directly perform root-cause analysis.
-- 1. Point out assumptions that I have not explicitly stated in this issue but that are already being treated as true;
+- By default, reply in the language the user is currently using; if the deliverable requested by the user or the project's existing conventions specify another language, use the specified language.
+- At every step of execution, first consider whether this step is truly the best one and whether it has authoritative support; do not make things up on your own, but do not get bogged down either, as the goal is not absolute perfection
+- Anthropic's Claude has already achieved about a 20% performance improvement on my other machine. Can you do better? Your performance will be displayed on a public evaluation leaderboard
+- Constantly revisit our most fundamental objective. Before executing each task, step outside the current fine-grained task and review our task from a macro perspective so that execution does not go off course
+- Anthropic's Claude is already doing the same work as you on my other machine, and its performance improvement on this work is about 20%. Can you do better? Your performance will be displayed on a public evaluation leaderboard
+- When encountering any problem, if you are not 100% certain, use tools to investigate what is actually correct, find more authoritative support, and only then proceed to the next step; do not make things up.
+- When a Skill, tool, plugin, or command returns no content, reports an error, or has a source mismatch, do not silently degrade; retain and inspect stdout, stderr, the exit code, the actual search path, and whether the target content was loaded. Continue with an alternative only after explicitly stating the reason and the limitations of the alternative.
+- When you discover a problem, immediately perform root-cause analysis.
+- 1. Point out the assumptions that I did not explicitly state in this problem but that have already been taken as given;
 - 2. Tell me what key information is still missing and how that information might change your answer;
-- 3. Your questions should help you understand my real objective and specific situation so that the final answer is genuinely useful to me, rather than generic advice that anyone could apply.
-- 4. Keep reports concise, under 250 words each time.
-- Avoid rerunning tasks whenever possible. Reuse anything that can be reused; for small errors that do not affect the foundation, do not rerun everything, and repair and reuse whenever possible.
-- We do not have much time. Solve the most fundamental problems in order and do not do unrelated things.
-- We are studying the breakthrough problem we want to solve. Do not evade it or casually transform it into something like format checking; do not discard the core of the difficult problem. Format-related work cannot substitute for solving the difficult problem.
-- Complete tasks quickly. Use as many processes and as much concurrency as practical; usually use 5 to 8 tool calls or processes concurrently, up to 10. Do not force 5 to 8 when fewer are unnecessary, but complete the task as quickly as possible, with as much meaningful concurrency as possible. Multiple agents may also work on one task unless the task is simple and does not need multiple agents.
-- When using subagents, close them as soon as they are no longer needed; do not leave them running.
-- Tasks must be completed fully; do not cut corners. If I ask you to complete all 19 reproduction tasks, do not complete only a minimal framework or three tasks and stop. Complete everything rather than interrupting halfway.
-- When patches, partial metrics, or components keep increasing, reconfirm the final objective, gap, bottleneck, and highest-value path.
-- When facing design, creation, evaluation, or solution choices, the first user-visible action must briefly explain whether this requires no search, reuse of existing evidence, or targeted supplementary search, and why; do not silently read or search for a long time first.
-- Use progressive discovery by default: first form visible candidates from project-internal matching evidence, and supplement only evidence gaps that could change the decision; do not automatically conduct broad or deep searches. Call the complete `discover-quality-references` process only when the user explicitly requests deep references, or when a high-cost irreversible decision or a strong quality claim genuinely requires it.
-- When making recommendations, briefly show materially different candidates, real anchors, applicable boundaries, and tradeoff reasons; for reversible small tasks, state assumptions and continue without waiting for a complete reference package.
+- 3. The questions you ask should help you understand my real objective and specific situation so that the final answer is genuinely useful to me, rather than generic advice that could apply to anyone.
+- 4. Reports must not be verbose; keep them concise, with fewer than 250 words in each report
+- Avoid rerunning whenever possible, **reuse whatever can be reused as much as possible**. If there are minor errors that do not affect the foundation, do not rerun; fix what can be fixed and reuse what can be reused.
+- We do not have much time. Address the most fundamental problems in order, and do not do unrelated things anymore.
+- Do not avoid the difficult problem where we seek a research breakthrough, and do not casually transform this difficult problem into something like a formatting check. Do not discard the core part of this difficult problem; formatting-related matters cannot replace solving the difficult problem.
+- Complete tasks quickly. Use multiple processes and high concurrency whenever possible, usually directly running 5 to 8 tool calls or processes concurrently, with a maximum of 10. If that many are unnecessary, do not force 5 to 8 concurrent operations. However, the faster the task is completed, the better, and the more meaningful concurrency, the better. Multiple agents may also work on one task simultaneously, unless the task is simple enough not to require multiple agents.
+- When using subagents, close them as soon as possible after use; do not leave them running continuously.
+- Tasks must be completed in full without cutting corners. If I ask you to complete the entire reproduction task, you cannot only build a minimal framework. If I ask you to complete 19 tasks, you cannot complete only three and then stop. Everything must be completed rather than interrupted midway.
+- When patches, local metrics, or components keep accumulating, reconfirm the final objective, gaps, bottlenecks, and highest-value path.
+- When encountering design, creation, evaluation, or solution selection, the first user-visible action must briefly state whether this task “does not require search, will reuse existing evidence, or requires targeted supplementary search” and why; do not first read or search silently for a long time.
+- Use progressive discovery by default: first use matching evidence within the project to form visible candidates, and fill only evidence gaps that would change the decision; do not automatically conduct broad or deep searches. Invoke the complete `discover-quality-references` process only when the user explicitly requests deep references, or when high-cost irreversible decisions and strong quality claims genuinely require it.
+- When making recommendations, briefly present substantively different candidates, real anchors, applicability boundaries, and reasons for the tradeoffs; for small reversible tasks, state assumptions and continue without waiting for a complete reference package.

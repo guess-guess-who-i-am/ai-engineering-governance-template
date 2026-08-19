@@ -60,7 +60,7 @@
 - Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。`scripts/configure-lazy-capabilities.ps1` 可把本机数百个用户 Skills 迁入 deferred 索引；另会复用 `E:\skills\_catalog_cn.json`，把其中约1.5万个 Skills 编译为持久化行索引，不递归预读正文。
 - 方法论发布器：保存中文源后自动翻译、备份、生成中英文文件、更新 Skills 和索引；失败时回滚。
 - 6个自建方法 Skills：`manage-global-methodology`、`method-research-evidence`、`method-engineering-execution`、`method-evaluation-gates`、`method-github-delivery`、`method-task-tree`。
-- 71条已归类方法论：常驻29条、研究9条、工程12条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
+- 72条已归类方法论：常驻27条、研究10条、工程14条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
 - 迁移工具：37个受管配置文件，以及安装、同步和安装测试脚本。`codex-profile/README.zh.md` 提供独立说明。
 
 ### 不会上传什么
@@ -86,7 +86,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-prof
 2. 安装全局 `AGENTS.md`、Hook、中文源、英文生成物、发布器、路由配置和6个自建 Skills。
 3. 根据目标电脑的用户目录生成 `hooks.json`，不会沿用原电脑的绝对路径。
 4. 创建“编辑并发布全局 Prompt”和“编辑并发布全局方法论”两个桌面入口。
-5. 校验71条方法论的中英文对应关系并刷新 Skill 索引。
+5. 校验72条方法论的中英文对应关系并刷新 Skill 索引。
 
 安装完成后，在该电脑单独完成 Codex 登录并重新启动 Codex，使全局 `AGENTS.md` 和 Hook 重新加载。完整说明见 [可迁移 Codex 全局配置](codex-profile/README.zh.md)。
 

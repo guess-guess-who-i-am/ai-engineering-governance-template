@@ -6,7 +6,7 @@
 - 每轮常驻提醒、方法论路由、Skill 推荐器和会话恢复 Hook；
 - 每轮自动执行的英文并发调度契约：无需用户提出并发要求，在每一波工具调用前计算当前已知独立操作数 `N`，取 `K=min(N,8)`；`K=5–8` 时必须在一次 `functions.exec` 的 `Promise.all` 中提交恰好 `K` 个真实调用。对于根据上一波结果即可机械确定的轮询、补充读取和验证，继续留在同一个 `functions.exec` 中完成，不得第一批并发后又退化成逐次模型往返；
 - 每个事件只注册一个稳定 dispatcher。dispatcher 内部并发运行常驻提醒、Skill 路由、可选 capability 路由和索引刷新，避免新增 Hook 导致索引位置变化、原信任记录失效；
-- 中文唯一编辑源、英文生成物、71条规则映射与完整性校验；
+- 中文唯一编辑源、英文生成物、72条规则映射与完整性校验；
 - 自动翻译和原子发布器；
 - `method-*` 五个方法 Skill 与 `manage-global-methodology`；
 - Skill 路由别名。
@@ -56,7 +56,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\configure-lazy-cap
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-profile.ps1
 ```
 
-安装器会先把目标电脑上即将被覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`，再安装配置、按目标用户名生成 `hooks.json`、创建两个桌面编辑入口，并执行71条方法论完整性校验和 Skill 索引刷新。
+安装器会先把目标电脑上即将被覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`，再安装配置、按目标用户名生成 `hooks.json`、创建两个桌面编辑入口，并执行72条方法论完整性校验和 Skill 索引刷新。
 
 安装后重新启动 Codex，使用户级 `AGENTS.md` 和 Hook 重新加载。随后分别执行 `gh auth login` 和该电脑上的 Codex 登录流程。
 
