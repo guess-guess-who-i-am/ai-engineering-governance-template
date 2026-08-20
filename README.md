@@ -11,6 +11,7 @@
 - `scripts/`：治理、Skills、敏感文件和整体检查。
 - `.kest/flow/`：Markdown-native Flow 示例。
 - `requirements/user-stories/`：带稳定验收条件 ID 和证据映射的用户故事。
+- `requirements/test-runs/`：阶段性交付、跨边界测试、缺陷复测和发布候选的轻量执行记录。
 - `requirements/user-journeys/` 与 `requirements/plans/`：仅在跨 Story 旅程或高影响实现需要时加载的模板。
 - `docs/DOCUMENTATION_AUTHORITY.md`：每类事实的唯一权威位置与联动规则。
 - `docs/PROJECT_LIFECYCLE.md`：从项目可开工到发布的 Gate 0–4。

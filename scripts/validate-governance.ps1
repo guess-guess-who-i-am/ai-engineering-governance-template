@@ -29,9 +29,12 @@ $required = @(
     'quality/findings.json',
     'quality/FINDINGS.md',
     'requirements/user-stories/TEMPLATE.md',
+    'requirements/test-runs/TEMPLATE.md',
     'requirements/user-journeys/TEMPLATE.md',
     'requirements/plans/TEMPLATE.md',
     'scripts/test-document-validation.ps1',
+    'scripts/validate-test-runs.ps1',
+    'scripts/test-test-contracts.ps1',
     '.github/workflows/governance.yml'
 )
 

@@ -287,6 +287,23 @@ risk: high
 - AC-001: planned: 技术栈确定后选择穿过真实消费者边界的测试
 - AC-002: planned: 技术栈确定后加入失败语义和恢复路径测试
 
+## 测试设计矩阵
+
+- 主成功路径: AC-001: 从真实入口执行第一条闭环并检查用户可见输出
+- 业务失败与恢复: AC-002: 触发输入、权限、依赖或环境失败并证明可恢复
+- 边界与重复操作: AC-002: 重复执行和最小边界输入不得产生未声明副作用
+- 性能与容量: N/A: 尚未承诺时延、吞吐、并发或数据规模，技术栈确定后必须替换为项目指标或保留具体理由
+- 身份与权限: AC-002: 未授权身份不得获得成功结果或敏感信息
+- 兼容与历史数据: N/A: 首条新项目闭环尚不读取旧版本或历史业务数据，出现后必须替换本理由
+- 持久数据与副作用: N/A: 技术栈确定后必须替换为真实数据库、文件、队列、审计或外部状态断言
+
+## 协作触发点
+
+- 需求评审: 实现前由产品、开发和测试确认第一条闭环、数据来源、权限边界和未决问题
+- 用例评审: 首个可测构建前由测试、产品和开发负责人确认 AC、断言、N/A 理由和测试取舍
+- 阶段交付: 每个可运行切片记录提交、构建、真实入口、测试环境和开发自测结果
+- 缺陷与回归: 每次修复记录负责人、修复构建、直接复测、相邻消费者和历史数据回归范围
+
 ## 非目标
 
 - 不包含 PROJECT_BRIEF.md 中未纳入第一条闭环的相邻能力。
@@ -347,6 +364,10 @@ foreach ($gate in $quality.gates) {
         $gate.PSObject.Properties.Remove('workingDirectory')
         $gate.PSObject.Properties.Remove('command')
     }
+    elseif ($gate.id -eq 'story-traceability') {
+        $gate.userStory = 'US-001'
+        $gate.acceptanceCriteria = @('AC-001', 'AC-002')
+    }
     elseif ($gate.category -in $productCategories -and $gate.state -eq 'not-applicable') {
         $gate.state = 'planned'
         $gate | Add-Member -NotePropertyName requiredBeforeRelease -NotePropertyValue $true -Force
@@ -371,6 +392,10 @@ foreach ($gate in $quality.gates) {
         if ([string]::IsNullOrWhiteSpace($gate.remediation)) {
             $gate | Add-Member -NotePropertyName remediation -NotePropertyValue "Configure and pass the $($gate.id) gate before release." -Force
         }
+    }
+    if ($null -ne $gate.userStory -and $gate.userStory -ne 'US-001') {
+        $gate.PSObject.Properties.Remove('userStory')
+        $gate.PSObject.Properties.Remove('acceptanceCriteria')
     }
 }
 

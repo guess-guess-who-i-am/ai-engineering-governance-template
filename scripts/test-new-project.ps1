@@ -41,6 +41,7 @@ try {
     foreach ($relativePath in @(
         'PROJECT_BRIEF.md',
         'requirements/user-stories/US-001-first-slice.md',
+        'requirements/test-runs/TEMPLATE.md',
         'requirements/user-journeys/TEMPLATE.md',
         'requirements/plans/TEMPLATE.md',
         'requirements/plans/US-001-first-slice.md',
@@ -69,6 +70,11 @@ try {
         }
     }
 
+    $storyOutput = & pwsh -NoProfile -File (Join-Path $destination 'scripts/validate-user-stories.ps1') -Root $destination 2>&1
+    if ($LASTEXITCODE -ne 0 -or ($storyOutput -join "`n") -notmatch 'Validated 1 user stories') {
+        throw "Generated first Story does not satisfy the executable test-design contract: $($storyOutput -join ' ')"
+    }
+
     $config = Get-Content -LiteralPath (Join-Path $destination 'quality/gates.json') -Raw | ConvertFrom-Json -Depth 20
     if ($config.projectKind -ne 'web') { throw 'Generated quality manifest did not retain the project type.' }
     if ($config.gates.id -contains 'template-bootstrap') {
@@ -77,6 +83,14 @@ try {
     $productFunctional = $config.gates | Where-Object id -eq 'product-functional'
     if ($productFunctional.state -ne 'planned' -or $productFunctional.requiredBeforeRelease -ne $true) {
         throw 'Generated project must replace the template self-test with a release-blocking product functional gate.'
+    }
+    $storyTraceability = $config.gates | Where-Object id -eq 'story-traceability'
+    if ($storyTraceability.userStory -ne 'US-001' -or @($storyTraceability.acceptanceCriteria).Count -ne 2) {
+        throw 'Generated story-traceability gate must map to the generated US-001 acceptance criteria.'
+    }
+    $staleStoryLinks = @($config.gates | Where-Object { $null -ne $_.userStory -and $_.userStory -ne 'US-001' })
+    if ($staleStoryLinks.Count -gt 0) {
+        throw "Generated project retained stale template Story links: $($staleStoryLinks.id -join ', ')"
     }
 
     $productCategories = @(

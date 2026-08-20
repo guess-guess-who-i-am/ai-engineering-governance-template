@@ -8,6 +8,8 @@
 
 对产品能力建立或更新 `requirements/user-stories/US-nnn-*.md`：Actor / Need / Value 定义意图，`AC-nnn` 用 Given / When / Then 定义可证伪的成功、失败和边界结果。
 
+需求评审时由产品、开发和测试共同确认功能拆分、数据来源、影响面和未知项。测试随后完成 Story 的测试设计矩阵并进行用例评审；开发不必等测试结束才开始，但首个可测构建前必须对 AC、断言和取舍达成一致。
+
 当一个最终结果跨多个 Story、模块或阶段时，先建立 `requirements/user-journeys/UJ-nnn-*.md`。只有高影响歧义、跨边界实现、数据迁移、复杂发布或回滚需要时才建立 `requirements/plans/US-nnn-*.md`；可逆局部修改直接执行。
 
 ## 2. Authority routing
@@ -40,6 +42,8 @@
 每完成一个独立单元就运行最窄、可证伪的检查。失败时按机制改变方案，不重复相同尝试。保持通过的未变检查，不为仪式重复运行。
 
 每条验收条件必须映射到真实测试文件。`quality/gates.json` 中每个必需类别都要显式标记 active、planned 或 not-applicable；planned 门禁允许项目逐步建设，但会阻止发布。详细分层和性能/安全证据边界见 `TESTING.md`。
+
+每个可独立运行的前端、接口或联调切片先由开发自测，再向测试交付提交、构建、环境和真实入口。阶段性交付、跨边界测试、缺陷修复和发布候选用 `requirements/test-runs/` 记录 AC 结果、数据前后状态、缺陷复测、相邻影响面与交接决定；局部单元测试仍只保留测试输出。
 
 门禁失败不只保留日志：报告生成稳定 Finding，`collect-findings.ps1` 以 fingerprint 去重，并按 `open → in_progress → resolved → testing → closed` 推进；再次失败进入 `reopened`。P0/P1 阻断边界和 Issue 同步规则见 `quality/FINDINGS.md`。
 
