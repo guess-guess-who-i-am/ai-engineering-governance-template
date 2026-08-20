@@ -68,22 +68,11 @@ risk: high
 - AC-001: planned: fixture success evidence
 - AC-002: planned: fixture failure evidence
 
-## 测试设计矩阵
+## 测试设计重点
 
 - 主成功路径: AC-001: exercise the real entrypoint
-- 业务失败与恢复: AC-002: reject invalid input and recover
-- 边界与重复操作: AC-002: repeat the invalid operation without side effects
-- 性能与容量: N/A: this contract fixture makes no latency throughput concurrency or resource claim
-- 身份与权限: N/A: this isolated fixture has no identity or permission boundary
-- 兼容与历史数据: N/A: this isolated fixture reads no historical or versioned data
-- 持久数据与副作用: AC-002: verify the invalid operation leaves state unchanged
-
-## 协作触发点
-
-- 需求评审: before implementation product development and test resolve the fixture behavior
-- 用例评审: before handoff development and test agree on assertions and exclusions
-- 阶段交付: hand off the commit build entrypoint environment and developer self-test
-- 缺陷与回归: assign the defect fix build direct retest and adjacent regression scope
+- 重要失败与恢复: AC-002: reject invalid input and recover
+- 变更影响面: validate the direct contract plus repeated invalid input and unchanged isolated state
 
 ## 非目标
 
@@ -97,14 +86,22 @@ risk: high
     Set-Content -LiteralPath (Join-Path $evidenceRoot 'fixture-failure.log') -Value 'failure path observed and recovered' -Encoding utf8
     & $storyValidator -Root $fixture | Out-Null
 
-    Set-Content -LiteralPath $storyPath -Value ($validStory -replace '(?m)^- 身份与权限:.*\r?\n', '') -Encoding utf8
-    Invoke-ExpectedFailure -Case 'missing matrix field' -Pattern "测试设计矩阵缺少 '身份与权限'" -Action { & $storyValidator -Root $fixture }
+    Set-Content -LiteralPath $storyPath -Value ($validStory -replace '(?m)^- 变更影响面:.*\r?\n', '') -Encoding utf8
+    Invoke-ExpectedFailure -Case 'missing design focus' -Pattern "测试设计重点缺少 '变更影响面'" -Action { & $storyValidator -Root $fixture }
 
-    Set-Content -LiteralPath $storyPath -Value ($validStory -replace 'AC-002: repeat the invalid operation', 'AC-999: repeat the invalid operation') -Encoding utf8
+    Set-Content -LiteralPath $storyPath -Value ($validStory -replace 'AC-002: reject invalid input', 'AC-999: reject invalid input') -Encoding utf8
     Invoke-ExpectedFailure -Case 'unknown AC reference' -Pattern "不存在的验收条件 'AC-999'" -Action { & $storyValidator -Root $fixture }
 
-    Set-Content -LiteralPath $storyPath -Value ($validStory -replace 'N/A: this isolated fixture has no identity or permission boundary', 'N/A: todo') -Encoding utf8
-    Invoke-ExpectedFailure -Case 'placeholder N/A' -Pattern 'N/A 必须给出具体' -Action { & $storyValidator -Root $fixture }
+    Set-Content -LiteralPath $storyPath -Value ($validStory -replace 'AC-002: reject invalid input and recover', 'N/A: isolated fixture has no failure') -Encoding utf8
+    Invoke-ExpectedFailure -Case 'high risk cannot omit failure' -Pattern "对 high-risk Story 不能使用 N/A" -Action { & $storyValidator -Root $fixture }
+
+    $lowRiskStory = $validStory -replace 'risk: high', 'risk: low'
+    $lowRiskStory = [regex]::Replace($lowRiskStory, '(?ms)^### AC-002: failure\s*.*?(?=^## 证据映射)', '')
+    $lowRiskStory = $lowRiskStory `
+        -replace '(?m)^- AC-002: planned: fixture failure evidence\r?\n', '' `
+        -replace 'AC-002: reject invalid input and recover', 'N/A: this low-risk fixture has no distinct recovery behavior'
+    Set-Content -LiteralPath $storyPath -Value $lowRiskStory -Encoding utf8
+    & $storyValidator -Root $fixture | Out-Null
 
     Set-Content -LiteralPath $storyPath -Value $validStory -Encoding utf8
     $validRun = @'
@@ -160,7 +157,7 @@ status: passed
     Set-Content -LiteralPath $runPath -Value ($validRun -replace 'file:evidence/fixture-success.log', 'file:evidence/missing.log') -Encoding utf8
     Invoke-ExpectedFailure -Case 'missing run evidence' -Pattern 'evidence file does not exist' -Action { & $runValidator -Root $fixture }
 
-    Write-Output 'Test design matrix, collaboration trigger, and execution-record contracts passed.'
+    Write-Output 'Risk-based Story focus and execution-record contracts passed.'
 }
 finally {
     $resolved = [IO.Path]::GetFullPath($fixture)

@@ -8,7 +8,7 @@
 
 对产品能力建立或更新 `requirements/user-stories/US-nnn-*.md`：Actor / Need / Value 定义意图，`AC-nnn` 用 Given / When / Then 定义可证伪的成功、失败和边界结果。
 
-需求评审时由产品、开发和测试共同确认功能拆分、数据来源、影响面和未知项。测试随后完成 Story 的测试设计矩阵并进行用例评审；开发不必等测试结束才开始，但首个可测构建前必须对 AC、断言和取舍达成一致。
+Story 只记录主成功路径、最重要失败与恢复和变更影响面。跨边界、高风险或多人协作时再进行需求/用例评审；普通可逆修改直接实现并运行最窄检查，不增加仪式。
 
 当一个最终结果跨多个 Story、模块或阶段时，先建立 `requirements/user-journeys/UJ-nnn-*.md`。只有高影响歧义、跨边界实现、数据迁移、复杂发布或回滚需要时才建立 `requirements/plans/US-nnn-*.md`；可逆局部修改直接执行。
 

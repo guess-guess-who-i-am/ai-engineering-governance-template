@@ -13,7 +13,7 @@
 
 - Direct behavior changed:
 - Adjacent consumers and interfaces checked:
-- Historical data, repeated operations, permissions, compatibility, and performance decisions:
+- Additional risk checked when applicable (data, repetition, permissions, compatibility, performance, or other):
 
 ## Evidence
 

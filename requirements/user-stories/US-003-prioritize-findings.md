@@ -41,22 +41,11 @@ risk: high
 - AC-002: file=scripts/test-findings.ps1; gate=findings-contract
 - AC-003: file=.github/workflows/findings.yml; validator=scripts/validate-workflows.ps1
 
-## 测试设计矩阵
+## 测试设计重点
 
 - 主成功路径: AC-001: 同一 fingerprint 更新原 Finding 并按生命周期重开
-- 业务失败与恢复: AC-002: 非法优先级或状态转换被拒绝且不写坏基线
-- 边界与重复操作: AC-001: 重复失败不创建重复记录；AC-002: 跳级状态转换被拒绝
-- 性能与容量: N/A: 当前 Finding 规模没有时延、吞吐或并发承诺，规模变化时需新增可比较基线
-- 身份与权限: AC-003: 普通 PR 只有预览权限，人工触发才允许写 Issue
-- 兼容与历史数据: AC-001: 已有 testing 记录再次失败时保留身份并转为 reopened
-- 持久数据与副作用: AC-001: 检查 findings.json 原记录更新；AC-002: 失败时文件不变；AC-003: 未授权不写 GitHub Issue
-
-## 协作触发点
-
-- 需求评审: Finding 字段、优先级或生命周期变化前，由质量负责人、使用者和测试确认影响与迁移边界
-- 用例评审: 聚合器或工作流修改时，由脚本维护者和测试核对去重、非法转换、重开和权限场景
-- 阶段交付: 交付提交、合成 Finding 输入、运行命令、变更前后基线和工作流权限检查结果
-- 缺陷与回归: 修复后复测原 fingerprint 和状态，并回归其他优先级、已有历史记录及无 Issue 写权限路径
+- 重要失败与恢复: AC-002: 非法优先级或状态转换被拒绝且不写坏基线
+- 变更影响面: 直接回归 Finding 去重和状态；相邻检查重复失败、历史 testing 重开、文件不变以及 GitHub Issue 写权限
 
 ## 非目标
 

@@ -33,22 +33,11 @@ risk: high
 - AC-001: file=.github/workflows/release.yml; validator=scripts/validate-release.ps1
 - AC-002: file=scripts/validate-release.ps1; workflow=.github/workflows/release.yml
 
-## 测试设计矩阵
+## 测试设计重点
 
 - 主成功路径: AC-001: 一致版本 tag 通过 release profile 后生成带证据的 Release
-- 业务失败与恢复: AC-002: tag、VERSION 或 changelog 不一致时在发布前失败
-- 边界与重复操作: AC-002: 普通 PR、缺少 tag 和重复不一致版本均不得创建 Release
-- 性能与容量: N/A: 发布流程当前没有时延、吞吐或并发发布承诺，超时由 GitHub 工作流运行证据判断
-- 身份与权限: AC-001: 只有受保护 tag 工作流使用最小所需权限发布制品
-- 兼容与历史数据: AC-001: tag、版本文件和 changelog 共同固定历史版本语义
-- 持久数据与副作用: AC-001: 创建 GitHub Release 和质量报告；AC-002: 校验失败不得创建远程 Release
-
-## 协作触发点
-
-- 需求评审: 发布格式或版本语义变化前，由发布维护者、使用者和测试确认 tag、制品和证据要求
-- 用例评审: 工作流变化时，由发布和测试核对成功发布、元数据不一致、无 tag 和远程写入边界
-- 阶段交付: 发布候选交付精确提交、版本号、tag、release profile 报告、制品哈希和部署 smoke
-- 缺陷与回归: 修复发布问题后复测原候选，并回归 VERSION、package、changelog、tag 和重复发布保护
+- 重要失败与恢复: AC-002: tag、VERSION 或 changelog 不一致时在远程写入前失败
+- 变更影响面: 直接回归版本元数据和 Release；相邻检查受保护 tag、最小权限、质量报告、重复发布及失败不创建远程制品
 
 ## 非目标
 
