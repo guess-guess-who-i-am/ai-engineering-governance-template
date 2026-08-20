@@ -74,6 +74,11 @@ try {
     if ($LASTEXITCODE -ne 0 -or ($storyOutput -join "`n") -notmatch 'Validated 1 user stories') {
         throw "Generated first Story does not satisfy the executable test-design contract: $($storyOutput -join ' ')"
     }
+    $copiedTestRuns = @(Get-ChildItem -LiteralPath (Join-Path $destination 'requirements/test-runs') -File -Filter '*.md' |
+        Where-Object Name -ne 'TEMPLATE.md')
+    if ($copiedTestRuns.Count -gt 0) {
+        throw "Generated project retained template execution history: $($copiedTestRuns.Name -join ', ')"
+    }
 
     $config = Get-Content -LiteralPath (Join-Path $destination 'quality/gates.json') -Raw | ConvertFrom-Json -Depth 20
     if ($config.projectKind -ne 'web') { throw 'Generated quality manifest did not retain the project type.' }

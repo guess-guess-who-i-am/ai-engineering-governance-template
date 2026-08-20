@@ -251,6 +251,10 @@ $storyRoot = Join-Path $destinationPath 'requirements/user-stories'
 Get-ChildItem -LiteralPath $storyRoot -File -Filter 'US-*.md' |
     Where-Object { $_.Name -ne 'TEMPLATE.md' } |
     ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force }
+$testRunRoot = Join-Path $destinationPath 'requirements/test-runs'
+Get-ChildItem -LiteralPath $testRunRoot -File -Filter '*.md' |
+    Where-Object { $_.Name -ne 'TEMPLATE.md' } |
+    ForEach-Object { Remove-Item -LiteralPath $_.FullName -Force }
 $firstStory = @"
 ---
 id: US-001
