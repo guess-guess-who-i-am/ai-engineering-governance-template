@@ -25,6 +25,10 @@ function frontmatterValue(text, key) {
   return block.match(new RegExp(`^${key}:\\s*(.+)$`, "m"))?.[1]?.trim().replace(/^['"]|['"]$/g, "") || "";
 }
 
+function indexField(value) {
+  return String(value || "").replace(/[\r\n\t]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
 try {
   for await (const _chunk of process.stdin) { /* Consume Hook input. */ }
   const home = os.homedir();
@@ -46,6 +50,21 @@ try {
   }));
   const registryDirectory = path.join(codexRoot, "skill-registry");
   await mkdir(registryDirectory, { recursive: true });
+  const deferredRoots = [
+    path.join(codexRoot, "deferred-skills", "codex"),
+    path.join(home, ".agents", "deferred-skills")
+  ];
+  const deferredFiles = (await Promise.all(deferredRoots.map(skillFiles))).flat().sort();
+  const deferredLines = await Promise.all(deferredFiles.map(async (file) => {
+    const text = await readFile(file, "utf8");
+    const name = indexField(frontmatterValue(text, "name") || path.basename(path.dirname(file)));
+    const description = indexField(frontmatterValue(text, "description"));
+    return [name, description, "", "", "", "", indexField(file), "deferred"].join("\t");
+  }));
+  const deferredIndexPath = path.join(registryDirectory, "deferred-skills.tsv");
+  const deferredTemporary = `${deferredIndexPath}.${process.pid}.tmp`;
+  await writeFile(deferredTemporary, `# codex-deferred-skill-index/1\n${deferredLines.join("\n")}${deferredLines.length ? "\n" : ""}`, { mode: 0o600 });
+  await rename(deferredTemporary, deferredIndexPath);
   const registryPath = path.join(registryDirectory, "skills-index.json");
   const temporary = `${registryPath}.${process.pid}.tmp`;
   await writeFile(temporary, `${JSON.stringify({
@@ -53,6 +72,8 @@ try {
     generatedAt: new Date().toISOString(),
     roots: [{ source: "agents", path: root }],
     skillCount: skills.length,
+    deferredSkillCount: deferredFiles.length,
+    deferredIndexPath,
     skills
   }, null, 2)}\n`, { mode: 0o600 });
   await rename(temporary, registryPath);

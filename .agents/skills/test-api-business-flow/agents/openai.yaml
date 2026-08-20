@@ -1,0 +1,4 @@
+interface:
+  display_name: "验证 API 业务流"
+  short_description: "用真实运行入口验证跨接口多步骤业务结果、失败语义与恢复路径"
+  default_prompt: "使用 $test-api-business-flow 验证这条 API 业务链路。"

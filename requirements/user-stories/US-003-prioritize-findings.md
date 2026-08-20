@@ -41,6 +41,12 @@ risk: high
 - AC-002: file=scripts/test-findings.ps1; gate=findings-contract
 - AC-003: file=.github/workflows/findings.yml; validator=scripts/validate-workflows.ps1
 
+## 测试设计重点
+
+- 主成功路径: AC-001: 同一 fingerprint 更新原 Finding 并按生命周期重开
+- 重要失败与恢复: AC-002: 非法优先级或状态转换被拒绝且不写坏基线
+- 变更影响面: 直接回归 Finding 去重和状态；相邻检查重复失败、历史 testing 重开、文件不变以及 GitHub Issue 写权限
+
 ## 非目标
 
 - 不允许不可信 PR 内容自动创建或修改 GitHub Issue。

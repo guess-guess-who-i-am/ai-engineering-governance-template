@@ -7,10 +7,15 @@
 - `AGENTS.md`：任务路由、权威顺序和验证预算。
 - `CONTEXT.md`：稳定术语、关系与歧义裁决。
 - `DESIGN.md`：工程工具默认视觉系统。
-- `.agents/skills/`：12 个按需加载且命名统一的专项工作流。
+- `.agents/skills/`：17 个按需加载且命名统一的专项工作流。
 - `scripts/`：治理、Skills、敏感文件和整体检查。
 - `.kest/flow/`：Markdown-native Flow 示例。
 - `requirements/user-stories/`：带稳定验收条件 ID 和证据映射的用户故事。
+- `requirements/test-runs/`：阶段性交付、跨边界测试、缺陷复测和发布候选的轻量执行记录。
+- `requirements/user-journeys/` 与 `requirements/plans/`：仅在跨 Story 旅程或高影响实现需要时加载的模板。
+- `docs/DOCUMENTATION_AUTHORITY.md`：每类事实的唯一权威位置与联动规则。
+- `docs/PROJECT_LIFECYCLE.md`：从项目可开工到发布的 Gate 0–4。
+- `docs/RESOURCE_REGISTRY.md`：服务、数据、模型、GPU、付费 API 和临时资源的责任与退出登记。
 - `quality/gates.json`：所有测试类别的显式启用、规划或不适用决策。
 - `TESTING.md`：功能、契约、E2E、可访问性、性能、安全、供应链和发布证据体系。
 - `UPSTREAMS.md`：第三方研究仓库与更新机制。
@@ -29,7 +34,10 @@
 ./scripts/check.ps1
 ./scripts/invoke-quality-gates.ps1 -Profile release
 ./scripts/search-design-references.ps1 -Query voice
+./scripts/route-design-references.ps1 -Query voice -ProductType ai-llm
 ```
+
+前端任务先加载 `$build-designed-interface`。它只查一次轻量设计目录并返回最多 5 个候选；落地页、作品集或改版再按需加载 `$design-taste-frontend`，手势和弹簧交互再按需加载 `$apple-design`。需要真实 Flow 证据时，在已审查 Kest CLI 可执行文件存在的电脑上设置 `KEST_BIN`，运行 `./scripts/run-kest-flow.ps1`；这不会进入每个 PR 的默认负载。
 
 创建一个独立的新项目时，可让 Codex 使用 `$start-new-project` 逐项填写 brief；也可直接运行交互式向导：
 
@@ -50,10 +58,10 @@
 - 英文运行文件：常驻提醒、完整方法论档案、方法论路由和映射文件；由中文源逐行翻译生成，不用润色摘要代替原文。
 - 每轮 Hook：每次用户提示重新注入英文常驻提醒和方法论路由；会话启动、恢复、清理和压缩时也会恢复这些内容。
 - 稳定 Hook dispatcher：`UserPromptSubmit` 和 `SessionStart` 各只注册一个入口，内部并发执行常驻提醒、Skill 推荐、可选 capability 推荐和索引刷新。以后增加内部路由不会移动 Hook 索引并使已有信任记录错位。
-- Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。除本机约数百个 Skills 外，还会复用 `E:\skills\_catalog_cn.json`，把其中约1.5万个 Skills 编译为持久化行索引；不会递归预读这一万多个正文。
+- Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。`scripts/configure-lazy-capabilities.ps1` 可把本机数百个用户 Skills 迁入 deferred 索引；另会复用 `E:\skills\_catalog_cn.json`，把其中约1.5万个 Skills 编译为持久化行索引，不递归预读正文。
 - 方法论发布器：保存中文源后自动翻译、备份、生成中英文文件、更新 Skills 和索引；失败时回滚。
 - 6个自建方法 Skills：`manage-global-methodology`、`method-research-evidence`、`method-engineering-execution`、`method-evaluation-gates`、`method-github-delivery`、`method-task-tree`。
-- 63条已归类方法论：常驻21条、研究9条、工程12条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
+- 72条已归类方法论：常驻27条、研究10条、工程14条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
 - 迁移工具：37个受管配置文件，以及安装、同步和安装测试脚本。`codex-profile/README.zh.md` 提供独立说明。
 
 ### 不会上传什么
@@ -79,9 +87,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-prof
 2. 安装全局 `AGENTS.md`、Hook、中文源、英文生成物、发布器、路由配置和6个自建 Skills。
 3. 根据目标电脑的用户目录生成 `hooks.json`，不会沿用原电脑的绝对路径。
 4. 创建“编辑并发布全局 Prompt”和“编辑并发布全局方法论”两个桌面入口。
-5. 校验63条方法论的中英文对应关系并刷新 Skill 索引。
+5. 校验72条方法论的中英文对应关系并刷新 Skill 索引。
 
 安装完成后，在该电脑单独完成 Codex 登录并重新启动 Codex，使全局 `AGENTS.md` 和 Hook 重新加载。完整说明见 [可迁移 Codex 全局配置](codex-profile/README.zh.md)。
+
+需要最小默认上下文时，再运行 `scripts/configure-lazy-capabilities.ps1`。它会备份并保留所有 Skill 正文，默认只启用 capability router；Codex Desktop 保留的内置 `node_repl` 注册会被明确设为禁用，插件能力与远程插件目录同步默认关闭，普通 `codex exec` 不再触发插件 401、403 或 GitHub 同步等待。task-tree、浏览器和文档插件改为 `-p task-tree`、`-p browser`、`-p documents` 等启动 profile；显式启用插件时，当前 Codex 版本仍可能校验已安装插件 bundle，这是上游运行时行为。
 
 修改过 `hooks.json` 的入口命令后，必须在 Codex 中重新批准两个 dispatcher。只看到 `user_prompt_submit:0:0` 的旧信任记录并不代表新命令已受信任；安装器不会复制或伪造 `trusted_hash`。
 
@@ -121,7 +131,7 @@ Linux 安装器保留已有 `~/.codex/AGENTS.md` 的用户内容，生成带目�
 
 安装测试已经覆盖：仓库快照哈希一致、缺少源文件时拒绝发布、全新用户目录安装、旧配置备份、目标用户名路径生成、6个 Skills 安装和路由输入。完整仓库还通过秘密扫描、本地 PR 质量门禁和 GitHub CI。
 
-创建下游项目时，首先修改 `CONTEXT.md` 和 `DESIGN.md`，再用 `$establish-test-strategy` 把 `quality/gates.json` 中的 `planned` 门禁替换为真实命令。PR 检查允许尚在建设中的明确计划；发布检查会拒绝任何仍未配置的必需门禁。
+创建下游项目时，首先修改 `CONTEXT.md` 和适用的 `DESIGN.md`，再用 `$establish-test-strategy` 把 `quality/gates.json` 中与项目类型相关的 `planned` 门禁替换为真实命令。普通 PR 只运行需求、治理、文档和安全基线；发布检查拒绝仍未配置的相关门禁。单元、集成、容器、身份权限等不能只凭 `web/api/cli/research/other` 判断的类别，会保留带启用条件的 `not-applicable` 决策，等真实技术边界出现时再启用。
 
 详细流程见 [WORKFLOW.md](WORKFLOW.md)。研究依据见 [外部工程规范与Agent技能调研.md](外部工程规范与Agent技能调研.md)。
 

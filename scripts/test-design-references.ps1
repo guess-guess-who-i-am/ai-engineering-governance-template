@@ -6,6 +6,9 @@ $catalog = Join-Path $Root 'design/catalog.json'
 & (Join-Path $Root 'scripts/validate-design-catalog.ps1') -Path $catalog | Out-Null
 $voice = @(& (Join-Path $Root 'scripts/search-design-references.ps1') -Query voice -CatalogPath $catalog)
 if ('elevenlabs' -notin $voice.id) { throw 'Design search did not find ElevenLabs for voice.' }
+$routed = (& (Join-Path $Root 'scripts/route-design-references.ps1') -Query voice -ProductType ai-llm -Root $Root | ConvertFrom-Json)
+if ($routed.candidate_count -lt 1 -or 'elevenlabs' -notin @($routed.candidates.id)) { throw 'Design route did not return a relevant lightweight candidate.' }
+if ($routed.candidate_count -gt 5) { throw 'Design route exceeded its lightweight candidate limit.' }
 $ai = @(& (Join-Path $Root 'scripts/search-design-references.ps1') -ProductType ai-llm -Limit 100 -CatalogPath $catalog)
 if ($ai.Count -lt 10 -or 'x.ai' -notin $ai.id) { throw 'AI/LLM product-type recommendations are incomplete.' }
 

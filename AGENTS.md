@@ -8,8 +8,11 @@ This repository stores reusable AI engineering-governance templates. The objecti
 2. For an ordinary local change, read only the nearest code and tests; do not preload every document or Skill.
 3. Read `CONTEXT.md` when the task changes global terminology, ownership, or boundaries.
 4. Read `DESIGN.md` when the task changes the UI visual system.
-5. Load one primary Skill only when its trigger description clearly matches. `Pair with` text and reference links are not automatic chaining commands.
-6. Rules that can be judged mechanically must be enforced by scripts, tests, contracts, or Flow, not by model self-report alone.
+5. Read `docs/DOCUMENTATION_AUTHORITY.md` only when fact ownership or required document linkage is unclear.
+6. Read `docs/PROJECT_LIFECYCLE.md` when starting a project or Story, preparing integration, or making a release claim.
+7. Read `docs/RESOURCE_REGISTRY.md` when adding persistent, scarce, paid, privileged, or data-bearing resources.
+8. Load one primary Skill only when its trigger description clearly matches. `Pair with` text and reference links are not automatic chaining commands.
+9. Rules that can be judged mechanically must be enforced by scripts, tests, contracts, or Flow, not by model self-report alone.
 
 ## Authority order
 
@@ -18,6 +21,8 @@ This repository stores reusable AI engineering-governance templates. The objecti
 | User objective and definition of success | The user's latest request |
 | Global terminology and ownership | `CONTEXT.md` |
 | Visual language | `DESIGN.md` |
+| Document ownership and lifecycle gates | `docs/DOCUMENTATION_AUTHORITY.md`, `docs/PROJECT_LIFECYCLE.md` |
+| Persistent or shared resources | `docs/RESOURCE_REGISTRY.md` |
 | Public interface behavior | Owning contract / schema |
 | Local implementation rules | Nearest `AGENTS.md` and existing code |
 | Specialized workflow | Triggered `.agents/skills/<name>/SKILL.md` |
@@ -38,6 +43,7 @@ When authorities conflict, the authority closest to the real behavior and with e
 - Put complete third-party mirrors in `upstreams/` and do not commit them to this repository. Record sources and pinned versions in `UPSTREAMS.md` and `.reports/upstreams.json`.
 - Do not copy upstream source with unclear licensing into the core templates.
 - Skills follow `.agents/skills/README.md`; keep bodies concise and put deterministic logic in `scripts/`.
+- Register persistent, scarce, paid, privileged, or data-bearing resources with an owner, review condition, and cleanup action.
 - Do not commit tokens, cookies, API keys, `.env` files, or machine-local configuration.
 - Preserve unrelated user changes and avoid destructive Git operations.
 - Without evidence, do not claim “completed,” “fixed,” or “passed.”
@@ -72,7 +78,7 @@ Registered for Codex via `[mcp_servers.task_tree]` in `~/.codex/config.toml`, an
 - In multi-Agent work, create/read an execution scope with `task_tree_scope`. Priority is latest user request > this Agent's scope > global `GraphState.Next`. Only scoped target nodes are execution targets and only scoped writable nodes may be changed; global Current/Next remains the human project view.
 - Write with `task_tree_write` (field-level). It backs up, enforces the compact gate, syncs flow status, and refuses `GraphState.Current/Next/NextPlan` — so focus stays the user's call.
 - Scoped Agents must pass `scopeId` (or use the injected `TASK_TREE_EXECUTION_SCOPE`) and may not overwrite whole-tree Markdown. Node patches are serialized on the server against the latest tree, so concurrent writes to different authorized nodes are preserved.
-- After a successful tree/subtree write, use only the tool/API's persisted `changes` result to tell the user every changed node and field as `old value → new value`. Never infer the receipt from memory or requested fields; omit unchanged writes and protected fields.
+- After a successful tree/subtree write, use only the tool/API's persisted `changes` result to tell the user every changed node and field as `旧值 → 新值`. Never infer the receipt from memory or requested fields; omit unchanged writes and protected fields.
 - `task_tree_chain` advances one chain step; `task_tree_flow_status` reports flow drift; `task_tree_check_compact` runs the gate; `task_tree_layout` re-arranges the canvas; `task_tree_knowledge` searches the local index.
 - When the user wants to *work with* the graph, `task_tree_open` embeds the real UI in the chat (MCP Apps widget): dragging, editing, flow view, knowledge panel. When they only want a look, `task_tree_render` returns a picture. Both are for the user's eyes — read data with the other tools.
 - `task_tree_server open` pops the UI on the user's desktop; use it when the host cannot render widgets.
@@ -118,7 +124,7 @@ Before any write, **must Read in order** (same turn, before editing):
 3. `llm-task-tree/skills/task-tree-grill/SKILL.md`
 4. `llm-task-tree/skills/task-tree-grill/references/schema-template.md`
 
-Then back up `task-tree.md` to `versions/<timestamp>_<reason>.md` before manual edits (see protocol §7). Follow **all nodes → `# GraphState` → `# Edges`** order.
+Then backup `task-tree.md` to `versions/<timestamp>_<原因>.md` before manual edits (see protocol §7). Follow **all nodes → `# GraphState` → `# Edges`** order.
 
 Cursor: `.cursor/rules/llm-task-tree-edit.mdc`
 
@@ -126,7 +132,7 @@ Cursor: `.cursor/rules/llm-task-tree-edit.mdc`
 
 Before any write, **must Read in order** (same turn, before editing):
 
-1. **`scripts/README.md`** — schema, block types, when to edit, when not to edit, saving, and backup (**the authoritative execution-flow format**)
+1. **`scripts/README.md`** — schema、块类型、何时改/不改、保存与备份（**执行流程的权威写法**）
 2. Current **`scripts/project.json`** (and **`scripts/run.json`** if editing run mode)
 3. Skim **`task-tree.md`** (+ relevant `subtrees/*.md`) for valid **`nodeId`** values
 
@@ -136,7 +142,7 @@ Cursor: `.cursor/rules/llm-task-tree-flow-edit.mdc` · Full gate: `llm-task-tree
 
 **End of task — only if you edited the tree or flow this turn**
 
-1. Update the smallest relevant node(s) and/or `blocks`; for tree writes, report every persisted node/field difference as `old value → new value` from the write result.
+1. Update the smallest relevant node(s) and/or `blocks`; for tree writes, report every persisted node/field difference as `旧值 → 新值` from the write result.
 2. For node `Input`/`Output`, write a short Chinese description plus optional paths; do not paste raw samples or code.
 3. If flow changed, note it in the affected node's `Notes`.
 4. If any tree/subtree changed, run `powershell -NoProfile -ExecutionPolicy Bypass -File llm-task-tree/check-tree-compact.ps1 <changed tree paths>`. Non-zero exit blocks completion: semantically rewrite every reported over-budget field and rerun until it passes. Never mechanically truncate facts. Codex Stop hooks enforce this automatically; other Agents must run it explicitly.
@@ -145,7 +151,7 @@ Cursor: `.cursor/rules/llm-task-tree-flow-edit.mdc` · Full gate: `llm-task-tree
 
 Create from `llm-task-tree/templates/task-tree.starter.md`, or run **task-tree-grill** (Read tree paths above first).
 
-**UI**: `llm-task-tree/打开任务图.cmd` → **Relationship Graph | Execution Flow** for `scripts/project.json` / `scripts/run.json`.
+**UI**: `llm-task-tree/打开任务图.cmd` → **关系图 | 执行流程** for `scripts/project.json` / `scripts/run.json`.
 <!-- llm-task-tree:end -->
 
 <!-- llm-task-tree:tool-calling:begin -->

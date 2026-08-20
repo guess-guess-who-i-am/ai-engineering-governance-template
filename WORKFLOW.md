@@ -8,9 +8,15 @@
 
 对产品能力建立或更新 `requirements/user-stories/US-nnn-*.md`：Actor / Need / Value 定义意图，`AC-nnn` 用 Given / When / Then 定义可证伪的成功、失败和边界结果。
 
+Story 只记录主成功路径、最重要失败与恢复和变更影响面。跨边界、高风险或多人协作时再进行需求/用例评审；普通可逆修改直接实现并运行最窄检查，不增加仪式。
+
+当一个最终结果跨多个 Story、模块或阶段时，先建立 `requirements/user-journeys/UJ-nnn-*.md`。只有高影响歧义、跨边界实现、数据迁移、复杂发布或回滚需要时才建立 `requirements/plans/US-nnn-*.md`；可逆局部修改直接执行。
+
 ## 2. Authority routing
 
 按 `AGENTS.md` 找到权威：术语看 `CONTEXT.md`，UI 看 `DESIGN.md`，公共行为看 contract，局部实现看最近代码与测试。
+
+事实归属或文档联动不清楚时读 `docs/DOCUMENTATION_AUTHORITY.md`；项目开工、Story 交付、集成或发布判断读 `docs/PROJECT_LIFECYCLE.md`；新增长期服务、数据、模型、GPU、付费 API 或共享环境时读 `docs/RESOURCE_REGISTRY.md`。
 
 ## 3. First vertical slice
 
@@ -20,7 +26,7 @@
 
 - 故障：`systematic-debugging`
 - 跨组件行为：`evolve-contracts`
-- 界面：`build-designed-interface`
+- 界面：`build-designed-interface`；落地页/作品集/改版再路由 `design-taste-frontend`，手势和流体交互再路由 `apple-design`
 - 高风险完成声明：`verify-before-completion`
 - 建立或修复完整测试体系：`establish-test-strategy`
 - 审查当前分支或 PR：`review-project-diff`
@@ -37,6 +43,8 @@
 
 每条验收条件必须映射到真实测试文件。`quality/gates.json` 中每个必需类别都要显式标记 active、planned 或 not-applicable；planned 门禁允许项目逐步建设，但会阻止发布。详细分层和性能/安全证据边界见 `TESTING.md`。
 
+每个可独立运行的前端、接口或联调切片先由开发自测，再向测试交付提交、构建、环境和真实入口。阶段性交付、跨边界测试、缺陷修复和发布候选用 `requirements/test-runs/` 记录 AC 结果、数据前后状态、缺陷复测、相邻影响面与交接决定；局部单元测试仍只保留测试输出。
+
 门禁失败不只保留日志：报告生成稳定 Finding，`collect-findings.ps1` 以 fingerprint 去重，并按 `open → in_progress → resolved → testing → closed` 推进；再次失败进入 `reopened`。P0/P1 阻断边界和 Issue 同步规则见 `quality/FINDINGS.md`。
 
 机械门禁先运行；只有清晰度、意图、层级或语气等不能稳定写成规则的判断才进入 LLM 定性门禁。定性门禁先用已知好/坏样例校准，再评价真实目标；模型只返回结构化证据，最终通过或失败由脚本按契约决定。
@@ -44,6 +52,8 @@
 ## 6. Delivery
 
 交付说明必须包含：用户现在能做什么、改动边界、实际运行的证据、未验证内容和下一项真实风险。GitHub Issues/PR 应链接对应 contract、Flow 或验证日志。
+
+完成声明按 Gate 0–4 使用真实候选、提交、环境和制品证据。Hotfix 从已部署标签或精确提交建立，不用含有未部署内容的新 `main` 替代生产事实。
 
 ## GitHub 协作建议
 

@@ -24,14 +24,20 @@ risk: high
 ### AC-002: 发布前不允许静默缺少产品测试
 
 - Type: failure
-- Given: 新项目尚未为技术栈配置单元、集成、端到端、性能和安全等产品门禁
+- Given: 新项目尚未配置其项目类型默认需要的产品门禁
 - When: 执行发布级质量检查
-- Then: 检查明确列出所有未配置的必需门禁并失败，而不是给出虚假的绿色结果
+- Then: 检查只列出与项目类型相关的未配置必需门禁并失败，不被无关类别阻塞，也不产生虚假的绿色结果
 
 ## 证据映射
 
 - AC-001: file=scripts/test-new-project.ps1; gate=template-bootstrap
 - AC-002: file=scripts/test-new-project.ps1; gate=template-bootstrap
+
+## 测试设计重点
+
+- 主成功路径: AC-001: 用合法 brief 从真实脚本生成可检查的独立仓库
+- 重要失败与恢复: AC-002: 产品测试未配置时发布门禁失败，但本地项目仍可继续配置
+- 变更影响面: 直接回归生成文件、Git 仓库和质量清单；相邻检查目录隔离、首条 Story、远程授权失败及本地项目保留
 
 ## 非目标
 

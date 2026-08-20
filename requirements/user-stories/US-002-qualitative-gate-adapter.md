@@ -41,6 +41,12 @@ risk: high
 - AC-002: file=scripts/test-qualitative-gate.ps1; gate=qualitative-adapter-contract
 - AC-003: file=.github/workflows/qualitative-gate.yml; validator=scripts/validate-workflows.ps1
 
+## 测试设计重点
+
+- 主成功路径: AC-001: 通过模拟 Responses API 完成请求、解析和结构化结果校验
+- 重要失败与恢复: AC-002: 缺少凭据时在网络请求前失败；AC-003: 未启用时不产生远程调用
+- 变更影响面: 直接回归鉴权、请求和严格响应契约；相邻检查空模型字段、校准样例、启用开关及凭据不落盘
+
 ## 非目标
 
 - 模拟服务不证明某个真实模型具有足够的审美或判断能力。

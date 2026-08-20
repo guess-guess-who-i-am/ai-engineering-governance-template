@@ -5,6 +5,16 @@ $ErrorActionPreference = 'Stop'
 $trackedRaw = & git -C $Root ls-files -z
 if ($LASTEXITCODE -ne 0) { throw 'Could not enumerate tracked files.' }
 $tracked = @($trackedRaw -split "`0" | Where-Object { $_ })
+$untrackedRaw = & git -C $Root ls-files --others --exclude-standard -z
+if ($LASTEXITCODE -ne 0) { throw 'Could not enumerate untracked files.' }
+$governedRoots = @('.agents', '.github', 'docs', 'quality', 'requirements', 'scripts', 'site')
+$untracked = @($untrackedRaw -split "`0" | Where-Object {
+    if (-not $_) { return $false }
+    $normalized = $_.Replace('\', '/')
+    if ($normalized -notmatch '/') { return $true }
+    return ($normalized.Split('/')[0] -in $governedRoots)
+})
+$repositoryFiles = @($tracked + $untracked | Sort-Object -Unique)
 $textExtensions = @('.md', '.json', '.yml', '.yaml', '.html', '.css', '.js', '.mjs', '.ps1')
 $decoder = [Text.UTF8Encoding]::new($false, $true)
 $mojibakeMarkers = @(
@@ -13,13 +23,13 @@ $mojibakeMarkers = @(
 )
 $incorrectProductName = -join @([char]0x7A, [char]0x67, [char]0x61, [char]0x69)
 $checked = 0
-foreach ($relative in $tracked) {
+foreach ($relative in $repositoryFiles) {
     $extension = [IO.Path]::GetExtension($relative).ToLowerInvariant()
     if ($extension -notin $textExtensions) { continue }
     $path = Join-Path $Root $relative
-    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Tracked text file is missing: $relative" }
-    try { $body = $decoder.GetString([IO.File]::ReadAllBytes($path)) } catch { throw "Tracked text is not valid UTF-8: $relative" }
-    if ($body.Contains([char]0xFFFD) -or @($mojibakeMarkers | Where-Object { $body.Contains($_) }).Count -gt 0) { throw "Tracked text contains replacement or mojibake markers: $relative" }
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { throw "Repository text file is missing: $relative" }
+    try { $body = $decoder.GetString([IO.File]::ReadAllBytes($path)) } catch { throw "Repository text is not valid UTF-8: $relative" }
+    if ($body.Contains([char]0xFFFD) -or @($mojibakeMarkers | Where-Object { $body.Contains($_) }).Count -gt 0) { throw "Repository text contains replacement or mojibake markers: $relative" }
     if ($body -match "(?i)\b$incorrectProductName\b") { throw "Use the verified product name ZGI, not the common misspelling: $relative" }
     if ($extension -eq '.json') { try { $body | ConvertFrom-Json -Depth 30 -AsHashtable | Out-Null } catch { throw "Invalid JSON: $relative" } }
     if ($extension -eq '.md') {
@@ -47,4 +57,4 @@ if (Test-Path -LiteralPath $sitePath) {
         if ($anchor.Groups['id'].Value -notin $ids) { throw "Broken site anchor '#$($anchor.Groups['id'].Value)'." }
     }
 }
-Write-Output "Validated encoding, JSON, terminology, and links across $checked tracked text files."
+Write-Output "Validated encoding, JSON, terminology, and links across $checked repository text files."

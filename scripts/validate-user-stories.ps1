@@ -46,7 +46,7 @@ foreach ($story in $stories) {
     if ($status -notin $allowedStatuses) { throw "$($story.Name): unsupported status '$status'." }
     if ($risk -notin $allowedRisks) { throw "$($story.Name): unsupported risk '$risk'." }
 
-    foreach ($heading in @('## 用户故事', '## 验收条件', '## 证据映射', '## 非目标')) {
+    foreach ($heading in @('## 用户故事', '## 验收条件', '## 证据映射', '## 测试设计重点', '## 非目标')) {
         if ($body -notmatch "(?m)^$([regex]::Escape($heading))\s*$") {
             throw "$($story.Name): missing heading '$heading'."
         }
@@ -91,7 +91,7 @@ foreach ($story in $stories) {
         throw "$($story.Name): $risk-risk stories require a failure, boundary, security, performance, or accessibility criterion."
     }
 
-    $evidenceSection = [regex]::Match($body, '(?s)## 证据映射\s*(?<value>.*?)(?=^## 非目标\s*$)', 'Multiline')
+    $evidenceSection = [regex]::Match($body, '(?s)## 证据映射\s*(?<value>.*?)(?=^## 测试设计重点\s*$)', 'Multiline')
     $evidenceMatches = [regex]::Matches($evidenceSection.Groups['value'].Value, '(?m)^- (?<id>AC-\d{3,}):\s*(?<value>\S.*?)\s*$')
     $evidence = @{}
     foreach ($entry in $evidenceMatches) {
@@ -115,6 +115,41 @@ foreach ($story in $stories) {
                 throw "$($story.Name): evidence file does not exist for '$criterionId': $evidencePath"
             }
         }
+    }
+
+    $designSection = [regex]::Match($body, '(?s)## 测试设计重点\s*(?<value>.*?)(?=^## 非目标\s*$)', 'Multiline')
+    $designValues = @{}
+    foreach ($field in @('主成功路径', '重要失败与恢复', '变更影响面')) {
+        $entry = [regex]::Match($designSection.Groups['value'].Value, "(?m)^- $([regex]::Escape($field)):\s*(?<value>\S.*?)\s*$")
+        if (-not $entry.Success) { throw "$($story.Name): 测试设计重点缺少 '$field'." }
+        $designValues[$field] = $entry.Groups['value'].Value.Trim()
+    }
+
+    foreach ($field in @('主成功路径', '重要失败与恢复')) {
+        $value = $designValues[$field]
+        $notApplicable = [regex]::Match($value, '^(?i:N/A):\s*(?<reason>.+)$')
+        if ($notApplicable.Success) {
+            $reason = $notApplicable.Groups['reason'].Value.Trim()
+            if ($field -eq '主成功路径' -or $risk -in @('high', 'critical')) {
+                throw "$($story.Name): '$field' 对 $risk-risk Story 不能使用 N/A."
+            }
+            if ($reason.Length -lt 8 -or $reason -match '(待补|待定|以后|unknown|todo|tbd|不清楚)') {
+                throw "$($story.Name): '$field' 的 N/A 必须给出具体、当前可审查的理由."
+            }
+            continue
+        }
+        $references = @([regex]::Matches($value, '\bAC-\d{3,}\b') | ForEach-Object Value | Select-Object -Unique)
+        if ($references.Count -eq 0) { throw "$($story.Name): '$field' 必须引用 AC-nnn，或在允许时写 N/A: 具体理由." }
+        foreach ($reference in $references) {
+            if (-not $criterionIds.ContainsKey($reference)) {
+                throw "$($story.Name): '$field' 引用了不存在的验收条件 '$reference'."
+            }
+        }
+    }
+
+    $impact = $designValues['变更影响面']
+    if ($impact.Length -lt 12 -or $impact -match '(待补|待定|以后|unknown|todo|tbd|不清楚|正常工作|已覆盖)') {
+        throw "$($story.Name): '变更影响面' 必须具体说明直接变化和需要回归的相邻表面."
     }
 }
 

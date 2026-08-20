@@ -276,6 +276,13 @@ try {
       $allScored.Add($item)
     }
   }
+  $deferredIndexProperty = $registry.PSObject.Properties["deferredIndexPath"]
+  $deferredIndexPath = if ($deferredIndexProperty) { [string]$deferredIndexProperty.Value } else { Join-Path $codexHome "skill-registry\deferred-skills.tsv" }
+  if ($deferredIndexPath -and -not $localAliasMatch) {
+    foreach ($item in @(Get-ExternalSkillScores -IndexPath $deferredIndexPath -Tokens $tokens -Query $query -Aliases $aliases -ExcludedNames $knownNames)) {
+      $allScored.Add($item)
+    }
+  }
   $scored = @($allScored | Sort-Object -Property @{Expression="Score";Descending=$true}, @{Expression={ [int]$_.Skill.rank };Ascending=$true}, @{Expression={ [string]$_.Skill.name };Ascending=$true})
   if (-not $scored.Count) { Write-EmptyResult }
   $topScore = [int]$scored[0].Score

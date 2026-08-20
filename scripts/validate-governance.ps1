@@ -18,6 +18,9 @@ $required = @(
     'upstreams.lock.json',
     'docs/RELEASING.md',
     'docs/AGENT_PLATFORM_BOUNDARY.md',
+    'docs/DOCUMENTATION_AUTHORITY.md',
+    'docs/PROJECT_LIFECYCLE.md',
+    'docs/RESOURCE_REGISTRY.md',
     '.agents/skills/README.md',
     'design/catalog.json',
     'site/index.html',
@@ -26,6 +29,12 @@ $required = @(
     'quality/findings.json',
     'quality/FINDINGS.md',
     'requirements/user-stories/TEMPLATE.md',
+    'requirements/test-runs/TEMPLATE.md',
+    'requirements/user-journeys/TEMPLATE.md',
+    'requirements/plans/TEMPLATE.md',
+    'scripts/test-document-validation.ps1',
+    'scripts/validate-test-runs.ps1',
+    'scripts/test-test-contracts.ps1',
     '.github/workflows/governance.yml'
 )
 
@@ -35,7 +44,14 @@ if ($missing.Count -gt 0) {
 }
 
 $agents = Get-Content -LiteralPath (Join-Path $Root 'AGENTS.md') -Raw
-foreach ($authority in @('CONTEXT.md', 'DESIGN.md', '.agents/skills')) {
+foreach ($authority in @(
+    'CONTEXT.md',
+    'DESIGN.md',
+    'docs/DOCUMENTATION_AUTHORITY.md',
+    'docs/PROJECT_LIFECYCLE.md',
+    'docs/RESOURCE_REGISTRY.md',
+    '.agents/skills'
+)) {
     if ($agents -notmatch [regex]::Escape($authority)) {
         throw "AGENTS.md does not route to $authority"
     }
