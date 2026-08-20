@@ -17,6 +17,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'project-kind-quality-policy.ps1')
 
 function Get-RequiredValue {
     param([string]$Value, [string]$Prompt, [string]$Name)
@@ -343,38 +344,35 @@ Set-Content -LiteralPath (Join-Path $planRoot 'US-001-first-slice.md') -Value $f
 $qualityPath = Join-Path $destinationPath 'quality/gates.json'
 $quality = Get-Content -LiteralPath $qualityPath -Raw | ConvertFrom-Json -Depth 20
 $quality.projectKind = $ProjectType
-$productCategories = @(
-    'unit', 'integration', 'contract', 'e2e', 'accessibility', 'performance',
-    'dependency-security', 'container-security', 'compatibility', 'deployment', 'data-quality'
+$productPolicy = @(Get-ProjectKindQualityPolicy -ProjectType $ProjectType)
+$productCategories = @($productPolicy.Category)
+$downstreamActiveGateIds = @(
+    'governance-structure', 'skill-packages', 'document-integrity',
+    'story-traceability', 'security-baseline'
 )
+$quality.gates = @($quality.gates | Where-Object {
+    $_.category -notin $productCategories -and
+    ($_.id -in $downstreamActiveGateIds -or $_.id -in @('application-security', 'llm-qualitative'))
+})
 foreach ($gate in $quality.gates) {
-    if ($gate.id -eq 'template-bootstrap') {
-        $gate.id = 'product-functional'
-        $gate.state = 'planned'
-        $gate | Add-Member -NotePropertyName requiredBeforeRelease -NotePropertyValue $true -Force
-        $gate | Add-Member -NotePropertyName rationale -NotePropertyValue 'Configure the first user-visible success and failure paths after choosing the application stack.' -Force
+    if ($gate.id -eq 'story-traceability') {
+        $gate.userStory = 'US-001'
+        $gate.acceptanceCriteria = @('AC-001', 'AC-002')
+    }
+    elseif ($gate.id -eq 'application-security' -and $gate.state -eq 'not-applicable') {
+        $gate.rationale = 'Enable when the product adds authentication, authorization, privileged actions, private user data, abuse boundaries, or sensitive telemetry.'
+    }
+    elseif ($gate.id -eq 'llm-qualitative' -and -not $IncludeQualitativeGate) {
+        $gate.state = 'not-applicable'
+        $gate | Add-Member -NotePropertyName rationale -NotePropertyValue 'The qualitative gate was not selected for this project. Enable it when taste, intent, or another non-numeric product requirement needs calibrated model evaluation.' -Force
         $gate.PSObject.Properties.Remove('profiles')
         $gate.PSObject.Properties.Remove('workingDirectory')
         $gate.PSObject.Properties.Remove('command')
     }
-    elseif ($gate.id -eq 'story-traceability') {
-        $gate.userStory = 'US-001'
-        $gate.acceptanceCriteria = @('AC-001', 'AC-002')
-    }
-    elseif ($gate.category -in $productCategories -and $gate.state -eq 'not-applicable') {
+    elseif ($gate.id -eq 'llm-qualitative' -and $IncludeQualitativeGate) {
         $gate.state = 'planned'
         $gate | Add-Member -NotePropertyName requiredBeforeRelease -NotePropertyValue $true -Force
-        $gate.rationale = "Configure the $($gate.category) gate for the selected $ProjectType stack, or replace this with a reviewed project-specific not-applicable decision."
-    }
-    elseif ($gate.id -eq 'application-security' -and $gate.state -eq 'not-applicable') {
-        $gate.state = 'planned'
-        $gate | Add-Member -NotePropertyName requiredBeforeRelease -NotePropertyValue $true -Force
-        $gate.rationale = 'Add product-specific authentication, authorization, privacy, abuse, and sensitive-telemetry tests.'
-    }
-    elseif ($gate.id -eq 'llm-qualitative' -and -not $IncludeQualitativeGate) {
-        $gate.state = 'planned'
-        $gate | Add-Member -NotePropertyName requiredBeforeRelease -NotePropertyValue $true -Force
-        $gate | Add-Member -NotePropertyName rationale -NotePropertyValue 'Configure LLM_BASE_URL and LLM_API_KEY, then restore the calibrated qualitative workflow.' -Force
+        $gate | Add-Member -NotePropertyName rationale -NotePropertyValue 'Calibrate the qualitative manifest against the product, then configure LLM_BASE_URL and LLM_API_KEY.' -Force
         $gate.PSObject.Properties.Remove('profiles')
         $gate.PSObject.Properties.Remove('workingDirectory')
         $gate.PSObject.Properties.Remove('command')
@@ -392,26 +390,30 @@ foreach ($gate in $quality.gates) {
     }
 }
 
-# Template-level active gates prove that the governance platform works; they do
-# not prove that the generated product has implemented the same quality layer.
-# Keep an explicit release blocker for every product-facing category until the
-# new repository replaces it with a stack-specific executable gate.
-foreach ($category in $productCategories) {
-    $hasProductPlan = @($quality.gates | Where-Object {
-        $_.category -eq $category -and $_.state -eq 'planned'
-    }).Count -gt 0
-    if ($hasProductPlan) { continue }
-
-    $quality.gates += [pscustomobject]@{
-        id = "product-$category"
-        category = $category
-        state = 'planned'
-        rationale = "Configure the product-level $category gate for the selected $ProjectType stack. Template self-tests in this category do not verify product behavior."
-        requiredBeforeRelease = $true
-        failurePriority = 'P1'
-        owner = 'project-maintainers'
-        remediation = "Implement and pass the product-level $category gate before release."
+$quality.gates += [pscustomobject]@{
+    id = 'product-functional'
+    category = 'functional'
+    state = 'planned'
+    rationale = 'Configure the first user-visible success and important failure paths after choosing the application stack.'
+    requiredBeforeRelease = $true
+    failurePriority = 'P1'
+    owner = 'project-maintainers'
+    remediation = 'Implement and pass the first real product flow before release.'
+}
+foreach ($decision in $productPolicy) {
+    $productGate = [ordered]@{
+        id = "product-$($decision.Category)"
+        category = $decision.Category
+        state = if ($decision.RequiredBeforeRelease) { 'planned' } else { 'not-applicable' }
+        rationale = $decision.Rationale
     }
+    if ($decision.RequiredBeforeRelease) {
+        $productGate.requiredBeforeRelease = $true
+        $productGate.failurePriority = 'P1'
+        $productGate.owner = 'project-maintainers'
+        $productGate.remediation = "Implement and pass the product-level $($decision.Category) gate before release."
+    }
+    $quality.gates += [pscustomobject]$productGate
 }
 $quality | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $qualityPath -Encoding utf8
 

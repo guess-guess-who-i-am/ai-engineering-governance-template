@@ -4,6 +4,23 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'project-kind-quality-policy.ps1')
+
+$expectedPolicy = @{
+    web = @('e2e', 'accessibility', 'performance', 'dependency-security', 'compatibility', 'deployment')
+    api = @('contract', 'e2e', 'performance', 'dependency-security', 'compatibility', 'deployment')
+    cli = @('contract', 'e2e', 'dependency-security', 'compatibility', 'deployment')
+    research = @('e2e', 'dependency-security', 'compatibility', 'data-quality')
+    other = @()
+}
+foreach ($projectKind in $expectedPolicy.Keys) {
+    $actual = @(Get-ProjectKindQualityPolicy -ProjectType $projectKind |
+        Where-Object RequiredBeforeRelease |
+        ForEach-Object Category)
+    if (Compare-Object -ReferenceObject @($expectedPolicy[$projectKind]) -DifferenceObject $actual) {
+        throw "Unexpected release policy for project type '$projectKind': $($actual -join ', ')"
+    }
+}
 $tempBase = [IO.Path]::GetTempPath()
 $testRoot = Join-Path $tempBase ("governance-template-test-" + [guid]::NewGuid().ToString('N'))
 $destination = Join-Path $testRoot 'story-tested-web'
@@ -46,6 +63,7 @@ try {
         'requirements/plans/TEMPLATE.md',
         'requirements/plans/US-001-first-slice.md',
         'quality/gates.json',
+        'scripts/project-kind-quality-policy.ps1',
         'TESTING.md',
         '.kest/flow/governance-smoke.flow.md',
         '.kest/flow.config.yaml',
@@ -98,15 +116,24 @@ try {
         throw "Generated project retained stale template Story links: $($staleStoryLinks.id -join ', ')"
     }
 
-    $productCategories = @(
-        'unit', 'integration', 'contract', 'e2e', 'accessibility', 'performance',
-        'dependency-security', 'container-security', 'compatibility', 'deployment', 'data-quality'
-    )
-    foreach ($category in $productCategories) {
-        $decision = @($config.gates | Where-Object category -eq $category)
-        if ($decision.Count -eq 0 -or 'planned' -notin $decision.state) {
-            throw "Generated project did not mark '$category' as a release-blocking planned gate."
+    $expectedPlanned = @('functional') + @($expectedPolicy.web)
+    $productDecisions = @($config.gates | Where-Object id -like 'product-*')
+    foreach ($category in @('functional', 'unit', 'integration', 'contract', 'e2e', 'accessibility', 'performance', 'dependency-security', 'container-security', 'compatibility', 'deployment', 'data-quality')) {
+        $decision = @($productDecisions | Where-Object category -eq $category)
+        if ($decision.Count -ne 1) { throw "Generated project must have one product decision for '$category'." }
+        $expectedState = if ($category -in $expectedPlanned) { 'planned' } else { 'not-applicable' }
+        if ($decision[0].state -ne $expectedState) {
+            throw "Generated web project marked '$category' as '$($decision[0].state)' instead of '$expectedState'."
         }
+    }
+    $activePrGates = @($config.gates | Where-Object { $_.state -eq 'active' -and 'pr' -in $_.profiles })
+    $expectedActivePr = @('governance-structure', 'skill-packages', 'document-integrity', 'story-traceability', 'security-baseline')
+    if (Compare-Object -ReferenceObject $expectedActivePr -DifferenceObject @($activePrGates.id)) {
+        throw "Generated project has unexpected routine PR gates: $($activePrGates.id -join ', ')"
+    }
+    $qualitative = $config.gates | Where-Object id -eq 'llm-qualitative'
+    if ($qualitative.state -ne 'not-applicable') {
+        throw 'A qualitative gate that was not selected must not block release.'
     }
 
     $releaseOutput = & pwsh -NoProfile -File (Join-Path $destination 'scripts/invoke-quality-gates.ps1') `
@@ -117,6 +144,7 @@ try {
     }
 
     Write-Output 'New-project functional test passed.'
+    $global:LASTEXITCODE = 0
 }
 finally {
     $env:GIT_AUTHOR_NAME = $previousGitAuthorName

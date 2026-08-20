@@ -131,7 +131,7 @@ Linux 安装器保留已有 `~/.codex/AGENTS.md` 的用户内容，生成带目�
 
 安装测试已经覆盖：仓库快照哈希一致、缺少源文件时拒绝发布、全新用户目录安装、旧配置备份、目标用户名路径生成、6个 Skills 安装和路由输入。完整仓库还通过秘密扫描、本地 PR 质量门禁和 GitHub CI。
 
-创建下游项目时，首先修改 `CONTEXT.md` 和 `DESIGN.md`，再用 `$establish-test-strategy` 把 `quality/gates.json` 中的 `planned` 门禁替换为真实命令。PR 检查允许尚在建设中的明确计划；发布检查会拒绝任何仍未配置的必需门禁。
+创建下游项目时，首先修改 `CONTEXT.md` 和适用的 `DESIGN.md`，再用 `$establish-test-strategy` 把 `quality/gates.json` 中与项目类型相关的 `planned` 门禁替换为真实命令。普通 PR 只运行需求、治理、文档和安全基线；发布检查拒绝仍未配置的相关门禁。单元、集成、容器、身份权限等不能只凭 `web/api/cli/research/other` 判断的类别，会保留带启用条件的 `not-applicable` 决策，等真实技术边界出现时再启用。
 
 详细流程见 [WORKFLOW.md](WORKFLOW.md)。研究依据见 [外部工程规范与Agent技能调研.md](外部工程规范与Agent技能调研.md)。
 
