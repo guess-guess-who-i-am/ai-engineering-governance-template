@@ -4,7 +4,11 @@ param([string]$Root = (Split-Path -Parent $PSScriptRoot))
 $ErrorActionPreference = 'Stop'
 $trackedRaw = & git -C $Root ls-files -z
 if ($LASTEXITCODE -ne 0) { throw 'Could not enumerate tracked files.' }
-$tracked = @($trackedRaw -split "`0" | Where-Object { $_ })
+$deletedRaw = & git -C $Root ls-files --deleted -z
+if ($LASTEXITCODE -ne 0) { throw 'Could not enumerate deleted tracked files.' }
+$deleted = @{}
+foreach ($relative in @($deletedRaw -split "`0" | Where-Object { $_ })) { $deleted[$relative] = $true }
+$tracked = @($trackedRaw -split "`0" | Where-Object { $_ -and -not $deleted.ContainsKey($_) })
 $untrackedRaw = & git -C $Root ls-files --others --exclude-standard -z
 if ($LASTEXITCODE -ne 0) { throw 'Could not enumerate untracked files.' }
 $governedRoots = @('.agents', '.github', 'docs', 'quality', 'requirements', 'scripts', 'site')

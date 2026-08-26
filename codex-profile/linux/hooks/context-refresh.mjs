@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -13,17 +12,6 @@ async function readInput() {
 async function optionalText(file) {
   try { return (await readFile(file, "utf8")).replace(/^\uFEFF/, "").trim(); }
   catch (error) { if (error.code === "ENOENT") return ""; throw error; }
-}
-
-function findProjectFile(startDirectory, fileName) {
-  let current = path.resolve(startDirectory);
-  while (true) {
-    const candidate = path.join(current, fileName);
-    if (existsSync(candidate)) return candidate;
-    const parent = path.dirname(current);
-    if (parent === current) return "";
-    current = parent;
-  }
 }
 
 const batchingContract = `[AUTOMATIC_TOOL_BATCHING_CONTRACT_V3]
@@ -52,6 +40,7 @@ try {
   const codexRoot = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
   const parts = [];
   if (eventName === "UserPromptSubmit") parts.push(batchingContract);
+  if (eventName === "UserPromptSubmit") parts.push("[CODEX_SKILL_ROUTER_GATE_V1]\nThe platform Skill list is metadata-only. Do not read Codex, user, project, task-tree, or external Skill bodies directly from that list. Read a SKILL.md only when the unified Skill Router names its exact path; if it names none, do not load a specialized Skill.");
   const [anchor, router] = await Promise.all([
     optionalText(path.join(codexRoot, "prompts", "global-attention-anchor.en.md")),
     optionalText(path.join(codexRoot, "prompts", "global-methodology-router.en.md"))
@@ -59,10 +48,6 @@ try {
   if (anchor) parts.push(`[GLOBAL_ALWAYS_ON_ORIGINAL_EN_V3]\n${anchor}`);
   if (router) parts.push(`[GLOBAL_METHODOLOGY_ROUTER_EN_V3]\n${router}`);
 
-  const cwd = typeof input.cwd === "string" && existsSync(input.cwd) ? input.cwd : process.cwd();
-  if (findProjectFile(cwd, "task-tree.md") || findProjectFile(cwd, "task-trees.json")) {
-    parts.push("Deterministic route: task-tree state exists. Load `method-task-tree` before acting, call `task_tree_focus`, and apply the nearest project `AGENTS.md`. The latest user request overrides stale graph focus; `GraphState.NextPlan` is never executable.");
-  }
   if (eventName === "SessionStart" && input.source === "compact") {
     parts.push("Compaction recovery: restore the active task, selected methodology routes, applicable `AGENTS.md` files, repository state, evidence, and first unresolved gap before continuing. Do not load the complete methodology archive; reload only the routes that still apply.");
   }

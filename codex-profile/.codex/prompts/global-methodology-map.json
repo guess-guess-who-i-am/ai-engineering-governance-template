@@ -4,7 +4,7 @@
   "chineseReviewSource": "global-every-turn.zh.md",
   "chineseEditorSource": "global-methodology-source.zh.md",
   "chineseReviewDocument": "global-methodology-routing-review.zh.md",
-  "ruleCount": 72,
+  "ruleCount": 127,
   "translationPolicy": "Each routed rule must be an exact line from the English translation source; summaries do not substitute for source wording.",
   "routes": {
     "alwaysOn": [
@@ -34,9 +34,7 @@
       24,
       25,
       26,
-      27
-    ],
-    "method-research-evidence": [
+      27,
       28,
       29,
       30,
@@ -46,40 +44,36 @@
       34,
       35,
       36,
-      37
-    ],
-    "method-engineering-execution": [
+      37,
       38,
       39,
       40,
       41,
       42,
       43,
-      44,
+      44
+    ],
+    "method-research-evidence": [
       45,
       46,
       47,
       48,
       49,
       50,
-      51
-    ],
-    "method-evaluation-gates": [
+      51,
       52,
       53,
-      54,
+      54
+    ],
+    "method-engineering-execution": [
       55,
       56,
       57,
       58,
       59,
       60,
-      61
-    ],
-    "method-github-delivery": [
-      62
-    ],
-    "method-task-tree": [
+      61,
+      62,
       63,
       64,
       65,
@@ -89,7 +83,68 @@
       69,
       70,
       71,
-      72
+      72,
+      73,
+      74
+    ],
+    "method-evaluation-gates": [
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85
+    ],
+    "method-github-delivery": [
+      86
+    ],
+    "method-task-tree": [
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127
     ]
   }
 }

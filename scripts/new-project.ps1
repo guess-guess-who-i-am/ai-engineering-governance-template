@@ -209,7 +209,7 @@ This repository implements **$DisplayName** for **$Audience**.
 4. Read DESIGN.md only for user-interface work.
 5. Read TESTING.md and the relevant user story when changing product behavior or test coverage.
 6. Read docs/DOCUMENTATION_AUTHORITY.md when fact ownership is unclear, docs/PROJECT_LIFECYCLE.md for project or release gates, and docs/RESOURCE_REGISTRY.md for persistent or shared resources.
-7. Load one matching Skill from .agents/skills only when its description clearly applies.
+7. Load a Skill from .agents/routed-skills only when the unified Router selects its exact path for the current request.
 8. Put mechanically decidable rules in tests, scripts, schemas, or contracts.
 
 ## Implementation Flow

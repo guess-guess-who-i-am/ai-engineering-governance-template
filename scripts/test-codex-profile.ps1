@@ -72,15 +72,20 @@ try {
   $dispatcherCommand = [string]$hooks.hooks.UserPromptSubmit[0].hooks[0].command
   if ($dispatcherCommand -notlike "*$testRoot*" -or $dispatcherCommand -notlike "*hook-dispatch.mjs*") { throw "hooks.json does not use the target user profile dispatcher path." }
   if ([int]$hooks.hooks.UserPromptSubmit[0].hooks[0].timeout -ne 20) { throw "The prompt dispatcher timeout is not configured." }
-  if ([int]$hooks.hooks.UserPromptSubmit[0].hooks[0].additionalContextLimit -ne 14000) { throw "The prompt dispatcher does not reserve room for reminders and routing." }
+  if ([int]$hooks.hooks.UserPromptSubmit[0].hooks[0].additionalContextLimit -ne 0) { throw "The prompt dispatcher does not pass the full additional context directly." }
   if ([int]$hooks.hooks.SessionStart[0].hooks[0].timeout -ne 70) { throw "The session dispatcher timeout is not configured for index refresh." }
+  if ([int]$hooks.hooks.SessionStart[0].hooks[0].additionalContextLimit -ne 0) { throw "The session dispatcher does not pass the full additional context directly." }
 
   $backup = Get-ChildItem -LiteralPath (Join-Path $testRoot ".codex\backups\portable-profile") -Filter "AGENTS.md" -Recurse -File | Select-Object -First 1
   if (-not $backup -or (Get-Content -Raw -LiteralPath $backup.FullName) -ne "old-profile-marker") {
     throw "The installer did not preserve the previous managed file."
   }
 
-  $skillCount = (Get-ChildItem -LiteralPath (Join-Path $testRoot ".agents\skills") -Filter "SKILL.md" -Recurse -File).Count
+  $directUserSkillRoot = Join-Path $testRoot ".agents\skills"
+  $directUserSkillCount = if (Test-Path -LiteralPath $directUserSkillRoot -PathType Container) { @(Get-ChildItem -LiteralPath $directUserSkillRoot -Filter "SKILL.md" -Recurse -File).Count } else { 0 }
+  if ($directUserSkillCount -ne 0) { throw "User Skills remain in the platform auto-scan directory: $directUserSkillCount" }
+  $routedUserSkillRoot = Join-Path $testRoot ".agents\routed-skills"
+  $skillCount = (Get-ChildItem -LiteralPath $routedUserSkillRoot -Filter "SKILL.md" -Recurse -File).Count
   if ($skillCount -ne 6) { throw "Expected 6 custom Skills, found $skillCount." }
 
   $registryText = Get-Content -Raw -LiteralPath (Join-Path $testRoot ".codex\skill-registry\skills-index.json")
@@ -148,17 +153,43 @@ try {
   $ambiguousOutput = $ambiguousInput | & node $router
   if (($ambiguousOutput | Out-String).Trim() -ne "{}") { throw "The Skill router selected a Skill for an ambiguous generic prompt." }
 
+  $githubInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Commit and push these changes to GitHub"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
+  $githubOutput = $githubInput | & node $router
+  $githubContext = [string](($githubOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
+  if ($githubContext -notmatch 'method-github-delivery' -or $githubContext -notmatch [regex]::Escape((Join-Path $routedUserSkillRoot 'method-github-delivery\SKILL.md'))) {
+    throw "The Skill router did not recommend the Router-only user method-github-delivery Skill. Output: $(($githubOutput | Out-String).Trim())"
+  }
+  if ($githubContext -notmatch 'source=agents') {
+    throw "The Skill router did not preserve the user Skill source label. Output: $(($githubOutput | Out-String).Trim())"
+  }
+
+  $directProjectSkillRoot = Join-Path $repositoryRoot '.agents\skills'
+  $directProjectSkillCount = if (Test-Path -LiteralPath $directProjectSkillRoot -PathType Container) { @(Get-ChildItem -LiteralPath $directProjectSkillRoot -Filter 'SKILL.md' -Recurse -File).Count } else { 0 }
+  if ($directProjectSkillCount -ne 0) { throw "Project Skills remain in the platform auto-scan directory: $directProjectSkillCount" }
+  $routedProjectSkillRoot = Join-Path $repositoryRoot '.agents\routed-skills'
+  $routedProjectSkillCount = @(Get-ChildItem -LiteralPath $routedProjectSkillRoot -Filter 'SKILL.md' -Recurse -File).Count
+  if ($routedProjectSkillCount -ne 17) { throw "Expected 17 Router-only project Skills, found $routedProjectSkillCount." }
+
   $frontendInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Build a responsive frontend landing page for an AI product"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $frontendOutput = $frontendInput | & node $router
   $frontendContext = [string](($frontendOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($frontendContext -notmatch 'build-designed-interface' -or $frontendContext -notmatch [regex]::Escape((Join-Path $repositoryRoot '.agents\skills\build-designed-interface\SKILL.md'))) {
+  if ($frontendContext -notmatch 'build-designed-interface' -or $frontendContext -notmatch [regex]::Escape((Join-Path $repositoryRoot '.agents\routed-skills\build-designed-interface\SKILL.md'))) {
     throw "The Skill router did not recommend the nearest project build-designed-interface Skill. Output: $(($frontendOutput | Out-String).Trim())"
+  }
+  if ($frontendContext -notmatch '\[CODEX_SKILL_ROUTER_V4\]' -or $frontendContext -notmatch 'source=project') {
+    throw "The Skill router did not expose the compact unified candidate. Output: $(($frontendOutput | Out-String).Trim())"
+  }
+  if ($frontendContext -match 'Unified scope|metadata-only|Evidence:') {
+    throw "The Skill router repeated fixed routing explanations instead of returning compact candidates. Output: $(($frontendOutput | Out-String).Trim())"
+  }
+  if ([regex]::Matches($frontendContext, '(?m)^\s*Read:\s*').Count -gt 4) {
+    throw "The Skill router emitted more than four candidates. Output: $(($frontendOutput | Out-String).Trim())"
   }
 
   $gestureInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Design a draggable bottom sheet with spring physics and interruption"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $gestureOutput = $gestureInput | & node $router
   $gestureContext = [string](($gestureOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($gestureContext -notmatch 'apple-design' -or $gestureContext -notmatch [regex]::Escape((Join-Path $repositoryRoot '.agents\skills\apple-design\SKILL.md'))) {
+  if ($gestureContext -notmatch 'apple-design' -or $gestureContext -notmatch [regex]::Escape((Join-Path $repositoryRoot '.agents\routed-skills\apple-design\SKILL.md'))) {
     throw "The Skill router did not recommend the nearest project apple-design Skill. Output: $(($gestureOutput | Out-String).Trim())"
   }
 
@@ -176,6 +207,9 @@ try {
       $toolHeavyContext -notmatch 'mechanically determined follow-up waves' -or
       $toolHeavyContext -notmatch 'process every listed item in the first wave') {
     throw "The context hook did not inject the automatic tool batching contract."
+  }
+  if ($toolHeavyContext -notmatch '\[CODEX_SKILL_ROUTER_GATE_V1\]' -or $toolHeavyContext -notmatch 'metadata-only' -or $toolHeavyContext -notmatch 'exact path') {
+    throw "The context hook did not inject the Skill routing gate."
   }
   $plainConcurrencyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "我不知道为什么，现在我感觉还是没有并发，你确定现在是可以并发了吗？"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $plainConcurrencyOutput = $plainConcurrencyInput | & node $contextRefresh
@@ -199,24 +233,31 @@ try {
 
   $secondDirectory = Join-Path $externalRoot "fixture-second"
   New-Item -ItemType Directory -Path $secondDirectory -Force | Out-Null
-  [IO.File]::WriteAllText((Join-Path $secondDirectory "SKILL.md"), "---`nname: second-fixture`ndescription: fixture`n---", [Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText((Join-Path $secondDirectory "SKILL.md"), "---`nname: awareness-stage-mapper`ndescription: fixture`n---", [Text.UTF8Encoding]::new($false))
   $externalCatalog.skills += [ordered]@{
     dir = "fixture-second"
-    name = "second-fixture"
-    key = "second-fixture"
-    c1 = "测试分类"
-    c2 = "缓存测试"
-    description = "Second fixture for cache invalidation."
-    problem_cn = "验证外部索引失效检测。"
-    when_cn = "目录发生变化时使用。"
+    name = "awareness-stage-mapper"
+    key = "awareness-stage-mapper"
+    c1 = "人工智能与智能体"
+    c2 = "智能体流程与自动化"
+    description = "One sentence - what this skill does and when to invoke it"
+    problem_cn = "一句话——该技能的作用以及何时调用它。"
+    when_cn = "工作目标属于智能体流程与自动化时使用。"
   }
   $externalCatalog.stats.active_skills = 2
   [IO.File]::WriteAllText($externalCatalogPath, ($externalCatalog | ConvertTo-Json -Depth 6), [Text.UTF8Encoding]::new($false))
   $refreshInput | & powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $refresh | Out-Null
   $manifestUpdated = Get-Content -LiteralPath $externalManifestPath -Raw | ConvertFrom-Json
   if ([int]$manifestUpdated.skillCount -ne 2) { throw "The external index did not rebuild after its catalog changed." }
+  $updatedIndexText = Get-Content -LiteralPath $externalIndexPath -Raw
+  if ($updatedIndexText -match 'One sentence - what this skill does' -or $updatedIndexText -match '该技能的作用以及何时调用它') {
+    throw "The external index retained placeholder Skill metadata."
+  }
+  $placeholderInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "把这一句话精简一下"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
+  $placeholderOutput = $placeholderInput | & node $router
+  if (($placeholderOutput | Out-String).Trim() -ne "{}") { throw "Placeholder external metadata caused a false Skill route." }
 
-  Write-Host "PASS: profile sync, clean install, backup, generated paths, 6 custom Skills, external indexing, cache invalidation, body isolation, prompt routing, and automatic per-turn tool batching injection."
+  Write-Host "PASS: profile sync, clean install, backup, generated paths, 6 custom Skills, external indexing, placeholder filtering, cache invalidation, body isolation, prompt routing, and automatic per-turn tool batching injection."
 } finally {
   $env:USERPROFILE = $previousUserProfile
   $env:CODEX_HOME = $previousCodexHome

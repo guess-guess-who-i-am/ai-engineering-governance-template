@@ -8,11 +8,11 @@ const codexRoot = process.env.CODEX_HOME || path.join(home, ".codex");
 const prompts = path.join(codexRoot, "prompts");
 const targets = {
   alwaysOn: path.join(prompts, "global-attention-anchor.en.md"),
-  "method-research-evidence": path.join(home, ".agents", "skills", "method-research-evidence", "SKILL.md"),
-  "method-engineering-execution": path.join(home, ".agents", "skills", "method-engineering-execution", "SKILL.md"),
-  "method-evaluation-gates": path.join(home, ".agents", "skills", "method-evaluation-gates", "SKILL.md"),
-  "method-github-delivery": path.join(home, ".agents", "skills", "method-github-delivery", "SKILL.md"),
-  "method-task-tree": path.join(home, ".agents", "skills", "method-task-tree", "SKILL.md")
+  "method-research-evidence": path.join(home, ".agents", "routed-skills", "method-research-evidence", "SKILL.md"),
+  "method-engineering-execution": path.join(home, ".agents", "routed-skills", "method-engineering-execution", "SKILL.md"),
+  "method-evaluation-gates": path.join(home, ".agents", "routed-skills", "method-evaluation-gates", "SKILL.md"),
+  "method-github-delivery": path.join(home, ".agents", "routed-skills", "method-github-delivery", "SKILL.md"),
+  "method-task-tree": path.join(home, ".agents", "routed-skills", "method-task-tree", "SKILL.md")
 };
 
 function lines(text) { return text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n").split("\n"); }

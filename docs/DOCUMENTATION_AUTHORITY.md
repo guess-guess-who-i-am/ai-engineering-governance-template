@@ -17,7 +17,7 @@
 | 测试类别与命令 | `quality/gates.json` | 技术栈、CI 或发布证据变化 |
 | 持久、稀缺、付费或承载数据的资源 | `docs/RESOURCE_REGISTRY.md` | 新增服务、端口、数据、模型、GPU、账号或长期进程 |
 | 发布事实 | `VERSION`、`CHANGELOG.md`、tag 与制品摘要 | 发布或 Hotfix |
-| 专项工作方法 | 匹配的 `.agents/skills/*/SKILL.md` | 仅在触发条件明确命中时 |
+| 专项工作方法 | Router 选中的 `.agents/routed-skills/*/SKILL.md` | 仅在触发条件明确命中时 |
 
 代码和测试是实际行为的权威。文档与实现冲突时，不用兼容层掩盖冲突：先确认应有行为，再同步拥有方及消费者。
 

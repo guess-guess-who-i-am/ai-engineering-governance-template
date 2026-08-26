@@ -109,12 +109,14 @@ function deduplicateSkillCandidates(context) {
   const output = [];
   for (let index = 0; index < lines.length; index += 1) {
     const candidate = lines[index];
-    const description = lines[index + 1] || "";
-    const readLine = lines[index + 2] || "";
-    if (candidate.startsWith("- ") && description.trim() && readLine.trim().startsWith("Read: ")) {
+    const nextLine = lines[index + 1] || "";
+    const followingLine = lines[index + 2] || "";
+    const span = nextLine.trim().startsWith("Read: ") ? 1 : followingLine.trim().startsWith("Read: ") ? 2 : 0;
+    if (candidate.startsWith("- ") && span) {
+      const readLine = span === 1 ? nextLine : followingLine;
       const skillPath = readLine.trim().slice("Read: ".length);
       if (seenPaths.has(skillPath)) {
-        index += 2;
+        index += span;
         continue;
       }
       seenPaths.add(skillPath);

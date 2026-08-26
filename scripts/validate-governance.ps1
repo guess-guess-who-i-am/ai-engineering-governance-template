@@ -21,7 +21,7 @@ $required = @(
     'docs/DOCUMENTATION_AUTHORITY.md',
     'docs/PROJECT_LIFECYCLE.md',
     'docs/RESOURCE_REGISTRY.md',
-    '.agents/skills/README.md',
+    '.agents/routed-skills/README.md',
     'design/catalog.json',
     'site/index.html',
     'quality/gates.json',
@@ -50,7 +50,7 @@ foreach ($authority in @(
     'docs/DOCUMENTATION_AUTHORITY.md',
     'docs/PROJECT_LIFECYCLE.md',
     'docs/RESOURCE_REGISTRY.md',
-    '.agents/skills'
+    '.agents/routed-skills'
 )) {
     if ($agents -notmatch [regex]::Escape($authority)) {
         throw "AGENTS.md does not route to $authority"

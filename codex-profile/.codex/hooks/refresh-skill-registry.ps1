@@ -54,6 +54,22 @@ function ConvertTo-IndexField {
   return ((([string]$Value) -replace "[`r`n`t]+", " ") -replace "\s+", " ").Trim()
 }
 
+function Test-PlaceholderSkillMetadata {
+  param([object[]]$Values)
+  $text = (($Values | ForEach-Object { [string]$_ }) -join " ").Normalize([Text.NormalizationForm]::FormKC).ToLowerInvariant()
+  $placeholders = @(
+    "one sentence - what this skill does and when to invoke it",
+    "what this skill does and when to use it",
+    "a brief description of what this skill does",
+    "one-paragraph description of what this skill does"
+  )
+  return @($placeholders | Where-Object { $text.Contains($_) }).Count -gt 0
+}
+
+function New-UniqueTempPath([string]$TargetPath) {
+  return "$TargetPath.$PID.$([guid]::NewGuid().ToString('N')).tmp"
+}
+
 function Get-ExternalSkillConfiguration {
   $catalogPath = if ($env:CODEX_EXTERNAL_SKILL_CATALOG) {
     [IO.Path]::GetFullPath($env:CODEX_EXTERNAL_SKILL_CATALOG)
@@ -89,7 +105,7 @@ function Update-ExternalSkillIndex {
     try {
       $manifest = [IO.File]::ReadAllText($manifestPath, $utf8) | ConvertFrom-Json
       $isCurrent = (
-        ([string]$manifest.schemaVersion -eq "codex-external-skill-index/2") -and
+        ([string]$manifest.schemaVersion -eq "codex-external-skill-index/3") -and
         ([string]$manifest.catalogPath -eq $catalogPath) -and
         ([string]$manifest.rootPath -eq $rootPath) -and
         ([int64]$manifest.sourceLength -eq [int64]$catalogFile.Length) -and
@@ -102,12 +118,12 @@ function Update-ExternalSkillIndex {
   if ($isCurrent) { return $manifest }
 
   $catalog = [IO.File]::ReadAllText($catalogPath, $utf8) | ConvertFrom-Json
-  $tempIndexPath = "$indexPath.tmp"
+  $tempIndexPath = New-UniqueTempPath $indexPath
   $writer = New-Object IO.StreamWriter($tempIndexPath, $false, $utf8)
   $count = 0
   $missingCount = 0
   try {
-    $writer.WriteLine("# codex-external-skill-index/2")
+    $writer.WriteLine("# codex-external-skill-index/3")
     foreach ($skill in @($catalog.skills)) {
       $name = ConvertTo-IndexField $skill.name
       $directory = ConvertTo-IndexField $skill.dir
@@ -117,13 +133,14 @@ function Update-ExternalSkillIndex {
         $missingCount++
         continue
       }
+      $placeholder = Test-PlaceholderSkillMetadata -Values @($skill.description, $skill.problem_cn, $skill.when_cn)
       $fields = @(
         $name,
-        (ConvertTo-IndexField $skill.description),
-        (ConvertTo-IndexField $skill.problem_cn),
-        (ConvertTo-IndexField $skill.when_cn),
-        (ConvertTo-IndexField $skill.c1),
-        (ConvertTo-IndexField $skill.c2),
+        $(if ($placeholder) { "" } else { ConvertTo-IndexField $skill.description }),
+        $(if ($placeholder) { "" } else { ConvertTo-IndexField $skill.problem_cn }),
+        $(if ($placeholder) { "" } else { ConvertTo-IndexField $skill.when_cn }),
+        $(if ($placeholder) { "" } else { ConvertTo-IndexField $skill.c1 }),
+        $(if ($placeholder) { "" } else { ConvertTo-IndexField $skill.c2 }),
         (ConvertTo-IndexField $skillPath),
         (ConvertTo-IndexField $skill.key)
       )
@@ -136,7 +153,7 @@ function Update-ExternalSkillIndex {
   Move-Item -LiteralPath $tempIndexPath -Destination $indexPath -Force
 
   $manifest = [ordered]@{
-    schemaVersion = "codex-external-skill-index/2"
+    schemaVersion = "codex-external-skill-index/3"
     generatedAt = [DateTime]::UtcNow.ToString("o")
     catalogPath = $catalogPath
     rootPath = $rootPath
@@ -146,7 +163,7 @@ function Update-ExternalSkillIndex {
     missingSkillCount = $missingCount
     indexPath = $indexPath
   }
-  $tempManifestPath = "$manifestPath.tmp"
+  $tempManifestPath = New-UniqueTempPath $manifestPath
   [IO.File]::WriteAllText($tempManifestPath, ($manifest | ConvertTo-Json -Depth 4), $utf8)
   Move-Item -LiteralPath $tempManifestPath -Destination $manifestPath -Force
   return [pscustomobject]$manifest
@@ -161,7 +178,7 @@ function Update-DeferredSkillIndex {
   ) | Where-Object { Test-Path -LiteralPath $_ -PathType Container }
   $indexPath = Join-Path $RegistryDirectory "deferred-skills.tsv"
   $manifestPath = Join-Path $RegistryDirectory "deferred-skills-manifest.json"
-  $tempIndexPath = "$indexPath.tmp"
+  $tempIndexPath = New-UniqueTempPath $indexPath
   $writer = New-Object IO.StreamWriter($tempIndexPath, $false, $utf8)
   $count = 0
   try {
@@ -188,7 +205,7 @@ function Update-DeferredSkillIndex {
     skillCount = $count
     indexPath = $indexPath
   }
-  $tempManifestPath = "$manifestPath.tmp"
+  $tempManifestPath = New-UniqueTempPath $manifestPath
   [IO.File]::WriteAllText($tempManifestPath, ($manifest | ConvertTo-Json -Depth 4), $utf8)
   Move-Item -LiteralPath $tempManifestPath -Destination $manifestPath -Force
   return [pscustomobject]$manifest
@@ -211,14 +228,14 @@ try {
 
   $roots = @(
     [pscustomobject]@{ source = "codex"; rank = 10; path = (Join-Path $codexHome "skills") },
-    [pscustomobject]@{ source = "agents"; rank = 20; path = (Join-Path $env:USERPROFILE ".agents\skills") },
+    [pscustomobject]@{ source = "agents"; rank = 20; path = (Join-Path $env:USERPROFILE ".agents\routed-skills") },
     [pscustomobject]@{ source = "orchestra"; rank = 30; path = (Join-Path $env:USERPROFILE ".orchestra\skills") }
   )
   $projectCwd = [string]$hookInput.cwd
   if ($projectCwd -and (Test-Path -LiteralPath $projectCwd -PathType Container)) {
     $roots += @(
       [pscustomobject]@{ source = "project"; rank = 0; path = (Join-Path $projectCwd "skills") },
-      [pscustomobject]@{ source = "project"; rank = 0; path = (Join-Path $projectCwd ".agents\skills") },
+      [pscustomobject]@{ source = "project"; rank = 0; path = (Join-Path $projectCwd ".agents\routed-skills") },
       [pscustomobject]@{ source = "project"; rank = 0; path = (Join-Path $projectCwd "llm-task-tree\skills") }
     )
   }
@@ -256,9 +273,30 @@ try {
     deferredIndexPath = if ($deferredManifest) { [string]$deferredManifest.indexPath } else { "" }
     skills = @($skills)
   }
-  $tempPath = "$registryPath.tmp"
+  $tempPath = New-UniqueTempPath $registryPath
   [IO.File]::WriteAllText($tempPath, ($payload | ConvertTo-Json -Depth 8), $utf8)
   Move-Item -LiteralPath $tempPath -Destination $registryPath -Force
+  $semanticRanker = Join-Path $codexHome "hooks\semantic-ranker.mjs"
+  if (($env:CODEX_EMBEDDING_API_KEY -or $env:AGICTO_API_KEY) -and (Test-Path -LiteralPath $semanticRanker -PathType Leaf)) {
+    try {
+      $documents = @($skills | ForEach-Object {
+        [ordered]@{
+          id = [string]$_.id
+          text = (@($_.name, $_.description, $_.problem, $_.when) + @($_.keywords) | Where-Object { $_ }) -join " "
+        }
+      })
+      $semanticInput = [ordered]@{
+        buildOnly = $true
+        buildMissing = $true
+        documents = $documents
+        cachePath = Join-Path $registryDir "semantic-index.json"
+      } | ConvertTo-Json -Depth 8 -Compress
+      $null = $semanticInput | & node $semanticRanker
+      if ($LASTEXITCODE -ne 0) { throw "semantic-ranker exited with code $LASTEXITCODE" }
+    } catch {
+      [Console]::Error.WriteLine("Local Skill semantic index refresh skipped: $($_.Exception.Message)")
+    }
+  }
   Write-EmptyResult
 } catch {
   [Console]::Error.WriteLine("Skill registry refresh skipped: $($_.Exception.Message)")

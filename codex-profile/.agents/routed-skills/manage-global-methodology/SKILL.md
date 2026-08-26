@@ -5,7 +5,17 @@ description: Manage the user's routed global methodology system. Use when the us
 
 # Manage Global Methodology
 
-User's original governing rule translated into English: “From now on, add everything through routing. I may add many other things, and all of them should use routing in the same way.”
+## User's original routing policy — English translation
+
+User's original wording: “From now on, use the route-finding approach for everything that is added. I may want to add many other things, and have them all follow the route-finding approach too.”
+
+Keep this policy in this Skill. Do not copy it into the per-turn methodology router.
+
+## Scope and trigger
+
+Trigger this Skill when the user asks to add, delete, rewrite, move, translate, review, or publish methodology, standards, tool instructions, workflows, always-on reminders, methodology routes, or `method-*` Skills. Do not load it for ordinary engineering work that only uses an existing methodology.
+
+When triggered, read the complete Chinese source of the user's routing policy in `E:\工程模板探索\docs\CODEX_RUNTIME_CONTEXT_PIPELINE.zh.md` section 4.2 before changing the methodology system. That document is the location of the full source for this policy; this Skill contains only routing and execution instructions.
 
 ## Existing categories
 
@@ -26,7 +36,7 @@ The publisher must translate line by line, enforce stable section IDs, reject du
 Do not infer a new Skill's triggers from its name alone. Before adding a new `method-*` section:
 
 1. Define concrete trigger and exclusion examples with the user.
-2. Create the user-level Skill under `~/.agents/skills` with `skill-creator`.
+2. Create the user-level Skill under `~/.agents/routed-skills` with `skill-creator`.
 3. Add the Skill to `methodology-targets.json` with a stable ID, Chinese title, English title, and `skillFile`.
 4. Add the same stable section ID and its rules to the Chinese source.
 5. Update the `router` section and `~/.codex/skill-registry/routing-rules.json`.

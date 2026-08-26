@@ -17,6 +17,11 @@ try {
     git -C $fixture add README.md
     if ($LASTEXITCODE -ne 0) { throw 'Could not stage the fixture README.' }
 
+    Set-Content -LiteralPath (Join-Path $fixture 'docs/obsolete.md') -Value "# Obsolete`n" -Encoding utf8
+    git -C $fixture add docs/obsolete.md
+    if ($LASTEXITCODE -ne 0) { throw 'Could not stage the obsolete fixture document.' }
+    Remove-Item -LiteralPath (Join-Path $fixture 'docs/obsolete.md') -Force
+
     Set-Content -LiteralPath (Join-Path $fixture 'docs/good.json') -Value '{"status":"ok"}' -Encoding utf8
     $success = & $validator -Root $fixture 2>&1
     if ($LASTEXITCODE -ne 0 -or ($success -join "`n") -notmatch '2 repository text files') {

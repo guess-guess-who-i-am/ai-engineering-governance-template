@@ -6,12 +6,23 @@
 - 每轮常驻提醒、方法论路由、Skill 推荐器和会话恢复 Hook；
 - 每轮自动执行的英文并发调度契约：无需用户提出并发要求，在每一波工具调用前计算当前已知独立操作数 `N`，取 `K=min(N,8)`；`K=5–8` 时必须在一次 `functions.exec` 的 `Promise.all` 中提交恰好 `K` 个真实调用。对于根据上一波结果即可机械确定的轮询、补充读取和验证，继续留在同一个 `functions.exec` 中完成，不得第一批并发后又退化成逐次模型往返；
 - 每个事件只注册一个稳定 dispatcher。dispatcher 内部并发运行常驻提醒、Skill 路由、可选 capability 路由和索引刷新，避免新增 Hook 导致索引位置变化、原信任记录失效；
-- 中文唯一编辑源、英文生成物、72条规则映射与完整性校验；
+- 中文唯一编辑源、英文生成物、126条规则映射与完整性校验；
 - 自动翻译和原子发布器；
-- `method-*` 五个方法 Skill 与 `manage-global-methodology`；
+- `method-*` 五个方法 Skill 与 `manage-global-methodology`，安装到 `~/.agents/routed-skills/`，不进入平台初始化清单；
 - Skill 路由别名。
 
 推荐器同时支持大型外部 Skill 库。默认读取 `E:\skills\_catalog_cn.json`，将约1.5万条名称、描述、中文问题、使用条件、分类和真实路径编译到 `~/.codex/skill-registry/external-skills.tsv`。它不会递归读取或注入这些 `SKILL.md` 正文；每轮只流式检索轻量索引，最多推荐4个候选，模型确认相关后才读取对应正文。
+
+## Skill Router 的 graph-tool-call 取舍
+
+当前 Router 复用了 [SonAIengine/graph-tool-call](https://github.com/SonAIengine/graph-tool-call) 的核心思路，但运行时不直接依赖其 Python 包：Embedding 选择并保护第一语义种子，`skill-relations.json` 只补充人工确认的直接 `requires`、`precedes` 或 `complementary` 关系，最终最多返回4个候选。外部1.5万条目录只有在本地候选未通过门禁或用户明确点名外部能力时才检索；模板占位元数据和纯问候、计算、摘要等通用请求不能成为外部路由证据。
+
+`scripts/benchmark-skill-routing.py` 使用同一组24个正例和3个硬负例复测了官方 `graph-tool-call 0.46.0`：纯 BM25 图的 Recall@4 为33.33%；纯 Embedding 为100%；官方完整混合图为91.67%，并且三个负例都会返回候选。当前真实 Hook 的 Recall@1 为95.83%、Recall@4 为100%、负例误触发率为0%，平均约282ms。由此不采用“官方混合分数直接决定最终候选”，而采用“Embedding 主召回 + 受保护种子 + 小型人工关系图 + 0.30门禁”。可使用隔离 Python 环境复现：
+
+```powershell
+python .\scripts\benchmark-skill-routing.py --with-embedding --live-only --output .\.reports\skill-routing-live.json
+python .\scripts\benchmark-skill-routing.py --with-embedding --skip-live --output .\.reports\skill-routing-graph-tool-call.json
+```
 
 ## 默认轻量加载
 
@@ -21,7 +32,7 @@ Windows 主机可运行以下命令，把大量用户 Skills、插件和重型 M
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\configure-lazy-capabilities.ps1
 ```
 
-脚本会先备份 `config.toml`、Hook 和 Skill 注册表，再把非核心 `~/.codex/skills` 移到 `~/.codex/deferred-skills/codex`，把非核心 `~/.agents/skills` 移到 `~/.agents/deferred-skills`。正文不会删除；`deferred-skills.tsv` 只保存名称、描述和真实路径，推荐命中后才读取完整 `SKILL.md`。项目自己的 `.agents/skills` 不受影响。
+脚本会先备份 `config.toml`、Hook 和 Skill 注册表，再把非核心 `~/.codex/skills` 移到 `~/.codex/deferred-skills/codex`，把旧自动扫描目录中的非核心 `~/.agents/skills` 移到 `~/.agents/deferred-skills`。正文不会删除；`deferred-skills.tsv` 只保存名称、描述和真实路径，推荐命中后才读取完整 `SKILL.md`。需要长期可用但不应直接展示的用户级 Skill 放在 `~/.agents/routed-skills/`；项目专项 Skill 放在 `.agents/routed-skills/`。统一 Router 会索引并按需推荐两者。
 
 默认只启用 capability router MCP。Codex Desktop 可能仍在 `config.toml` 中保留内置 `node_repl` 的注册信息，但迁移脚本会明确写入 `enabled = false`，所以它不会默认启动。默认层同时设置 `features.plugins = false` 和 `features.remote_plugin = false`，阻止默认插件加载和远程目录同步；实测普通 `codex exec` 不再出现插件 401、403 或 GitHub 同步等待。按需插件 profile 会显式启用对应插件，当前 Codex 版本仍可能对已启用插件执行远程 bundle 校验，这是上游运行时行为，不能仅靠 `remote_plugin=false` 完全阻止。`browser` 和 `full-tools` profile 会显式恢复 `node_repl`。以下 profile 在新任务启动时按需恢复重型能力：
 
@@ -56,7 +67,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\configure-lazy-cap
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-profile.ps1
 ```
 
-安装器会先把目标电脑上即将被覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`，再安装配置、按目标用户名生成 `hooks.json`、创建两个桌面编辑入口，并执行72条方法论完整性校验和 Skill 索引刷新。
+安装器会先把目标电脑上即将被覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`，再安装配置、按目标用户名生成 `hooks.json`、创建两个桌面编辑入口，并执行126条方法论完整性校验和 Skill 索引刷新。
 
 安装后重新启动 Codex，使用户级 `AGENTS.md` 和 Hook 重新加载。随后分别执行 `gh auth login` 和该电脑上的 Codex 登录流程。
 

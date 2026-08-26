@@ -7,7 +7,7 @@
 - `AGENTS.md`：任务路由、权威顺序和验证预算。
 - `CONTEXT.md`：稳定术语、关系与歧义裁决。
 - `DESIGN.md`：工程工具默认视觉系统。
-- `.agents/skills/`：17 个按需加载且命名统一的专项工作流。
+- `.agents/routed-skills/`：17 个只由统一 Router 推荐、命中后才读取正文的专项工作流；不放入平台自动扫描目录。
 - `scripts/`：治理、Skills、敏感文件和整体检查。
 - `.kest/flow/`：Markdown-native Flow 示例。
 - `requirements/user-stories/`：带稳定验收条件 ID 和证据映射的用户故事。
@@ -58,10 +58,11 @@
 - 英文运行文件：常驻提醒、完整方法论档案、方法论路由和映射文件；由中文源逐行翻译生成，不用润色摘要代替原文。
 - 每轮 Hook：每次用户提示重新注入英文常驻提醒和方法论路由；会话启动、恢复、清理和压缩时也会恢复这些内容。
 - 稳定 Hook dispatcher：`UserPromptSubmit` 和 `SessionStart` 各只注册一个入口，内部并发执行常驻提醒、Skill 推荐、可选 capability 推荐和索引刷新。以后增加内部路由不会移动 Hook 索引并使已有信任记录错位。
+- 混合语义路由：Skill/Capability Router 可使用 `text-embedding-3-large` 对候选做语义召回与重排，词法匹配继续负责精确名称、ID、路径和硬约束；向量与查询缓存保存在用户级 `.codex` 目录，不进入仓库。配置通过 `CODEX_EMBEDDING_BASE_URL`、`CODEX_EMBEDDING_MODEL` 和 `CODEX_EMBEDDING_API_KEY` 环境变量读取，接口不可用时自动回退词法路由。
 - Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。`scripts/configure-lazy-capabilities.ps1` 可把本机数百个用户 Skills 迁入 deferred 索引；另会复用 `E:\skills\_catalog_cn.json`，把其中约1.5万个 Skills 编译为持久化行索引，不递归预读正文。
 - 方法论发布器：保存中文源后自动翻译、备份、生成中英文文件、更新 Skills 和索引；失败时回滚。
-- 6个自建方法 Skills：`manage-global-methodology`、`method-research-evidence`、`method-engineering-execution`、`method-evaluation-gates`、`method-github-delivery`、`method-task-tree`。
-- 72条已归类方法论：常驻27条、研究10条、工程14条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
+- 6个自建方法 Skills：`manage-global-methodology`、`method-research-evidence`、`method-engineering-execution`、`method-evaluation-gates`、`method-github-delivery`、`method-task-tree`；安装到用户级 Router-only 目录，不进入平台初始化清单。
+- 126条已归类方法论：常驻43条、研究10条、工程20条、评价11条、GitHub交付1条、任务树41条；机械校验保证零重复、零遗漏，并拒绝英文运行版残留未翻译中文。
 - 迁移工具：37个受管配置文件，以及安装、同步和安装测试脚本。`codex-profile/README.zh.md` 提供独立说明。
 
 ### 不会上传什么
@@ -84,10 +85,10 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-prof
 安装器会：
 
 1. 把目标电脑上即将覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`。
-2. 安装全局 `AGENTS.md`、Hook、中文源、英文生成物、发布器、路由配置和6个自建 Skills。
+2. 安装全局 `AGENTS.md`、Hook、中文源、英文生成物、发布器、路由配置和6个自建 Skills；Skills 写入 `~/.agents/routed-skills/`。
 3. 根据目标电脑的用户目录生成 `hooks.json`，不会沿用原电脑的绝对路径。
 4. 创建“编辑并发布全局 Prompt”和“编辑并发布全局方法论”两个桌面入口。
-5. 校验72条方法论的中英文对应关系并刷新 Skill 索引。
+5. 校验126条方法论的中英文对应关系并刷新 Skill 索引。
 
 安装完成后，在该电脑单独完成 Codex 登录并重新启动 Codex，使全局 `AGENTS.md` 和 Hook 重新加载。完整说明见 [可迁移 Codex 全局配置](codex-profile/README.zh.md)。
 

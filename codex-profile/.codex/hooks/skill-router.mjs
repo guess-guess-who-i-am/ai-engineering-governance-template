@@ -8,13 +8,16 @@ import readline from "node:readline";
 import { createReadStream } from "node:fs";
 
 const debugEnabled = process.env.CODEX_SKILL_ROUTER_DEBUG === "1";
+const MAX_SKILL_CANDIDATES = 4;
+const SEMANTIC_ROUTE_THRESHOLD = 0.30;
 const PER_TERM_LIMIT = 120;
 const DEFAULT_RG_TIMEOUT_MS = 3000;
 const GENERIC_TERMS = new Set([
   "api", "build", "config", "data", "design", "get", "helper", "list", "manage", "management",
   "operate", "operation", "page", "platform", "project", "query", "review", "search", "service",
   "short", "skill", "task", "tool", "tools", "use", "workflow", "write",
-  "任务", "工具", "平台", "查看", "查询", "操作", "搜索", "数据", "服务", "流程", "管理", "获取", "配置"
+  "任务", "工具", "平台", "查看", "查询", "操作", "搜索", "数据", "服务", "流程", "管理", "获取", "配置",
+  "一句", "一句话", "精简", "缩写", "摘要", "总结", "概括", "改写", "润色", "翻译", "问候", "你好", "计算", "多少", "一下", "这句话", "这一句"
 ]);
 const cjkSegmenter = typeof Intl.Segmenter === "function" ? new Intl.Segmenter("zh", { granularity: "word" }) : null;
 
@@ -94,8 +97,32 @@ function exactName(query, name) {
 function phraseMatch(query, phrase) {
   const normalizedQuery = String(query || "").normalize("NFKC").toLocaleLowerCase();
   const normalizedPhrase = String(phrase || "").normalize("NFKC").toLocaleLowerCase().trim();
-  if (normalizedPhrase.length < 4 || !normalizedQuery.includes(normalizedPhrase)) return false;
+  const minimumLength = /[\u4e00-\u9fff]/.test(normalizedPhrase) ? 2 : 4;
+  if (normalizedPhrase.length < minimumLength || !normalizedQuery.includes(normalizedPhrase)) return false;
   return normalizedPhrase.includes(" ") || normalizedPhrase.includes("-") || /[\u4e00-\u9fff]/.test(normalizedPhrase);
+}
+
+function sourceLabel(skill) {
+  const source = String(skill?.source || "unknown").toLocaleLowerCase();
+  return source || "unknown";
+}
+
+function metadataKeywords(name, description) {
+  const values = [...String(name || "").split(/[-_\s]+/), ...(String(description || "").toLocaleLowerCase().match(/[a-z][a-z0-9-]{2,}/g) || [])];
+  return [...new Set(values.filter(value => value && value.length >= 3))].slice(0, 24);
+}
+
+function isPlaceholderMetadata(...values) {
+  const text = values.join(" ").normalize("NFKC").toLocaleLowerCase();
+  return [
+    "one sentence - what this skill does and when to invoke it",
+    "what this skill does and when to use it",
+    "a brief description of what this skill does",
+    "one-paragraph description of what this skill does",
+    "一句话——该技能的作用以及何时调用它",
+    "一句话 - 这项技能的作用是什么以及何时调用它",
+    "用一段话描述该技能的作用"
+  ].some(placeholder => text.includes(placeholder));
 }
 
 async function projectSkillCandidates(cwd) {
@@ -103,7 +130,7 @@ async function projectSkillCandidates(cwd) {
   let current;
   try { current = path.resolve(cwd); } catch { return []; }
   while (current && current !== path.dirname(current)) {
-    const skillsRoot = path.join(current, ".agents", "skills");
+    const skillsRoot = path.join(current, ".agents", "routed-skills");
     try {
       const entries = await readdir(skillsRoot, { withFileTypes: true });
       const candidates = await Promise.all(entries.filter((entry) => entry.isDirectory()).map(async (entry) => {
@@ -111,9 +138,9 @@ async function projectSkillCandidates(cwd) {
         try {
           const body = (await readFile(skillPath, "utf8")).slice(0, 12000);
           const name = body.match(/^name:\s*([^\r\n]+)$/m)?.[1]?.trim() || entry.name;
-          const description = body.match(/^description:\s*([^\r\n]+)$/m)?.[1]?.trim() || "";
+          const description = (body.match(/^description:\s*([^\r\n]+)$/m)?.[1]?.trim() || "").replace(/\s+/g, " ").slice(0, 280);
           if (!name || !description) return null;
-          return { id: `project:${name}`, name, description, keywords: [], path: skillPath, source: "project", rank: 0 };
+          return { id: `project:${name.toLocaleLowerCase()}`, name, description, keywords: metadataKeywords(name, description), path: skillPath, source: "project", rank: 0 };
         } catch { return null; }
       }));
       return candidates.filter(Boolean);
@@ -174,6 +201,15 @@ function strongLocalAliasMatch(query, skills, aliases) {
   return skills.some((skill) => (aliases[String(skill.name || "").toLocaleLowerCase()] || []).some((alias) => phraseMatch(query, alias)));
 }
 
+function hasExternalIdentifierSignal(prompt, skills, aliases) {
+  const text = String(prompt || "");
+  const identifiers = [
+    ...(text.match(/\b[A-Z][a-z0-9]+[A-Z][A-Za-z0-9]*\b/g) || []),
+    ...(text.match(/\b[a-z0-9]+(?:[-_][a-z0-9]+){1,}\b/gi) || [])
+  ].map(value => value.normalize("NFKC").toLocaleLowerCase());
+  return identifiers.some(identifier => !skills.some(skill => skillFields(skill, aliases).some(([, value]) => hasTerm(value, identifier))));
+}
+
 function runRg(indexPath, pattern) {
   return new Promise((resolve) => {
     const args = ["--ignore-case", "--fixed-strings", "--no-heading", "--color", "never", "--max-count", String(PER_TERM_LIMIT)];
@@ -192,6 +228,24 @@ function runRg(indexPath, pattern) {
       if (timedOut || code === null) return resolve({ lines: [], timedOut: true });
       resolve({ lines: [0, 1].includes(code) ? output.split(/\r?\n/).filter(Boolean).slice(0, PER_TERM_LIMIT) : [], timedOut: false });
     });
+  });
+}
+
+function runSemanticRanker(query, candidates) {
+  return new Promise((resolve) => {
+    const ranker = path.join(process.env.CODEX_HOME || path.join(os.homedir(), ".codex"), "hooks", "semantic-ranker.mjs");
+    if (!existsSync(ranker) || !process.env.CODEX_EMBEDDING_API_KEY) return resolve(new Map());
+    const child = spawn(process.execPath, [ranker], { windowsHide: true, stdio: ["pipe", "pipe", "ignore"] });
+    let output = "";
+    const timer = setTimeout(() => { child.kill(); resolve(new Map()); }, 25000);
+    child.stdout.on("data", chunk => { output += chunk.toString("utf8"); });
+    child.on("error", () => { clearTimeout(timer); resolve(new Map()); });
+    child.on("close", () => {
+      clearTimeout(timer);
+      try { const parsed = JSON.parse(output.trim() || "{}"); resolve(new Map((parsed.available ? parsed.results : []).map(item => [String(item.id), Number(item.score) || 0]))); }
+      catch { resolve(new Map()); }
+    });
+    child.stdin.end(JSON.stringify({ query, documents: candidates.map(item => ({ id: item.id, text: item.text })), topK: candidates.length, buildMissing: false, cachePath: path.join(process.env.CODEX_HOME || path.join(os.homedir(), ".codex"), "skill-registry", "semantic-index.json") }), "utf8");
   });
 }
 
@@ -240,9 +294,12 @@ async function externalScores(indexPath, tokens, query, aliases, stopTokens, exc
     const name = fields[0];
     const normalized = name.toLocaleLowerCase();
     if (excludedNames.has(normalized) || !existsSync(fields[6])) continue;
+    const placeholder = isPlaceholderMetadata(fields[1], fields[2], fields[3]);
     const candidate = scoreSkill({
-      id: `external:${normalized}`, name, description: fields[1] || "", problem: fields[2] || "", when: fields[3] || "",
-      c1: fields[4] || "", c2: fields[5] || "", keywords: [fields[7] || ""], path: fields[6], source: "external-catalog", rank: 100
+      id: `external:${normalized}`, name,
+      description: placeholder ? "" : (fields[1] || ""), problem: placeholder ? "" : (fields[2] || ""), when: placeholder ? "" : (fields[3] || ""),
+      c1: placeholder ? "" : (fields[4] || ""), c2: placeholder ? "" : (fields[5] || ""),
+      keywords: [fields[7] || ""], path: fields[6], source: "external-catalog", rank: 100
     }, tokens, query, aliases, stopTokens, counts, totalDocs);
     if (candidate.rawScore <= 0) continue;
     if (!best.has(normalized) || candidate.rawScore > best.get(normalized).rawScore) best.set(normalized, candidate);
@@ -254,13 +311,52 @@ async function externalScores(indexPath, tokens, query, aliases, stopTokens, exc
 function selectCandidate(scored) {
   scored.sort((a, b) => b.confidence - a.confidence || b.rawScore - a.rawScore || String(a.skill.name).localeCompare(String(b.skill.name)));
   const first = scored[0];
-  if (!first) return null;
-  const second = scored[1];
-  const margin = second ? first.confidence - second.confidence : 1;
-  const hasEvidence = first.explicitName || first.explicitAlias || first.distinctive.size >= 2 || (first.matchedIntent && first.matchedDomain);
-  const accepted = hasEvidence && ((first.confidence >= 0.75 && margin >= 0.12) || (first.confidence >= 0.5 && margin >= 0.08));
-  debug("selection", { top: first.skill.name, confidence: first.confidence, margin, hasEvidence, accepted });
-  return accepted ? first : null;
+  if (!first) return [];
+  const hasEvidence = (item) => item.explicitName || item.explicitAlias || item.distinctive.size >= 2 || (item.matchedIntent && item.matchedDomain) || Number(item.semanticScore || 0) >= 0.55;
+  const firstAccepted = hasEvidence(first) && first.confidence >= 0.5;
+  if (!firstAccepted) {
+    debug("selection", { top: first.skill.name, confidence: first.confidence, selected: [] });
+    return [];
+  }
+  const confidenceFloor = Math.max(0.5, first.confidence * 0.72);
+  const selected = scored.filter((item) => hasEvidence(item) && item.confidence >= confidenceFloor).slice(0, MAX_SKILL_CANDIDATES);
+  debug("selection", { top: first.skill.name, confidence: first.confidence, confidenceFloor, selected: selected.map((item) => item.skill.name) });
+  return selected;
+}
+
+function selectExplicitCandidate(scored) {
+  return scored
+    .filter(item => item.explicitName)
+    .sort((left, right) => right.confidence - left.confidence || right.rawScore - left.rawScore)
+    .slice(0, MAX_SKILL_CANDIDATES);
+}
+
+function expandProtectedSemanticSeed(ranked, relationDocument, skillByName) {
+  if (!ranked.length || Number(ranked[0].semanticScore || 0) < SEMANTIC_ROUTE_THRESHOLD) return [];
+  const selected = [];
+  const add = (item) => {
+    if (!item || selected.some(candidate => String(candidate.skill.name).toLocaleLowerCase() === String(item.skill.name).toLocaleLowerCase())) return;
+    selected.push(item);
+  };
+  const seed = ranked[0];
+  const seedName = String(seed.skill.name || "").toLocaleLowerCase();
+  add(seed);
+  for (const relation of Array.isArray(relationDocument?.relations) ? relationDocument.relations : []) {
+    if (!Array.isArray(relation) || relation.length < 2) continue;
+    const source = String(relation[0] || "").toLocaleLowerCase();
+    const target = String(relation[1] || "").toLocaleLowerCase();
+    const neighbour = source === seedName ? target : target === seedName ? source : "";
+    if (!neighbour) continue;
+    const skill = skillByName.get(neighbour);
+    if (skill) add({ skill, semanticScore: 0, confidence: seed.confidence, rawScore: 0, evidence: [`graph:${relation[2] || "related"}`] });
+    if (selected.length >= MAX_SKILL_CANDIDATES) break;
+  }
+  for (const item of ranked) {
+    add(item);
+    if (selected.length >= MAX_SKILL_CANDIDATES) break;
+  }
+  debug("semantic graph selection", { seed: seedName, score: seed.semanticScore, selected: selected.map(item => item.skill.name) });
+  return selected.slice(0, MAX_SKILL_CANDIDATES);
 }
 
 try {
@@ -270,9 +366,10 @@ try {
   const codexRoot = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
   const cwdCandidates = [input.cwd];
   if (!input.cwd || String(input.cwd).includes("?") || !existsSync(String(input.cwd))) cwdCandidates.push(process.cwd());
-  const [registry, ruleDocument, projectSkillLists] = await Promise.all([
+  const [registry, ruleDocument, relationDocument, projectSkillLists] = await Promise.all([
     readFile(path.join(codexRoot, "skill-registry", "skills-index.json"), "utf8").then(JSON.parse),
     readFile(path.join(codexRoot, "skill-registry", "routing-rules.json"), "utf8").then(JSON.parse),
+    readFile(path.join(codexRoot, "skill-registry", "skill-relations.json"), "utf8").then(JSON.parse),
     Promise.all([...new Set(cwdCandidates.filter((value) => value).map((value) => String(value)))]
       .map((cwd) => projectSkillCandidates(cwd)))
   ]);
@@ -291,24 +388,36 @@ try {
   const skills = [...skillByName.values()];
   const knownNames = new Set(skills.map((skill) => String(skill.name || "").toLocaleLowerCase()));
   const localAliasMatch = strongLocalAliasMatch(query, skills, aliases);
-  const scored = skills.map((skill) => scoreSkill(skill, tokens, query, aliases, stopTokens, new Map(), Math.max(1, skills.length))).filter((item) => item.rawScore > 0);
-  debug("request", { prompt, cwd: input.cwd || process.cwd(), projectSkills: projectSkills.map((skill) => skill.name), tokens, localAliasMatch, localScores: scored.length });
+  const localScored = skills.map((skill) => scoreSkill(skill, tokens, query, aliases, stopTokens, new Map(), Math.max(1, skills.length))).filter((item) => item.rawScore > 0);
+  debug("request", { prompt, cwd: input.cwd || process.cwd(), projectSkills: projectSkills.map((skill) => skill.name), tokens, localAliasMatch, localScores: localScored.length });
+  let selected = selectExplicitCandidate(localScored);
   const externalEvidenceCount = tokens.filter((token) => !GENERIC_TERMS.has(token) && !stopTokens.has(token)).length;
-  if (!localAliasMatch && externalEvidenceCount >= 2) {
+  const externalIdentifierSignal = hasExternalIdentifierSignal(prompt, skills, aliases);
+  if (!selected.length) {
+    const semanticCandidates = skills.map(skill => ({ id: String(skill.id || skill.name), text: [skill.name, skill.description, skill.problem, skill.when, ...(skill.keywords || [])].filter(Boolean).join(" ") }));
+    const semanticScores = await runSemanticRanker(query, semanticCandidates);
+    if (semanticScores.size) {
+      const ranked = skills.map(skill => {
+        const semanticScore = semanticScores.get(String(skill.id || skill.name)) || 0;
+        return { skill, semanticScore, confidence: semanticScore, rawScore: 0, evidence: ["semantic"] };
+      }).sort((left, right) => right.semanticScore - left.semanticScore || String(left.skill.name).localeCompare(String(right.skill.name)));
+      selected = expandProtectedSemanticSeed(ranked, relationDocument, skillByName);
+    }
+  }
+  if (!selected.length) selected = selectCandidate(localScored);
+  if ((!selected.length || externalIdentifierSignal) && !localAliasMatch && externalEvidenceCount >= 2) {
     const indexPaths = [registry.externalIndexPath || path.join(codexRoot, "skill-registry", "external-skills.tsv"), registry.deferredIndexPath || path.join(codexRoot, "skill-registry", "deferred-skills.tsv")].filter((value, index, values) => value && values.indexOf(value) === index);
     const indexed = await Promise.all(indexPaths.map((indexPath) => externalScores(indexPath, tokens, query, aliases, stopTokens, knownNames)));
-    scored.push(...indexed.flat());
+    const externalSelected = selectCandidate(indexed.flat());
+    const strongExternal = externalSelected[0] && (externalSelected[0].explicitName || externalSelected[0].explicitAlias || (externalSelected[0].confidence >= 0.75 && externalSelected[0].distinctive.size >= 2));
+    if (strongExternal) selected = externalSelected;
   }
-  const selected = selectCandidate(scored);
-  if (!selected) { process.stdout.write("{}"); process.exit(0); }
-  const evidence = selected.evidence.join(", ") || "metadata match";
-  const lines = [
-    "[CODEX_SKILL_ROUTER_V3]",
-    "Assistive routing only: read the selected SKILL.md only when it directly applies; do not load the whole Skill catalog.",
-    `- ${selected.skill.name} [confidence=${selected.confidence.toFixed(2)}]`,
-    `  Evidence: ${evidence}`,
-    `  Read: ${selected.skill.path}`
-  ];
+  if (!selected.length) { process.stdout.write("{}"); process.exit(0); }
+  const lines = ["[CODEX_SKILL_ROUTER_V4]"];
+  for (const item of selected) {
+    lines.push(`- ${item.skill.name} [source=${sourceLabel(item.skill)}; confidence=${item.confidence.toFixed(2)}]`);
+    lines.push(`  Read: ${item.skill.path}`);
+  }
   process.stdout.write(JSON.stringify({ hookSpecificOutput: { hookEventName: "UserPromptSubmit", additionalContext: lines.join("\n") } }));
 } catch (error) {
   process.stderr.write(`Skill router skipped: ${error.message}\n`);

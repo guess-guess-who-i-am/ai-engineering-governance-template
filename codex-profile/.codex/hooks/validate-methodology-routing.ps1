@@ -8,11 +8,11 @@ $chineseReviewPath = Join-Path $codexRoot "prompts\global-methodology-routing-re
 $mapPath = Join-Path $codexRoot "prompts\global-methodology-map.json"
 $targetPaths = @{
   alwaysOn = Join-Path $codexRoot "prompts\global-attention-anchor.en.md"
-  "method-research-evidence" = Join-Path $env:USERPROFILE ".agents\skills\method-research-evidence\SKILL.md"
-  "method-engineering-execution" = Join-Path $env:USERPROFILE ".agents\skills\method-engineering-execution\SKILL.md"
-  "method-evaluation-gates" = Join-Path $env:USERPROFILE ".agents\skills\method-evaluation-gates\SKILL.md"
-  "method-github-delivery" = Join-Path $env:USERPROFILE ".agents\skills\method-github-delivery\SKILL.md"
-  "method-task-tree" = Join-Path $env:USERPROFILE ".agents\skills\method-task-tree\SKILL.md"
+  "method-research-evidence" = Join-Path $env:USERPROFILE ".agents\routed-skills\method-research-evidence\SKILL.md"
+  "method-engineering-execution" = Join-Path $env:USERPROFILE ".agents\routed-skills\method-engineering-execution\SKILL.md"
+  "method-evaluation-gates" = Join-Path $env:USERPROFILE ".agents\routed-skills\method-evaluation-gates\SKILL.md"
+  "method-github-delivery" = Join-Path $env:USERPROFILE ".agents\routed-skills\method-github-delivery\SKILL.md"
+  "method-task-tree" = Join-Path $env:USERPROFILE ".agents\routed-skills\method-task-tree\SKILL.md"
 }
 
 $errors = [Collections.Generic.List[string]]::new()

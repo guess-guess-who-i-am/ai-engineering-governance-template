@@ -8,20 +8,6 @@ function Write-EmptyResult {
   exit 0
 }
 
-function Find-ProjectFile {
-  param(
-    [Parameter(Mandatory = $true)][string]$StartDirectory,
-    [Parameter(Mandatory = $true)][string]$FileName
-  )
-  $current = [IO.DirectoryInfo]::new([IO.Path]::GetFullPath($StartDirectory))
-  while ($null -ne $current) {
-    $candidate = Join-Path $current.FullName $FileName
-    if (Test-Path -LiteralPath $candidate -PathType Leaf) { return $candidate }
-    $current = $current.Parent
-  }
-  return $null
-}
-
 try {
   $inputText = [Console]::In.ReadToEnd()
   if (-not $inputText) { Write-EmptyResult }
@@ -49,21 +35,13 @@ Apply this execution contract on every user turn and before every later tool wav
 - Do not invent calls to fill a quota, hide dependencies, weaken checks, or claim concurrency without overlapping execution intervals.
 - A phase with fewer than two independent operations may remain single-step. Otherwise, repeated one-call model-tool round trips are noncompliant.
 '@.Trim())
+    $parts.Add("[CODEX_SKILL_ROUTER_GATE_V1]`nThe platform Skill list is metadata-only. Do not read Codex, user, project, task-tree, or external Skill bodies directly from that list. Read a SKILL.md only when the unified Skill Router names its exact path; if it names none, do not load a specialized Skill.")
   }
   if (Test-Path -LiteralPath $anchorPath -PathType Leaf) {
     $parts.Add("[GLOBAL_ALWAYS_ON_ORIGINAL_EN_V3]`n$([IO.File]::ReadAllText($anchorPath, $utf8).Trim())")
   }
   if (Test-Path -LiteralPath $routerPath -PathType Leaf) {
     $parts.Add("[GLOBAL_METHODOLOGY_ROUTER_EN_V3]`n$([IO.File]::ReadAllText($routerPath, $utf8).Trim())")
-  }
-
-  $cwd = if ([string]$hookInput.cwd) { [string]$hookInput.cwd } else { (Get-Location).Path }
-  if (Test-Path -LiteralPath $cwd -PathType Container) {
-    $taskTreePath = Find-ProjectFile -StartDirectory $cwd -FileName "task-tree.md"
-    $taskTreesPath = Find-ProjectFile -StartDirectory $cwd -FileName "task-trees.json"
-    if ($taskTreePath -or $taskTreesPath) {
-      $parts.Add("Deterministic route: task-tree state exists. Load `method-task-tree` before acting, call `task_tree_focus`, and apply the nearest project `AGENTS.md`. The latest user request overrides stale graph focus; `GraphState.NextPlan` is never executable.")
-    }
   }
 
   if ($eventName -eq "SessionStart" -and [string]$hookInput.source -eq "compact") {

@@ -65,9 +65,18 @@ try {
   assert(hooks.hooks.UserPromptSubmit[0].hooks.length === 1 && hooks.hooks.SessionStart[0].hooks.length === 1, "hooks.json does not use one stable dispatcher per event");
   const hookCommand = hooks.hooks.UserPromptSubmit[0].hooks[0].command;
   assert(hookCommand.includes(process.execPath) && hookCommand.includes("hook-dispatch.mjs"), "hooks.json does not pin the absolute Node executable and dispatcher path");
+  assert(hooks.hooks.UserPromptSubmit[0].hooks[0].additionalContextLimit === 0, "prompt dispatcher does not pass the full additional context directly");
+  assert(hooks.hooks.SessionStart[0].hooks[0].additionalContextLimit === 0, "session dispatcher does not pass the full additional context directly");
   const targets = JSON.parse(await readFile(path.join(home, ".codex", "prompt-publisher", "methodology-targets.json"), "utf8"));
   assert(targets.validatorFile.endsWith("validate-methodology-routing.mjs"), "Linux publisher still targets the PowerShell validator");
   assert(targets.refreshRegistryFile.endsWith("refresh-skill-registry.mjs"), "Linux publisher still targets the PowerShell registry refresher");
+  const directUserSkillDirectoryExists = await readdir(path.join(home, ".agents", "skills")).then(() => true, (error) => {
+    if (error.code === "ENOENT") return false;
+    throw error;
+  });
+  assert(!directUserSkillDirectoryExists, "Linux clean install created the platform auto-scan user Skill directory");
+  const routedUserSkills = await readdir(path.join(home, ".agents", "routed-skills"));
+  assert(routedUserSkills.length === 6, `Linux clean install expected 6 Router-only user Skills, found ${routedUserSkills.length}`);
 
   const backup = await latestBackup(home);
   const manifest = JSON.parse(await readFile(path.join(backup, "manifest.json"), "utf8"));
@@ -76,16 +85,19 @@ try {
 
   const envArgs = { home };
   const validator = run(path.join(home, ".codex", "hooks", "validate-methodology-routing.mjs"), [], envArgs);
-  assert(validator.status === 0 && validator.stdout.includes("PASS: 72 English rules"), `72-rule validation failed: ${validator.stderr || validator.stdout}`);
+  assert(validator.status === 0 && validator.stdout.includes("PASS: 126 English rules"), `126-rule validation failed: ${validator.stderr || validator.stdout}`);
   const contextInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const dispatcher = path.join(home, ".codex", "hooks", "hook-dispatch.mjs");
   const context = run(dispatcher, [], { ...envArgs, input: contextInput });
   const contextPayload = JSON.parse(context.stdout);
   const contextText = String(contextPayload.hookSpecificOutput.additionalContext);
   assert(context.status === 0 && contextText.startsWith("[AUTOMATIC_TOOL_BATCHING_CONTRACT_V3]") && contextText.includes("mechanically determined follow-up waves"), "automatic batching contract is absent, not first, or weakened");
-  const routeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Please push this release to GitHub", cwd: REPOSITORY_ROOT })}\n`;
+  const routeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Commit and push this release to GitHub", cwd: REPOSITORY_ROOT })}\n`;
   const routed = run(dispatcher, [], { ...envArgs, input: routeInput });
-  assert(routed.status === 0 && routed.stdout.includes("method-github-delivery"), `GitHub methodology route did not match: ${routed.stderr || routed.stdout}`);
+  const routedContext = routed.status === 0
+    ? String(JSON.parse(routed.stdout).hookSpecificOutput?.additionalContext || "")
+    : "";
+  assert(routed.status === 0 && routedContext.includes("method-github-delivery") && routedContext.includes(path.join(home, ".agents", "routed-skills", "method-github-delivery", "SKILL.md")), `GitHub Router-only methodology route did not match: ${routed.stderr || routed.stdout}`);
   const unrelated = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n` });
   assert(unrelated.status === 0 && unrelated.stdout.trim() === "{}", "unrelated prompt received a methodology recommendation");
 
