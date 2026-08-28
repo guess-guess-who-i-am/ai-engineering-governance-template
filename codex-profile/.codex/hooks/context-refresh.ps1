@@ -46,6 +46,13 @@ This is mandatory on every user turn and before every later tool wave; never wai
   if ($eventName -eq "SessionStart" -and [string]$hookInput.source -eq "compact") {
     $parts.Add("Compaction recovery: restore the active task, selected methodology routes, applicable `AGENTS.md` files, repository state, evidence, and first unresolved gap before continuing. Do not load the complete methodology archive; reload only the routes that still apply.")
   }
+  if ($eventName -eq "UserPromptSubmit") {
+    $parts.Add(@'
+[TOOL_BATCH_EXECUTION_GATE_V1]
+When 2 or more safe operations are known, the next tool message must be one `functions.exec` call with this shape: `const results = await Promise.all([tools.exec_command({...}), tools.exec_command({...})]); text(results.map(r => r.output).join("\n"));`
+Put every known independent operation in that array (up to 8); do not send a one-command probe first. Use a later wave only when its dependency is real.
+'@.Trim())
+  }
 
   if ($parts.Count -eq 0) { Write-EmptyResult }
   $payload = [ordered]@{

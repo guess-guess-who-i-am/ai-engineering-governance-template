@@ -198,6 +198,12 @@ try {
   if ($dispatcherText -notmatch 'Promise\.all\(handlers\.map' -or $dispatcherText -notmatch 'CODEX_CAPABILITY_HOOK' -or $dispatcherText -notmatch 'own\("skill-router"') {
     throw "The stable dispatcher no longer runs Skill routing and the capability/graph hook through the existing parallel architecture."
   }
+  $nodeContext = Join-Path $testRoot ".codex\hooks\context-refresh.mjs"
+  if (-not (Test-Path -LiteralPath $nodeContext -PathType Leaf)) { throw "The Windows profile is missing the Node context-refresh handler." }
+  $nodeContextText = Get-Content -Raw -LiteralPath $nodeContext
+  if ($nodeContextText -notmatch 'TOOL_BATCH_EXECUTION_GATE_V1' -or $nodeContextText -notmatch 'Promise\.all\(\[tools\.exec_command') {
+    throw "The executable batching gate is absent from the Node context handler."
+  }
   $toolHeavyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "请高并发检查多个文件并运行测试"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $toolHeavyOutput = $toolHeavyInput | & node $contextRefresh
   $toolHeavyContext = [string](($toolHeavyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
