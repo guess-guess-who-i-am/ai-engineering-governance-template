@@ -267,7 +267,7 @@ async function verifyInstallation(home, codexHome, operations) {
   catch { throw new Error(`Methodology publisher returned invalid JSON: ${publisher.stdout.trim()}`); }
   const hookInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const context = await run(process.execPath, [path.join(codexHome, "hooks", "hook-dispatch.mjs")], { env, input: hookInput });
-  if (context.code !== 0 || !context.stdout.includes("AUTOMATIC_TOOL_BATCHING_CONTRACT_V3")) throw new Error("Hook dispatcher did not emit the automatic batching contract");
+  if (context.code !== 0 || !context.stdout.includes("AUTOMATIC_TOOL_BATCHING_CONTRACT_V4")) throw new Error("Hook dispatcher did not emit the automatic batching contract");
   return { validation: publication.validation, trust: await inspectHookTrust(codexHome) };
 }
 

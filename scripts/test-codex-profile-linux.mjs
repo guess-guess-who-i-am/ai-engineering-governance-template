@@ -85,13 +85,13 @@ try {
 
   const envArgs = { home };
   const validator = run(path.join(home, ".codex", "hooks", "validate-methodology-routing.mjs"), [], envArgs);
-  assert(validator.status === 0 && validator.stdout.includes("PASS: 126 English rules"), `126-rule validation failed: ${validator.stderr || validator.stdout}`);
+  assert(validator.status === 0 && validator.stdout.includes("PASS: 127 English rules"), `127-rule validation failed: ${validator.stderr || validator.stdout}`);
   const contextInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const dispatcher = path.join(home, ".codex", "hooks", "hook-dispatch.mjs");
   const context = run(dispatcher, [], { ...envArgs, input: contextInput });
   const contextPayload = JSON.parse(context.stdout);
   const contextText = String(contextPayload.hookSpecificOutput.additionalContext);
-  assert(context.status === 0 && contextText.startsWith("[AUTOMATIC_TOOL_BATCHING_CONTRACT_V3]") && contextText.includes("mechanically determined follow-up waves"), "automatic batching contract is absent, not first, or weakened");
+  assert(context.status === 0 && contextText.startsWith("[AUTOMATIC_TOOL_BATCHING_CONTRACT_V4]") && contextText.includes("If K >= 2, the first wave MUST") && contextText.includes("Sending only one or two") && contextText.includes("mechanically determined follow-up waves"), "automatic batching contract is absent, not first, or weakened");
   const routeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Commit and push this release to GitHub", cwd: REPOSITORY_ROOT })}\n`;
   const routed = run(dispatcher, [], { ...envArgs, input: routeInput });
   const routedContext = routed.status === 0
