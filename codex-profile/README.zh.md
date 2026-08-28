@@ -57,6 +57,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\configure-lazy-cap
 原始的“通常直接5到8个工具调用或者进程的并发”仍逐轮注入且没有改写。除此之外，`context-refresh.ps1` 会把英文自动执行契约放在每次用户提示附加上下文的最前面，不再判断用户是否提到“并发”。该契约要求只要存在两个以上真实独立的操作就批量提交；能根据上一波结果机械确定的后续操作继续留在同一个工具编排中。简单单步任务仍可单步执行，也不会把存在语义依赖、交互确认、审批或破坏性的步骤伪装成并发。
 
 在 Windows 上，dispatcher 会优先发现并运行同目录的 `context-refresh.mjs`；该处理器在 V4 原文之后追加一个可直接照抄的 `TOOL_BATCH_EXECUTION_GATE_V1`，明确要求下一条 `functions.exec` 使用 `Promise.all([...])` 放入全部已知独立操作。这是对模型的可执行提示，不是平台级强制；平台仍可能在语义依赖或工具调用能力限制下选择单个调用。
+dispatcher 的注册路径没有变化，只是在每次事件执行时重新选择同目录的处理器；因此这次新增的 Node 处理器会在下一次 Hook 事件直接生效，不以退出当前 Codex 会话为前提。
 
 曾经出现过的退化根因是：新增 capability router 后，`context-refresh` 从 `user_prompt_submit:0:1` 移到 `0:2`，而 `config.toml` 只保留了 `0:0` 的信任记录，所以新任务没有执行并发契约。同时旧 PowerShell Skill 推荐器会用宽泛中文二元词扫描15471条外部索引，单次最坏约80秒。当前 dispatcher 固定每个事件只有一个入口，Skill 推荐器改用 Node、三元词和最多300条候选；本机实测推荐约0.3–0.4秒。
 
