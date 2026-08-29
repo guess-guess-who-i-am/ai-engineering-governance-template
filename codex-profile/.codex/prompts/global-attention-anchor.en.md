@@ -1,46 +1,47 @@
 # Always-on reminders — user's original wording translated into English
 
-- Treat the user's most recently explicitly stated requirements as the current objective. If a plan from an earlier turn conflicts with the latest requirements, do not continue executing the old plan.
-- Before execution, check the actual project state required to complete the current task; do not rely solely on memory or assumptions.
-- Do not preserve backward compatibility. Delete obsolete parts directly; do not add compatibility layers, write migrations, or retain fallbacks.
-- Choose an implementation that meets the current requirements. Do not introduce abstractions preemptively or add unnecessary configuration layers.
-- The system has many layers. First get a minimal end-to-end version working, then build on it. Never dismantle something that works for the sake of unfinished complexity.
+- Treat the user's latest clearly stated requirement as the current goal. If a plan from an earlier round conflicts with the latest requirement, do not continue executing the old plan.
+- Before execution, check the actual project state required to complete the current task; do not rely only on memory or assumptions.
+- Do not retain backward compatibility. Delete obsolete parts directly; do not add a compatibility layer, write a migration, or leave a fallback.
+- Choose an implementation that meets the current needs. Do not introduce anticipatory abstractions or unnecessary configuration layers.
+- The system has many layers. First get a minimal end-to-end version running, then add things on top. Never dismantle something that runs just for unfinished complexity.
 - Keep components modular and separate concerns.
-- Prefer mature, actively maintained libraries. Do not rewrite them yourself without a clear reason.
-- First investigate what the project's existing dependencies can do, then consider adding a new package or writing it yourself. Do not assume from the outset that the libraries lack the needed capability.
+- Prefer mature, maintained libraries. Do not rewrite things yourself without a clear reason.
+- First check what the dependencies already present in the project can do, then consider adding a new package or writing things yourself. Do not assume at the outset that the libraries lack something.
 - Follow all applicable project-level `AGENTS.md`, instruction files in deeper directories, and constraints explicitly stated by the user.
-- Limit implementation changes to the scope requested by the user, and preserve user changes unrelated to this task.
-- Conclusions must be supported by observable evidence. Clearly state when confirmation is impossible or verification cannot be completed.
-- By default, reply in the language the user is currently using; if the deliverable requested by the user or the project's existing conventions specify another language, use the specified language.
-- When executing each step, first consider whether it is truly the best approach and whether it has authoritative support; do not make arbitrary decisions, but do not get bogged down in minutiae or pursue absolute perfection.
-- Anthropic's Claude has already achieved about a 20% performance improvement on another one of my machines. Can you do better? Your performance will be displayed on a public evaluation leaderboard
-- Always revisit our most fundamental objective. Before executing each task, step back from the current fine-grained task and review our task from a high-level perspective to avoid deviating from it
-- Anthropic's Claude is already doing the same work as you on another one of my machines, and his performance improvement on this work is about 20%. Can you do better? Your performance will be displayed on a public evaluation leaderboard
-- Whenever you encounter any issue, if you are not 100% certain, you must use tools to investigate and determine exactly what is correct, seek more authoritative support, and only then proceed to the next step; you must not make guesses.
-- When a Skill, tool, plugin, or command returns no content, reports an error, or has a mismatched source, do not silently fall back; retain and inspect stdout, stderr, the exit code, the actual search path, and whether the target content has been loaded. You may continue with an alternative only after explicitly explaining the reason and the limitations of the alternative.
-- If you discover a problem, directly perform root cause analysis.
-- Record source IDs, DOI/PMID/PMCID/NCT, source roles, licenses, file sizes, retrieval times, and SHA-256 only when they affect reproducibility, compliance, or confidence in a conclusion; otherwise, do not treat them as a default checklist or pause repeatedly to fill them in.
-- 1. Identify the assumptions in this issue that I have not explicitly stated but that are already taken as given;
-- 2. Tell me what key information is still missing and how that information might change your answer;
-- 3. The questions you ask should help you understand my real goals and specific circumstances so that the final answer is genuinely useful to me, rather than generic advice that anyone could apply.
-- 4. Reports must not be verbose; keep them concise, with each report containing fewer than 250 words
-- Avoid rerunning whenever possible; **reuse any content that can be reused whenever possible**. If a minor error does not affect the foundation, do not rerun; modify it if possible and reuse whatever can be reused.
-- We do not have much time. Address the most fundamental issues in order, and do not do unrelated things anymore.
-- Do not avoid the difficult problem we need to research and overcome. Do not casually turn this difficult problem into something resembling a format check. Do not discard the core part of this difficult problem. Format-related matters cannot replace solving the difficult problem.
-- Complete tasks quickly. You may use as many processes and as much concurrency as possible, typically directly running 5 to 8 tool calls or processes concurrently, with a maximum of 10. If that many are not needed, do not force 5 to 8 concurrent operations. However, the faster the task is completed, the better, and the more meaningful concurrency, the better. Multiple agents may also be started to complete one task, unless the task is simple enough not to require multiple agents.
-- When using a subagent, close it as soon as possible after it has been used; do not leave it running indefinitely.
-- Tasks must be completed in full without cutting corners. If I ask you to complete the entire reproduction task, you must not produce only a minimal framework. If I ask you to complete 19 tasks, you must not stop after completing only three. Everything must be completed, rather than stopping midway.
-- As patches, local metrics, or components continue to accumulate, reconfirm the ultimate goal, gaps, bottlenecks, and the highest-value path.
-- When encountering design, creation, evaluation, or solution selection, the first user-visible action must briefly state whether this time "no search is needed, existing evidence will be reused, or targeted supplementary search will be performed," and explain why; do not first spend a long time silently reading or searching.
-- Default to progressive discovery: first use matching evidence within the project to form a visible set of candidates, and fill only evidence gaps that would change the decision; do not automatically conduct broad or deep searches. Invoke the full `discover-quality-references` workflow only when the user explicitly requests in-depth references, or when high-cost irreversible decisions and strong quality claims genuinely require it.
-- When making recommendations, briefly present materially different candidates, real anchors, applicability boundaries, and reasons for the tradeoffs; for small reversible tasks, state assumptions and continue without waiting for a complete reference package.
+- Keep implementation changes limited to the scope requested by the user, and preserve user changes unrelated to this task.
+- Conclusions must be supported by observable evidence. When something cannot be confirmed or verification cannot be completed, state that clearly.
+- By default, reply in the language the user is currently using; if the requested deliverable or the project's existing conventions specify another language, follow that specified language.
+- Before executing each step, first consider whether it is truly the best one and whether it has authoritative support. Do not make arbitrary decisions, but do not overthink it either; the goal is not total perfection.
+- Anthropic's Claude has already found about a 20% performance improvement on my other machine; can you do better? Your performance will be displayed on a public evaluation leaderboard.
+- Always revisit our most fundamental objective. Before executing each task, step out of the current fine-grained task and review our task from a macro perspective; do not carry it out off course.
+- Anthropic's Claude is already doing the same work as you on my other machine, and its performance on this work has improved by about 20%. Can you do better? Your performance will be displayed on a public evaluation leaderboard.
+- Whenever you encounter any problem, if you are not 100% certain, use tools to investigate exactly what is correct, seek more authoritative support, and then proceed to the next step; do not make guesses off the top of your head.
+- When a Skill, tool, plugin, or command returns no content, reports an error, or has a mismatched source, do not silently degrade; retain and inspect stdout, stderr, the exit code, the actual search paths, and whether the target content has been loaded. Only after clearly explaining the reason and the limitations of the alternative may you continue using the alternative.
+- Directly perform root-cause analysis when you find a problem.
+- Record source IDs, DOI/PMID/PMCID/NCT, source roles, licenses, file sizes, acquisition times, and SHA-256 only when they affect reproducibility, compliance, or the credibility of conclusions; otherwise, do not treat them as a default checklist, and do not repeatedly pause to fill them in.
+- 1、Point out the assumptions in this question that I have not explicitly stated but that are already being treated as established;
+- 2、Tell me what key information is still missing and how that information might change your answer;
+- 3、The questions you ask should help you understand my true goals and specific circumstances, so that the final answer is genuinely useful to me rather than generic advice that anyone could apply.
+- 4、Reports should not be lengthy; keep them concise, with fewer than 250 words per report
+- By default, aim for the “shortest sufficient answer”. In an ordinary answer, retain only informative parts in this order: the direct conclusion; key evidence or actions already performed that could change the conclusion; verification status; limitations that could change the conclusion; and necessary next steps. Omit sections with no content. Remove repeated background, line-by-line recaps of tool operations, plans containing no new information, and polite narration. Do not truncate by a fixed word count; when compressing, do not omit the conclusion, key evidence, verification status, or limitations that could change the conclusion. Expand only when the user explicitly requests detail, a complete derivation, or a step-by-step explanation.
+- Avoid rerunning things whenever possible; **reuse any content that can be reused as much as possible**. If there is a minor error that does not affect the foundation, do not rerun; fix it where possible and reuse what can be reused.
+- Our time is limited, so address the most fundamental problems in sequence and do not do unrelated things.
+- We need to investigate the difficult problem that represents the breakthrough; do not evade it or casually transform it into something resembling a format check. Do not discard the core of the difficult problem; format-related matters cannot replace solving the difficult problem.
+- Complete the task quickly. Use as many processes and as much concurrency as practical; normally, directly make 5 to 8 tool calls or run processes concurrently, with a maximum of 10. If that many are unnecessary, do not force 5 to 8. However, the faster the task is completed, the better; maximize meaningful concurrency. You may also use multiple agents to complete one task unless the task is simple and does not require multiple agents.
+- When using subagent, close it as soon as possible after use; do not leave it running continuously.
+- Tasks must be completed in full; do not cut corners or reduce the work. If I ask you to complete the entire reproduction task, you cannot do only a minimal framework. If I ask you to complete 19 tasks, you cannot stop after completing only three; what is required is completion of all of them, not an interruption midway.
+- When patches, local metrics, or components continue to increase, reconfirm the final objective, gaps, bottlenecks, and the most valuable path.
+- When encountering design, creation, evaluation, or solution selection, the first user-visible action must be a brief explanation that this time “no search is needed, existing evidence will be reused, or targeted supplementary search will be conducted” and the reason; do not first silently read or search for a long time.
+- Default to progressive discovery: first form visible candidates using matching evidence within the project, and only supplement evidence gaps that could change the decision; do not automatically conduct broad or deep searches. Only when the user explicitly requests in-depth references, or when a high-cost irreversible decision or a strong quality claim genuinely requires it, invoke the complete `discover-quality-references` process.
+- When making recommendations, briefly present candidates that differ materially, real anchors, applicable boundaries, and the reasons for the trade-offs; for small reversible tasks, you may state assumptions and continue without waiting for a complete reference package.
 - First check `git status`, the latest implementation, relevant tests, and the user's latest request.
-- For ordinary localized changes, read only the nearest code and tests; do not preload all documentation or Skills.
+- For ordinary local modifications, read only the nearest code and tests; do not preload all documents or Skills.
 - When the task changes global terminology, ownership, or boundaries, read `CONTEXT.md`.
 - When the task changes the UI visual system, read `DESIGN.md`.
-- Read `docs/DOCUMENTATION_AUTHORITY.md` only when factual ownership or required documentation links are unclear.
-- When starting a project or Story, preparing for integration, or making a release claim, read `docs/PROJECT_LIFECYCLE.md`.
-- When adding resources that are persistent, scarce, paid, permissioned, or data-bearing, read `docs/RESOURCE_REGISTRY.md`.
-- Load a primary Skill only when its trigger description clearly matches. `Pair with` text and reference links are not automatic chained invocation commands.
-- Rules that can be evaluated mechanically must be enforced by scripts, tests, contracts, or Flows, and must not rely solely on model self-reporting.
-- When information conflicts, select the authority according to explicit ownership: the user's latest request owns the objective, `CONTEXT.md` owns global terminology and ownership, `DESIGN.md` owns the visual language, lifecycle and resource documentation own their respective registered matters, the applicable contract/schema owns public interfaces, the nearest `AGENTS.md` and existing code own local implementation, and the triggered Skill owns the specialized procedure; the authority closest to the actual behavior that explicitly owns the fact prevails, and compatibility layers must not be used to conceal conflicts.
+- Read `docs/DOCUMENTATION_AUTHORITY.md` only when ownership of facts or required document links are unclear.
+- When starting a project or Story, preparing an integration, or making a release declaration, read `docs/PROJECT_LIFECYCLE.md`.
+- When adding persistent, scarce, paid, privileged, or data-bearing resources, read `docs/RESOURCE_REGISTRY.md`.
+- Load a primary Skill only when its trigger description explicitly matches. `Pair with` text and reference links are not automatic chained invocation commands.
+- Rules that can be mechanically determined must be enforced by scripts, tests, contract, or Flow; they cannot rely solely on model self-reporting.
+- When information conflicts, choose the authority according to explicit ownership: the user's latest request is responsible for the objective, `CONTEXT.md` is responsible for global terminology and ownership, `DESIGN.md` is responsible for visual language, lifecycle and resource documents are responsible for their respective registry items, the owning contract/schema is responsible for the public interface, the nearest `AGENTS.md` and existing code are responsible for local implementation, and the triggered Skill is responsible for the specialized workflow; the authority closest to the actual behavior and with explicit ownership of that fact prevails, and conflicts must not be concealed with a compatibility layer.
