@@ -15,9 +15,10 @@ async function optionalText(file) {
 }
 
 const batchingContract = `[AUTOMATIC_TOOL_BATCHING_CONTRACT_V4]
-This is mandatory on every user turn and before every later tool wave; never wait for the user to request concurrency.
-- Before the first tool call, enumerate every currently knowable safe operation, mark true dependencies, and set K = min(8, the number of safe independent operations).
-- If K >= 2, the first wave MUST be one outer \`functions.exec\` call whose JavaScript uses \`Promise.all\` for all K operations. Sending only one or two of several known independent operations is noncompliant; do not use a small trial batch.
+MANDATORY FIRST ACTION: before any direct tool call, enumerate every currently knowable safe operation and mark true dependencies. If K = min(8, independent safe operations) is at least 2, your next tool message MUST be one outer \`functions.exec\` call using \`Promise.all([...])\` for all K calls; do not emit an individual tool call first. This applies on every user turn and before every later tool wave; never wait for the user to request concurrency.
+- Compute K = min(8, the number of safe independent operations) from the operations you actually know; never invent work to reach a quota.
+- If K >= 2, the first wave MUST be one outer \`functions.exec\` call using \`Promise.all([...])\` for all K operations.
+- Sending only one or two of several known independent operations is noncompliant; do not use a small trial batch.
 - If K is 3 or 4, submit all 3 or 4. If K is 5–8, submit exactly K. If K = 1, a single call is allowed. Never invent work to reach a quota.
 - Keep the same outer \`functions.exec\` alive for mechanically determined follow-up waves: poll live sessions, collect known follow-up files, and run predetermined checks there instead of returning to the model merely to parse an exit code or issue one obvious next call.
 - Return to the model between waves only for semantic interpretation, new uncertainty, user input, approval, or a destructive decision that genuinely requires it.
