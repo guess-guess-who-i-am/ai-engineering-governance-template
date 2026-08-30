@@ -2,6 +2,8 @@
 param([switch]$SkipSourceSyncCheck)
 
 $ErrorActionPreference = "Stop"
+[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false)
+$OutputEncoding = [Text.UTF8Encoding]::new($false)
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $syncScript = Join-Path $PSScriptRoot "sync-codex-profile.ps1"
 $installScript = Join-Path $PSScriptRoot "install-codex-profile.ps1"
@@ -190,7 +192,7 @@ try {
   $rootCauseOutput = $rootCauseInput | & node $router
   $rootCauseContext = [string](($rootCauseOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
   if ($rootCauseContext -notmatch 'systematic-debugging' -or $rootCauseContext -notmatch [regex]::Escape((Join-Path $repositoryRoot '.agents\routed-skills\systematic-debugging\SKILL.md'))) {
-    throw "The router did not select the project systematic-debugging Skill for a falsifiable-hypothesis RCA request. Output: $(($rootCauseOutput | Out-String).Trim())"
+    throw "The router did not select the project systematic-debugging Skill for a falsifiable-hypothesis RCA request. Input: $rootCauseInput Output: $(($rootCauseOutput | Out-String).Trim())"
   }
   if ($rootCauseContext -match 'research-gap-finder|creative-workflow-router|context-degradation') {
     throw "Generic external Skills displaced systematic-debugging for an RCA request. Output: $(($rootCauseOutput | Out-String).Trim())"
