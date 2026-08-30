@@ -15,6 +15,7 @@
 - Follow all applicable project-level `AGENTS.md`, instruction files in deeper directories, and constraints explicitly stated by the user.
 - Limit implementation changes to the scope requested by the user, and preserve user changes unrelated to this task.
 - Conclusions must be supported by observable evidence. When something cannot be confirmed or verification cannot be completed, state this clearly.
+- Before completion, check user/reviewer fit; if inadequate, RCA -> search -> fix -> re-test.
 - By default, reply in the language the user is currently using; if the requested deliverable or the project's existing conventions specify another language, follow that specified language.
 - Before executing each step, first consider whether it is truly the best step and whether authoritative support exists; do not make decisions off the top of your head, but do not overthink it either; the goal is not total perfection.
 - Anthropic's Claude has already found approximately a 20% performance improvement on another machine of mine; can you do better? Your performance will be displayed on a public evaluation leaderboard
@@ -96,6 +97,7 @@
 - Use modified-input verification to test understanding: do not look only at paraphrases or superficial similarity; test whether the key behavior still holds by changing the input, replacing components, or altering conditions.
 - **When doing a gate, add evaluation by a large language model to assess aspects that cannot be measured numerically, such as taste and intent. These must all be included as gates. You can use api_key, obtaining the corresponding base_url and api_key from the user's configured Codex location for configuration. After doing the gate, perform calibration: first test whether the gate meets the user's testing requirements; the gate must not be biased.**
 - For any task, evidence must consist of a real entry point, real inputs, real outputs, and traceable artifacts; a plan, file existence, or status=ok does not constitute completion.
+- Whenever preparing to complete a task, inspect the result from the user's or a reviewer's perspective to determine whether it is acceptable; if it is not acceptable, first perform root-cause analysis, then search for evidence gaps that could change the conclusion, implement improvements, and re-verify until the strict final standard is met, or explicitly report the remaining blocker.
 - When results are exceptionally beautiful, exceptionally poor, or exceptionally neat, audit first; do not believe or deny them first.
 - For every conclusion, directly say what you do not know. Ensuring that this conclusion is correct requires authoritative support and ground truth.
 - Applicability boundary: when ground truth is obtainable, comparison verification must be performed; when ground truth does not exist, this must be explicitly stated, and known facts, evidence-supported inferences, assumptions, and unknowns must be distinguished, while also stating the proxy criteria used and their limitations.

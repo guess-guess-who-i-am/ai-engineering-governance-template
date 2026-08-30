@@ -10,12 +10,12 @@ const sections = parseRoutedSections(source);
 const rules = validateSourceSections(sections, config.routes);
 
 assert.equal(sections.size, 7);
-assert.equal([...rules.values()].reduce((sum, routeRules) => sum + routeRules.length, 0), 129);
+assert.equal([...rules.values()].reduce((sum, routeRules) => sum + routeRules.length, 0), 131);
 assert.deepEqual(Object.fromEntries([...rules].map(([route, routeRules]) => [route, routeRules.length])), {
-  alwaysOn: 46,
+  alwaysOn: 47,
   "method-research-evidence": 10,
   "method-engineering-execution": 20,
-  "method-evaluation-gates": 11,
+  "method-evaluation-gates": 12,
   "method-github-delivery": 1,
   "method-task-tree": 41
 });

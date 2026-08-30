@@ -220,19 +220,17 @@ try {
   $nodeContext = Join-Path $testRoot ".codex\hooks\context-refresh.mjs"
   if (-not (Test-Path -LiteralPath $nodeContext -PathType Leaf)) { throw "The Windows profile is missing the Node context-refresh handler." }
   $nodeContextText = Get-Content -Raw -LiteralPath $nodeContext
-  if ($nodeContextText -notmatch 'TOOL_BATCH_EXECUTION_GATE_V1' -or $nodeContextText -notmatch 'Promise\.all\(\[tools\.exec_command') {
+  if ($nodeContextText -notmatch 'AUTOMATIC_TOOL_BATCHING_CONTRACT_V6' -or $nodeContextText -notmatch 'Promise\.all') {
     throw "The executable batching gate is absent from the Node context handler."
   }
   $toolHeavyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "请高并发检查多个文件并运行测试"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $toolHeavyOutput = $toolHeavyInput | & node $contextRefresh
   $toolHeavyContext = [string](($toolHeavyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if (-not $toolHeavyContext.StartsWith('[AUTOMATIC_TOOL_BATCHING_CONTRACT_V4]') -or
+  if (-not $toolHeavyContext.StartsWith('[AUTOMATIC_TOOL_BATCHING_CONTRACT_V6]') -or
       $toolHeavyContext -notmatch 'Promise\.all' -or
-      $toolHeavyContext -notmatch 'K = min\(8, the number of safe independent operations\)' -or
-      $toolHeavyContext -notmatch 'If K >= 2, the first wave MUST' -or
-      $toolHeavyContext -notmatch 'Sending only one or two' -or
-      $toolHeavyContext -notmatch 'mechanically determined follow-up waves' -or
-      $toolHeavyContext -notmatch 'Batch every independent read') {
+      $toolHeavyContext -notmatch 'If 2 or more operations are independent' -or
+      $toolHeavyContext -notmatch 'same message' -or
+      $toolHeavyContext -notmatch 'actual tool name') {
     throw "The context hook did not inject the automatic tool batching contract."
   }
   if ($toolHeavyContext -notmatch '\[CODEX_SKILL_ROUTER_GATE_V1\]' -or $toolHeavyContext -notmatch 'metadata-only' -or $toolHeavyContext -notmatch 'exact path') {
@@ -241,13 +239,13 @@ try {
   $plainConcurrencyInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "我不知道为什么，现在我感觉还是没有并发，你确定现在是可以并发了吗？"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $plainConcurrencyOutput = $plainConcurrencyInput | & node $contextRefresh
   $plainConcurrencyContext = [string](($plainConcurrencyOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($plainConcurrencyContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V4\]') {
+  if ($plainConcurrencyContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V6\]') {
     throw "The context hook did not inject automatic batching for the user's concurrency wording."
   }
   $simpleInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "你好"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $simpleOutput = $simpleInput | & node $contextRefresh
   $simpleContext = [string](($simpleOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
-  if ($simpleContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V4\]') {
+  if ($simpleContext -notmatch '\[AUTOMATIC_TOOL_BATCHING_CONTRACT_V6\]') {
     throw "The context hook did not inject automatic batching for a simple prompt."
   }
 
