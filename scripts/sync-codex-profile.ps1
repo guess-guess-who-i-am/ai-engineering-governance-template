@@ -14,14 +14,17 @@ $agentsHome = Join-Path $UserHome ".agents"
 $codexFiles = @(
   "AGENTS.md",
   "hooks/hook-dispatch.mjs",
+  "hooks/context-refresh.mjs",
   "hooks/context-refresh.ps1",
   "hooks/refresh-skill-registry.ps1",
   "hooks/skill-router.mjs",
+  "hooks/semantic-ranker.mjs",
   "hooks/skill-router.ps1",
   "hooks/validate-methodology-routing.ps1",
   "prompts/global-attention-anchor.en.md",
   "prompts/global-attention-anchor.zh.md",
   "prompts/global-every-turn.en.md",
+  "prompts/global-every-turn.README.en.md",
   "prompts/global-every-turn.zh.md",
   "prompts/global-methodology-map.json",
   "prompts/global-methodology-router.en.md",
@@ -38,7 +41,8 @@ $codexFiles = @(
   "prompt-publisher/README.zh.md",
   "prompt-publisher/test-methodology-publisher.mjs",
   "prompt-publisher/translation.schema.json",
-  "skill-registry/routing-rules.json"
+  "skill-registry/routing-rules.json",
+  "skill-registry/skill-relations.json"
 )
 
 $skillNames = @(
@@ -60,8 +64,8 @@ foreach ($relativePath in $codexFiles) {
 foreach ($skillName in $skillNames) {
   foreach ($relativePath in @("SKILL.md", "agents/openai.yaml")) {
     $entries.Add([pscustomobject]@{
-      Source = Join-Path (Join-Path (Join-Path $agentsHome "skills") $skillName) $relativePath
-      Destination = Join-Path (Join-Path (Join-Path (Join-Path $bundleRoot ".agents") "skills") $skillName) $relativePath
+      Source = Join-Path (Join-Path (Join-Path $agentsHome "routed-skills") $skillName) $relativePath
+      Destination = Join-Path (Join-Path (Join-Path (Join-Path $bundleRoot ".agents") "routed-skills") $skillName) $relativePath
     })
   }
 }

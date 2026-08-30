@@ -41,6 +41,12 @@ risk: high
 - AC-002: file=scripts/test-design-references.ps1; gate=design-reference-catalog
 - AC-003: file=scripts/install-design-reference.ps1; gate=design-reference-catalog
 
+## 测试设计重点
+
+- 主成功路径: AC-001: 从完整目录搜索匹配参考；AC-002: 安装内容并生成 provenance
+- 重要失败与恢复: AC-003: 未知 ID 或漂移镜像在写入前失败
+- 变更影响面: 直接回归搜索、安装与 provenance；相邻检查固定 commit、重复安装、未知 ID 和失败不留部分文件
+
 ## 非目标
 
 - 不复制品牌字体、图片、商标，也不自动覆盖项目根 DESIGN.md。

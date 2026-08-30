@@ -35,11 +35,25 @@ risk: high
 - When: workflow 请求输出的 page_url
 - Then: 只有 HTTP 200 且正文包含模板标题才视为部署成功
 
+### AC-004: 静态站保持资源预算
+
+- Type: performance
+- Given: 文档站、脚本和 74 条设计 catalog 已构建
+- When: 统计公开站点的受管静态文件
+- Then: 各文件不超过已审查预算、总量不超过 300000 字节且首页不引入重型媒体
+
 ## 证据映射
 
 - AC-001: file=scripts/test-docs-site.mjs; workflow=.github/workflows/docs-site.yml
 - AC-002: file=scripts/test-docs-site.mjs; workflow=.github/workflows/docs-site.yml
 - AC-003: file=.github/workflows/pages.yml; validator=scripts/validate-pages-deployment.ps1
+- AC-004: file=scripts/validate-site-performance.ps1; gate=performance-regression
+
+## 测试设计重点
+
+- 主成功路径: AC-001: 在宽屏和窄屏完成阅读与搜索旅程；AC-002: 完成键盘与可访问性旅程
+- 重要失败与恢复: AC-003: 部署 URL 非 200 或正文错误时部署验证失败
+- 变更影响面: 直接回归阅读、搜索和部署；相邻检查 375px/1440px、键盘焦点、reduced motion、静态资源预算及外部请求
 
 ## 非目标
 

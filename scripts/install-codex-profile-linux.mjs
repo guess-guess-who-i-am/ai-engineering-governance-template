@@ -79,10 +79,10 @@ function hooksDocument(codexHome) {
     description: "One stable dispatcher per event keeps Hook trust indices fixed while internally batching reminders, Skill routing, capability routing, and refresh work.",
     hooks: {
       UserPromptSubmit: [{ hooks: [
-        { type: "command", command: command("hook-dispatch.mjs"), timeout: 20, statusMessage: "Loading reminders and routing in parallel", additionalContextLimit: 14000 }
+        { type: "command", command: command("hook-dispatch.mjs"), timeout: 20, statusMessage: "Loading reminders and routing in parallel", additionalContextLimit: 0 }
       ] }],
       SessionStart: [{ matcher: "^(startup|resume|clear|compact)$", hooks: [
-        { type: "command", command: command("hook-dispatch.mjs"), timeout: 70, statusMessage: "Restoring reminders and refreshing indexes in parallel", additionalContextLimit: 10000 }
+        { type: "command", command: command("hook-dispatch.mjs"), timeout: 70, statusMessage: "Restoring reminders and refreshing indexes in parallel", additionalContextLimit: 0 }
       ] }]
     }
   };
@@ -121,8 +121,15 @@ async function buildOperations(home) {
     mode: 0o700,
     source: routerSource
   });
+  const semanticRankerSource = path.join(PROFILE_ROOT, ".codex", "hooks", "semantic-ranker.mjs");
+  operations.set(path.join(codexHome, "hooks", "semantic-ranker.mjs"), {
+    destination: path.join(codexHome, "hooks", "semantic-ranker.mjs"),
+    content: await readFile(semanticRankerSource),
+    mode: 0o700,
+    source: semanticRankerSource
+  });
   for (const name of OWNED_SKILLS) {
-    await addTree(path.join(PROFILE_ROOT, ".agents", "skills", name), path.join(agentsHome, "skills", name));
+    await addTree(path.join(PROFILE_ROOT, ".agents", "routed-skills", name), path.join(agentsHome, "routed-skills", name));
   }
 
   const routingSource = path.join(PROFILE_ROOT, ".codex", "skill-registry", "routing-rules.json");
@@ -131,6 +138,13 @@ async function buildOperations(home) {
     content: await readFile(routingSource),
     mode: 0o600,
     source: routingSource
+  });
+  const relationsSource = path.join(PROFILE_ROOT, ".codex", "skill-registry", "skill-relations.json");
+  operations.set(path.join(codexHome, "skill-registry", "skill-relations.json"), {
+    destination: path.join(codexHome, "skill-registry", "skill-relations.json"),
+    content: await readFile(relationsSource),
+    mode: 0o600,
+    source: relationsSource
   });
 
   const sourceConfig = JSON.parse(await readFile(path.join(PROFILE_ROOT, ".codex", "prompt-publisher", "methodology-targets.json"), "utf8"));
@@ -253,7 +267,7 @@ async function verifyInstallation(home, codexHome, operations) {
   catch { throw new Error(`Methodology publisher returned invalid JSON: ${publisher.stdout.trim()}`); }
   const hookInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const context = await run(process.execPath, [path.join(codexHome, "hooks", "hook-dispatch.mjs")], { env, input: hookInput });
-  if (context.code !== 0 || !context.stdout.includes("AUTOMATIC_TOOL_BATCHING_CONTRACT_V3")) throw new Error("Hook dispatcher did not emit the automatic batching contract");
+  if (context.code !== 0 || !context.stdout.includes("AUTOMATIC_TOOL_BATCHING_CONTRACT_V4")) throw new Error("Hook dispatcher did not emit the automatic batching contract");
   return { validation: publication.validation, trust: await inspectHookTrust(codexHome) };
 }
 

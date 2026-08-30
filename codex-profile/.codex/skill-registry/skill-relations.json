@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "codex-skill-relations/1",
+  "policy": "Protect the accepted semantic seed. Add only direct, curated workflow neighbours, then fill remaining slots from semantic rank. Relations never create a route by themselves.",
+  "relations": [
+    ["start-new-project", "clarify-before-build", "requires"],
+    ["start-new-project", "model-project-domain", "complementary"],
+    ["start-new-project", "establish-test-strategy", "complementary"],
+    ["model-project-domain", "design-data-boundary", "precedes"],
+    ["design-data-boundary", "review-data-migration", "precedes"],
+    ["evolve-contracts", "test-api-business-flow", "precedes"],
+    ["systematic-debugging", "fix-regression-with-tdd", "precedes"],
+    ["fix-regression-with-tdd", "verify-before-completion", "precedes"],
+    ["test-api-business-flow", "verify-before-completion", "precedes"],
+    ["review-project-diff", "write-pr-description", "precedes"],
+    ["write-pr-description", "method-github-delivery", "precedes"],
+    ["design-taste-frontend", "build-designed-interface", "complementary"],
+    ["apple-design", "build-designed-interface", "complementary"],
+    ["manage-global-methodology", "review-governance-framework", "complementary"]
+  ]
+}

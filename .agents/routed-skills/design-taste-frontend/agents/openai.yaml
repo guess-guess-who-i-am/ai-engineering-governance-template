@@ -1,0 +1,4 @@
+interface:
+  display_name: "反模板前端设计"
+  short_description: "为落地页、作品集和改版建立有依据的视觉方向并避免模板化界面"
+  default_prompt: "使用 $design-taste-frontend 先建立 Design Read，再实现并审查界面。"

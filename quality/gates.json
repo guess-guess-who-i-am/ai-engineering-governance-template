@@ -119,6 +119,20 @@
       }
     },
     {
+      "id": "document-validator-contract",
+      "category": "governance",
+      "state": "active",
+      "failurePriority": "P1",
+      "owner": "documentation-maintainers",
+      "remediation": "Restore coverage for governed untracked files and invalid JSON rejection, then rerun the validator contract test.",
+      "profiles": ["pr", "release"],
+      "workingDirectory": ".",
+      "command": {
+        "executable": "pwsh",
+        "arguments": ["-NoProfile", "-File", "scripts/test-document-validation.ps1"]
+      }
+    },
+    {
       "id": "release-contract",
       "category": "governance",
       "state": "active",
@@ -153,11 +167,13 @@
       "failurePriority": "P1",
       "owner": "product-maintainers",
       "remediation": "Restore stable user-story acceptance criteria and map each verified criterion to existing evidence.",
+      "userStory": "US-008",
+      "acceptanceCriteria": ["AC-001", "AC-002", "AC-003"],
       "profiles": ["pr", "release"],
       "workingDirectory": ".",
       "command": {
         "executable": "pwsh",
-        "arguments": ["-NoProfile", "-File", "scripts/validate-user-stories.ps1"]
+        "arguments": ["-NoProfile", "-File", "scripts/test-test-contracts.ps1"]
       }
     },
     {
@@ -265,6 +281,8 @@
       "failurePriority": "P2",
       "owner": "design-maintainers",
       "remediation": "Reduce documentation assets or explicitly review and revise the measured budget with comparable evidence.",
+      "userStory": "US-005",
+      "acceptanceCriteria": ["AC-004"],
       "profiles": ["pr", "release"],
       "workingDirectory": ".",
       "command": {

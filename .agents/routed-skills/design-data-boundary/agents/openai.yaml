@@ -1,0 +1,4 @@
+interface:
+  display_name: "设计数据边界"
+  short_description: "设计数据所有权、结构、查询索引、并发、生命周期与迁移边界"
+  default_prompt: "使用 $design-data-boundary 设计这项持久数据变更。"

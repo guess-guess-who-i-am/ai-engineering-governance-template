@@ -1,0 +1,4 @@
+interface:
+  display_name: "流体交互设计"
+  short_description: "为手势、弹簧动效和可中断交互建立即时、连续且可验证的行为规则"
+  default_prompt: "使用 $apple-design 设计并验证这个流体交互。"

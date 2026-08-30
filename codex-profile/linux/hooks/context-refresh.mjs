@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -15,27 +14,13 @@ async function optionalText(file) {
   catch (error) { if (error.code === "ENOENT") return ""; throw error; }
 }
 
-function findProjectFile(startDirectory, fileName) {
-  let current = path.resolve(startDirectory);
-  while (true) {
-    const candidate = path.join(current, fileName);
-    if (existsSync(candidate)) return candidate;
-    const parent = path.dirname(current);
-    if (parent === current) return "";
-    current = parent;
-  }
-}
-
-const batchingContract = `[AUTOMATIC_TOOL_BATCHING_CONTRACT_V3]
-Apply this execution contract on every user turn and before every later tool wave. Do not wait for the user to request concurrency.
-- Before entering tools, enumerate all currently knowable operations, separate independent work from true dependencies, and let K = min(8, the independent count).
-- Use one outer \`functions.exec\` as the orchestration envelope for the largest safe phase. Run independent calls with \`Promise.all\`; when K is 5-8, the first wave must contain exactly K meaningful calls, not a 2-4 call sample.
-- Keep using the same outer \`functions.exec\` for mechanically determined follow-up waves after awaited results. Poll live sessions, collect known follow-up files, and run predetermined verification there instead of returning to the model merely to plan, parse an exit code, or issue one obvious next call.
-- Return to the model between waves only when semantic interpretation, a newly discovered uncertainty, user input, approval, or a destructive decision is genuinely required.
-- When the user lists up to eight independent items, process every listed item in the first wave. Never serialize independent reads, searches, state checks, edits, or verification commands.
-- Read a required primary Skill completely first, then batch all independent evidence checks immediately. After edits, batch all independent tests and status checks.
-- Do not invent calls to fill a quota, hide dependencies, weaken checks, or claim concurrency without overlapping execution intervals.
-- A phase with fewer than two independent operations may remain single-step. Otherwise, repeated one-call model-tool round trips are noncompliant.`;
+const batchingContract = `[AUTOMATIC_TOOL_BATCHING_CONTRACT_V6]
+Default execution policy for every user turn and every later tool wave: collect all safe operations whose inputs are already known, mark the real dependencies, then execute one complete batch before returning to reasoning.
+- If 2 or more operations are independent, the next assistant tool message MUST contain every known operation together (up to 8); prefer 5–8 when that many are already known. Use the actual tool name exposed in this conversation and never invent a wrapper name.
+- When the platform accepts parallel tool calls, emit 5–8 separate calls in the same message so they can overlap; never split a known batch into serial probes or wait for the user to request concurrency.
+- When only one shell/command tool is exposed, start the independent commands concurrently inside that one command (for example PowerShell \`ForEach-Object -Parallel -ThrottleLimit 8\`, \`Start-Job\`, or Node \`Promise.all\`) and wait for all results. Do not use a sequential \`foreach\` for independent work.
+- Use the actual operations you know, never invented filler. Keep mechanically determined follow-up polls, reads, and checks in the same batch wave. Return for interpretation only when a true dependency, uncertainty, user input, approval, or destructive decision requires it.
+- This policy applies equally to reads, searches, state checks, edits, tests, and MCP/tool requests that can safely overlap. Do not claim concurrency unless the operations overlap in execution.`;
 
 try {
   const input = await readInput();
@@ -52,17 +37,15 @@ try {
   const codexRoot = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
   const parts = [];
   if (eventName === "UserPromptSubmit") parts.push(batchingContract);
+  if (eventName === "UserPromptSubmit") parts.push("[CODEX_SKILL_ROUTER_GATE_V1]\nThe platform Skill list is metadata-only. Do not read Codex, user, project, task-tree, or external Skill bodies directly from that list. Read a SKILL.md only when the unified Skill Router names its exact path; if it names none, do not load a specialized Skill.");
   const [anchor, router] = await Promise.all([
     optionalText(path.join(codexRoot, "prompts", "global-attention-anchor.en.md")),
     optionalText(path.join(codexRoot, "prompts", "global-methodology-router.en.md"))
   ]);
   if (anchor) parts.push(`[GLOBAL_ALWAYS_ON_ORIGINAL_EN_V3]\n${anchor}`);
   if (router) parts.push(`[GLOBAL_METHODOLOGY_ROUTER_EN_V3]\n${router}`);
+  if (eventName === "UserPromptSubmit") parts.push("[RESPONSE_LENGTH_GATE_V4]\nHard acceptance check before sending: every ordinary answer, including search, research, comparison, recommendation, audit, and debugging summaries, MUST be <=300 total visible characters (including punctuation, Markdown, URLs, and English). Count the complete rendered text and rewrite until within the limit. Keep only the direct conclusion, decisive evidence/actions, verification status, and material limitations; use one compact paragraph or at most 3 short bullets. For searches, stop once decision-changing evidence is sufficient and cite at most 1–2 short source links; never dump source pages or lengthy comparisons. If a search tool fails or approval is unavailable, state the evidence gap within the same limit. Do not send an over-limit draft. Exceed 300 characters only when the user explicitly requests detail, a complete derivation, or step-by-step explanation.");
 
-  const cwd = typeof input.cwd === "string" && existsSync(input.cwd) ? input.cwd : process.cwd();
-  if (findProjectFile(cwd, "task-tree.md") || findProjectFile(cwd, "task-trees.json")) {
-    parts.push("Deterministic route: task-tree state exists. Load `method-task-tree` before acting, call `task_tree_focus`, and apply the nearest project `AGENTS.md`. The latest user request overrides stale graph focus; `GraphState.NextPlan` is never executable.");
-  }
   if (eventName === "SessionStart" && input.source === "compact") {
     parts.push("Compaction recovery: restore the active task, selected methodology routes, applicable `AGENTS.md` files, repository state, evidence, and first unresolved gap before continuing. Do not load the complete methodology archive; reload only the routes that still apply.");
   }
