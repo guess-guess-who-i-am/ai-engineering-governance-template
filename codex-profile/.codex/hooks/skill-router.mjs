@@ -97,7 +97,9 @@ function exactName(query, name) {
 function phraseMatch(query, phrase) {
   const normalizedQuery = String(query || "").normalize("NFKC").toLocaleLowerCase();
   const normalizedPhrase = String(phrase || "").normalize("NFKC").toLocaleLowerCase().trim();
-  const minimumLength = /[\u4e00-\u9fff]/.test(normalizedPhrase) ? 2 : 4;
+  // Two-character Chinese aliases are usually generic ("问题", "验证", "失败").
+  // Keep them usable as lexical evidence, but do not let them become an explicit route.
+  const minimumLength = /[\u4e00-\u9fff]/.test(normalizedPhrase) ? 3 : 4;
   if (normalizedPhrase.length < minimumLength || !normalizedQuery.includes(normalizedPhrase)) return false;
   return normalizedPhrase.includes(" ") || normalizedPhrase.includes("-") || /[\u4e00-\u9fff]/.test(normalizedPhrase);
 }
@@ -185,16 +187,18 @@ function scoreSkill(skill, tokens, query, aliases, stopTokens, df, totalDocs) {
   }
   const aliasesForSkill = aliases[name] || [];
   const explicitName = exactName(query, name) && (name.includes("-") || /\bskill\b/i.test(query) || query.trim().toLocaleLowerCase() === name);
-  const explicitAlias = aliasesForSkill.some((alias) => phraseMatch(query, alias));
+  const matchedAliases = aliasesForSkill.filter((alias) => phraseMatch(query, alias));
+  const explicitAlias = matchedAliases.length > 0;
+  const explicitAliasLength = matchedAliases.reduce((longest, alias) => Math.max(longest, String(alias).length), 0);
   if (explicitName) { rawScore += 40; evidence.unshift("explicit-name"); }
   if (explicitAlias) { rawScore += 32; evidence.unshift("explicit-alias"); }
   const denominator = Math.max(4, Math.max(1, distinctive.size) * 3.2);
   let confidence = rawScore > 0 ? rawScore / (rawScore + denominator) : 0;
   if (explicitName) confidence = Math.max(confidence, 0.92);
-  if (explicitAlias) confidence = Math.max(confidence, 0.88);
+  if (explicitAlias) confidence = Math.max(confidence, Math.min(0.96, 0.80 + explicitAliasLength * 0.02));
   if (distinctive.size < 2 && !explicitName && !explicitAlias && !(matchedIntent && matchedDomain)) confidence = Math.min(confidence, 0.54);
   if (distinctive.size === 0 && !explicitName && !explicitAlias) confidence = Math.min(confidence, 0.34);
-  return { skill, rawScore, confidence, distinctive, generic, matchedIntent, matchedDomain, explicitName, explicitAlias, evidence: [...new Set(evidence)].slice(0, 5) };
+  return { skill, rawScore, confidence, distinctive, generic, matchedIntent, matchedDomain, explicitName, explicitAlias, explicitAliasLength, evidence: [...new Set(evidence)].slice(0, 5) };
 }
 
 function strongLocalAliasMatch(query, skills, aliases) {
@@ -331,6 +335,26 @@ function selectExplicitCandidate(scored) {
     .slice(0, MAX_SKILL_CANDIDATES);
 }
 
+function routeSpecificity(item) {
+  if (!item) return 0;
+  if (item.explicitName) return 1000;
+  if (item.explicitAlias) return 100 + Number(item.explicitAliasLength || 0);
+  return 0;
+}
+
+function preferSpecificCandidate(localSelected, externalSelected) {
+  if (!externalSelected.length) return localSelected;
+  if (!localSelected.length) return externalSelected;
+  const localTop = localSelected[0];
+  const externalTop = externalSelected[0];
+  const localSpecificity = routeSpecificity(localTop);
+  const externalSpecificity = routeSpecificity(externalTop);
+  // A concrete external intent (for example "可证伪假设" or "根因分析")
+  // must beat a generic local match (for example "验证").
+  if (externalSpecificity > localSpecificity && externalTop.confidence >= 0.75) return externalSelected;
+  return localSelected;
+}
+
 function expandProtectedSemanticSeed(ranked, relationDocument, skillByName) {
   if (!ranked.length || Number(ranked[0].semanticScore || 0) < SEMANTIC_ROUTE_THRESHOLD) return [];
   const selected = [];
@@ -393,6 +417,20 @@ try {
   let selected = selectExplicitCandidate(localScored);
   const externalEvidenceCount = tokens.filter((token) => !GENERIC_TERMS.has(token) && !stopTokens.has(token)).length;
   const externalIdentifierSignal = hasExternalIdentifierSignal(prompt, skills, aliases);
+  if (!selected.length) selected = selectCandidate(localScored);
+
+  // External/deferred Skills are part of the same route space. A weak local alias
+  // must not suppress a stronger, concrete deferred route.
+  let externalSelected = [];
+  const localSpecificity = routeSpecificity(selected[0]);
+  if ((externalEvidenceCount >= 2 || externalIdentifierSignal) && (!selected.length || localSpecificity < 104 || externalIdentifierSignal)) {
+    const indexPaths = [registry.externalIndexPath || path.join(codexRoot, "skill-registry", "external-skills.tsv"), registry.deferredIndexPath || path.join(codexRoot, "skill-registry", "deferred-skills.tsv")].filter((value, index, values) => value && values.indexOf(value) === index);
+    const indexed = await Promise.all(indexPaths.map((indexPath) => externalScores(indexPath, tokens, query, aliases, stopTokens, knownNames)));
+    externalSelected = selectCandidate(indexed.flat());
+    const strongExternal = externalSelected[0] && (externalSelected[0].explicitName || externalSelected[0].explicitAlias || (externalSelected[0].confidence >= 0.75 && externalSelected[0].distinctive.size >= 2));
+    if (strongExternal) selected = preferSpecificCandidate(selected, externalSelected);
+  }
+
   if (!selected.length) {
     const semanticCandidates = skills.map(skill => ({ id: String(skill.id || skill.name), text: [skill.name, skill.description, skill.problem, skill.when, ...(skill.keywords || [])].filter(Boolean).join(" ") }));
     const semanticScores = await runSemanticRanker(query, semanticCandidates);
@@ -403,14 +441,6 @@ try {
       }).sort((left, right) => right.semanticScore - left.semanticScore || String(left.skill.name).localeCompare(String(right.skill.name)));
       selected = expandProtectedSemanticSeed(ranked, relationDocument, skillByName);
     }
-  }
-  if (!selected.length) selected = selectCandidate(localScored);
-  if ((!selected.length || externalIdentifierSignal) && !localAliasMatch && externalEvidenceCount >= 2) {
-    const indexPaths = [registry.externalIndexPath || path.join(codexRoot, "skill-registry", "external-skills.tsv"), registry.deferredIndexPath || path.join(codexRoot, "skill-registry", "deferred-skills.tsv")].filter((value, index, values) => value && values.indexOf(value) === index);
-    const indexed = await Promise.all(indexPaths.map((indexPath) => externalScores(indexPath, tokens, query, aliases, stopTokens, knownNames)));
-    const externalSelected = selectCandidate(indexed.flat());
-    const strongExternal = externalSelected[0] && (externalSelected[0].explicitName || externalSelected[0].explicitAlias || (externalSelected[0].confidence >= 0.75 && externalSelected[0].distinctive.size >= 2));
-    if (strongExternal) selected = externalSelected;
   }
   if (!selected.length) { process.stdout.write("{}"); process.exit(0); }
   const lines = ["[CODEX_SKILL_ROUTER_V4]"];

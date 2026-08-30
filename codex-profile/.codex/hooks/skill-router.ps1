@@ -226,7 +226,8 @@ try {
   $registryPath = Join-Path $codexHome "skill-registry\skills-index.json"
   if (-not (Test-Path -LiteralPath $registryPath -PathType Leaf)) { Write-EmptyResult }
   $registry = ([IO.File]::ReadAllText($registryPath, $utf8)) | ConvertFrom-Json
-  $skills = @($registry.skills)
+  $projectSkills = @(Get-LocalSkillEntries -StartDirectory ([string]$hookInput.cwd))
+  $skills = @($registry.skills) + $projectSkills
   $query = ([string]$prompt).ToLowerInvariant()
   $rcaPath = @(
     (Join-Path $codexHome "skills\root-cause-analysis\SKILL.md"),
@@ -271,14 +272,14 @@ try {
   }
   $externalIndexProperty = $registry.PSObject.Properties["externalIndexPath"]
   $externalIndexPath = if ($externalIndexProperty) { [string]$externalIndexProperty.Value } else { Join-Path $codexHome "skill-registry\external-skills.tsv" }
-  if ($externalIndexPath -and -not $localAliasMatch) {
+  if ($externalIndexPath) {
     foreach ($item in @(Get-ExternalSkillScores -IndexPath $externalIndexPath -Tokens $tokens -Query $query -Aliases $aliases -ExcludedNames $knownNames)) {
       $allScored.Add($item)
     }
   }
   $deferredIndexProperty = $registry.PSObject.Properties["deferredIndexPath"]
   $deferredIndexPath = if ($deferredIndexProperty) { [string]$deferredIndexProperty.Value } else { Join-Path $codexHome "skill-registry\deferred-skills.tsv" }
-  if ($deferredIndexPath -and -not $localAliasMatch) {
+  if ($deferredIndexPath) {
     foreach ($item in @(Get-ExternalSkillScores -IndexPath $deferredIndexPath -Tokens $tokens -Query $query -Aliases $aliases -ExcludedNames $knownNames)) {
       $allScored.Add($item)
     }

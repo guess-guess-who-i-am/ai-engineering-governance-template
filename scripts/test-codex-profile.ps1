@@ -186,6 +186,23 @@ try {
     throw "The Skill router emitted more than four candidates. Output: $(($frontendOutput | Out-String).Trim())"
   }
 
+  $rootCauseInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "请先猜测 3 到 5 个可能的根因，给出可证伪预测，再做最小实验"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
+  $rootCauseOutput = $rootCauseInput | & node $router
+  $rootCauseContext = [string](($rootCauseOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
+  if ($rootCauseContext -notmatch 'systematic-debugging' -or $rootCauseContext -notmatch [regex]::Escape((Join-Path $repositoryRoot '.agents\routed-skills\systematic-debugging\SKILL.md'))) {
+    throw "The router did not select the project systematic-debugging Skill for a falsifiable-hypothesis RCA request. Output: $(($rootCauseOutput | Out-String).Trim())"
+  }
+  if ($rootCauseContext -match 'research-gap-finder|creative-workflow-router|context-degradation') {
+    throw "Generic external Skills displaced systematic-debugging for an RCA request. Output: $(($rootCauseOutput | Out-String).Trim())"
+  }
+
+  $failureInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "为什么失败"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
+  $failureOutput = $failureInput | & node $router
+  $failureContext = [string](($failureOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
+  if ($failureContext -notmatch 'systematic-debugging') {
+    throw "The router did not select systematic-debugging for a direct failure question. Output: $(($failureOutput | Out-String).Trim())"
+  }
+
   $gestureInput = @{ hook_event_name = "UserPromptSubmit"; prompt = "Design a draggable bottom sheet with spring physics and interruption"; cwd = $repositoryRoot } | ConvertTo-Json -Compress
   $gestureOutput = $gestureInput | & node $router
   $gestureContext = [string](($gestureOutput | ConvertFrom-Json).hookSpecificOutput.additionalContext)
