@@ -19,6 +19,9 @@ When authorities conflict, the authority closest to the real behavior and with e
 
 ## Implementation flow
 
+For each turn, batch all already-known independent operations into one parallel tool wave (up to 8; normally 5–8 when available). With one shell tool, run them concurrently inside it; do not serialize independent work.
+Before sending an ordinary-task answer, count the complete rendered text (including punctuation, Markdown, URLs, and English) and rewrite it until the total is <=300 characters; preserve the conclusion, decisive evidence/actions, verification status, and material limitations. For search tasks, stop when decision-changing evidence is sufficient and summarize only the strongest sources. Exceed this only when the user explicitly requests detail.
+
 1. Discover: confirm current state, real consumers, and the first information-flow boundary.
 2. Freeze: create a short build brief only for high-impact ambiguity.
 3. Minimal closed loop: complete one runnable end-to-end path first.
