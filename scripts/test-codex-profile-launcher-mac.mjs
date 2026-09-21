@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdtemp, mkdir, readFile, rm } from "node:fs/promises";
+import { access, mkdtemp, mkdir, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPOSITORY_ROOT = path.dirname(SCRIPT_DIR);
 const LAUNCHER = path.join(REPOSITORY_ROOT, "Deploy Codex Profile.app", "Contents", "MacOS", "deploy");
-const COMMAND = path.join(REPOSITORY_ROOT, "Deploy Codex Profile.command");
+const APP = path.join(REPOSITORY_ROOT, "Deploy Codex Profile.app");
 
 function assert(condition, message) { if (!condition) throw new Error(message); }
 function run(args, home) {
@@ -16,6 +16,13 @@ function run(args, home) {
     cwd: REPOSITORY_ROOT,
     encoding: "utf8",
     env: { ...process.env, HOME: home, USERPROFILE: home, CODEX_PROFILE_LAUNCHER_NO_DIALOG: "1" }
+  });
+}
+function runLaunchServices(args) {
+  return spawnSync("/usr/bin/open", ["-W", "-n", APP, "--args", ...args], {
+    cwd: REPOSITORY_ROOT,
+    encoding: "utf8",
+    env: { ...process.env, CODEX_PROFILE_LAUNCHER_NO_DIALOG: "1" }
   });
 }
 
@@ -35,20 +42,21 @@ try {
   const repeat = run(["--repo", REPOSITORY_ROOT, "--home", secondHome, "--no-dialog"], secondHome);
   assert(repeat.status === 0 && repeat.stdout.includes("available to every Codex workspace"), "repeat launcher deployment was not idempotent");
 
-  const commandHome = path.join(root, "command-home");
-  await mkdir(commandHome, { recursive: true });
-  const command = spawnSync(COMMAND, ["--home", commandHome, "--no-dialog"], {
-    cwd: REPOSITORY_ROOT,
-    encoding: "utf8",
-    env: { ...process.env, HOME: commandHome, USERPROFILE: commandHome, CODEX_PROFILE_LAUNCHER_NO_DIALOG: "1" }
-  });
-  assert(command.status === 0 && (await readFile(path.join(commandHome, ".codex", "config.toml"), "utf8")).includes('web_search = "live"'), "command launcher did not deploy the profile");
+  const plist = spawnSync("/usr/bin/plutil", ["-p", path.join(APP, "Contents", "Info.plist")], { encoding: "utf8" });
+  assert(plist.status === 0 && plist.stdout.includes('"public.folder"'), "app is not registered for Finder folders");
+  await access(path.join(APP, "Contents", "MacOS", "deploy"));
+  const launchHome = path.join(root, "launchservices-home");
+  await mkdir(launchHome, { recursive: true });
+  const launched = runLaunchServices(["--repo", REPOSITORY_ROOT, "--home", launchHome, "--no-dialog"]);
+  assert(launched.status === 0 && (await readFile(path.join(launchHome, ".codex", "config.toml"), "utf8")).includes('web_search = "live"'), "Finder LaunchServices invocation did not deploy the profile");
+  const relaunched = runLaunchServices(["--repo", REPOSITORY_ROOT, "--home", launchHome, "--no-dialog"]);
+  assert(relaunched.status === 0, "profile could not be deployed again after the launcher process exited");
 
   const invalid = path.join(root, "not-a-repository");
   await mkdir(invalid, { recursive: true });
   const failure = run([invalid, "--home", path.join(root, "failure-home"), "--no-dialog"], home);
   assert(failure.status !== 0 && (failure.stdout + failure.stderr).includes("不是治理模板仓库"), "invalid folder did not produce actionable failure");
-  console.log("PASS: macOS launcher supports double-click/Folder-open arguments, explicit repository deployment, global scope reporting, idempotent repeat, and actionable invalid-folder failure.");
+  console.log("PASS: Finder folder registration, LaunchServices right-click invocation, relaunch persistence, global scope reporting, idempotent repeat, and actionable invalid-folder failure.");
 } finally {
   await rm(root, { recursive: true, force: true });
 }
