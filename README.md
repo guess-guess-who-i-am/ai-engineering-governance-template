@@ -2,14 +2,14 @@
 
 一个面向 Codex 和其他 Agent Skills 兼容工具的工程治理起点，将常驻规则、领域语义、设计上下文、按需 Skills、确定性门禁和可执行 Flow 分层组织。
 
-最后更新：2026-09-20 晚上
+最后更新：2026-09-21
 
 ## 已包含
 
 - `AGENTS.md`：任务路由、权威顺序和验证预算。
 - `CONTEXT.md`：稳定术语、关系与歧义裁决。
 - `DESIGN.md`：工程工具默认视觉系统。
-- `.agents/skills/`：12 个按需加载且命名统一的专项工作流。
+- `codex-profile/global-skills/`：22 个全局 Skill 的非自动发现版本源；安装后仅由用户级目录加载。
 - `scripts/`：治理、Skills、敏感文件和整体检查。
 - `.kest/flow/`：Markdown-native Flow 示例。
 - `requirements/user-stories/`：带稳定验收条件 ID 和证据映射的用户故事。
@@ -17,7 +17,7 @@
 - `TESTING.md`：功能、契约、E2E、可访问性、性能、安全、供应链和发布证据体系。
 - `UPSTREAMS.md`：第三方研究仓库与更新机制。
 - `.github/`：CI、Issue 和 PR 模板。
-- `codex-profile/`：可迁移的全局 Codex Hook、中文方法论源、英文生成物、推荐器、发布器和自建方法 Skills；不含任何登录态或密钥。
+- `codex-profile/`：仅面向 macOS 的全局 Codex Hook、中文方法论源、英文生成物、推荐器和发布器；安装器还合并实时搜索、Hooks、多 Agent 和20并发默认项，并从唯一 Skill 版本源安装全部22个全局 Skills；不含任何登录态或密钥。
 - `qualitative/`：带正反样例校准的 LLM 定性门禁。
 - `quality/findings.json`：P0–P3 问题、稳定 fingerprint、责任人和生命周期契约。
 - `design/catalog.json`：74 条固定 commit、许可证和来源路径的设计参考。
@@ -43,7 +43,7 @@
 
 ## 跨电脑复用 Codex 全局配置
 
-当前完整工程保存在公开仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是受保护的 `main`。`codex-profile/` 是本机全局 Codex 配置的可迁移版本，另一台 Windows 或 Linux 电脑克隆仓库后即可安装同一套方法论路由、Hook、发布器和自建 Skills。
+当前完整工程保存在公开仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是受保护的 `main`。`codex-profile/` 是本机 macOS 全局 Codex 配置的可迁移版本；安装后 Skill 只从用户级目录加载，不从项目目录加载。
 
 ### 仓库中具体保存了什么
 
@@ -52,9 +52,9 @@
 - 英文运行文件：常驻提醒、完整方法论档案、方法论路由和映射文件；由中文源逐行翻译生成，不用润色摘要代替原文。
 - 每轮 Hook：每次用户提示重新注入英文常驻提醒和方法论路由；会话启动、恢复、清理和压缩时也会恢复这些内容。
 - 稳定 Hook dispatcher：`UserPromptSubmit` 和 `SessionStart` 各只注册一个入口，内部并发执行常驻提醒、Skill 推荐、可选 capability 推荐和索引刷新。以后增加内部路由不会移动 Hook 索引并使已有信任记录错位。
-- Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。除本机约数百个 Skills 外，还会复用 `E:\skills\_catalog_cn.json`，把其中约1.5万个 Skills 编译为持久化行索引；不会递归预读这一万多个正文。
+- Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。索引只扫描用户级 Codex、`~/.agents/skills`、插件和外部 Skill 根，不扫描项目目录。
 - 方法论发布器：保存中文源后自动翻译、备份、生成中英文文件、更新 Skills 和索引；失败时回滚。
-- 6个自建方法 Skills：`manage-global-methodology`、`method-research-evidence`、`method-engineering-execution`、`method-evaluation-gates`、`method-github-delivery`、`method-task-tree`。
+- 22个全局 Skills：6个方法 Skill、12个治理 Skill 和4个任务树 Skill；安装器将它们统一写入 `~/.agents/skills`。仓库版本源位于不会被 Codex 自动发现的 `codex-profile/global-skills`，因此项目目录不会产生同名 Skill。
 - 63条已归类方法论：常驻21条、研究9条、工程12条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
 - 迁移工具：37个受管配置文件，以及安装、同步和安装测试脚本。`codex-profile/README.zh.md` 提供独立说明。
 
@@ -64,64 +64,50 @@
 
 远程 LLM 配置允许模型名留空，由远程网关选择模型；需要时只在目标电脑或 GitHub repository secrets 中设置 `LLM_BASE_URL` 和 `LLM_API_KEY`，不要写入仓库文件。
 
-### 在另一台 Windows 电脑安装
+### 在 macOS 安装
 
-先安装 Git、GitHub CLI、Node.js 和 Codex，然后运行：
+先安装 Git、GitHub CLI、Codex，并确保 Codex 自带 Node.js 可用，然后运行：
 
-```powershell
+```bash
 gh auth login
 gh repo clone guess-guess-who-i-am/ai-engineering-governance-template
 cd ai-engineering-governance-template
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-profile.ps1
+./scripts/deploy-codex-profile-mac.sh
 ```
+
+这一条命令会安装并立即执行漂移检查。配置写入用户级目录，因此同一用户的所有现有和未来 Codex 工作区都会自动使用，不需要在每个项目重复部署。
 
 安装器会：
 
 1. 把目标电脑上即将覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`。
-2. 安装全局 `AGENTS.md`、Hook、中文源、英文生成物、发布器、路由配置和6个自建 Skills。
+2. 安装全局 `AGENTS.md`、非敏感 `config.toml` 默认项、Hook、中文源、英文生成物、发布器、路由配置和22个全局 Skills。
 3. 根据目标电脑的用户目录生成 `hooks.json`，不会沿用原电脑的绝对路径。
-4. 创建“编辑并发布全局 Prompt”和“编辑并发布全局方法论”两个桌面入口。
-5. 校验63条方法论的中英文对应关系并刷新 Skill 索引。
+4. 校验63条方法论的中英文对应关系并刷新 Skill 索引。
 
 安装完成后，在该电脑单独完成 Codex 登录并重新启动 Codex，使全局 `AGENTS.md` 和 Hook 重新加载。完整说明见 [可迁移 Codex 全局配置](codex-profile/README.zh.md)。
 
 修改过 `hooks.json` 的入口命令后，必须在 Codex 中重新批准两个 dispatcher。只看到 `user_prompt_submit:0:0` 的旧信任记录并不代表新命令已受信任；安装器不会复制或伪造 `trusted_hash`。
 
-### 在另一台 Linux 电脑安装
-
-```bash
-git clone https://github.com/guess-guess-who-i-am/ai-engineering-governance-template.git
-cd ai-engineering-governance-template
-./scripts/install-codex-profile-linux.sh
-./scripts/install-codex-profile-linux.sh --check
-```
-
-Linux 安装器保留已有 `~/.codex/AGENTS.md` 的用户内容，生成带目标机绝对 Node 路径的 `hooks.json`，并在写入前创建 manifest 备份。安装、发布器校验或 Hook 验证任一步失败都会自动回滚。真实遇到的 PATH、PowerShell、Hook 信任、网络和并发配置错误见 [Linux 安装与故障排查](docs/CODEX_PROFILE_LINUX.md)。
-
-若外部 Skills 不在默认的 `E:\skills`，可在该电脑设置 `CODEX_EXTERNAL_SKILL_ROOT` 和 `CODEX_EXTERNAL_SKILL_CATALOG`。生成的 `external-skills.tsv` 与 manifest 只保存在 `~/.codex/skill-registry/`，不提交第三方 Skill 正文；源目录发生变化时才重建，普通会话启动只检查目录元数据。
-
 ### 其他项目如何使用
 
-安装完成后，这套用户级配置会被同一台电脑上的其他 Codex 项目共同使用；每个项目仍可通过最近的项目级 `AGENTS.md`、`CONTEXT.md`、`DESIGN.md` 和项目 Skills 增加自己的规则。
+安装完成后，这套用户级配置会被同一台电脑上的其他 Codex 项目共同使用。项目级 `AGENTS.md`、`CONTEXT.md` 和 `DESIGN.md` 仍可提供项目语义，但 Skill 统一从全局目录加载，项目 Skill 不会被注册表扫描。
 
 `gh auth login` 只代表该电脑上的 GitHub CLI 已登录当前账号，不代表 Agent 可以在没有任务授权时任意创建仓库。用户明确要求创建或发布项目，或项目既定工作流明确要求交付时，`method-github-delivery` 才执行 commit、push 或创建私有仓库。新项目可使用 `$start-new-project` 或 `./scripts/new-project.ps1` 创建。
 
 ### 以后修改方法论并同步到 GitHub
 
-1. 使用桌面的“编辑并发布全局 Prompt”修改中文唯一源并保存。
+1. 通过 `$manage-global-methodology` 修改中文唯一源并发布。
 2. 等待发布器完成翻译、备份、生成、索引更新和完整性校验。
 3. 在本仓库运行：
 
-```powershell
-./scripts/sync-codex-profile.ps1
-./scripts/sync-codex-profile.ps1 -Check
-./scripts/test-codex-profile.ps1
-./scripts/check.ps1
+```bash
+./scripts/deploy-codex-profile-mac.sh
+./scripts/test-codex-profile-mac.sh
 ```
 
 4. 检查 diff 和秘密扫描结果，再通过 PR 合并到受保护的公开 `main`。另一台电脑之后拉取最新 `main` 并重新运行安装脚本即可更新。
 
-安装测试已经覆盖：仓库快照哈希一致、缺少源文件时拒绝发布、全新用户目录安装、旧配置备份、目标用户名路径生成、6个 Skills 安装和路由输入。完整仓库还通过秘密扫描、本地 PR 质量门禁和 GitHub CI。
+安装测试覆盖：一键部署、全新用户目录安装、旧配置备份、非敏感配置合并、macOS Node 路径生成、22个全局 Skills 安装、全局-only 注册表、系统/任务树路由输入、20路并发和失败回滚。完整仓库门禁由 macOS GitHub Actions 执行。
 
 创建下游项目时，首先修改 `CONTEXT.md` 和 `DESIGN.md`，再用 `$establish-test-strategy` 把 `quality/gates.json` 中的 `planned` 门禁替换为真实命令。PR 检查允许尚在建设中的明确计划；发布检查会拒绝任何仍未配置的必需门禁。
 

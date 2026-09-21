@@ -100,7 +100,7 @@ try {
     }
 
     $includedRoots = @(
-        '.agents', '.github', '.kest', 'design', 'docs', 'qualitative', 'quality',
+        '.github', '.kest', 'design', 'docs', 'qualitative', 'quality',
         'requirements', 'scripts', 'site',
         '.gitignore', 'AGENTS.md', 'CONTEXT.md', 'DESIGN.md', 'LICENSE',
         'README.md', 'TESTING.md', 'UPSTREAMS.md', 'WORKFLOW.md',
@@ -119,6 +119,9 @@ try {
             }
         }
         if (-not $include) { continue }
+        if ($normalized -match '^scripts/(deploy|install|test)-(codex-profile|task-tree-mcp)-mac\.(mjs|sh)$') {
+            continue
+        }
         if (-not $IncludeQualitativeGate -and $normalized -eq '.github/workflows/qualitative-gate.yml') {
             continue
         }
@@ -136,6 +139,44 @@ finally {
         Remove-Item -LiteralPath $resolvedTemp -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
+
+$projectGovernance = @'
+name: governance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: governance-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          persist-credentials: false
+      - name: Run PR quality profile
+        shell: pwsh
+        run: ./scripts/check.ps1
+      - name: Upload quality evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: pr-quality-${{ github.sha }}
+          path: .reports/quality/pr.json
+          if-no-files-found: error
+          retention-days: 14
+'@
+Set-Content -LiteralPath (Join-Path $destinationPath '.github/workflows/governance.yml') -Value $projectGovernance -Encoding utf8
 
 $brief = @"
 # Project Brief
@@ -204,7 +245,7 @@ This repository implements **$DisplayName** for **$Audience**.
 3. Read CONTEXT.md for domain terms, ownership, and boundaries.
 4. Read DESIGN.md only for user-interface work.
 5. Read TESTING.md and the relevant user story when changing product behavior or test coverage.
-6. Load one matching Skill from .agents/skills only when its description clearly applies.
+6. Load one matching Skill from the user-level global registry only when its description clearly applies.
 7. Put mechanically decidable rules in tests, scripts, schemas, or contracts.
 
 ## Implementation Flow
@@ -242,6 +283,13 @@ Run repository checks with: ./scripts/check.ps1
 Run release readiness with: ./scripts/invoke-quality-gates.ps1 -Profile release
 "@
 Set-Content -LiteralPath (Join-Path $destinationPath 'README.md') -Value $readme -Encoding utf8
+
+$packagePath = Join-Path $destinationPath 'package.json'
+$package = Get-Content -LiteralPath $packagePath -Raw | ConvertFrom-Json -Depth 20
+foreach ($scriptName in @('deploy:codex-profile:mac', 'test:codex-profile:mac', 'check:codex-profile:mac')) {
+    $package.scripts.PSObject.Properties.Remove($scriptName)
+}
+$package | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $packagePath -Encoding utf8
 
 $storyRoot = Join-Path $destinationPath 'requirements/user-stories'
 Get-ChildItem -LiteralPath $storyRoot -File -Filter 'US-*.md' |

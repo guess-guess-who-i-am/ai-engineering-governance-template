@@ -2,21 +2,21 @@
 
 > 这个文件是大模型和前端共同维护的任务图。每个项目一棵独立的树。
 
-## ROOT - <填写你的项目目标>
+## ROOT - macOS 全局 Codex 治理配置
 
 - Position: 120,120
 - Size: 400,520
 - Completion: 已完成
-- Problem: 如何让用户通过 Codex 逐项填写项目资料，并一键生成独立私有 GitHub 项目？
-- Approach: 先生成简短项目 brief，再用确定性脚本复制最小治理骨架、初始化 Git，并可选创建私有 GitHub 仓库；模型只负责澄清，不直接处理密钥。
-- Input: 当前治理模板、GitHub CLI 登录状态、用户的项目想法。
-- Output: 可执行的新项目向导、项目 brief、私有仓库初始化结果。
-- Metrics: 向导可重复运行；缺少必填信息时停止；新目录可通过基础检查；GitHub 创建失败不丢失本地项目。
-- Notes: 第一次使用时，请让 Agent 拆成 3-7 个节点；节点不写代码、原始数据或复杂英文术语。
-- CurrentResult: 完整工程仍已在私有 main；根 README 现已补齐配置组成、55条归类、6个自建方法 Skills、凭据边界、跨电脑安装、其他项目继承和后续同步流程。文件计数、方法论解析、文档、治理与秘密扫描均通过，“完整说明写入 README”目标已达到。
-- RootCauseAnalysis: 生成器必须从已提交模板导出，才能隔离母仓库未提交内容；定性 LLM 门禁默认排除，避免缺少新仓库 Secrets 时首推失败。
+- Problem: 如何把仓库治理配置安装成 macOS 全局 Codex 行为，并让并发、Hook、路由和全部 Skill 真正可用？
+- Approach: 用一键脚本安装并检查 macOS 用户级配置；22 个 Skill 由唯一版本源发布到全局目录；用临时用户目录和真实用户目录共同验证路由、并发、信任与回滚。
+- Input: 仓库中的 macOS profile、用户 Codex 目录和现有非敏感配置。
+- Output: `/Users/pku1727/.codex` 与 `/Users/pku1727/.agents/skills` 中的可运行全局配置。
+- Metrics: 一键部署后 `--check` 无漂移；63 条规则零重复；22 个 Skill 可发现；项目来源为 0；20 路调用重叠；macOS CI 通过。
+- Notes: 只支持 macOS；22 个 Skill 统一安装到用户级目录，项目 Skill 源不参与运行时注册。Hook 信任由 Codex 交互式审核记录，不能由安装器伪造。
+- CurrentResult: 0.3.0 一键部署已在真实用户目录完成，随后检查为零漂移；临时安装验证22个全局 Skill、63条规则、20路并发、路由和回滚均通过。GitHub提交与macOS CI尚待完成，因此本轮交付目标尚未完全达到。
+- RootCauseAnalysis: 原实现分散维护多平台入口和重复 Skill 源，导致部署边界、验证对象与实际运行来源不一致；当前收敛为 macOS 全局部署和唯一 Skill 版本源。
 - CaseStudy:
-- NextIdea: 在另一台 Windows 电脑克隆私有仓库并运行安装脚本，再分别登录 GitHub 与 Codex。
+- NextIdea: 提交并推送0.3.0分支，确认远端macOS CI通过后完成交付。
 - SelectedSkills:
 
 # GraphState

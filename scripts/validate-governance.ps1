@@ -18,7 +18,7 @@ $required = @(
     'upstreams.lock.json',
     'docs/RELEASING.md',
     'docs/AGENT_PLATFORM_BOUNDARY.md',
-    '.agents/skills/README.md',
+    'codex-profile/global-skills/README.md',
     'design/catalog.json',
     'site/index.html',
     'quality/gates.json',
@@ -35,7 +35,7 @@ if ($missing.Count -gt 0) {
 }
 
 $agents = Get-Content -LiteralPath (Join-Path $Root 'AGENTS.md') -Raw
-foreach ($authority in @('CONTEXT.md', 'DESIGN.md', '.agents/skills')) {
+foreach ($authority in @('CONTEXT.md', 'DESIGN.md', 'codex-profile/global-skills')) {
     if ($agents -notmatch [regex]::Escape($authority)) {
         throw "AGENTS.md does not route to $authority"
     }

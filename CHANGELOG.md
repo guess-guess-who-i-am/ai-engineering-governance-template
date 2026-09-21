@@ -4,6 +4,19 @@
 
 ## Unreleased
 
+## 0.3.0 - 2026-09-21
+
+### Added
+
+- macOS 一键全局部署入口，安装后同一用户的全部 Codex 工作区共享配置。
+- macOS 安装、漂移检查、22 个全局 Skills、路由、20 路并发和回滚的端到端测试。
+
+### Changed
+
+- Codex profile 收敛为 macOS 版本，CI 在 macOS runner 验证，不再发布 Windows 或 Linux 安装器。
+- 22 个 Skills 统一以非自动发现的 `codex-profile/global-skills` 为版本源，运行时只安装到 `~/.agents/skills`。
+- 新项目不再复制项目级 Skills 或全局 profile 部署脚本。
+
 ## 0.2.0 - 2026-08-16
 
 ### Added

@@ -1,11 +1,12 @@
 {
   "name": "ai-engineering-governance-template",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
+    "deploy:codex-profile:mac": "./scripts/deploy-codex-profile-mac.sh",
     "test:site": "node scripts/test-docs-site.mjs",
-    "test:codex-profile:linux": "node scripts/test-codex-profile-linux.mjs",
-    "check:codex-profile:linux": "node scripts/install-codex-profile-linux.mjs --check"
+    "test:codex-profile:mac": "node scripts/test-codex-profile-mac.mjs",
+    "check:codex-profile:mac": "./scripts/deploy-codex-profile-mac.sh --check"
   },
   "devDependencies": {
     "axe-core": "4.10.3",

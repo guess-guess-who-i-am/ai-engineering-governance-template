@@ -93,6 +93,7 @@ try {
     process.exit(0);
   }
   const codexRoot = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
+  const testing = Boolean(testHandlers());
   const handlers = testHandlers() || defaultHandlers(eventName, codexRoot);
   const results = await Promise.all(handlers.map((handler) => runHandler(handler, raw)));
   for (const result of results) {
@@ -100,6 +101,7 @@ try {
       process.stderr.write(`Hook dispatcher child ${result.file}: ${result.error || result.stderr.trim()}\n`);
     }
   }
+  if (testing && results.some((result) => result.error)) process.exitCode = 1;
   const contexts = results.map((result) => result.context.trim()).filter(Boolean);
   if (!contexts.length) process.stdout.write("{}");
   else process.stdout.write(JSON.stringify({
@@ -108,4 +110,5 @@ try {
 } catch (error) {
   process.stderr.write(`Hook dispatcher skipped: ${error.message}\n`);
   process.stdout.write("{}");
+  if (process.env.CODEX_HOOK_DISPATCH_TEST_MODE === "1") process.exitCode = 1;
 }
