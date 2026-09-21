@@ -75,6 +75,8 @@ cd ai-engineering-governance-template
 ./scripts/deploy-codex-profile-mac.sh
 ```
 
+不想打开终端时，直接双击仓库里的 `Deploy Codex Profile.app`（或 `Deploy Codex Profile.command`）。也可以在 Finder 中右键仓库文件夹，选择“打开方式 → Deploy Codex Profile”；应用会自动识别该文件夹、弹出成功/失败提示，并把配置部署到当前用户目录。部署一次后，该用户的所有 Codex 工作区都会使用同一份全局配置。
+
 这一条命令会安装并立即执行漂移检查。配置写入用户级目录，因此同一用户的所有现有和未来 Codex 工作区都会自动使用，不需要在每个项目重复部署。
 
 安装器会：
@@ -108,6 +110,8 @@ cd ai-engineering-governance-template
 4. 检查 diff 和秘密扫描结果，再通过 PR 合并到受保护的公开 `main`。另一台电脑之后拉取最新 `main` 并重新运行安装脚本即可更新。
 
 安装测试覆盖：一键部署、全新用户目录安装、旧配置备份、非敏感配置合并、macOS Node 路径生成、22个全局 Skills 安装、全局-only 注册表、系统/任务树路由输入、20路并发和失败回滚。完整仓库门禁由 macOS GitHub Actions 执行。
+
+图形入口也有独立 macOS 测试，覆盖双击/ Finder 文件夹参数、`.command` 入口、显式仓库路径、重复部署幂等和非仓库目录的可理解失败提示：`npm run test:codex-profile-launcher:mac`。
 
 创建下游项目时，首先修改 `CONTEXT.md` 和 `DESIGN.md`，再用 `$establish-test-strategy` 把 `quality/gates.json` 中的 `planned` 门禁替换为真实命令。PR 检查允许尚在建设中的明确计划；发布检查会拒绝任何仍未配置的必需门禁。
 

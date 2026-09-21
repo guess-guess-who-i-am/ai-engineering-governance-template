@@ -11,6 +11,15 @@ cd ai-engineering-governance-template
 ./scripts/deploy-codex-profile-mac.sh
 ```
 
+### 不打开终端：双击或 Finder 右键
+
+仓库根目录提供两个 macOS 入口：
+
+- 双击 `Deploy Codex Profile.app`，或双击 `Deploy Codex Profile.command`。
+- 在 Finder 里右键仓库文件夹，选择“打开方式 → Deploy Codex Profile”。应用会把打开的文件夹当作仓库，自动运行部署、检查，并用 macOS 对话框报告结果。
+
+这只是用户入口，底层仍调用同一份可审计、可回滚的部署逻辑；部署目标仍是当前用户的 `~/.codex` 和 `~/.agents/skills`，因此一次操作即可覆盖所有工作区。仓库不需要安装 Windows 安装器，也不会把配置写进项目目录。
+
 部署脚本安装后立即做完整漂移检查。配置位于 `~/.codex` 和 `~/.agents/skills`，所以同一用户的所有工作区一次部署即可共享。
 
 安装器会先比较目标文件，只处理有变化的文件；随后在 `~/.codex/backups/portable-profile/<时间戳>/` 保存旧文件和 `manifest.json`。任一步校验失败都会自动恢复安装前内容。
@@ -25,6 +34,8 @@ cd ai-engineering-governance-template
 ./scripts/test-codex-profile-mac.sh
 ./scripts/install-codex-profile-mac.sh --check
 ```
+
+若偏好 npm 入口，图形启动器测试命令为 `npm run test:codex-profile-launcher:mac`；它会验证双击/Finder 文件夹参数、`.command` 入口、全局范围提示、重复部署和无效目录错误。
 
 `--check` 会比较所有受管文件，运行63条方法论完整性校验、刷新 Skill 索引，并真实调用上下文 Hook 检查自动并发契约。
 

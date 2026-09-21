@@ -6,6 +6,7 @@
     "deploy:codex-profile:mac": "./scripts/deploy-codex-profile-mac.sh",
     "test:site": "node scripts/test-docs-site.mjs",
     "test:codex-profile:mac": "node scripts/test-codex-profile-mac.mjs",
+    "test:codex-profile-launcher:mac": "./scripts/test-codex-profile-launcher-mac.sh",
     "check:codex-profile:mac": "./scripts/deploy-codex-profile-mac.sh --check"
   },
   "devDependencies": {

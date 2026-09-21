@@ -13,10 +13,10 @@
 - Output: `/Users/pku1727/.codex` 与 `/Users/pku1727/.agents/skills` 中的可运行全局配置。
 - Metrics: 一键部署后 `--check` 无漂移；63 条规则零重复；22 个 Skill 可发现；项目来源为 0；20 路调用重叠；macOS CI 通过。
 - Notes: 只支持 macOS；22 个 Skill 统一安装到用户级目录，项目 Skill 源不参与运行时注册。Hook 信任由 Codex 交互式审核记录，不能由安装器伪造。
-- CurrentResult: 0.3.0 全局部署已在真实用户目录完成并通过零漂移检查；临时安装验证22个全局 Skill、63条规则、20路并发、路由和回滚均通过。仓库新增可双击的 macOS 应用与 `.command` 入口，Finder/LaunchServices、重复部署和无效目录测试均通过。
+- CurrentResult: 0.3.0 一键部署已在真实用户目录完成，随后检查为零漂移；临时安装验证22个全局 Skill、63条规则、20路并发、路由和回滚均通过。GitHub提交与macOS CI尚待完成，因此本轮交付目标尚未完全达到。
 - RootCauseAnalysis: 原实现分散维护多平台入口和重复 Skill 源，导致部署边界、验证对象与实际运行来源不一致；当前收敛为 macOS 全局部署和唯一 Skill 版本源。
 - CaseStudy:
-- NextIdea: 提交并推送图形入口版本，确认远端 macOS CI 通过后完成交付。
+- NextIdea: 提交并推送0.3.0分支，确认远端macOS CI通过后完成交付。
 - SelectedSkills:
 
 # GraphState

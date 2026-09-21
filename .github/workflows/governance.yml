@@ -28,6 +28,8 @@ jobs:
           cache: npm
       - name: Test macOS global Codex profile
         run: ./scripts/test-codex-profile-mac.sh
+      - name: Test macOS click launcher
+        run: ./scripts/test-codex-profile-launcher-mac.sh
 
   validate:
     runs-on: macos-15
