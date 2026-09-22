@@ -13,9 +13,9 @@ cd ai-engineering-governance-template
 
 ### 不打开终端：Finder 右键
 
-在 Finder 里右键仓库文件夹，选择“打开方式 → Deploy Codex Profile”。应用会把打开的文件夹当作仓库，自动运行部署、检查，并用 macOS 对话框报告结果。
+在 Finder 里右键任意工作区文件夹，在“快速操作”子菜单中直接选择“部署 Codex 全局配置”。服务调用首次部署时固化到用户 `~/.codex/tools` 的稳定源，自动运行部署、检查，并发送 macOS 通知报告结果；被选中的文件夹不需要包含本仓库脚本。
 
-这是唯一用户入口，底层仍调用同一份可审计、可回滚的部署逻辑；应用通过 `CFBundleDocumentTypes` 注册文件夹类型，LaunchServices 会保留该“打开方式”关联，重启后仍可从 Finder 使用。部署目标仍是当前用户的 `~/.codex` 和 `~/.agents/skills`，因此一次操作即可覆盖所有工作区。仓库不需要安装 Windows 安装器，也不会把配置写进项目目录。
+这是唯一用户入口，底层仍调用同一份可审计、可回滚的部署逻辑；Quick Action 元数据限定 Finder 文件夹输入，服务安装在 `~/Library/Services`，因此重启后仍会出现在 Finder 右键菜单。部署源和 task-tree 运行时同时固化在 `~/.codex/tools`，不依赖原仓库路径或再次联网。部署目标仍是当前用户的 `~/.codex` 和 `~/.agents/skills`，因此一次操作即可覆盖所有工作区。仓库不需要安装 Windows 安装器，也不会把配置写进项目目录。
 
 部署脚本安装后立即做完整漂移检查。配置位于 `~/.codex` 和 `~/.agents/skills`，所以同一用户的所有工作区一次部署即可共享。
 
@@ -32,7 +32,7 @@ cd ai-engineering-governance-template
 ./scripts/install-codex-profile-mac.sh --check
 ```
 
-若偏好 npm 入口，Finder 右键入口测试命令为 `npm run test:codex-profile-launcher:mac`；它会验证文件夹类型注册、LaunchServices 启动、进程重启后的再次部署、全局范围提示、重复部署和无效目录错误。
+安装测试由 `./scripts/test-codex-profile-mac.sh` 覆盖；它会验证 Quick Action 服务包、Finder 文件夹输入元数据、全局范围、任意工作区部署、重复部署和服务检查。
 
 `--check` 会比较所有受管文件，运行63条方法论完整性校验、刷新 Skill 索引，并真实调用上下文 Hook 检查自动并发契约。
 

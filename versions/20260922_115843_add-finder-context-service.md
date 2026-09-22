@@ -13,14 +13,14 @@
 - Output: `/Users/pku1727/.codex` 与 `/Users/pku1727/.agents/skills` 中的可运行全局配置。
 - Metrics: 一键部署后 `--check` 无漂移；63 条规则零重复；22 个 Skill 可发现；项目来源为 0；20 路调用重叠；macOS CI 通过。
 - Notes: 只支持 macOS；22 个 Skill 统一安装到用户级目录，项目 Skill 源不参与运行时注册。Hook 信任由 Codex 交互式审核记录，不能由安装器伪造。
-- CurrentResult: Finder 右键“快速操作 → 部署 Codex 全局配置”已在任意工作区真实执行并更新用户级配置；部署源与 task-tree 运行时已固化到用户工具目录，重复执行不依赖原仓库路径或网络。重启 Finder 后菜单仍出现，临时目录与真实用户目录的全局配置、22 个 Skill、63 条规则、20 路并发、Hook、路由、MCP、回滚和幂等测试均通过。
-- RootCauseAnalysis: 原服务把被右键选中的目录当作治理仓库，导致普通工作区点击后找不到部署脚本；同时稳定副本未携带 task-tree 运行时，重复部署会退回联网查找。现在服务忽略选中目录，调用用户级稳定源并固化运行时。
+- CurrentResult: 0.3.0 全局部署已在真实用户目录完成并通过零漂移检查；临时安装验证22个全局 Skill、63条规则、20路并发、路由和回滚均通过。当前仅保留 Finder 右键“打开方式”入口，文件夹注册、LaunchServices 再次启动、重复部署和无效目录测试均通过。
+- RootCauseAnalysis: 原实现同时暴露多个手动入口，增加了用户选择和文档维护成本；当前收敛为 Finder 文件夹关联加用户级配置，入口和运行时边界一致。
 - CaseStudy:
-- NextIdea: 完成仓库级校验后提交并推送 macOS Finder 右键部署版本，记录远端 CI 结果。
+- NextIdea: 提交并推送 Finder 右键入口版本，确认远端 macOS CI 通过后完成交付。
 - SelectedSkills:
 
 # GraphState
-- ChainForceNext: 
+- ChainForceNext:
 
 - Current: ROOT
 - Next: ROOT

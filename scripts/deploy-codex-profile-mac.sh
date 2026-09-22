@@ -18,8 +18,10 @@ else
   exit 1
 fi
 "$node_bin" "$script_dir/install-task-tree-mcp-mac.mjs" "$@"
+"$script_dir/install-codex-profile-service-mac.sh" "$@"
 "$script_dir/install-codex-profile-mac.sh" "$@" --check
 "$node_bin" "$script_dir/install-task-tree-mcp-mac.mjs" "$@" --check
+"$script_dir/install-codex-profile-service-mac.sh" "$@" --check
 
 printf '%s\n' "Global Codex profile deployment passed and is available to every Codex workspace for this user."
 printf '%s\n' "Restart Codex if this installation changed Hooks or AGENTS.md."

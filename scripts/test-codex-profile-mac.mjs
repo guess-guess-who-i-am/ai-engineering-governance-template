@@ -173,6 +173,19 @@ try {
   assert(deployedRegistry.skills.filter((skill) => skill.source === "agents").length === expectedSkills.length, "one-click deployment did not register all global Skills");
   const deployedConfig = await readFile(path.join(deployHome, ".codex", "config.toml"), "utf8");
   assert(deployedConfig.includes("[mcp_servers.task_tree]") && deployedConfig.includes("enable_mcp_apps = true"), "one-click deployment did not register the global task_tree MCP app");
+  const stagedSource = path.join(deployHome, ".codex", "tools", "ai-engineering-governance-template");
+  const serviceRunner = path.join(stagedSource, "scripts", "run-codex-profile-service-mac.sh");
+  assert(await readFile(serviceRunner, "utf8").then((text) => text.includes("deploy-codex-profile-mac.sh") && text.includes("CODEX_PROFILE_SOURCE")), "one-click deployment did not stage a stable global service runner");
+  const serviceWorkflow = path.join(deployHome, "Library", "Services", "部署 Codex 全局配置.workflow");
+  const workflow = await readFile(path.join(serviceWorkflow, "Contents", "document.wflow"), "utf8");
+  assert(workflow.includes("workflowTypeIdentifier") && workflow.includes("com.apple.Automator.servicesMenu") && workflow.includes("serviceInputTypeIdentifier") && workflow.includes("run-codex-profile-service-mac.sh"), "one-click deployment did not install the Finder Quick Action");
+  assert(!workflow.includes("Please select one governance repository folder") && !workflow.includes("$repo/scripts/deploy-codex-profile-mac.sh"), "Finder Quick Action still depends on the selected folder being the governance repository");
+  const arbitraryWorkspace = path.join(root, "arbitrary-workspace");
+  await mkdir(arbitraryWorkspace, { recursive: true });
+  const arbitraryDeploy = runShell(serviceRunner, [arbitraryWorkspace], { home: deployHome });
+  assert(arbitraryDeploy.status === 0, `Finder Quick Action runner failed for an arbitrary workspace: ${arbitraryDeploy.stderr || arbitraryDeploy.stdout}`);
+  const serviceCheck = runShell(path.join(stagedSource, "scripts", "install-codex-profile-service-mac.sh"), ["--home", deployHome, "--check"], { home: deployHome });
+  assert(serviceCheck.status === 0, `staged Finder Quick Action check failed: ${serviceCheck.stderr || serviceCheck.stdout}`);
 
   const reinstall = run(INSTALLER, ["--home", home, "--json"], { home });
   assert(reinstall.status === 0, `repeat install failed: ${reinstall.stderr || reinstall.stdout}`);
