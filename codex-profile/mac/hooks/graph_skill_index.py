@@ -72,7 +72,7 @@ def load_skills(root: Path, catalog: Path):
     return records, missing, invalid
 
 
-def graph_from_records(records):
+def graph_from_records(records, mcp_records=None):
     graph = ToolGraph()
     mcp_tools = [{
         "name": record["tool_name"],
@@ -93,13 +93,30 @@ def graph_from_records(records):
             category_name = f"skills:{label}"
             graph.add_category(category_name)
             graph.assign_category(record["tool_name"], category_name)
+    for record in mcp_records or []:
+        tool_name = record.get("tool_name")
+        if not tool_name:
+            continue
+        graph.ingest_mcp_tools([{
+            "name": tool_name,
+            "description": record.get("description", ""),
+            "inputSchema": record.get("inputSchema", {"type": "object"}),
+            "annotations": record.get("annotations", {})
+        }], server_name=record.get("server", "global-mcp"), detect_dependencies=False)
+        node = graph.tools.get(tool_name)
+        if node is not None:
+            node.metadata.update({"kind": "mcp", "mcp_server": record.get("server", ""), "mcp_original_name": record.get("name", tool_name)})
     return graph
 
 
 def build(args):
     root, catalog, output = Path(args.root), Path(args.catalog), Path(args.output)
     records, missing, invalid = load_skills(root, catalog)
-    graph = graph_from_records(records)
+    mcp_records = []
+    if args.mcp_catalog and Path(args.mcp_catalog).is_file():
+        data = json.loads(Path(args.mcp_catalog).read_text(encoding="utf-8"))
+        mcp_records = data.get("tools", []) if isinstance(data, dict) else []
+    graph = graph_from_records(records, mcp_records)
     embedding = "disabled"
     if args.embedding:
         graph.enable_embedding("sentence-transformers/all-MiniLM-L6-v2")
@@ -123,6 +140,7 @@ def build(args):
         "catalogSha256": digest.hexdigest(),
         "catalogSkillCount": len(records) + missing + invalid,
         "skillCount": len(records),
+        "mcpToolCount": len(mcp_records),
         "missingSkillCount": missing,
         "invalidSkillCount": invalid,
         "graphPath": str(output),
@@ -143,7 +161,7 @@ def retrieve(args):
         tool = result.tool
         metadata = tool.metadata or {}
         output.append({
-            "name": metadata.get("skill_name", tool.name),
+            "name": metadata.get("skill_name", metadata.get("mcp_original_name", tool.name)),
             "description": tool.description,
             "path": metadata.get("skill_path", ""),
             "score": result.score,
@@ -151,6 +169,8 @@ def retrieve(args):
             "keyword_score": result.keyword_score,
             "graph_score": result.graph_score,
             "embedding_score": result.embedding_score,
+            "kind": metadata.get("kind", "skill"),
+            "mcp_server": metadata.get("mcp_server", ""),
         })
     print(json.dumps(output, ensure_ascii=False))
 
@@ -163,6 +183,7 @@ def main():
     build_parser.add_argument("--catalog", required=True)
     build_parser.add_argument("--output", required=True)
     build_parser.add_argument("--embedding", action="store_true")
+    build_parser.add_argument("--mcp-catalog")
     build_parser.set_defaults(func=build)
     retrieve_parser = subparsers.add_parser("retrieve")
     retrieve_parser.add_argument("--graph", required=True)

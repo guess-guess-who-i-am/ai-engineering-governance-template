@@ -46,11 +46,60 @@ async function externalCatalogPaths(home, codexRoot) {
   const graphManifest = path.join(codexRoot, "skill-registry", "skills.graph.manifest.json");
   const graphIndexer = path.join(codexRoot, "hooks", "graph_skill_index.py");
   const graphPython = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexRoot, "tools", "graph-tool-call-venv", "bin", "python");
-  return { root, catalog, graphIndex, graphManifest, graphIndexer, graphPython };
+  const mcpCatalog = path.join(codexRoot, "skill-registry", "mcp-tools.json");
+  return { root, catalog, graphIndex, graphManifest, graphIndexer, graphPython, mcpCatalog };
+}
+
+function parseMcpServers(text) {
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
+  const servers = [];
+  let current = null;
+  for (const line of lines) {
+    const section = line.match(/^\s*\[mcp_servers\.([^\]]+)\]\s*$/);
+    if (section) { current = { name: section[1], command: "", args: [], env: {} }; servers.push(current); continue; }
+    if (!current) continue;
+    const command = line.match(/^\s*command\s*=\s*["'](.*)["']\s*$/);
+    if (command) current.command = command[1];
+    const args = line.match(/^\s*args\s*=\s*\[(.*)\]\s*$/);
+    if (args) current.args = [...args[1].matchAll(/["']([^"']*)["']/g)].map((m) => m[1]);
+  }
+  return servers.filter((server) => server.command);
+}
+
+async function listMcpTools(codexRoot, outputPath) {
+  const configPath = path.join(codexRoot, "config.toml");
+  let text;
+  try { text = await readFile(configPath, "utf8"); } catch { return { tools: [] }; }
+  const tools = [];
+  for (const server of parseMcpServers(text)) {
+    const payload = [
+      { jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "codex-global-indexer", version: "1" } } },
+      { jsonrpc: "2.0", id: 2, method: "tools/list", params: {} }
+    ].map(JSON.stringify).join("\n") + "\n";
+    const result = await new Promise((resolve) => {
+      const child = spawn(server.command, server.args, { env: process.env, stdio: ["pipe", "pipe", "pipe"] });
+      let stdout = ""; const timer = setTimeout(() => { child.kill(); resolve({ code: -1, stdout }); }, 20000);
+      child.stdout.on("data", (chunk) => { stdout += chunk.toString("utf8"); });
+      child.on("error", () => { clearTimeout(timer); resolve({ code: -1, stdout }); });
+      child.on("close", (code) => { clearTimeout(timer); resolve({ code, stdout }); });
+      child.stdin.end(payload);
+    });
+    for (const line of String(result.stdout || "").split(/\r?\n/)) {
+      try {
+        const response = JSON.parse(line);
+        if (response.id !== 2) continue;
+        for (const tool of response.result?.tools || []) tools.push({ ...tool, name: tool.name, tool_name: `mcp_${server.name}_${tool.name}`, server: server.name });
+      } catch { /* Ignore non-JSON server logs. */ }
+    }
+  }
+  const data = { schemaVersion: "codex-mcp-tool-catalog/1", generatedAt: new Date().toISOString(), tools };
+  await mkdir(path.dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, `${JSON.stringify(data, null, 2)}\n`, { mode: 0o600 });
+  return data;
 }
 
 async function refreshExternalIndex(home, codexRoot) {
-  const { root, catalog, graphIndex, graphManifest, graphIndexer, graphPython } = await externalCatalogPaths(home, codexRoot);
+  const { root, catalog, graphIndex, graphManifest, graphIndexer, graphPython, mcpCatalog } = await externalCatalogPaths(home, codexRoot);
   if (!await exists(root) || !await exists(catalog)) return null;
 
   if (!await exists(graphPython) || !await exists(graphIndexer)) {
@@ -66,16 +115,18 @@ async function refreshExternalIndex(home, codexRoot) {
     stream.once("end", () => resolve(hash.digest("hex")));
   });
   const manifestPath = path.join(codexRoot, "skill-registry", "external-skills-manifest.json");
+  let mcpCatalogData = null;
+  try { mcpCatalogData = await listMcpTools(codexRoot, mcpCatalog); } catch { mcpCatalogData = { tools: [] }; }
   try {
     const current = JSON.parse(await readFile(manifestPath, "utf8"));
     if (current.schemaVersion === "graph-tool-call-skills/1" && current.catalogPath === catalog &&
         current.rootPath === root && current.catalogLength === sourceStat.size &&
         current.catalogMtimeMs === sourceStat.mtimeMs && current.catalogSha256 === sourceHash && current.embedding === "sentence-transformers/all-MiniLM-L6-v2" &&
-        current.graphPath === graphIndex && await exists(graphIndex)) return current;
+        current.graphPath === graphIndex && current.mcpToolCount === (mcpCatalogData.tools || []).length && await exists(graphIndex) && await exists(mcpCatalog)) return current;
   } catch { /* Rebuild a missing or stale index. */ }
 
   await mkdir(path.dirname(graphIndex), { recursive: true });
-  const args = [graphIndexer, "build", "--root", root, "--catalog", catalog, "--output", graphIndex, "--embedding"];
+  const args = [graphIndexer, "build", "--root", root, "--catalog", catalog, "--output", graphIndex, "--mcp-catalog", mcpCatalog, "--embedding"];
   const child = spawn(graphPython, args, { windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
   let stdout = "";
   let stderr = "";

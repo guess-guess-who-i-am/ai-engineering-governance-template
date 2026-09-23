@@ -70,7 +70,7 @@ function graphCandidates(graphPath, query, pythonPath, indexerPath, excludedName
       if (Number(code) !== 0) return resolve([]);
       try {
         const results = JSON.parse(stdout.trim() || "[]");
-        resolve(results.filter((item) => item?.path && existsSync(item.path) && !excludedNames.has(String(item.name).toLocaleLowerCase()))
+        resolve(results.filter((item) => (item?.kind === "mcp" || (item?.path && existsSync(item.path))) && !excludedNames.has(String(item.name).toLocaleLowerCase()))
           .map((item) => ({ skill: {
             id: `external:${String(item.name).toLocaleLowerCase()}`,
             name: item.name,
@@ -78,8 +78,10 @@ function graphCandidates(graphPath, query, pythonPath, indexerPath, excludedName
             keywords: [],
             path: item.path,
             source: "graph-tool-call",
-            rank: 100
-          }, score: Math.round(Number(item.score || 0) * 1000), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] })));
+            rank: 100,
+            kind: item.kind || "skill",
+            mcpServer: item.mcp_server || ""
+          }, score: Math.round(Number(item.score || 0) * 1000) + (item.kind === "mcp" ? 1000 : 0), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] })));
       } catch { resolve([]); }
     });
   });
@@ -118,12 +120,10 @@ try {
   for (const name of promptSkillExclusions(prompt)) knownNames.add(name);
   const explicitlyRouted = [...knownNames].some((name) => (aliases[name] || []).some((alias) => query.includes(alias)));
   const scored = skills.map((skill) => scoreSkill(skill, tokens, query, aliases)).filter((item) => item.score > 0);
-  if (!explicitlyRouted) {
-    const indexerPath = path.join(codexRoot, "hooks", "graph_skill_index.py");
-    const pythonPath = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexRoot, "tools", "graph-tool-call-venv", "bin", "python");
-    const externalNames = new Set(Object.keys(aliases).map((name) => name.toLocaleLowerCase()));
-    scored.push(...await graphCandidates(registry.externalGraphPath, prompt, pythonPath, indexerPath, externalNames));
-  }
+  const indexerPath = path.join(codexRoot, "hooks", "graph_skill_index.py");
+  const pythonPath = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexRoot, "tools", "graph-tool-call-venv", "bin", "python");
+  const externalNames = new Set(Object.keys(aliases).map((name) => name.toLocaleLowerCase()));
+  scored.push(...await graphCandidates(registry.externalGraphPath, prompt, pythonPath, indexerPath, externalNames));
   scored.sort((a, b) => b.score - a.score || Number(a.skill.rank || 0) - Number(b.skill.rank || 0) || String(a.skill.name).localeCompare(String(b.skill.name)));
   if (!scored.length || scored[0].score < 6) {
     process.stdout.write("{}");
@@ -138,9 +138,12 @@ try {
   ];
   for (const item of selected) {
     const description = String(item.skill.description || "").replace(/\s+/g, " ").trim().slice(0, 280);
-    lines.push(`- ${item.skill.name} [score=${item.score}; match=${item.matches.join(", ") || "description match"}]`);
+    const routeKind = item.skill.kind === "mcp" ? `MCP/${item.skill.mcpServer}` : "Skill";
+    lines.push(`- ${item.skill.name} [${routeKind}; score=${item.score}; match=${item.matches.join(", ") || "description match"}]`);
     lines.push(`  ${description}`);
-    lines.push(`  Read: ${item.skill.path}`);
+    lines.push(item.skill.kind === "mcp"
+      ? `  Call through indexed MCP server: ${item.skill.mcpServer}/${item.skill.name}`
+      : `  Read: ${item.skill.path}`);
   }
   lines.push("If none is genuinely relevant, ignore this list and continue without a specialized Skill.");
   process.stdout.write(JSON.stringify({

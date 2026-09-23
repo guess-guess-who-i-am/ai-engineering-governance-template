@@ -52,7 +52,7 @@
 - 英文运行文件：常驻提醒、完整方法论档案、方法论路由和映射文件；由中文源逐行翻译生成，不用润色摘要代替原文。
 - 每轮 Hook：每次用户提示重新注入英文常驻提醒和方法论路由；会话启动、恢复、清理和压缩时也会恢复这些内容。
 - 稳定 Hook dispatcher：`UserPromptSubmit` 和 `SessionStart` 各只注册一个入口，内部并发执行常驻提醒、Skill 推荐、可选 capability 推荐和索引刷新。以后增加内部路由不会移动 Hook 索引并使已有信任记录错位。
-- Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。索引扫描用户级 Codex、`~/.agents/skills`、插件，并通过本机生成的 GraphToolCall 工具关系图检索私有第三方 Skill 镜像；不会扫描项目目录。
+- 全局调用路由：所有自有/第三方 Skill 和已注册 MCP 的 `tools/list` 工具都先进入本机 GraphToolCall 关系图；每次提示先检索图，再读取命中的 `SKILL.md` 或调用对应 MCP server，不允许绕过索引直接发现外部 Skill/MCP。索引扫描用户级 Codex、`~/.agents/skills`、插件和配置中的 MCP，不扫描项目目录。
 - 方法论发布器：保存中文源后自动翻译、备份、生成中英文文件、更新 Skills 和索引；失败时回滚。
 - 22个自有全局 Skills：6个方法 Skill、12个治理 Skill 和4个任务树 Skill；安装器将它们统一写入 `~/.agents/skills`。另将仓库旁私有镜像中的约15,472条第三方 Skill 目录部署到 `~/.codex/tools/skills` 并建立机器本地路由索引，不把第三方镜像打包进公开模板仓库。仓库版本源位于不会被 Codex 自动发现的 `codex-profile/global-skills`，因此项目目录不会产生同名 Skill。
 - 63条已归类方法论：常驻21条、研究9条、工程12条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
