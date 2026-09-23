@@ -75,8 +75,9 @@ if [ "$check" -eq 1 ]; then
       install-codex-profile-mac.mjs \
       install-task-tree-mcp-mac.mjs \
       install-codex-profile-service-mac.sh \
-      run-codex-profile-service-mac.sh \
-      test-codex-profile-mac.mjs
+    run-codex-profile-service-mac.sh \
+      test-codex-profile-mac.mjs \
+      parallel-run.mjs
     do
       if ! /usr/bin/cmp -s "$repository_root/scripts/$script" "$source_destination/scripts/$script"; then
         source_current=0
@@ -149,7 +150,8 @@ if [ "$repository_root" != "$source_destination" ]; then
     install-task-tree-mcp-mac.mjs \
     install-codex-profile-service-mac.sh \
     run-codex-profile-service-mac.sh \
-    test-codex-profile-mac.mjs
+    test-codex-profile-mac.mjs \
+    parallel-run.mjs
   do
     /usr/bin/ditto "$repository_root/scripts/$script" "$source_temporary/scripts/$script"
   done

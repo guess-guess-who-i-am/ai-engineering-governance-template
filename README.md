@@ -11,6 +11,7 @@
 - `DESIGN.md`：工程工具默认视觉系统。
 - `codex-profile/global-skills/`：22 个全局 Skill 的非自动发现版本源；安装后仅由用户级目录加载。
 - `scripts/`：治理、Skills、敏感文件和整体检查。
+- `scripts/parallel-run.mjs`：最多20路独立终端命令并行执行器，输出可审计的时间区间和退出码。
 - `.kest/flow/`：Markdown-native Flow 示例。
 - `requirements/user-stories/`：带稳定验收条件 ID 和证据映射的用户故事。
 - `quality/gates.json`：所有测试类别的显式启用、规划或不适用决策。
