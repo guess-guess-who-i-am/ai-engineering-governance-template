@@ -139,7 +139,7 @@ try {
   const context = run(dispatcher, [], { ...envArgs, input: contextInput });
   const contextPayload = JSON.parse(context.stdout);
   const contextText = String(contextPayload.hookSpecificOutput.additionalContext);
-  assert(context.status === 0 && contextText.startsWith("[AUTOMATIC_TOOL_BATCHING_CONTRACT_V3]") && contextText.includes("mechanically determined follow-up waves"), "automatic batching contract is absent, not first, or weakened");
+  assert(context.status === 0 && contextText.startsWith("[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4]") && contextText.includes("Start ordinary read-only waves at 2-4") && contextText.includes("halve it after failures"), "adaptive scheduling contract is absent, not first, or weakened");
   const routeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Please push this release to GitHub", cwd: REPOSITORY_ROOT })}\n`;
   const routed = run(dispatcher, [], { ...envArgs, input: routeInput });
   assert(routed.status === 0 && routed.stdout.includes("method-github-delivery"), `GitHub methodology route did not match: ${routed.stderr || routed.stdout}`);
@@ -234,6 +234,7 @@ try {
   await writeFile(path.join(syncSource, "scripts", "run-codex-profile-service-mac.sh"), await readFile(syncRunner));
   await writeFile(path.join(syncSource, "scripts", "install-codex-profile-service-mac.sh"), await readFile(path.join(SCRIPT_DIR, "install-codex-profile-service-mac.sh")));
   await writeFile(path.join(syncSource, "scripts", "install-task-tree-mcp-mac.mjs"), "process.exit(0);\n");
+  await writeFile(path.join(syncSource, "scripts", "parallel-run.mjs"), await readFile(path.join(SCRIPT_DIR, "parallel-run.mjs"), "utf8"));
   const syncTools = path.join(syncHome, ".codex", "tools");
   const stagedProfile = path.join(syncTools, "ai-engineering-governance-template");
   await mkdir(path.join(stagedProfile, "scripts"), { recursive: true });
@@ -247,6 +248,7 @@ try {
   await writeFile(path.join(stagedProfile, "scripts", "test-codex-profile-mac.mjs"), "process.exit(0);\n");
   await writeFile(path.join(stagedProfile, "scripts", "install-task-tree-mcp-mac.mjs"), "process.exit(0);\n");
   await writeFile(path.join(stagedProfile, "scripts", "install-codex-profile-service-mac.sh"), await readFile(path.join(SCRIPT_DIR, "install-codex-profile-service-mac.sh")));
+  await writeFile(path.join(stagedProfile, "scripts", "parallel-run.mjs"), "stale runner\n");
   const liveLibrary = path.join(syncTools, "skills");
   await mkdir(path.join(liveLibrary, "obsolete-managed-skill"), { recursive: true });
   await mkdir(path.join(liveLibrary, "astro-islands"), { recursive: true });
@@ -267,6 +269,7 @@ try {
   assert(await readFile(path.join(liveLibrary, "acme-astro-islands", "SKILL.md"), "utf8").then((value) => value.includes("Build Astro islands.")), "Finder Skill sync failed to update managed files");
   assert(await readFile(path.join(liveLibrary, "obsolete-managed-skill", "SKILL.md"), "utf8").then((value) => value.includes("obsolete")), "Finder Skill sync removed a stale unmanaged file");
   assert(await readFile(path.join(liveLibrary, "_catalog_cn.json"), "utf8").then((value) => value.includes("skills")), "Finder Skill sync did not preserve the catalog");
+  assert(await readFile(path.join(stagedProfile, "scripts", "parallel-run.mjs"), "utf8").then((value) => value.includes("Execute a dependency DAG in adaptive waves")), "Finder source sync did not update the adaptive scheduler");
 
   const reinstall = run(INSTALLER, ["--home", home, "--json"], { home, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: skillFixture, CODEX_EXTERNAL_SKILL_CATALOG: skillCatalog, CODEX_GRAPH_TOOL_PYTHON: GRAPH_PYTHON } });
   assert(reinstall.status === 0, `repeat install failed: ${reinstall.stderr || reinstall.stdout}`);
@@ -303,7 +306,7 @@ try {
     console.log(`PASS: full catalog fixture indexed ${fullManifest.skillCount}/${fullManifest.catalogSkillCount} Skills; total index bytes=${Buffer.byteLength(fullIndex)}; example route=resolving-merge-conflicts`);
   }
 
-  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 22 owned Skills, global-only registry, system and task-tree routing, merge, manifest backup, credential isolation, 63-rule validation, 20-way batching, failure visibility, idempotent update, check mode, and rollback.");
+  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 22 owned Skills, global-only registry, system and task-tree routing, merge, manifest backup, credential isolation, 63-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
 } finally {
   await rm(root, { recursive: true, force: true });
 }

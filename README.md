@@ -2,7 +2,7 @@
 
 一个面向 Codex 和其他 Agent Skills 兼容工具的工程治理起点，将常驻规则、领域语义、设计上下文、按需 Skills、确定性门禁和可执行 Flow 分层组织。
 
-最后更新：2026-09-21
+最后更新：2026-09-23
 
 ## 已包含
 
@@ -11,14 +11,14 @@
 - `DESIGN.md`：工程工具默认视觉系统。
 - `codex-profile/global-skills/`：22 个全局 Skill 的非自动发现版本源；安装后仅由用户级目录加载。
 - `scripts/`：治理、Skills、敏感文件和整体检查。
-- `scripts/parallel-run.mjs`：最多20路独立终端命令并行执行器，输出可审计的时间区间和退出码。
+- `scripts/parallel-run.mjs`：依赖感知的自适应命令调度器，默认4路、失败回压、危险任务串行，20仅为硬上限。
 - `.kest/flow/`：Markdown-native Flow 示例。
 - `requirements/user-stories/`：带稳定验收条件 ID 和证据映射的用户故事。
 - `quality/gates.json`：所有测试类别的显式启用、规划或不适用决策。
 - `TESTING.md`：功能、契约、E2E、可访问性、性能、安全、供应链和发布证据体系。
 - `UPSTREAMS.md`：第三方研究仓库与更新机制。
 - `.github/`：CI、Issue 和 PR 模板。
-- `codex-profile/`：仅面向 macOS 的全局 Codex Hook、中文方法论源、英文生成物、推荐器和发布器；安装器还合并实时搜索、Hooks、多 Agent 和20并发默认项，并从唯一 Skill 版本源安装全部22个全局 Skills；不含任何登录态或密钥。
+- `codex-profile/`：仅面向 macOS 的全局 Codex Hook、中文方法论源、英文生成物、推荐器和发布器；安装器还合并实时搜索、Hooks、多 Agent 和最多20并发 Agent 的安全上限，并从唯一 Skill 版本源安装全部22个全局 Skills；不含任何登录态或密钥。
 - `qualitative/`：带正反样例校准的 LLM 定性门禁。
 - `quality/findings.json`：P0–P3 问题、稳定 fingerprint、责任人和生命周期契约。
 - `design/catalog.json`：74 条固定 commit、许可证和来源路径的设计参考。
@@ -111,7 +111,7 @@ cd ai-engineering-governance-template
 
 4. 检查 diff 和秘密扫描结果，再通过 PR 合并到受保护的公开 `main`。另一台电脑之后拉取最新 `main` 并重新运行安装脚本即可更新。
 
-安装测试覆盖：一键部署、全新用户目录安装、旧配置备份、非敏感配置合并、macOS Node 路径生成、22个全局 Skills 安装、全局-only 注册表、系统/任务树路由输入、20路并发和失败回滚。完整仓库门禁由 macOS GitHub Actions 执行。
+安装测试覆盖：一键部署、全新用户目录安装、旧配置备份、非敏感配置合并、macOS Node 路径生成、22个全局 Skills 安装、全局-only 注册表、系统/任务树路由输入、自适应调度契约、Hook 重叠执行和失败回滚。独立调度器测试覆盖 DAG 顺序、4路真实重叠、失败/超时回压、危险任务串行和20路硬上限；完整仓库门禁由 macOS GitHub Actions 执行。
 
 Finder 右键 Quick Action 已纳入 macOS 安装测试，覆盖服务安装、文件夹输入类型、任意工作区部署、重复部署幂等和服务检查。
 

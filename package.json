@@ -6,6 +6,7 @@
     "deploy:codex-profile:mac": "./scripts/deploy-codex-profile-mac.sh",
     "install:codex-profile-service:mac": "./scripts/install-codex-profile-service-mac.sh",
     "test:site": "node scripts/test-docs-site.mjs",
+    "test:parallel-run": "node scripts/test-parallel-run.mjs",
     "test:codex-profile:mac": "node scripts/test-codex-profile-mac.mjs",
     "check:codex-profile:mac": "./scripts/deploy-codex-profile-mac.sh --check"
   },

@@ -26,16 +26,17 @@ function findProjectFile(startDirectory, fileName) {
   }
 }
 
-const batchingContract = `[AUTOMATIC_TOOL_BATCHING_CONTRACT_V3]
-Apply this execution contract on every user turn and before every later tool wave. Do not wait for the user to request concurrency.
-- Before entering tools, enumerate all currently knowable operations, separate independent work from true dependencies, and let K = min(20, the independent count).
-- Use one outer \`functions.exec\` as the orchestration envelope for the largest safe phase. Run independent calls with \`Promise.all\`; when K is 5-20, the first wave must contain exactly K meaningful calls, not a small sample.
-- Keep using the same outer \`functions.exec\` for mechanically determined follow-up waves after awaited results. Poll live sessions, collect known follow-up files, and run predetermined verification there instead of returning to the model merely to plan, parse an exit code, or issue one obvious next call.
-- Return to the model between waves only when semantic interpretation, a newly discovered uncertainty, user input, approval, or a destructive decision is genuinely required.
-- When the user lists up to twenty independent items, process every listed item in the first wave. Never serialize independent reads, searches, state checks, edits, or verification commands.
-- Read a required primary Skill completely first, then batch all independent evidence checks immediately. After edits, batch all independent tests and status checks.
-- Do not invent calls to fill a quota, hide dependencies, weaken checks, or claim concurrency without overlapping execution intervals.
-- A phase with fewer than two independent operations may remain single-step. Otherwise, repeated one-call model-tool round trips are noncompliant.`;
+const batchingContract = `[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4]
+Apply this execution contract on every user turn and before every later tool wave. Twenty is a hard safety ceiling, never a utilization target.
+- First build the smallest useful dependency DAG: identify prerequisites, independent branches, shared mutable state, rate limits, destructive effects, and the result that each consumer actually needs.
+- Prefer one native batched tool request for homogeneous reads or searches. Do not open extra terminals when a multi-query API, one bounded command, or one shared process can perform the same independent work.
+- Start ordinary read-only waves at 2-4 concurrent operations. Increase width gradually only after successful low-contention waves; halve it after failures, timeouts, rate limits, or resource contention. Never exceed 20.
+- Execute only ready DAG nodes in each wave. Keep stateful, destructive, rate-limited, approval-gated, uncertain, or mutually interfering operations at concurrency 1 unless the owning interface explicitly guarantees safe parallelism.
+- Use one outer \`functions.exec\` when it reduces model round trips, and use \`Promise.all\` only for operations proven independent. Continue mechanically determined polling, collection, and verification inside that envelope.
+- Return to the model when results require semantic interpretation, the graph changes, uncertainty appears, user input is required, or a destructive decision must be made.
+- Read a required primary Skill completely first. After edits, batch independent checks, but preserve producer-consumer order and run the narrowest evidence capable of falsifying the claim.
+- Record wave membership, concurrency width, timings, exit codes, retries, timeouts, and skipped dependency consumers. Real overlap is evidence; a configured maximum is not.
+- Do not invent work to fill capacity, split one efficient operation into many terminals, hide dependencies, weaken checks, or claim concurrency without overlapping execution intervals.`;
 
 try {
   const input = await readInput();
