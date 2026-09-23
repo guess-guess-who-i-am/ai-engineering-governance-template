@@ -72,6 +72,24 @@ def load_skills(root: Path, catalog: Path):
     return records, missing, invalid
 
 
+def load_owned_skills(root: Path):
+    records = []
+    if not root.is_dir():
+        return records
+    for target in sorted(root.glob("*/SKILL.md")):
+        text = target.read_text(encoding="utf-8")
+        block = re.search(r"^---\s*\n([\s\S]*?)\n---", text, re.M)
+        frontmatter = block.group(1) if block else ""
+        name_match = re.search(r"^name:\s*(.+)$", frontmatter, re.M)
+        description_match = re.search(r"^description:\s*(.+)$", frontmatter, re.M)
+        name = name_match.group(1).strip().strip("'\"") if name_match else target.parent.name
+        description = description_match.group(1).strip().strip("'\"") if description_match else ""
+        digest = hashlib.sha1(str(target).encode()).hexdigest()[:8]
+        records.append({"name": name, "tool_name": f"skill_{re.sub(r'[^a-zA-Z0-9_-]+', '_', name).strip('_')[:60]}_{digest}",
+                        "description": description, "path": str(target), "categories": ["global-owned"], "tags": [], "source": "owned"})
+    return records
+
+
 def graph_from_records(records, mcp_records=None):
     graph = ToolGraph()
     mcp_tools = [{
@@ -112,6 +130,8 @@ def graph_from_records(records, mcp_records=None):
 def build(args):
     root, catalog, output = Path(args.root), Path(args.catalog), Path(args.output)
     records, missing, invalid = load_skills(root, catalog)
+    owned_records = load_owned_skills(Path(args.owned_root)) if args.owned_root else []
+    records.extend(owned_records)
     mcp_records = []
     if args.mcp_catalog and Path(args.mcp_catalog).is_file():
         data = json.loads(Path(args.mcp_catalog).read_text(encoding="utf-8"))
@@ -140,6 +160,8 @@ def build(args):
         "catalogSha256": digest.hexdigest(),
         "catalogSkillCount": len(records) + missing + invalid,
         "skillCount": len(records),
+        "externalSkillCount": len(records) - len(owned_records),
+        "ownedSkillCount": len(owned_records),
         "mcpToolCount": len(mcp_records),
         "missingSkillCount": missing,
         "invalidSkillCount": invalid,
@@ -184,6 +206,7 @@ def main():
     build_parser.add_argument("--output", required=True)
     build_parser.add_argument("--embedding", action="store_true")
     build_parser.add_argument("--mcp-catalog")
+    build_parser.add_argument("--owned-root", default="")
     build_parser.set_defaults(func=build)
     retrieve_parser = subparsers.add_parser("retrieve")
     retrieve_parser.add_argument("--graph", required=True)

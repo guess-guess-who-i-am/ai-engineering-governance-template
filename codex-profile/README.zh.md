@@ -14,6 +14,8 @@
 
 所有调用都经过全局 GraphToolCall 路由。默认从仓库旁的私有镜像 `../skills` 部署到 `~/.codex/tools/skills`；没有该目录时可通过 `CODEX_EXTERNAL_SKILL_ROOT` 指定已有目录。会话启动时把 `_catalog_cn.json` 转成 Skill 节点，并读取 `config.toml` 中每个 MCP server 的 `tools/list`，统一写入 `~/.codex/skill-registry/skills.graph.json`。用户提示通过 GraphToolCall 检索，命中 Skill 后才读取原始 `SKILL.md`，命中 MCP 后显示其 server/tool 调用入口。没有可靠元数据时不伪造 producer-consumer 边。完整 Skill 正文与生成索引只留在本机。
 
+图中的仓库自有 22 个 Skill 与第三方 Skill 一样部署到用户级全局目录；它们不写入具体项目，也不使用当前电脑的固定绝对路径。换电脑时安装器会先复制全局 Skill，再按新电脑的实际路径重建图。
+
 “最多20并发”的要求会逐轮注入。除此之外，`context-refresh` 会把英文自动执行契约放在每次用户提示附加上下文的最前面，不再判断用户是否提到“并发”。该契约要求只要存在两个以上真实独立的操作就批量提交；能根据上一波结果机械确定的后续操作继续留在同一个工具编排中。简单单步任务仍可单步执行，也不会把存在语义依赖、交互确认、审批或破坏性的步骤伪装成并发。
 
 曾经出现过的退化根因是：新增 capability router 后，`context-refresh` 从 `user_prompt_submit:0:1` 移到 `0:2`，而 `config.toml` 只保留了 `0:0` 的信任记录，所以新任务没有执行并发契约。同时旧 PowerShell Skill 推荐器会用宽泛中文二元词扫描15471条外部索引，单次最坏约80秒。当前 dispatcher 固定每个事件只有一个入口，Skill 推荐器改用 Node、三元词和最多300条候选；本机实测推荐约0.3–0.4秒。

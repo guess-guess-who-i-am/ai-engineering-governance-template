@@ -47,7 +47,8 @@ async function externalCatalogPaths(home, codexRoot) {
   const graphIndexer = path.join(codexRoot, "hooks", "graph_skill_index.py");
   const graphPython = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexRoot, "tools", "graph-tool-call-venv", "bin", "python");
   const mcpCatalog = path.join(codexRoot, "skill-registry", "mcp-tools.json");
-  return { root, catalog, graphIndex, graphManifest, graphIndexer, graphPython, mcpCatalog };
+  const ownedRoot = path.join(home, ".agents", "skills");
+  return { root, catalog, graphIndex, graphManifest, graphIndexer, graphPython, mcpCatalog, ownedRoot };
 }
 
 function parseMcpServers(text) {
@@ -99,7 +100,7 @@ async function listMcpTools(codexRoot, outputPath) {
 }
 
 async function refreshExternalIndex(home, codexRoot) {
-  const { root, catalog, graphIndex, graphManifest, graphIndexer, graphPython, mcpCatalog } = await externalCatalogPaths(home, codexRoot);
+  const { root, catalog, graphIndex, graphManifest, graphIndexer, graphPython, mcpCatalog, ownedRoot } = await externalCatalogPaths(home, codexRoot);
   if (!await exists(root) || !await exists(catalog)) return null;
 
   if (!await exists(graphPython) || !await exists(graphIndexer)) {
@@ -122,11 +123,11 @@ async function refreshExternalIndex(home, codexRoot) {
     if (current.schemaVersion === "graph-tool-call-skills/1" && current.catalogPath === catalog &&
         current.rootPath === root && current.catalogLength === sourceStat.size &&
         current.catalogMtimeMs === sourceStat.mtimeMs && current.catalogSha256 === sourceHash && current.embedding === "sentence-transformers/all-MiniLM-L6-v2" &&
-        current.graphPath === graphIndex && current.mcpToolCount === (mcpCatalogData.tools || []).length && await exists(graphIndex) && await exists(mcpCatalog)) return current;
+        current.graphPath === graphIndex && current.mcpToolCount === (mcpCatalogData.tools || []).length && current.ownedSkillCount === (await skillFiles(ownedRoot)).length && await exists(graphIndex) && await exists(mcpCatalog)) return current;
   } catch { /* Rebuild a missing or stale index. */ }
 
   await mkdir(path.dirname(graphIndex), { recursive: true });
-  const args = [graphIndexer, "build", "--root", root, "--catalog", catalog, "--output", graphIndex, "--mcp-catalog", mcpCatalog, "--embedding"];
+  const args = [graphIndexer, "build", "--root", root, "--catalog", catalog, "--output", graphIndex, "--mcp-catalog", mcpCatalog, "--owned-root", ownedRoot, "--embedding"];
   const child = spawn(graphPython, args, { windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
   let stdout = "";
   let stderr = "";
@@ -215,7 +216,8 @@ try {
     generatedAt: new Date().toISOString(),
     roots: uniqueRoots,
     skillCount: skills.length,
-    externalSkillCount: externalManifest?.skillCount || 0,
+    externalSkillCount: externalManifest?.externalSkillCount || externalManifest?.skillCount || 0,
+    ownedSkillCount: externalManifest?.ownedSkillCount || 0,
     externalMissingSkillCount: externalManifest?.missingSkillCount || 0,
     externalGraphPath: externalManifest?.graphPath || path.join(codexRoot, "skill-registry", "skills.graph.json"),
     skills
