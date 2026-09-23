@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPOSITORY_ROOT = path.dirname(SCRIPT_DIR);
+const SKILL_LIBRARY_ROOT = path.resolve(REPOSITORY_ROOT, "..", "skills");
 const PROFILE_ROOT = path.join(REPOSITORY_ROOT, "codex-profile");
 const SKILLS_ROOT = path.join(PROFILE_ROOT, "global-skills");
 const BLOCK_BEGIN = "<!-- ai-engineering-governance-template:begin -->";
@@ -78,6 +79,13 @@ async function filesUnder(root) {
   return output.sort();
 }
 
+async function treeDigests(root) {
+  const files = await filesUnder(root);
+  const result = new Map();
+  for (const file of files) result.set(path.relative(root, file), sha256(await readFile(file)));
+  return result;
+}
+
 function shellQuote(value) {
   return `'${String(value).replaceAll("'", `'"'"'`)}'`;
 }
@@ -146,6 +154,8 @@ async function buildOperations(home) {
   const codexHome = path.join(home, ".codex");
   const agentsHome = path.join(home, ".agents");
   const operations = new Map();
+  const externalSkillRoot = process.env.CODEX_EXTERNAL_SKILL_ROOT || process.env.CODEX_PROFILE_SKILL_SOURCE || path.join(home, ".codex", "tools", "skills");
+  const bundledSkillLibrary = path.join(codexHome, "tools", "skills");
   const addTree = async (sourceRoot, destinationRoot, filter = () => true) => {
     for (const source of await filesUnder(sourceRoot)) {
       if (!filter(source)) continue;
@@ -161,6 +171,70 @@ async function buildOperations(home) {
     (source) => !source.endsWith("methodology-targets.json")
   );
   await addTree(path.join(PROFILE_ROOT, "mac", "hooks"), path.join(codexHome, "hooks"));
+  const graphIndexerSource = path.join(PROFILE_ROOT, "mac", "hooks", "graph_skill_index.py");
+  operations.set(path.join(codexHome, "hooks", "graph_skill_index.py"), {
+    destination: path.join(codexHome, "hooks", "graph_skill_index.py"),
+    content: await readFile(graphIndexerSource),
+    mode: 0o700,
+    source: graphIndexerSource
+  });
+  const graphToolRequirements = path.join(codexHome, "tools", "graph-tool-call-requirements.txt");
+  operations.set(graphToolRequirements, {
+    destination: graphToolRequirements,
+    content: Buffer.from("graph-tool-call[embedding]==0.46.0\nsentence-transformers==6.1.0\n", "utf8"),
+    mode: 0o600,
+    source: "generated:graph-tool-call-requirements"
+  });
+  const librarySource = process.env.CODEX_PROFILE_SKILL_SOURCE || (await exists(path.join(SKILL_LIBRARY_ROOT, "_catalog_cn.json")) ? SKILL_LIBRARY_ROOT : null);
+  const catalogSource = process.env.CODEX_PROFILE_SKILL_CATALOG || (librarySource ? path.join(librarySource, "_catalog_cn.json") : null);
+  if (librarySource && path.resolve(externalSkillRoot) === path.resolve(bundledSkillLibrary)) {
+    const sourceDigests = await treeDigests(librarySource);
+    if (catalogSource && !path.resolve(catalogSource).startsWith(`${path.resolve(librarySource)}${path.sep}`)) {
+      sourceDigests.set("_catalog_cn.json", sha256(await readFile(catalogSource)));
+    }
+    const previousManifestPath = path.join(codexHome, "skill-registry", "external-library-manifest.json");
+    let previousManifest = null;
+    try { previousManifest = JSON.parse(await readFile(previousManifestPath, "utf8")); } catch { /* First install. */ }
+    if (previousManifest?.destination === bundledSkillLibrary && Array.isArray(previousManifest.files)) {
+      for (const previous of previousManifest.files) {
+        if (sourceDigests.has(previous.relativePath)) continue;
+        const destination = path.join(bundledSkillLibrary, previous.relativePath);
+        let content = null;
+        try { content = await readFile(destination); } catch (error) { if (error.code !== "ENOENT") throw error; }
+        if (content && sha256(content) === previous.sha256) {
+          operations.set(destination, { destination, content: null, mode: 0o600, source: "generated:remove-stale-managed-skill", original: content });
+        }
+      }
+    }
+    for (const source of await filesUnder(librarySource)) {
+      if (source.includes(`${path.sep}.git${path.sep}`)) continue;
+      const destination = path.join(bundledSkillLibrary, path.relative(librarySource, source));
+      operations.set(destination, {
+        destination, content: await readFile(source), mode: source.endsWith(".sh") || source.endsWith(".command") ? 0o700 : 0o600,
+        source, externalLibrary: true
+      });
+    }
+    if (catalogSource && !path.resolve(catalogSource).startsWith(`${path.resolve(librarySource)}${path.sep}`)) {
+      operations.set(path.join(bundledSkillLibrary, "_catalog_cn.json"), {
+        destination: path.join(bundledSkillLibrary, "_catalog_cn.json"),
+        content: await readFile(catalogSource), mode: 0o600, source: catalogSource, externalLibrary: true
+      });
+    }
+    const manifestPath = path.join(codexHome, "skill-registry", "external-library-manifest.json");
+    const manifest = {
+      schemaVersion: "codex-external-library-copy/1",
+      destination: bundledSkillLibrary,
+      source: librarySource,
+      files: [...sourceDigests].map(([relativePath, hash]) => ({ relativePath, sha256: hash }))
+    };
+    operations.set(manifestPath, { destination: manifestPath, content: Buffer.from(`${JSON.stringify(manifest)}\n`), mode: 0o600, source: "generated:external-library-manifest" });
+  }
+  operations.set(path.join(codexHome, "skill-registry", "external-library-config.json"), {
+    destination: path.join(codexHome, "skill-registry", "external-library-config.json"),
+    content: Buffer.from(`${JSON.stringify({ root: externalSkillRoot, catalog: process.env.CODEX_EXTERNAL_SKILL_CATALOG || process.env.CODEX_PROFILE_SKILL_CATALOG || path.join(externalSkillRoot, "_catalog_cn.json") }, null, 2)}\n`),
+    mode: 0o600,
+    source: "generated:external-library-config"
+  });
   const dispatcherSource = path.join(PROFILE_ROOT, ".codex", "hooks", "hook-dispatch.mjs");
   operations.set(path.join(codexHome, "hooks", "hook-dispatch.mjs"), {
     destination: path.join(codexHome, "hooks", "hook-dispatch.mjs"),
@@ -232,6 +306,10 @@ async function buildOperations(home) {
 async function changedOperations(operations) {
   const changed = [];
   for (const operation of operations) {
+    if (operation.source === "generated:remove-stale-managed-skill") {
+      changed.push(operation);
+      continue;
+    }
     let current = null;
     try { current = await readFile(operation.destination); }
     catch (error) { if (error.code !== "ENOENT") throw error; }
@@ -267,19 +345,25 @@ async function applyTransaction(codexHome, changes) {
     if (backup) await atomicWrite(backup, change.original, 0o600);
     manifest.files.push({
       destination: change.destination,
+      kind: "file",
       existed: change.original !== null,
       beforeSha256: change.original === null ? null : sha256(change.original),
-      afterSha256: sha256(change.content),
+      afterSha256: change.content === null ? null : sha256(change.content),
       backup
     });
   }
   await atomicWrite(path.join(backupDirectory, "manifest.json"), Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`), 0o600);
   try {
-    for (const change of changes) await atomicWrite(change.destination, change.content, change.mode);
+    for (const change of changes) {
+      await mkdir(path.dirname(change.destination), { recursive: true, mode: 0o700 });
+      if (change.source === "generated:remove-stale-managed-skill") await rm(change.destination, { force: true });
+      else await atomicWrite(change.destination, change.content, change.mode);
+    }
     if (process.env.CODEX_PROFILE_TEST_FAIL_STAGE === "post-write") throw new Error("Injected post-write failure for rollback verification");
   } catch (error) {
     for (const change of [...changes].reverse()) {
-      if (change.original === null) await rm(change.destination, { force: true });
+      if (change.source === "generated:remove-stale-managed-skill") await atomicWrite(change.destination, change.original, change.mode);
+      else if (change.original === null) await rm(change.destination, { force: true });
       else await atomicWrite(change.destination, change.original, change.mode);
     }
     throw error;
@@ -301,10 +385,29 @@ function run(command, args, { env, input = "", timeoutMs = 30000 } = {}) {
   });
 }
 
+async function ensureGraphToolRuntime(codexHome) {
+  const graphToolPython = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexHome, "tools", "graph-tool-call-venv", "bin", "python");
+  const graphToolRequirements = path.join(codexHome, "tools", "graph-tool-call-requirements.txt");
+  const requirements = "graph-tool-call[embedding]==0.46.0\nsentence-transformers==6.1.0\n";
+  const python = process.env.CODEX_PYTHON || (await exists("/opt/homebrew/bin/python3") ? "/opt/homebrew/bin/python3" : "python3");
+  await mkdir(path.dirname(graphToolPython), { recursive: true, mode: 0o700 });
+  await mkdir(path.dirname(graphToolRequirements), { recursive: true, mode: 0o700 });
+  await writeFile(graphToolRequirements, requirements, { mode: 0o600 });
+  if (!await exists(graphToolPython)) {
+    const venv = await run(python, ["-m", "venv", path.dirname(path.dirname(graphToolPython))], { timeoutMs: 120000 });
+    if (venv.code !== 0) throw new Error(`Could not create isolated GraphToolCall runtime: ${venv.stderr || venv.stdout}`);
+  }
+  const probe = await run(graphToolPython, ["-c", "import importlib.metadata as m; assert m.version('graph-tool-call') == '0.46.0'; assert m.version('sentence-transformers') == '6.1.0'"], { timeoutMs: 30000 });
+  if (probe.code === 0) return graphToolPython;
+  const install = await run(graphToolPython, ["-m", "pip", "install", "--disable-pip-version-check", "-r", graphToolRequirements], { timeoutMs: 300000 });
+  if (install.code !== 0) throw new Error(`Could not install GraphToolCall: ${install.stderr || install.stdout}`);
+  return graphToolPython;
+}
+
 async function verifyInstallation(home, codexHome, operations) {
   const drift = await changedOperations(operations);
   if (drift.length) throw new Error(`Installed profile differs in ${drift.length} managed file(s): ${drift.slice(0, 5).map((item) => item.destination).join(", ")}`);
-  const env = { ...process.env, HOME: home, USERPROFILE: home, CODEX_HOME: codexHome };
+  const env = { ...process.env, HOME: home, USERPROFILE: home, CODEX_HOME: codexHome, CODEX_EXTERNAL_SKILL_ROOT: undefined, CODEX_EXTERNAL_SKILL_CATALOG: undefined, CODEX_SKIP_EXTERNAL_INDEX_REFRESH: "1" };
   const publisher = await run(process.execPath, [
     path.join(codexHome, "prompt-publisher", "publish-methodology.mjs"),
     "--config",
@@ -317,7 +420,7 @@ async function verifyInstallation(home, codexHome, operations) {
   try { publication = JSON.parse(publisher.stdout); }
   catch { throw new Error(`Methodology publisher returned invalid JSON: ${publisher.stdout.trim()}`); }
   const hookInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
-  const context = await run(process.execPath, [path.join(codexHome, "hooks", "hook-dispatch.mjs")], { env, input: hookInput });
+  const context = await run(process.execPath, [path.join(codexHome, "hooks", "hook-dispatch.mjs")], { env, input: hookInput, timeoutMs: 300000 });
   if (context.code !== 0 || !context.stdout.includes("AUTOMATIC_TOOL_BATCHING_CONTRACT_V3")) throw new Error("Hook dispatcher did not emit the automatic batching contract");
   return { validation: publication.validation, trust: await inspectHookTrust(codexHome) };
 }
@@ -337,10 +440,13 @@ async function inspectHookTrust(codexHome) {
 async function install(options) {
   const { codexHome, operations } = await buildOperations(options.home);
   if (options.check) {
+    const graphToolPython = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexHome, "tools", "graph-tool-call-venv", "bin", "python");
+    if (!await exists(graphToolPython)) throw new Error(`GraphToolCall runtime is missing: ${graphToolPython}`);
     const verification = await verifyInstallation(options.home, codexHome, operations);
     return { status: "current", home: options.home, codexHome, changedFiles: 0, ...verification };
   }
   const changes = await changedOperations(operations);
+  const graphToolPython = await ensureGraphToolRuntime(codexHome);
   let transaction = null;
   try {
     if (changes.length) transaction = await applyTransaction(codexHome, changes);
@@ -356,7 +462,8 @@ async function install(options) {
   } catch (error) {
     if (transaction) {
       for (const change of [...transaction.changes].reverse()) {
-        if (change.original === null) await rm(change.destination, { force: true });
+        if (change.source === "generated:remove-stale-managed-skill") await atomicWrite(change.destination, change.original, change.mode);
+        else if (change.original === null) await rm(change.destination, { force: true });
         else await atomicWrite(change.destination, change.original, change.mode);
       }
     }

@@ -3,8 +3,16 @@ set -u
 
 home_root=${HOME:-$(/usr/bin/dscl . -read /Users/$(/usr/bin/whoami) NFSHomeDirectory | /usr/bin/awk '{print $2}')}
 profile_root=${CODEX_PROFILE_SOURCE:-$home_root/.codex/tools/ai-engineering-governance-template}
+skill_source=${CODEX_PROFILE_SKILL_SOURCE:-$home_root/.codex/tools/skills}
 deploy="$profile_root/scripts/deploy-codex-profile-mac.sh"
 runtime_root="$home_root/.codex/tools/llm-task-tree/llm-task-tree-kit"
+catalog_source=${CODEX_PROFILE_SKILL_CATALOG:-$home_root/.codex/tools/skills/_catalog_cn.json}
+if [ -f "$skill_source/_catalog_cn.json" ]; then
+  export CODEX_PROFILE_SKILL_SOURCE="$skill_source"
+fi
+if [ -f "$catalog_source" ]; then
+  export CODEX_PROFILE_SKILL_CATALOG="$catalog_source"
+fi
 
 if [ ! -x "$deploy" ]; then
   title="Codex 全局配置部署失败"

@@ -35,6 +35,22 @@ done
 
 source_destination="$home_root/.codex/tools/ai-engineering-governance-template"
 source_temporary="$home_root/.codex/tools/.ai-engineering-governance-template.install-$$"
+skills_destination="$home_root/.codex/tools/skills"
+skills_source=${CODEX_PROFILE_SKILL_SOURCE:-}
+skills_catalog=${CODEX_PROFILE_SKILL_CATALOG:-}
+if [ -n "$skills_source" ] && [ ! -d "$skills_source" ]; then
+  printf '%s\n' "Skill source directory does not exist: $skills_source" >&2
+  exit 1
+fi
+if [ -z "$skills_source" ] && [ -f "$repository_root/../../skills/_catalog_cn.json" ]; then
+  skills_source=$(CDPATH= cd -- "$repository_root/../../skills" && pwd)
+fi
+if [ -z "$skills_source" ] && [ -d "$home_root/.codex/tools/skills" ]; then
+  skills_source="$home_root/.codex/tools/skills"
+fi
+if [ -n "$skills_source" ] && [ -z "$skills_catalog" ]; then
+  skills_catalog="$skills_source/_catalog_cn.json"
+fi
 runtime_destination="$home_root/.codex/tools/llm-task-tree/llm-task-tree-kit"
 runtime_source=${TASK_TREE_RUNTIME_ROOT:-}
 if [ -z "$runtime_source" ] && [ -d "$repository_root/../llm-task-tree-macos/llm-task-tree-kit" ]; then
@@ -59,20 +75,66 @@ if [ "$check" -eq 1 ]; then
       install-codex-profile-mac.mjs \
       install-task-tree-mcp-mac.mjs \
       install-codex-profile-service-mac.sh \
-      run-codex-profile-service-mac.sh
+      run-codex-profile-service-mac.sh \
+      test-codex-profile-mac.mjs
     do
       if ! /usr/bin/cmp -s "$repository_root/scripts/$script" "$source_destination/scripts/$script"; then
         source_current=0
         break
       fi
     done
+    if [ -n "$skills_source" ] && [ -d "$skills_source" ] && [ -d "$skills_destination" ]; then
+      if ! /usr/bin/diff -qr --exclude='.git' --exclude='_catalog_cn.json' "$skills_source" "$skills_destination" >/dev/null 2>&1; then
+        source_current=0
+      fi
+    fi
+    if [ -n "$skills_catalog" ] && [ -f "$skills_catalog" ] && [ -f "$skills_destination/_catalog_cn.json" ] && ! /usr/bin/cmp -s "$skills_catalog" "$skills_destination/_catalog_cn.json"; then
+      source_current=0
+    fi
   fi
-  if [ "$source_current" -eq 1 ] && [ -f "$runtime_destination/scripts/mcp-server.mjs" ] && [ -d "$destination" ] && /usr/bin/diff -qr "$source_workflow" "$destination" >/dev/null 2>&1; then
+  skills_current=1
+  if [ -n "$skills_source" ] && [ -d "$skills_destination" ] && ! /usr/bin/diff -qr --exclude='.git' --exclude='_catalog_cn.json' "$skills_source" "$skills_destination" >/dev/null 2>&1; then
+    skills_current=0
+  fi
+  if [ -n "$skills_catalog" ] && [ -f "$skills_catalog" ] && [ -f "$skills_destination/_catalog_cn.json" ] && ! /usr/bin/cmp -s "$skills_catalog" "$skills_destination/_catalog_cn.json"; then
+    skills_current=0
+  fi
+  if [ "$source_current" -eq 1 ] && [ "$skills_current" -eq 1 ] && [ -f "$runtime_destination/scripts/mcp-server.mjs" ] && [ -d "$destination" ] && /usr/bin/diff -qr "$source_workflow" "$destination" >/dev/null 2>&1; then
     printf '%s\n' "Finder Quick Action: current"
     exit 0
   fi
   printf '%s\n' "Finder Quick Action: missing or stale" >&2
   exit 1
+fi
+
+if [ -n "$skills_source" ] && [ "$skills_source" != "$skills_destination" ]; then
+  /bin/mkdir -p "$home_root/.codex/tools"
+  /bin/mkdir -p "$skills_destination"
+  previous_manifest="$home_root/.codex/skill-registry/external-library-manifest.json"
+  if [ -f "$previous_manifest" ]; then
+    while IFS= read -r relative_path; do
+      case "$relative_path" in
+        ""|/*|*../*|../*|*/..|..|_catalog_cn.json) continue ;;
+      esac
+      destination_file="$skills_destination/$relative_path"
+      source_file="$skills_source/$relative_path"
+      if [ ! -f "$source_file" ] && [ -f "$destination_file" ]; then
+        expected_hash=$(/usr/bin/awk -v key="\"$relative_path\"" '$0 ~ key {getline; gsub(/[", ]/, "", $2); print $2; exit}' "$previous_manifest")
+        actual_hash=$(/usr/bin/shasum -a 256 "$destination_file" | /usr/bin/awk '{print $1}')
+        if [ -n "$expected_hash" ] && [ "$expected_hash" = "$actual_hash" ]; then
+          /bin/rm -f "$destination_file"
+        fi
+      fi
+    done <<EOF
+$(/usr/bin/awk -F '"relativePath": ' '/"relativePath"/ {gsub(/[",]/, "", $2); print $2}' "$previous_manifest")
+EOF
+  fi
+  if [ -f "$skills_catalog" ] && [ "$skills_catalog" != "$skills_source/_catalog_cn.json" ]; then
+    /usr/bin/rsync -a --exclude='/.git/' --exclude='/_catalog_cn.json' "$skills_source/" "$skills_destination/"
+    /usr/bin/ditto "$skills_catalog" "$skills_destination/_catalog_cn.json"
+  else
+    /usr/bin/rsync -a --exclude='/.git/' "$skills_source/" "$skills_destination/"
+  fi
 fi
 
 if [ "$repository_root" != "$source_destination" ]; then
@@ -86,7 +148,8 @@ if [ "$repository_root" != "$source_destination" ]; then
     install-codex-profile-mac.mjs \
     install-task-tree-mcp-mac.mjs \
     install-codex-profile-service-mac.sh \
-    run-codex-profile-service-mac.sh
+    run-codex-profile-service-mac.sh \
+    test-codex-profile-mac.mjs
   do
     /usr/bin/ditto "$repository_root/scripts/$script" "$source_temporary/scripts/$script"
   done

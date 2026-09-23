@@ -10,9 +10,9 @@
 - 中文唯一编辑源、英文生成物、63条规则映射与完整性校验；
 - 自动翻译和原子发布器；
 - `method-*` 五个方法 Skill、`manage-global-methodology`、12个治理 Skill 和4个任务树 Skill，共22个全局 Skill；
-- Skill 路由别名。
+- Skill 路由别名；部署时从仓库旁的私有 Skill 镜像复制约 15,472 条目录到用户级工具目录，并用 GraphToolCall 0.46.0 建立本机工具关系图索引。完整第三方库不进入本仓库，避免把混合许可的第三方内容发布到公开模板仓库。
 
-推荐器可选支持大型外部 Skill 库。外部目录必须使用当前 macOS 的绝对路径，并编译到 `~/.codex/skill-registry/external-skills.tsv`；它不会递归读取或注入这些 `SKILL.md` 正文，每轮只流式检索轻量索引，最多推荐4个候选。
+推荐器支持大型外部 Skill 库。默认从仓库旁的私有镜像 `../skills` 部署到 `~/.codex/tools/skills`；没有该目录时可通过 `CODEX_EXTERNAL_SKILL_ROOT` 指定已有目录。安装器在 `~/.codex/tools/graph-tool-call-venv` 建立隔离 Python 环境并固定安装 GraphToolCall 0.46.0；会话启动时把 `_catalog_cn.json` 转成 GraphToolCall MCP-style Skill 节点和分类边，用户提示通过 GraphToolCall 检索，只有命中后才读取原始 `SKILL.md`。明确没有产消关系元数据的 Skills 不会被伪造 producer-consumer 边。完整 Skill 正文与生成索引都只留在本机，不进入工作区或公开模板仓库。
 
 “最多20并发”的要求会逐轮注入。除此之外，`context-refresh` 会把英文自动执行契约放在每次用户提示附加上下文的最前面，不再判断用户是否提到“并发”。该契约要求只要存在两个以上真实独立的操作就批量提交；能根据上一波结果机械确定的后续操作继续留在同一个工具编排中。简单单步任务仍可单步执行，也不会把存在语义依赖、交互确认、审批或破坏性的步骤伪装成并发。
 

@@ -8,6 +8,15 @@ fi
 
 script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
+# The sibling private mirror stays outside the public template repository.
+if [ -z "${CODEX_PROFILE_SKILL_SOURCE:-}" ] && [ -f "$script_dir/../../skills/_catalog_cn.json" ]; then
+  export CODEX_PROFILE_SKILL_SOURCE=$(CDPATH= cd -- "$script_dir/../../skills" && pwd)
+fi
+
+if [ -z "${CODEX_PROFILE_SKILL_SOURCE:-}" ]; then
+  printf '%s\n' "Warning: sibling Skill library was not found; only the 22 owned global Skills will be deployed." >&2
+fi
+
 "$script_dir/install-codex-profile-mac.sh" "$@"
 if [ -x "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node" ]; then
   node_bin="/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
