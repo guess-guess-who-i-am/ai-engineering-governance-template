@@ -4,8 +4,6 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import readline from "node:readline";
-import { createReadStream } from "node:fs";
 
 async function readInput() {
   let raw = "";
@@ -54,61 +52,49 @@ function scoreSkill(skill, tokens, query, aliases) {
   return { skill, score, matches: [...new Set(matches)].slice(0, 3) };
 }
 
-function rgCandidates(indexPath, patterns) {
+function graphCandidates(graphPath, query, pythonPath, indexerPath, excludedNames) {
+  if (!graphPath || !existsSync(graphPath) || !existsSync(pythonPath) || !existsSync(indexerPath)) return Promise.resolve([]);
   return new Promise((resolve) => {
-    const args = ["--ignore-case", "--fixed-strings", "--no-heading", "--color", "never", "--max-count", "300"];
-    for (const pattern of patterns) args.push("-e", pattern);
-    args.push("--", indexPath);
-    const child = spawn("rg", args, { windowsHide: true, stdio: ["ignore", "pipe", "ignore"] });
-    let output = "";
-    const timer = setTimeout(() => child.kill(), 3000);
-    child.stdout.on("data", (chunk) => { output += chunk.toString("utf8"); });
-    child.on("error", () => { clearTimeout(timer); resolve(null); });
+    const child = spawn(pythonPath, [indexerPath, "retrieve", "--graph", graphPath, "--query", query, "--top-k", "8"], {
+      windowsHide: true,
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+    let stdout = "";
+    const timer = setTimeout(() => child.kill(), 60000);
+    let stderr = "";
+    child.stdout.on("data", (chunk) => { stdout += chunk.toString("utf8"); });
+    child.stderr.on("data", (chunk) => { stderr += chunk.toString("utf8"); });
+    child.on("error", () => { clearTimeout(timer); resolve([]); });
     child.on("close", (code) => {
       clearTimeout(timer);
-      resolve([0, 1].includes(Number(code)) ? output.split(/\r?\n/).filter(Boolean).slice(0, 300) : null);
+      if (Number(code) !== 0) return resolve([]);
+      try {
+        const results = JSON.parse(stdout.trim() || "[]");
+        resolve(results.filter((item) => (item?.kind === "mcp" || (item?.path && existsSync(item.path))) && !excludedNames.has(String(item.name).toLocaleLowerCase()))
+          .map((item) => ({ skill: {
+            id: `external:${String(item.name).toLocaleLowerCase()}`,
+            name: item.name,
+            description: item.description,
+            keywords: [],
+            path: item.path,
+            source: "graph-tool-call",
+            rank: 100,
+            kind: item.kind || "skill",
+            mcpServer: item.mcp_server || ""
+          }, score: Math.round(Number(item.score || 0) * 1000) + (item.kind === "mcp" ? 1000 : 0), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] })));
+      } catch { resolve([]); }
     });
   });
 }
 
-async function streamedCandidates(indexPath, patterns) {
-  const lines = [];
-  const reader = readline.createInterface({ input: createReadStream(indexPath, "utf8"), crlfDelay: Infinity });
-  for await (const line of reader) {
-    const lower = line.toLocaleLowerCase();
-    if (patterns.some((pattern) => lower.includes(pattern.toLocaleLowerCase()))) lines.push(line);
-    if (lines.length >= 300) break;
+function promptSkillExclusions(prompt) {
+  const selected = new Set();
+  const quoted = prompt.match(/(?:^|\s)(?:skill:|skill=|\$)([a-z0-9][a-z0-9._-]{1,100})/gi) || [];
+  for (const match of quoted) {
+    const name = match.replace(/^\s*(?:skill:|skill=|\$)/i, "").toLocaleLowerCase();
+    if (name) selected.add(name);
   }
-  reader.close();
-  return lines;
-}
-
-async function externalScores(indexPath, tokens, query, aliases, excludedNames) {
-  if (!indexPath || !existsSync(indexPath)) return [];
-  const patterns = [...new Set(tokens.filter((token) => token.length >= 3).sort((a, b) => b.length - a.length))].slice(0, 16);
-  if (!patterns.length) return [];
-  const lines = await rgCandidates(indexPath, patterns) || await streamedCandidates(indexPath, patterns);
-  const best = new Map();
-  for (const line of lines) {
-    if (!line || line.startsWith("#")) continue;
-    const fields = line.split("\t");
-    if (fields.length < 8) continue;
-    const name = fields[0];
-    const normalized = name.toLocaleLowerCase();
-    if (excludedNames.has(normalized) || !existsSync(fields[6])) continue;
-    const candidate = scoreSkill({
-      id: `external:${normalized}`,
-      name,
-      description: fields[1] || fields[2] || fields[3],
-      keywords: [fields[4], fields[5], fields[7]],
-      path: fields[6],
-      source: "external-catalog",
-      rank: 100
-    }, tokens, query, aliases);
-    if (candidate.score <= 0) continue;
-    if (!best.has(normalized) || candidate.score > best.get(normalized).score) best.set(normalized, candidate);
-  }
-  return [...best.values()];
+  return selected;
 }
 
 try {
@@ -131,17 +117,13 @@ try {
   const tokens = queryTokens(query, stopTokens);
   const skills = Array.isArray(registry.skills) ? registry.skills : [];
   const knownNames = new Set(skills.map((skill) => String(skill.name || "").toLocaleLowerCase()));
-  const localAliasMatch = [...knownNames].some((name) => (aliases[name] || []).some((alias) => query.includes(alias)));
+  for (const name of promptSkillExclusions(prompt)) knownNames.add(name);
+  const explicitlyRouted = [...knownNames].some((name) => (aliases[name] || []).some((alias) => query.includes(alias)));
   const scored = skills.map((skill) => scoreSkill(skill, tokens, query, aliases)).filter((item) => item.score > 0);
-  if (!localAliasMatch) {
-    scored.push(...await externalScores(
-      registry.externalIndexPath || path.join(codexRoot, "skill-registry", "external-skills.tsv"),
-      tokens,
-      query,
-      aliases,
-      knownNames
-    ));
-  }
+  const indexerPath = path.join(codexRoot, "hooks", "graph_skill_index.py");
+  const pythonPath = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexRoot, "tools", "graph-tool-call-venv", "bin", "python");
+  const externalNames = new Set(Object.keys(aliases).map((name) => name.toLocaleLowerCase()));
+  scored.push(...await graphCandidates(registry.externalGraphPath, prompt, pythonPath, indexerPath, externalNames));
   scored.sort((a, b) => b.score - a.score || Number(a.skill.rank || 0) - Number(b.skill.rank || 0) || String(a.skill.name).localeCompare(String(b.skill.name)));
   if (!scored.length || scored[0].score < 6) {
     process.stdout.write("{}");
@@ -156,9 +138,12 @@ try {
   ];
   for (const item of selected) {
     const description = String(item.skill.description || "").replace(/\s+/g, " ").trim().slice(0, 280);
-    lines.push(`- ${item.skill.name} [score=${item.score}; match=${item.matches.join(", ") || "description match"}]`);
+    const routeKind = item.skill.kind === "mcp" ? `MCP/${item.skill.mcpServer}` : "Skill";
+    lines.push(`- ${item.skill.name} [${routeKind}; score=${item.score}; match=${item.matches.join(", ") || "description match"}]`);
     lines.push(`  ${description}`);
-    lines.push(`  Read: ${item.skill.path}`);
+    lines.push(item.skill.kind === "mcp"
+      ? `  Call through indexed MCP server: ${item.skill.mcpServer}/${item.skill.name}`
+      : `  Read: ${item.skill.path}`);
   }
   lines.push("If none is genuinely relevant, ignore this list and continue without a specialized Skill.");
   process.stdout.write(JSON.stringify({

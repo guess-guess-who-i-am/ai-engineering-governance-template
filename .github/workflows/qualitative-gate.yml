@@ -30,7 +30,7 @@ concurrency:
 jobs:
   evaluate:
     if: ${{ github.event_name == 'workflow_dispatch' || vars.LLM_GATE_ENABLED == 'true' }}
-    runs-on: windows-latest
+    runs-on: macos-15
     timeout-minutes: 20
     env:
       LLM_API_KEY: ${{ secrets.LLM_API_KEY }}

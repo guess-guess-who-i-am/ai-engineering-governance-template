@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "publishedAt": "2026-08-16T07:20:35.993Z",
-  "runtimeSourceSha256": "d838614fef06514d11e6e4c7379fc3594309cebeedcf0c51ac5242205774c7c0",
-  "translationSha256": "f265f34e90c32e259aa203c11d1608537d318ca48ee79812c4db4707ada91bc8",
+  "publishedAt": "2026-09-19T23:58:03.909Z",
+  "runtimeSourceSha256": "7ee114f41fd5c0cfc486cf27640522a97d417ab789e40b56fb99038ea56a6a04",
+  "translationSha256": "a26811c6fdbb120694d0984571db15e101737176317784fef07945e0d860c5b5",
   "ruleCount": 63,
   "routeCounts": {
     "alwaysOn": 21,

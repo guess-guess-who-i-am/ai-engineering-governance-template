@@ -1,0 +1,4 @@
+interface:
+  display_name: "全局方法论管理器"
+  short_description: "编辑、校验并发布通过路由按需加载的全局方法论规则体系"
+  default_prompt: "使用 $manage-global-methodology 更新并发布我的全局方法论规则。"

@@ -311,6 +311,20 @@ export async function publishMethodology(config, { force = false, dryRun = false
   const chineseSections = parseRoutedSections(runtimeSource);
   const chineseRules = validateSourceSections(chineseSections, config.routes);
   if (check) {
+    const state = await readState(config.stateFile);
+    if (state.runtimeSourceSha256 !== sha256(runtimeSource)) {
+      throw new Error("方法论状态过期：当前中文源与 methodology-state.json 不一致；请先运行发布器更新翻译缓存和生成物");
+    }
+    if (!existsSync(config.translationCacheFile)) {
+      throw new Error("方法论翻译缓存缺失；请先运行发布器生成 translation cache");
+    }
+    const cachedTranslation = `${normalizeText(await readFile(config.translationCacheFile, "utf8"))}\n`;
+    if (state.translationSha256 !== sha256(cachedTranslation)) {
+      throw new Error("方法论状态过期：翻译缓存与 methodology-state.json 不一致；请先运行发布器");
+    }
+    validateTranslation(runtimeSource, cachedTranslation);
+    const translatedSections = parseRoutedSections(cachedTranslation);
+    assertTranslatedSections(chineseSections, translatedSections, config.routes);
     const validation = await runPostPublish(config);
     return { status: "checked", translated: false, ruleCount: [...chineseRules.values()].reduce((sum, rules) => sum + rules.length, 0), validation };
   }
