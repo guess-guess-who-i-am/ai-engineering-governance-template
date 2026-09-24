@@ -1,4 +1,4 @@
 interface:
-  display_name: "GitHub Delivery Method"
-  short_description: "Deliver authorized project changes safely to GitHub"
-  default_prompt: "Use $method-github-delivery to prepare this project for authorized GitHub delivery."
+  display_name: "GitHub 交付方法"
+  short_description: "在获得授权后安全整理、提交并交付项目变更到 GitHub"
+  default_prompt: "使用 $method-github-delivery 准备并完成这个项目的 GitHub 授权交付。"

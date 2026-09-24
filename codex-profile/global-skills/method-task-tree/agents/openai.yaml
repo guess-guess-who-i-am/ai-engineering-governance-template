@@ -1,4 +1,4 @@
 interface:
-  display_name: "Task Tree Governance Method"
-  short_description: "Operate llm-task-tree state and evidence correctly"
-  default_prompt: "Use $method-task-tree to work with this project task graph."
+  display_name: "任务树治理方法"
+  short_description: "按当前状态、执行范围与证据规则正确维护项目任务图状态"
+  default_prompt: "使用 $method-task-tree 读取、执行并维护这个项目的任务图。"

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Task Tree Core State"
-  short_description: "Keep live task trees decision-relevant and compact"
-  default_prompt: "Use $task-tree-core-state to retain only decision-relevant live task state."
+  display_name: "任务树核心状态"
+  short_description: "精炼任务树并只保留会改变下一步决策的当前核心状态信息"
+  default_prompt: "使用 $task-tree-core-state 只保留与下一步决策相关的任务树当前状态。"

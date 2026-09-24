@@ -1,4 +1,4 @@
 interface:
-  display_name: "Evaluation Gates Method"
-  short_description: "Design justified metrics and calibrated quality gates"
-  default_prompt: "Use $method-evaluation-gates to define and verify acceptance criteria."
+  display_name: "评价门禁方法"
+  short_description: "设计有权威依据、可校准并能严格验收结果的评价门禁体系"
+  default_prompt: "使用 $method-evaluation-gates 定义并验证验收标准。"

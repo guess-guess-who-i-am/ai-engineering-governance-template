@@ -18,7 +18,6 @@ $required = @(
     'upstreams.lock.json',
     'docs/RELEASING.md',
     'docs/AGENT_PLATFORM_BOUNDARY.md',
-    'codex-profile/global-skills/README.md',
     'design/catalog.json',
     'site/index.html',
     'quality/gates.json',
@@ -35,7 +34,15 @@ if ($missing.Count -gt 0) {
 }
 
 $agents = Get-Content -LiteralPath (Join-Path $Root 'AGENTS.md') -Raw
-foreach ($authority in @('CONTEXT.md', 'DESIGN.md', 'codex-profile/global-skills')) {
+$authorities = @('CONTEXT.md', 'DESIGN.md')
+$globalSkillSource = Join-Path $Root 'codex-profile/global-skills'
+if (Test-Path -LiteralPath $globalSkillSource) {
+    if (-not (Test-Path -LiteralPath (Join-Path $globalSkillSource 'README.md'))) {
+        throw 'Global Skill version source exists without codex-profile/global-skills/README.md.'
+    }
+    $authorities += 'codex-profile/global-skills'
+}
+foreach ($authority in $authorities) {
     if ($agents -notmatch [regex]::Escape($authority)) {
         throw "AGENTS.md does not route to $authority"
     }

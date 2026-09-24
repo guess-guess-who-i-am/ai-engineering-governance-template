@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
-import { cp, mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { chmod, cp, mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -10,7 +11,6 @@ const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const INSTALLER = path.join(SCRIPT_DIR, "install-codex-profile-mac.mjs");
 const DEPLOYER = path.join(SCRIPT_DIR, "deploy-codex-profile-mac.sh");
 const REPOSITORY_ROOT = path.dirname(SCRIPT_DIR);
-const GRAPH_PYTHON = process.env.CODEX_GRAPH_TOOL_PYTHON || "/Users/pku1727/.codex/tools/graph-tool-call-venv/bin/python";
 
 function hash(data) { return createHash("sha256").update(data).digest("hex"); }
 
@@ -73,11 +73,30 @@ try {
   await cp(path.join(REPOSITORY_ROOT, "codex-profile", "mac", "hooks", "graph_skill_index.py"), path.join(home, ".codex", "hooks", "graph_skill_index.py"));
   await writeFile(path.join(home, ".codex", "skill-registry", "external-library-config.json"), JSON.stringify({ root: skillFixture, catalog: skillCatalog }));
   const graphPython = path.join(home, ".codex", "tools", "graph-tool-call-venv", "bin", "python");
+  const userGraphPython = path.join(os.homedir(), ".codex", "tools", "graph-tool-call-venv", "bin", "python");
+  const graphShim = path.join(root, "graph-tool-call-python-shim");
+  await writeFile(graphShim, `#!/usr/bin/env python3
+import json, pathlib, sys
+args = sys.argv[1:]
+if "-c" in args:
+    raise SystemExit(0)
+def value(name):
+    return args[args.index(name) + 1]
+if "build" in args:
+    output = pathlib.Path(value("--output"))
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text("{}\\n", encoding="utf-8")
+    print(json.dumps({"schemaVersion":"graph-tool-call-skills/1","graphToolCallVersion":"test-shim","embedding":"disabled","catalogSkillCount":2,"skillCount":1,"externalSkillCount":1,"ownedSkillCount":0,"mcpToolCount":0,"missingSkillCount":1,"invalidSkillCount":0,"graphPath":str(output)}))
+elif "retrieve" in args:
+    print(json.dumps([{"name":"astro-islands","description":"Build Astro islands architecture and hydration patterns","path":"external skills with spaces/acme-astro-islands/SKILL.md","score":1,"confidence":"test","keyword_score":1,"graph_score":0,"embedding_score":0,"kind":"skill","mcp_server":""}]))
+`);
+  await chmod(graphShim, 0o700);
+  const graphToolPython = process.env.CODEX_GRAPH_TOOL_PYTHON || (existsSync(userGraphPython) ? userGraphPython : graphShim);
   const authFile = path.join(home, ".codex", "auth.json");
   const configFile = path.join(home, ".codex", "config.toml");
   const authBefore = hash(await readFile(authFile));
 
-  const install = run(INSTALLER, ["--home", home, "--json"], { home, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: skillFixture, CODEX_EXTERNAL_SKILL_CATALOG: skillCatalog, CODEX_GRAPH_TOOL_PYTHON: GRAPH_PYTHON } });
+  const install = run(INSTALLER, ["--home", home, "--json"], { home, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: skillFixture, CODEX_EXTERNAL_SKILL_CATALOG: skillCatalog, CODEX_GRAPH_TOOL_PYTHON: graphToolPython } });
   assert(install.status === 0, `clean install failed: ${install.stderr || install.stdout}`);
   const result = JSON.parse(install.stdout);
   assert(result.status === "installed" && result.changedFiles > 0, "installer did not report a real installation");
@@ -121,7 +140,7 @@ try {
 
   const envArgs = { home };
   const refreshInput = `${JSON.stringify({ hook_event_name: "SessionStart", source: "startup", cwd: REPOSITORY_ROOT })}\n`;
-  const refresh = run(path.join(home, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { ...envArgs, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: GRAPH_PYTHON }, input: refreshInput });
+  const refresh = run(path.join(home, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { ...envArgs, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
   assert(refresh.status === 0, `Skill registry refresh failed: ${refresh.stderr || refresh.stdout}`);
   const registry = JSON.parse(await readFile(path.join(home, ".codex", "skill-registry", "skills-index.json"), "utf8"));
   assert(registry.schemaVersion === "codex-skill-registry/2", "portable registry does not use the multi-root schema");
@@ -151,7 +170,7 @@ try {
   const taskTreeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "帮我精简任务树的核心状态", cwd: REPOSITORY_ROOT })}\n`;
   const taskTree = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: taskTreeInput });
   assert(taskTree.status === 0 && taskTree.stdout.includes("task-tree-core-state"), `task-tree core-state route did not match: ${taskTree.stderr || taskTree.stdout}`);
-  const externalRoute = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: GRAPH_PYTHON }, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Help implement Astro islands hydration patterns", cwd: REPOSITORY_ROOT })}\n` });
+  const externalRoute = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Help implement Astro islands hydration patterns", cwd: REPOSITORY_ROOT })}\n` });
   assert(externalRoute.status === 0 && externalRoute.stdout.includes("astro-islands") && externalRoute.stdout.includes("external skills with spaces/acme-astro-islands/SKILL.md"), `GraphToolCall Skill route failed: ${externalRoute.stderr || externalRoute.stdout}`);
 
   const fixtureDirectory = path.join(root, "dispatcher-fixtures");
@@ -194,7 +213,7 @@ try {
   const deploy = runShell(DEPLOYER, ["--home", deployHome], { home: deployHome, extraEnv: { CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog } });
   assert(deploy.status === 0, `one-click deployment failed: ${deploy.stderr || deploy.stdout}`);
   assert(deploy.stdout.includes("available to every Codex workspace"), "one-click deployment did not report its global workspace scope");
-  const deployedRefresh = run(path.join(deployHome, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { home: deployHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: GRAPH_PYTHON }, input: refreshInput });
+  const deployedRefresh = run(path.join(deployHome, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { home: deployHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
   assert(deployedRefresh.status === 0, `one-click SessionStart refresh failed: ${deployedRefresh.stderr || deployedRefresh.stdout}`);
   const deployedRegistry = JSON.parse(await readFile(path.join(deployHome, ".codex", "skill-registry", "skills-index.json"), "utf8"));
   assert(deployedRegistry.skills.filter((skill) => skill.source === "agents").length === expectedSkills.length, "one-click deployment did not register all global Skills");
@@ -271,11 +290,11 @@ try {
   assert(await readFile(path.join(liveLibrary, "_catalog_cn.json"), "utf8").then((value) => value.includes("skills")), "Finder Skill sync did not preserve the catalog");
   assert(await readFile(path.join(stagedProfile, "scripts", "parallel-run.mjs"), "utf8").then((value) => value.includes("Execute a dependency DAG in adaptive waves")), "Finder source sync did not update the adaptive scheduler");
 
-  const reinstall = run(INSTALLER, ["--home", home, "--json"], { home, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: skillFixture, CODEX_EXTERNAL_SKILL_CATALOG: skillCatalog, CODEX_GRAPH_TOOL_PYTHON: GRAPH_PYTHON } });
+  const reinstall = run(INSTALLER, ["--home", home, "--json"], { home, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: skillFixture, CODEX_EXTERNAL_SKILL_CATALOG: skillCatalog, CODEX_GRAPH_TOOL_PYTHON: graphToolPython } });
   assert(reinstall.status === 0, `repeat install failed: ${reinstall.stderr || reinstall.stdout}`);
   const agentsAfter = await readFile(path.join(home, ".codex", "AGENTS.md"), "utf8");
   assert((agentsAfter.match(/ai-engineering-governance-template:begin/g) || []).length === 1, "repeat install duplicated the managed AGENTS.md block");
-  const check = run(INSTALLER, ["--home", home, "--check", "--json"], { home, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: skillFixture, CODEX_EXTERNAL_SKILL_CATALOG: skillCatalog, CODEX_GRAPH_TOOL_PYTHON: GRAPH_PYTHON } });
+  const check = run(INSTALLER, ["--home", home, "--check", "--json"], { home, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: skillFixture, CODEX_EXTERNAL_SKILL_CATALOG: skillCatalog, CODEX_GRAPH_TOOL_PYTHON: graphToolPython } });
   assert(check.status === 0 && JSON.parse(check.stdout).status === "current", `--check failed: ${check.stderr || check.stdout}`);
 
   const failureHome = path.join(root, "rollback-home");
@@ -294,14 +313,14 @@ try {
   if (fullFixture) {
     const fullHome = path.join(root, "full-library-home");
     await seedHome(fullHome, "FULL_LIBRARY_SENTINEL");
-  const fullInstall = run(INSTALLER, ["--home", fullHome, "--json"], { home: fullHome, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: fullFixture, CODEX_EXTERNAL_SKILL_CATALOG: path.join(fullFixture, "_catalog_cn.json"), CODEX_GRAPH_TOOL_PYTHON: GRAPH_PYTHON } });
+  const fullInstall = run(INSTALLER, ["--home", fullHome, "--json"], { home: fullHome, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: fullFixture, CODEX_EXTERNAL_SKILL_CATALOG: path.join(fullFixture, "_catalog_cn.json"), CODEX_GRAPH_TOOL_PYTHON: graphToolPython } });
     assert(fullInstall.status === 0, `full catalog profile setup failed: ${fullInstall.stderr || fullInstall.stdout}`);
-  const fullRefresh = run(path.join(fullHome, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { home: fullHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: GRAPH_PYTHON }, input: refreshInput });
+  const fullRefresh = run(path.join(fullHome, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { home: fullHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
     assert(fullRefresh.status === 0, `full catalog indexing failed: ${fullRefresh.stderr || fullRefresh.stdout}`);
     const fullManifest = JSON.parse(await readFile(path.join(fullHome, ".codex", "skill-registry", "external-skills-manifest.json"), "utf8"));
     const fullIndex = await readFile(path.join(fullHome, ".codex", "skill-registry", "skills.graph.json"));
     assert(fullManifest.catalogSkillCount === 15472 && fullManifest.skillCount > 15000, `full catalog was not indexed in its entirety: ${fullManifest.catalogSkillCount}/${fullManifest.skillCount}`);
-  const semanticRoute = run(path.join(fullHome, ".codex", "hooks", "skill-router.mjs"), [], { home: fullHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: GRAPH_PYTHON }, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "I need to resolve a git merge conflict safely", cwd: REPOSITORY_ROOT })}\n` });
+  const semanticRoute = run(path.join(fullHome, ".codex", "hooks", "skill-router.mjs"), [], { home: fullHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "I need to resolve a git merge conflict safely", cwd: REPOSITORY_ROOT })}\n` });
     assert(semanticRoute.status === 0 && semanticRoute.stdout.includes("resolving-merge-conflicts"), `real external Skill was not routed: ${semanticRoute.stderr || semanticRoute.stdout}`);
     console.log(`PASS: full catalog fixture indexed ${fullManifest.skillCount}/${fullManifest.catalogSkillCount} Skills; total index bytes=${Buffer.byteLength(fullIndex)}; example route=resolving-merge-conflicts`);
   }

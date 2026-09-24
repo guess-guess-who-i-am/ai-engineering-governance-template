@@ -1,4 +1,4 @@
 interface:
-  display_name: "Research Evidence Method"
-  short_description: "Authoritative research and paper evidence workflow"
-  default_prompt: "Use $method-research-evidence to plan an evidence-grounded research task."
+  display_name: "研究证据方法"
+  short_description: "使用权威论文、基线与基准建立可审计的完整研究证据链"
+  default_prompt: "使用 $method-research-evidence 规划并执行有证据支撑的研究任务。"

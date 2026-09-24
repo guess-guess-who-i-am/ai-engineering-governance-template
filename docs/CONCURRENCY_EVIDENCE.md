@@ -1,6 +1,6 @@
 # 自适应工具并发的研究与工程依据
 
-更新时间：2026-09-23
+更新时间：2026-09-24
 
 ## 结论
 
@@ -33,15 +33,15 @@ CCF 入口：
 
 ## 高 Star 工程项目
 
-2026-09-23 通过 GitHub API 读取的 Star 数仅用于说明项目采用规模，会随时间变化。
+2026-09-24 通过 GitHub API 读取的 Star 数仅用于说明项目采用规模，会随时间变化。
 
 | 项目 | Star | 借鉴点 |
 |---|---:|---|
-| microsoft/autogen | 61,117 | GraphFlow 用有向图精确控制串行、并行、条件和循环；官方还明确要求有共享内部状态的 AgentTool/TeamTool 禁止并行 |
-| langchain-ai/langgraph | 42,171 | 用图结构表达分支、状态与汇合，而不是用固定线程数表达工作流 |
-| deepset-ai/haystack | 26,582 | AsyncPipeline 只并行可独立运行的组件，并暴露 `concurrency_limit` 作为上限 |
-| PrefectHQ/prefect | 23,904 | 把任务运行、重试、状态和限流作为调度器的一等状态 |
-| SWE-agent/SWE-agent | 20,386 | 重视可观察轨迹、环境边界和可复现证据，而不是追求最大终端数量 |
+| microsoft/autogen | 61,129 | GraphFlow 用有向图精确控制串行、并行、条件和循环；官方还明确要求有共享内部状态的 AgentTool/TeamTool 禁止并行 |
+| langchain-ai/langgraph | 42,197 | 用图结构表达分支、状态与汇合，而不是用固定线程数表达工作流 |
+| deepset-ai/haystack | 26,584 | AsyncPipeline 只并行可独立运行的组件，并暴露 `concurrency_limit` 作为上限 |
+| PrefectHQ/prefect | 23,912 | 把任务运行、重试、状态和限流作为调度器的一等状态 |
+| SWE-agent/SWE-agent | 20,392 | 重视可观察轨迹、环境边界和可复现证据，而不是追求最大终端数量 |
 | SqueezeAILab/LLMCompiler | 1,885 | 论文方法的参考实现，展示规划、取任务和执行的分层 |
 
 工程入口：

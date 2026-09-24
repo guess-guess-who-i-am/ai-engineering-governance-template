@@ -5,6 +5,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $skillsRoot = Join-Path $Root 'codex-profile/global-skills'
+if (-not (Test-Path -LiteralPath $skillsRoot)) {
+    Write-Output 'No repository-owned Skill packages; global registry owns Skills for this project.'
+    return
+}
 $validator = Join-Path $Root 'scripts/validate-skill.ps1'
 if (-not (Test-Path -LiteralPath $validator)) { throw "Missing validator: $validator" }
 
