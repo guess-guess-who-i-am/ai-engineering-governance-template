@@ -1,10 +1,6 @@
 ---
 name: task-tree-chain-run
-description: >-
-  Run one Agent step along GraphState.Chain in Codex or Cursor. Use chain-step
-  for focus; execute Next node's NextIdea (下一步思路); may read full task-tree.md
-  when needed. Stop loop when shouldStopLoop=true. Do not use when no active
-  GraphState.Chain run exists.
+description: Run one Agent step along GraphState.Chain in Codex or Cursor. Use chain-step for focus; execute Next node's NextIdea (下一步思路); may read full task-tree.md when needed. Stop loop when shouldStopLoop=true. Do not use when no active GraphState.Chain run exists.
 ---
 
 # Task Tree Chain Run

@@ -1,10 +1,6 @@
 ---
 name: task-tree-subtree-run
-description: >-
-  Parallel subtree Workers for Codex. Workers MAY read full task-tree.md when
-  main tree is mostly folded stubs; must NOT read other subtrees or write main
-  tree detail. Merge via UI unfold only. Do not use without an authorized
-  subtree execution scope.
+description: Parallel subtree Workers for Codex. Workers MAY read full task-tree.md when main tree is mostly folded stubs; must NOT read other subtrees or write main tree detail. Merge via UI unfold only. Do not use without an authorized subtree execution scope.
 ---
 
 # Task Tree Subtree Run (v2)
