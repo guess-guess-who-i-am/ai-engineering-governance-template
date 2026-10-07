@@ -74,6 +74,7 @@ if [ "$check" -eq 1 ]; then
       install-codex-profile-mac.sh \
       install-codex-profile-mac.mjs \
       install-task-tree-mcp-mac.mjs \
+      ensure-global-skill-library.mjs \
       install-codex-profile-service-mac.sh \
     run-codex-profile-service-mac.sh \
       test-codex-profile-mac.mjs \
@@ -148,6 +149,7 @@ if [ "$repository_root" != "$source_destination" ]; then
     install-codex-profile-mac.sh \
     install-codex-profile-mac.mjs \
     install-task-tree-mcp-mac.mjs \
+    ensure-global-skill-library.mjs \
     install-codex-profile-service-mac.sh \
     run-codex-profile-service-mac.sh \
     test-codex-profile-mac.mjs \

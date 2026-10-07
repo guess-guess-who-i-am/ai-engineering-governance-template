@@ -18,7 +18,7 @@ function run(file, args, { home, input = "", extraEnv = {} } = {}) {
     cwd: REPOSITORY_ROOT,
     encoding: "utf8",
     input,
-    env: { ...process.env, HOME: home, USERPROFILE: home, CODEX_HOME: path.join(home, ".codex"), HF_HOME: process.env.HF_HOME || path.join(os.tmpdir(), "codex-profile-hf-cache"), TRANSFORMERS_CACHE: process.env.TRANSFORMERS_CACHE || path.join(os.tmpdir(), "codex-profile-hf-cache"), ...extraEnv }
+    env: { ...process.env, HOME: home, USERPROFILE: home, CODEX_HOME: path.join(home, ".codex"), HF_HOME: process.env.HF_HOME || path.join(os.tmpdir(), "codex-profile-hf-cache"), TRANSFORMERS_CACHE: process.env.TRANSFORMERS_CACHE || path.join(os.tmpdir(), "codex-profile-hf-cache"), CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS: process.env.CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS || "2", CODEX_SKILL_REGISTRY_FOREGROUND: "1", ...extraEnv }
   });
   return result;
 }
@@ -28,7 +28,7 @@ function runShell(file, args, { home, input = "", extraEnv = {} } = {}) {
     cwd: REPOSITORY_ROOT,
     encoding: "utf8",
     input,
-    env: { ...process.env, HOME: home, USERPROFILE: home, CODEX_HOME: path.join(home, ".codex"), HF_HOME: process.env.HF_HOME || path.join(os.tmpdir(), "codex-profile-hf-cache"), TRANSFORMERS_CACHE: process.env.TRANSFORMERS_CACHE || path.join(os.tmpdir(), "codex-profile-hf-cache"), ...extraEnv }
+    env: { ...process.env, HOME: home, USERPROFILE: home, CODEX_HOME: path.join(home, ".codex"), HF_HOME: process.env.HF_HOME || path.join(os.tmpdir(), "codex-profile-hf-cache"), TRANSFORMERS_CACHE: process.env.TRANSFORMERS_CACHE || path.join(os.tmpdir(), "codex-profile-hf-cache"), CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS: process.env.CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS || "2", CODEX_SKILL_REGISTRY_FOREGROUND: "1", ...extraEnv }
   });
 }
 
@@ -74,7 +74,7 @@ try {
   const graphPython = path.join(home, ".codex", "tools", "graph-tool-call-venv", "bin", "python");
   const graphShim = path.join(root, "graph-tool-call-python-shim");
   await writeFile(graphShim, `#!/usr/bin/env python3
-import json, pathlib, sys
+import json, os, pathlib, socket, sys, time
 args = sys.argv[1:]
 if "-c" in args:
     raise SystemExit(0)
@@ -84,8 +84,32 @@ if "build" in args:
     output = pathlib.Path(value("--output"))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("{}\\n", encoding="utf-8")
-    print(json.dumps({"schemaVersion":"graph-tool-call-skills/1","graphToolCallVersion":"test-shim","embedding":"disabled","catalogSkillCount":2,"skillCount":1,"externalSkillCount":1,"ownedSkillCount":0,"mcpToolCount":0,"missingSkillCount":1,"invalidSkillCount":0,"graphPath":str(output)}))
+    print(json.dumps({"schemaVersion":"graph-tool-call-skills/1","graphToolCallVersion":"test-shim","embedding":"sentence-transformers/all-MiniLM-L6-v2","catalogSkillCount":2,"skillCount":1,"externalSkillCount":1,"ownedSkillCount":0,"mcpToolCount":0,"missingSkillCount":1,"invalidSkillCount":0,"graphPath":str(output)}))
+elif "serve" in args:
+    socket_path = pathlib.Path(value("--socket"))
+    socket_path.parent.mkdir(parents=True, exist_ok=True)
+    try: socket_path.unlink()
+    except FileNotFoundError: pass
+    marker = os.environ.get("CODEX_GRAPH_TOOL_WORKER_MARKER")
+    if marker: pathlib.Path(marker).open("a", encoding="utf-8").write("serve\\n")
+    server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    server.bind(str(socket_path)); server.listen(4); server.settimeout(0.2)
+    deadline = time.time() + float(os.environ.get("CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS", "10"))
+    try:
+        while time.time() < deadline:
+            try: connection, _ = server.accept()
+            except socket.timeout: continue
+            with connection:
+                connection.recv(65536)
+                if marker: pathlib.Path(marker).open("a", encoding="utf-8").write("request\\n")
+                connection.sendall((json.dumps({"ok": True, "results": [{"name":"astro-islands","description":"Build Astro islands architecture and hydration patterns","path":"external skills with spaces/acme-astro-islands/SKILL.md","score":1,"confidence":"worker","keyword_score":1,"graph_score":0,"embedding_score":0,"kind":"skill","mcp_server":""}]} ) + "\\n").encode())
+    finally:
+        server.close()
+        try: socket_path.unlink()
+        except FileNotFoundError: pass
 elif "retrieve" in args:
+    marker = os.environ.get("CODEX_GRAPH_TOOL_WORKER_MARKER")
+    if marker: pathlib.Path(marker).open("a", encoding="utf-8").write("retrieve\\n")
     print(json.dumps([{"name":"astro-islands","description":"Build Astro islands architecture and hydration patterns","path":"external skills with spaces/acme-astro-islands/SKILL.md","score":1,"confidence":"test","keyword_score":1,"graph_score":0,"embedding_score":0,"kind":"skill","mcp_server":""}]))
 `);
   await chmod(graphShim, 0o700);
@@ -111,8 +135,11 @@ elif "retrieve" in args:
   assert((agents.match(/ai-engineering-governance-template:begin/g) || []).length === 1, "managed AGENTS.md block is missing or duplicated");
   const hooks = JSON.parse(await readFile(path.join(home, ".codex", "hooks.json"), "utf8"));
   assert(hooks.hooks.UserPromptSubmit[0].hooks.length === 1 && hooks.hooks.SessionStart[0].hooks.length === 1, "hooks.json does not use one stable dispatcher per event");
+  assert(hooks.hooks.UserPromptSubmit[0].hooks[0].timeout === 60, "UserPromptSubmit dispatcher timeout is below the GraphToolCall route budget");
   const hookCommand = hooks.hooks.UserPromptSubmit[0].hooks[0].command;
   assert(hookCommand.includes(process.execPath) && hookCommand.includes("hook-dispatch.mjs"), "hooks.json does not pin the absolute Node executable and dispatcher path");
+  const dispatcherSource = await readFile(path.join(home, ".codex", "hooks", "hook-dispatch.mjs"), "utf8");
+  assert(dispatcherSource.includes('own("skill-router", 60000)'), "dispatcher UserPromptSubmit handler timeout is below the GraphToolCall route budget");
   const targets = JSON.parse(await readFile(path.join(home, ".codex", "prompt-publisher", "methodology-targets.json"), "utf8"));
   assert(targets.validatorFile.endsWith("validate-methodology-routing.mjs"), "macOS publisher still targets the PowerShell validator");
   assert(targets.refreshRegistryFile.endsWith("refresh-skill-registry.mjs"), "macOS publisher still targets the PowerShell registry refresher");
@@ -145,6 +172,35 @@ elif "retrieve" in args:
   assert(registry.externalSkillCount === 1 && registry.externalMissingSkillCount === 1, `external Skill graph counts are wrong: ${registry.externalSkillCount}/${registry.externalMissingSkillCount}`);
   const externalGraph = path.join(home, ".codex", "skill-registry", "skills.graph.json");
   assert((await stat(externalGraph)).size > 0, "GraphToolCall graph index is empty");
+  const graphStat = await stat(externalGraph);
+  const refreshAgain = run(path.join(home, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { ...envArgs, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
+  assert(refreshAgain.status === 0 && (await stat(externalGraph)).mtimeMs === graphStat.mtimeMs, "unchanged graph inputs caused a rebuild");
+  const editedOwnedSkill = path.join(home, ".agents", "skills", "systematic-debugging", "SKILL.md");
+  const ownedSkillBefore = await readFile(editedOwnedSkill, "utf8");
+  await writeFile(editedOwnedSkill, `${ownedSkillBefore}\nChanged fixture with the same Skill count.\n`);
+  const editedRefresh = run(path.join(home, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { ...envArgs, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
+  assert(editedRefresh.status === 0 && (await stat(externalGraph)).mtimeMs !== graphStat.mtimeMs, "same-count Skill edit did not invalidate the graph");
+  await writeFile(editedOwnedSkill, ownedSkillBefore);
+  const mcpFixture = path.join(root, "mcp-refresh-fixture.mjs");
+  const mcpVersion = path.join(root, "mcp-refresh-description.txt");
+  await writeFile(mcpVersion, "version one");
+  await writeFile(mcpFixture, `import { readFileSync } from 'node:fs';
+let raw = ''; for await (const chunk of process.stdin) raw += chunk;
+for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse)) {
+ const result = request.method === 'tools/list' ? { tools: [{name:'fixture-tool',description:readFileSync(process.argv[2],'utf8'),inputSchema:{type:'object'}}] } : {protocolVersion:'2025-06-18',capabilities:{}};
+ process.stdout.write(JSON.stringify({jsonrpc:'2.0',id:request.id,result})+'\\n');
+}
+`);
+  await writeFile(configFile, `${config}\n[mcp_servers.refresh_fixture]\ncommand = '${process.execPath}'\nargs = ['${mcpFixture}', '${mcpVersion}']\n`);
+  const mcpRefresh = () => run(path.join(home, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { ...envArgs, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
+  assert(mcpRefresh().status === 0, "MCP discovery fixture failed");
+  const refreshManifestPath = path.join(home, ".codex", "skill-registry", "external-skills-manifest.json");
+  const beforeMcpEdit = JSON.parse(await readFile(refreshManifestPath, "utf8"));
+  await writeFile(mcpVersion, "version two");
+  assert(mcpRefresh().status === 0, "MCP edit refresh failed");
+  const afterMcpEdit = JSON.parse(await readFile(refreshManifestPath, "utf8"));
+  assert(beforeMcpEdit.graphInputsSha256 !== afterMcpEdit.graphInputsSha256, "same-count MCP definition edit did not invalidate graph inputs");
+  await writeFile(configFile, config);
   assert(registry.roots.every((root) => root.source !== "project"), "global registry unexpectedly includes project Skill roots");
   assert(!registry.skills.some((skill) => skill.source === "project"), "global registry unexpectedly indexes project Skills");
   assert(registry.skills.filter((skill) => skill.source === "agents").length === expectedSkills.length, `expected ${expectedSkills.length} installed global Skills in the registry`);
@@ -168,8 +224,14 @@ elif "retrieve" in args:
   const taskTreeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "帮我精简任务树的核心状态", cwd: REPOSITORY_ROOT })}\n`;
   const taskTree = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: taskTreeInput });
   assert(taskTree.status === 0 && taskTree.stdout.includes("task-tree-core-state"), `task-tree core-state route did not match: ${taskTree.stderr || taskTree.stdout}`);
-  const externalRoute = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Help implement Astro islands hydration patterns", cwd: REPOSITORY_ROOT })}\n` });
+  const workerMarker = path.join(root, "graph-worker-marker.txt");
+  const workerEnv = { CODEX_GRAPH_TOOL_PYTHON: graphToolPython, CODEX_GRAPH_TOOL_WORKER_MARKER: workerMarker, CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS: "2" };
+  const externalRoute = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, extraEnv: workerEnv, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Help implement Astro islands hydration patterns", cwd: REPOSITORY_ROOT })}\n` });
   assert(externalRoute.status === 0 && externalRoute.stdout.includes("astro-islands") && externalRoute.stdout.includes("external skills with spaces/acme-astro-islands/SKILL.md"), `GraphToolCall Skill route failed: ${externalRoute.stderr || externalRoute.stdout}`);
+  const externalRouteAgain = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, extraEnv: workerEnv, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Help implement Astro islands hydration patterns", cwd: REPOSITORY_ROOT })}\n` });
+  assert(externalRouteAgain.status === 0 && externalRouteAgain.stdout.includes("astro-islands"), `Persistent GraphToolCall worker did not answer a second route: ${externalRouteAgain.stderr || externalRouteAgain.stdout}`);
+  const workerMarkerContents = await readFile(workerMarker, "utf8").catch(() => "missing");
+  assert(workerMarkerContents === "serve\nrequest\nrequest\n", `GraphToolCall route did not reuse the persistent worker protocol: ${workerMarkerContents}`);
 
   const fixtureDirectory = path.join(root, "dispatcher-fixtures");
   await mkdir(fixtureDirectory, { recursive: true });
@@ -245,7 +307,7 @@ await writeFile(configPath, config);
   await mkdir(path.join(deploySource, "scripts"), { recursive: true });
   await mkdir(path.join(deploySource, "codex-profile"), { recursive: true });
   await writeFile(path.join(deploySource, "scripts", "deploy-codex-profile-mac.sh"), "#!/bin/sh\nexit 0\n");
-  const deploy = runShell(DEPLOYER, ["--home", deployHome], { home: deployHome, extraEnv: { CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog, TASK_TREE_RUNTIME_ROOT: taskTreeRuntime } });
+  const deploy = runShell(DEPLOYER, ["--home", deployHome], { home: deployHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython, CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog, TASK_TREE_RUNTIME_ROOT: taskTreeRuntime } });
   assert(deploy.status === 0, `one-click deployment failed: ${deploy.stderr || deploy.stdout}`);
   assert(deploy.stdout.includes("available to every Codex workspace"), "one-click deployment did not report its global workspace scope");
   const deployedRefresh = run(path.join(deployHome, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { home: deployHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
@@ -263,7 +325,7 @@ await writeFile(configPath, config);
   assert(!workflow.includes("Please select one governance repository folder") && !workflow.includes("$repo/scripts/deploy-codex-profile-mac.sh"), "Finder Quick Action still depends on the selected folder being the governance repository");
   const arbitraryWorkspace = path.join(root, "arbitrary-workspace");
   await mkdir(arbitraryWorkspace, { recursive: true });
-  const arbitraryDeploy = runShell(serviceRunner, [arbitraryWorkspace], { home: deployHome, extraEnv: { CODEX_PROFILE_SOURCE: stagedSource, CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog, TASK_TREE_RUNTIME_ROOT: taskTreeRuntime, CODEX_PROFILE_DEBUG: "1" } });
+  const arbitraryDeploy = runShell(serviceRunner, [arbitraryWorkspace], { home: deployHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython, CODEX_PROFILE_SOURCE: stagedSource, CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog, TASK_TREE_RUNTIME_ROOT: taskTreeRuntime, CODEX_PROFILE_DEBUG: "1" } });
   assert(arbitraryDeploy.status === 0, `Finder Quick Action runner failed for an arbitrary workspace: ${arbitraryDeploy.stderr || arbitraryDeploy.stdout || `exit ${arbitraryDeploy.status}`}`);
   const serviceCheck = runShell(path.join(stagedSource, "scripts", "install-codex-profile-service-mac.sh"), ["--home", deployHome, "--check"], { home: deployHome, extraEnv: { CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog } });
   assert(serviceCheck.status === 0, `staged Finder Quick Action check failed: ${serviceCheck.stderr || serviceCheck.stdout}`);
@@ -288,6 +350,7 @@ await writeFile(configPath, config);
   await writeFile(path.join(syncSource, "scripts", "run-codex-profile-service-mac.sh"), await readFile(syncRunner));
   await writeFile(path.join(syncSource, "scripts", "install-codex-profile-service-mac.sh"), await readFile(path.join(SCRIPT_DIR, "install-codex-profile-service-mac.sh")));
   await writeFile(path.join(syncSource, "scripts", "install-task-tree-mcp-mac.mjs"), "process.exit(0);\n");
+  await cp(path.join(SCRIPT_DIR, "ensure-global-skill-library.mjs"), path.join(syncSource, "scripts", "ensure-global-skill-library.mjs"));
   await writeFile(path.join(syncSource, "scripts", "parallel-run.mjs"), await readFile(path.join(SCRIPT_DIR, "parallel-run.mjs"), "utf8"));
   const syncTools = path.join(syncHome, ".codex", "tools");
   const stagedProfile = path.join(syncTools, "ai-engineering-governance-template");
@@ -301,6 +364,7 @@ await writeFile(configPath, config);
   await writeFile(path.join(stagedProfile, "scripts", "install-codex-profile-mac.mjs"), "process.exit(0);\n");
   await writeFile(path.join(stagedProfile, "scripts", "test-codex-profile-mac.mjs"), "process.exit(0);\n");
   await writeFile(path.join(stagedProfile, "scripts", "install-task-tree-mcp-mac.mjs"), "process.exit(0);\n");
+  await cp(path.join(SCRIPT_DIR, "ensure-global-skill-library.mjs"), path.join(stagedProfile, "scripts", "ensure-global-skill-library.mjs"));
   await writeFile(path.join(stagedProfile, "scripts", "install-codex-profile-service-mac.sh"), await readFile(path.join(SCRIPT_DIR, "install-codex-profile-service-mac.sh")));
   await writeFile(path.join(stagedProfile, "scripts", "parallel-run.mjs"), "stale runner\n");
   const liveLibrary = path.join(syncTools, "skills");

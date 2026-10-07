@@ -4,7 +4,9 @@
 
 ## 一次安装
 
-前提：目标机已安装 Git 和 Codex，并已克隆本仓库。脚本优先使用 Codex 自带 Node.js，找不到时才使用 `PATH` 中的 Node.js。
+前提：目标机已安装 Git 和 Codex，并已下载本仓库的 `codex/macos-global-deploy` 分支。双击仓库根目录 `安装全局配置.command` 即可启动安装，不需要输入部署命令。脚本优先使用 Codex 自带 Node.js，找不到时才使用 `PATH` 中的 Node.js。
+
+完整Skill库保存在独立私有仓库 `guess-guess-who-i-am/skills-library`。目标机没有库时部署自动拉取固定commit并校验目录摘要；先通过 `gh auth login` 和 `gh auth setup-git` 完成该电脑的授权，或带入已有库。没有权限时明确失败，不会把22个自有Skill的部分安装说成完整复原。首次构图会下载embedding模型并为新电脑重写路径；不会复制旧机图中的绝对路径。
 
 ```bash
 cd ai-engineering-governance-template

@@ -4,15 +4,22 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
+import gc
 import hashlib
 import json
 import os
 from pathlib import Path
 import re
+import socket
+import socketserver
+import subprocess
 import sys
+import threading
+import time
 import warnings
 
-from graph_tool_call import ToolGraph
+# Import GraphToolCall only after the worker owns the inter-process lock.
 
 
 def catalog_rows(catalog: Path):
@@ -91,6 +98,7 @@ def load_owned_skills(root: Path):
 
 
 def graph_from_records(records, mcp_records=None):
+    from graph_tool_call import ToolGraph
     graph = ToolGraph()
     mcp_tools = [{
         "name": record["tool_name"],
@@ -174,10 +182,7 @@ def build(args):
     print(json.dumps(manifest, ensure_ascii=False))
 
 
-def retrieve(args):
-    warnings.filterwarnings("ignore", message="Retrieving over .* without an embedding index")
-    graph = ToolGraph.load(args.graph)
-    results = graph.retrieve_with_scores(args.query, top_k=args.top_k, max_graph_depth=2)
+def result_records(results):
     output = []
     for result in results:
         tool = result.tool
@@ -194,7 +199,157 @@ def retrieve(args):
             "kind": metadata.get("kind", "skill"),
             "mcp_server": metadata.get("mcp_server", ""),
         })
-    print(json.dumps(output, ensure_ascii=False))
+    return output
+
+
+def retrieve(args):
+    from graph_tool_call import ToolGraph
+    warnings.filterwarnings("ignore", message="Retrieving over .* without an embedding index")
+    graph = ToolGraph.load(args.graph)
+    graph.tune_for_scale()
+    results = graph.retrieve_with_scores(args.query, top_k=args.top_k, max_graph_depth=2)
+    print(json.dumps(result_records(results), ensure_ascii=False))
+
+
+class _GraphWorker:
+    """Keep one graph and its retrieval caches alive across Hook requests."""
+
+    def __init__(self, graph_path: Path):
+        self.graph_path = graph_path
+        self._graph: ToolGraph | None = None
+        self._signature: tuple[int, int, int] | None = None
+        self._lock = threading.RLock()
+        self._last_request = time.monotonic()
+        self.loads = 0
+
+    def _load_if_stale(self) -> ToolGraph:
+        from graph_tool_call import ToolGraph
+        stat = self.graph_path.stat()
+        signature = (stat.st_ino, stat.st_size, stat.st_mtime_ns)
+        if self._graph is None or signature != self._signature:
+            # Drop old caches first: a reload must not hold two 15k graphs.
+            self._graph = None
+            self._signature = None
+            gc.collect()
+            graph = ToolGraph.load(self.graph_path)
+            # The serialized retrieval state does not persist this scale hook.
+            graph.tune_for_scale()
+            self._graph = graph
+            self._signature = signature
+            self.loads += 1
+        return self._graph
+
+    def query(self, payload: dict) -> list[dict]:
+        query = str(payload.get("query") or "").strip()
+        if not query:
+            return []
+        top_k = max(1, min(int(payload.get("top_k", 8)), 50))
+        with self._lock:
+            self._last_request = time.monotonic()
+            graph = self._load_if_stale()
+            results = graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2)
+            return result_records(results)
+
+
+class _WorkerHandler(socketserver.StreamRequestHandler):
+    def handle(self):
+        self.connection.settimeout(2)
+        # A stuck native model call cannot be cancelled by a Python thread.
+        # Exit the worker; the next request safely reacquires its OS lock.
+        watchdog = threading.Timer(50, lambda: os._exit(1))
+        watchdog.daemon = True
+        watchdog.start()
+        try:
+            line = self.rfile.readline(262145)
+            if not line:
+                return
+            if len(line) > 262144 or not line.endswith(b"\n"):
+                raise ValueError("request exceeds 256 KiB")
+            payload = json.loads(line.decode("utf-8"))
+            if not isinstance(payload, dict):
+                raise ValueError("request must be an object")
+            if payload.get("deadline", time.time() * 1000 + 1) < time.time() * 1000:
+                raise ValueError("request expired in queue")
+            results = self.server.worker.query(payload)
+            graph = self.server.worker._graph
+            response = {"ok": True, "results": results, "pid": os.getpid(),
+                        "loads": self.server.worker.loads,
+                        "prefilter": bool(graph and graph._get_retrieval_engine()._prefilter_enabled)}
+        except Exception as error:
+            response = {"ok": False, "error": str(error)}
+        finally:
+            watchdog.cancel()
+            self.server.worker._last_request = time.monotonic()
+        try:
+            self.wfile.write((json.dumps(response, ensure_ascii=False) + "\n").encode("utf-8"))
+            self.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError, TimeoutError):
+            pass
+
+
+class _WorkerServer(socketserver.UnixStreamServer):
+    # GraphToolCall mutates lazy caches: serialize retrieval, not entire tasks.
+    request_queue_size = 64
+
+    def __init__(self, socket_path: str, worker: _GraphWorker):
+        self.worker = worker
+        super().__init__(socket_path, _WorkerHandler)
+
+
+def serve(args):
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+    socket_path = Path(args.socket)
+    socket_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    # Never unlink the lock: all contenders must lock the same inode.
+    with open(str(socket_path) + ".lock", "a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return
+        _serve_locked(args, socket_path)
+
+
+def _serve_locked(args, socket_path):
+    socket_path.unlink(missing_ok=True)
+    worker = _GraphWorker(Path(args.graph))
+    server = _WorkerServer(str(socket_path), worker)
+    server.timeout = 1.0
+    os.chmod(socket_path, 0o600)
+    source = Path(__file__)
+    revision = source.stat().st_mtime_ns
+    try:
+        try:
+            while True:
+                server.handle_request()
+                if args.idle_timeout > 0 and time.monotonic() - worker._last_request >= args.idle_timeout:
+                    break
+                # A deployment replaces this file atomically. Retire the old
+                # code on the next loop; the next Hook starts the updated code.
+                if source.stat().st_mtime_ns != revision:
+                    break
+        except KeyboardInterrupt:
+            pass
+    finally:
+        server.server_close()
+        try:
+            socket_path.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def refresh(args):
+    """Run one background registry rebuild per user, independent of Hook timeouts."""
+    lock_path = Path(args.lock)
+    lock_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    with open(lock_path, "a") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return
+        subprocess.run([args.node, args.script], check=True,
+                       env={**os.environ, "CODEX_SKILL_REGISTRY_FOREGROUND": "1"},
+                       stdin=subprocess.DEVNULL)
 
 
 def main():
@@ -213,6 +368,16 @@ def main():
     retrieve_parser.add_argument("--query", required=True)
     retrieve_parser.add_argument("--top-k", type=int, default=8)
     retrieve_parser.set_defaults(func=retrieve)
+    serve_parser = subparsers.add_parser("serve")
+    serve_parser.add_argument("--graph", required=True)
+    serve_parser.add_argument("--socket", required=True)
+    serve_parser.add_argument("--idle-timeout", type=float, default=0.0)
+    serve_parser.set_defaults(func=serve)
+    refresh_parser = subparsers.add_parser("refresh")
+    refresh_parser.add_argument("--lock", required=True)
+    refresh_parser.add_argument("--node", required=True)
+    refresh_parser.add_argument("--script", required=True)
+    refresh_parser.set_defaults(func=refresh)
     args = parser.parse_args()
     args.func(args)
 

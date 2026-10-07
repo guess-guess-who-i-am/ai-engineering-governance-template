@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { existsSync, realpathSync } from "node:fs";
+import { readFile, mkdir, lstat } from "node:fs/promises";
+import { createConnection } from "node:net";
 import os from "node:os";
 import path from "node:path";
 
@@ -52,39 +54,111 @@ function scoreSkill(skill, tokens, query, aliases) {
   return { skill, score, matches: [...new Set(matches)].slice(0, 3) };
 }
 
-function graphCandidates(graphPath, query, pythonPath, indexerPath, excludedNames) {
-  if (!graphPath || !existsSync(graphPath) || !existsSync(pythonPath) || !existsSync(indexerPath)) return Promise.resolve([]);
-  return new Promise((resolve) => {
-    const child = spawn(pythonPath, [indexerPath, "retrieve", "--graph", graphPath, "--query", query, "--top-k", "8"], {
-      windowsHide: true,
-      stdio: ["ignore", "pipe", "pipe"]
-    });
-    let stdout = "";
-    const timer = setTimeout(() => child.kill(), 60000);
-    let stderr = "";
-    child.stdout.on("data", (chunk) => { stdout += chunk.toString("utf8"); });
-    child.stderr.on("data", (chunk) => { stderr += chunk.toString("utf8"); });
-    child.on("error", () => { clearTimeout(timer); resolve([]); });
-    child.on("close", (code) => {
+function workerSocketPath(graphPath) {
+  const digest = createHash("sha256").update(graphPath).digest("hex").slice(0, 24);
+  // macOS limits AF_UNIX paths; keep the socket short even for long test/workspace paths.
+  return path.join("/tmp", `codex-graph-${process.getuid()}`, `${digest}.sock`);
+}
+
+function requestGraphWorker(socketPath, payload, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const socket = createConnection(socketPath);
+    let buffer = "";
+    let settled = false;
+    const timer = setTimeout(() => {
+      socket.destroy();
+      if (!settled) { settled = true; reject(new Error(`GraphToolCall worker timed out after ${timeoutMs}ms`)); }
+    }, timeoutMs);
+    const finish = (error, value) => {
+      if (settled) return;
+      settled = true;
       clearTimeout(timer);
-      if (Number(code) !== 0) return resolve([]);
+      socket.destroy();
+      if (error) reject(error); else resolve(value);
+    };
+    socket.setEncoding("utf8");
+    socket.on("connect", () => socket.write(`${JSON.stringify(payload)}\n`));
+    socket.on("data", (chunk) => {
+      buffer += chunk;
+      const newline = buffer.indexOf("\n");
+      if (newline < 0) return;
       try {
-        const results = JSON.parse(stdout.trim() || "[]");
-        resolve(results.filter((item) => (item?.kind === "mcp" || (item?.path && existsSync(item.path))) && !excludedNames.has(String(item.name).toLocaleLowerCase()))
-          .map((item) => ({ skill: {
-            id: `external:${String(item.name).toLocaleLowerCase()}`,
-            name: item.name,
-            description: item.description,
-            keywords: [],
-            path: item.path,
-            source: "graph-tool-call",
-            rank: 100,
-            kind: item.kind || "skill",
-            mcpServer: item.mcp_server || ""
-          }, score: Math.round(Number(item.score || 0) * 1000) + (item.kind === "mcp" ? 1000 : 0), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] })));
-      } catch { resolve([]); }
+        const response = JSON.parse(buffer.slice(0, newline));
+        if (!response.ok) return finish(new Error(response.error || "GraphToolCall worker failed"));
+        finish(null, response.results || []);
+      } catch (error) {
+        finish(error);
+      }
     });
+    socket.on("error", (error) => finish(error));
+    socket.on("close", () => finish(new Error("GraphToolCall worker closed the connection")));
   });
+}
+
+function startGraphWorker(graphPath, pythonPath, indexerPath, socketPath) {
+  const idleTimeout = String(Number(process.env.CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS || 0));
+  const child = spawn(pythonPath, [indexerPath, "serve", "--graph", graphPath, "--socket", socketPath, "--idle-timeout", idleTimeout], {
+    detached: true,
+    windowsHide: true,
+    stdio: "ignore",
+    env: { ...process.env, PYTHONUNBUFFERED: "1" }
+  });
+  child.on("error", (error) => process.stderr.write(`GraphToolCall startup failed: ${error.message}\n`));
+  child.unref();
+}
+
+async function requestAfterWorkerStart(socketPath, payload, timeoutMs) {
+  const deadline = Date.now() + timeoutMs;
+  let lastError = null;
+  while (Date.now() < deadline) {
+    try {
+      return await requestGraphWorker(socketPath, payload, Math.max(1, payload.deadline - Date.now()));
+    } catch (error) {
+      lastError = error;
+      if (!["ENOENT", "ECONNREFUSED"].includes(error.code)) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
+  throw lastError || new Error("GraphToolCall worker did not start");
+}
+
+
+async function graphCandidates(graphPath, query, pythonPath, indexerPath, excludedNames) {
+  if (!graphPath || !existsSync(graphPath) || !existsSync(pythonPath) || !existsSync(indexerPath)) return Promise.resolve([]);
+  graphPath = realpathSync(graphPath);
+  const socketPath = workerSocketPath(graphPath);
+  await mkdir(path.dirname(socketPath), { recursive: true, mode: 0o700 });
+  const directory = await lstat(path.dirname(socketPath));
+  if (!directory.isDirectory() || directory.uid !== process.getuid() || (directory.mode & 0o077)) {
+    throw new Error("GraphToolCall socket directory must be private and owned by this user");
+  }
+  const deadline = Date.now() + 55000;
+  const payload = { query, top_k: 8, deadline };
+  const asSkills = (results) => results
+    .filter((item) => (item?.kind === "mcp" || (item?.path && existsSync(item.path))) && !excludedNames.has(String(item.name).toLocaleLowerCase()))
+    .map((item) => ({ skill: {
+      id: `external:${String(item.name).toLocaleLowerCase()}`,
+      name: item.name,
+      description: item.description,
+      keywords: [],
+      path: item.path,
+      source: "graph-tool-call",
+      rank: 100,
+      kind: item.kind || "skill",
+      mcpServer: item.mcp_server || ""
+    }, score: Math.round(Number(item.score || 0) * 1000) + (item.kind === "mcp" ? 1000 : 0), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] }));
+
+  return requestGraphWorker(socketPath, payload, 55000)
+    .catch((error) => {
+      if (!["ENOENT", "ECONNREFUSED"].includes(error.code)) throw error;
+      startGraphWorker(graphPath, pythonPath, indexerPath, socketPath);
+      return requestAfterWorkerStart(socketPath, payload, Math.min(5000, deadline - Date.now()));
+    })
+    .then(asSkills)
+    .catch((error) => {
+      process.stderr.write(`GraphToolCall routing failed (no per-request fallback): ${error.message}\n`);
+      return [];
+    });
 }
 
 function promptSkillExclusions(prompt) {

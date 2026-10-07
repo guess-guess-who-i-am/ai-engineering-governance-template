@@ -68,6 +68,8 @@
 
 ### 在 macOS 安装
 
+当前完整macOS版本位于 `codex/macos-global-deploy` 分支。下载后双击仓库根目录 **安装全局配置.command**，安装成功后即可使用持久的Finder右键部署入口；不用手输脚本。缺少15k+Skill库时会自动从独立私有仓库拉取固定版本，需先在新电脑授权GitHub读取该库。图索引会按目标机实际路径重建，常驻worker与候选池随后由Hook启动。完整迁移范围与凭据边界见 `codex-profile/README.zh.md`。
+
 先安装 Git、GitHub CLI、Codex，并确保 Codex 自带 Node.js 可用，然后运行：
 
 ```bash

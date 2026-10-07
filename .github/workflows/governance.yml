@@ -28,6 +28,13 @@ jobs:
           cache: npm
       - name: Test macOS global Codex profile
         run: ./scripts/test-codex-profile-mac.sh
+      - name: Test pinned Skill library restore on a clean home
+        run: node scripts/test-global-skill-library.mjs
+      - name: Test real GraphToolCall worker and candidate pool
+        run: |
+          python3 -m venv .tools/graph-worker-tests
+          .tools/graph-worker-tests/bin/python -m pip install 'graph-tool-call==0.46.0'
+          .tools/graph-worker-tests/bin/python scripts/test-graph-worker.py
 
   validate:
     runs-on: macos-15

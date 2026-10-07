@@ -73,7 +73,7 @@ function defaultHandlers(eventName, codexRoot) {
     return { file, timeoutMs };
   };
   const handlers = eventName === "UserPromptSubmit"
-    ? [own("context-refresh", 7000), own("skill-router", 12000)]
+    ? [own("context-refresh", 7000), own("skill-router", 60000)]
     : eventName === "SessionStart"
       ? [own("context-refresh", 7000), own("refresh-skill-registry", 65000)]
       : [];

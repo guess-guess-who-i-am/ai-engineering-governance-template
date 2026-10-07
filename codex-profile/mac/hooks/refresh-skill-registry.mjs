@@ -4,7 +4,7 @@ import { access, readdir, readFile, rename, writeFile, mkdir, stat, realpath, op
 import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import { createReadStream } from "node:fs";
+import { createReadStream, openSync, closeSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 async function skillFiles(root) {
@@ -67,6 +67,27 @@ function parseMcpServers(text) {
   return servers.filter((server) => server.command);
 }
 
+function stableJson(value) {
+  if (Array.isArray(value)) return value.map(stableJson);
+  if (value && typeof value === "object") return Object.fromEntries(Object.keys(value).sort().map((key) => [key, stableJson(value[key])]));
+  return value;
+}
+
+async function graphInputsHash(ownedRoot, mcpTools) {
+  const hash = createHash("sha256");
+  // Hash content, not timestamps/counts: an edited Skill or MCP schema must
+  // invalidate the graph even when the number of tools stays unchanged.
+  for (const file of await skillFiles(ownedRoot)) {
+    hash.update(path.relative(ownedRoot, file));
+    hash.update("\0");
+    hash.update(await readFile(file));
+    hash.update("\0");
+  }
+  const canonicalTools = mcpTools.map((tool) => JSON.stringify(stableJson(tool))).sort();
+  hash.update(JSON.stringify(canonicalTools));
+  return hash.digest("hex");
+}
+
 async function listMcpTools(codexRoot, outputPath) {
   const configPath = path.join(codexRoot, "config.toml");
   let text;
@@ -118,12 +139,13 @@ async function refreshExternalIndex(home, codexRoot) {
   const manifestPath = path.join(codexRoot, "skill-registry", "external-skills-manifest.json");
   let mcpCatalogData = null;
   try { mcpCatalogData = await listMcpTools(codexRoot, mcpCatalog); } catch { mcpCatalogData = { tools: [] }; }
+  const inputsHash = await graphInputsHash(ownedRoot, mcpCatalogData.tools || []);
   try {
     const current = JSON.parse(await readFile(manifestPath, "utf8"));
     if (current.schemaVersion === "graph-tool-call-skills/1" && current.catalogPath === catalog &&
         current.rootPath === root && current.catalogLength === sourceStat.size &&
         current.catalogMtimeMs === sourceStat.mtimeMs && current.catalogSha256 === sourceHash && current.embedding === "sentence-transformers/all-MiniLM-L6-v2" &&
-        current.graphPath === graphIndex && current.mcpToolCount === (mcpCatalogData.tools || []).length && current.ownedSkillCount === (await skillFiles(ownedRoot)).length && await exists(graphIndex) && await exists(mcpCatalog)) return current;
+        current.graphPath === graphIndex && current.graphInputsSha256 === inputsHash && await exists(graphIndex) && await exists(mcpCatalog)) return current;
   } catch { /* Rebuild a missing or stale index. */ }
 
   await mkdir(path.dirname(graphIndex), { recursive: true });
@@ -147,6 +169,7 @@ async function refreshExternalIndex(home, codexRoot) {
     catalogLength: sourceStat.size,
     catalogMtimeMs: sourceStat.mtimeMs,
     catalogSha256: sourceHash,
+    graphInputsSha256: inputsHash,
     graphPath: graphIndex,
     graphManifestPath: graphManifest,
     indexerPath: graphIndexer,
@@ -170,6 +193,22 @@ try {
   }
   const home = os.homedir();
   const codexRoot = process.env.CODEX_HOME || path.join(home, ".codex");
+  if (process.env.CODEX_SKILL_REGISTRY_FOREGROUND !== "1") {
+    const config = await externalCatalogPaths(home, codexRoot);
+    await mkdir(path.join(codexRoot, "skill-registry"), { recursive: true, mode: 0o700 });
+    const log = openSync(path.join(codexRoot, "skill-registry", "refresh.log"), "a", 0o600);
+    try {
+      const child = spawn(config.graphPython, [config.graphIndexer, "refresh",
+        "--lock", path.join(codexRoot, "skill-registry", "refresh.lock"),
+        "--node", process.execPath, "--script", fileURLToPath(import.meta.url)], {
+        detached: true, stdio: ["ignore", log, log], env: process.env
+      });
+      child.on("error", (error) => process.stderr.write(`Background Skill refresh failed: ${error.message}\n`));
+      child.unref();
+    } finally { closeSync(log); }
+    process.stdout.write("{}");
+    process.exit(0);
+  }
   const roots = [
     { source: "codex", rank: 10, path: path.join(codexRoot, "skills") },
     { source: "agents", rank: 20, path: path.join(home, ".agents", "skills") },
