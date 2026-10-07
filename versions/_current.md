@@ -12,11 +12,11 @@
 - Input: 仓库中的 macOS profile、用户 Codex 目录和现有非敏感配置。
 - Output: `/Users/pku1727/.codex` 与 `/Users/pku1727/.agents/skills` 中的可运行全局配置。
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
-- Notes: 只支持 macOS；22 个 Skill 统一安装到用户级目录，项目 Skill 源不参与运行时注册。Hook 信任由 Codex 交互式审核记录，不能由安装器伪造。
-- CurrentResult: 真实全局 Hook 已注入 V4 自适应契约，安装后的调度器与仓库一致；专用测试覆盖 DAG、4路重叠、回压、串行安全和20硬上限，完整 macOS 安装测试通过；GraphToolCall 全局图的 v0.3.0 Release 资产已验证存在。尚待提交推送并观察远端 CI。
+- Notes: 只支持 macOS；20 是硬上限，不是首波目标。全局 Skill/MCP 仍由 GraphToolCall 路由。
+- CurrentResult: 真实全局 Hook 已注入 V4 自适应契约，调度器按依赖 DAG 波次运行；专用测试与完整 macOS 安装测试通过。PR #26 的 governance 两项门禁和 docs-site browser 均通过，状态为 clean/mergeable；GraphToolCall 全局图 v0.3.0 Release 资产已验证存在。
 - RootCauseAnalysis: 旧契约把20这个容量上限当成首波配额，导致模型为凑数量拆分终端、忽略依赖与失败回压。根因是调度目标按调用数量定义，而不是按依赖图、风险和实际执行反馈定义。
 - CaseStudy:
-- NextIdea: 提交并推送自适应调度版本，观察远端 CI 后记录最终交付状态。
+- NextIdea: 在 PR #26 中合并 7f8b2f4，并在下一台 Mac 通过 Finder 右键部署后运行 --check。
 - SelectedSkills:
 
 # GraphState

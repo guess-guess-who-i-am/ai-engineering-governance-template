@@ -27,6 +27,7 @@ Thumbs.db
 .task-tree-port
 .task-tree-ports
 .task-tree-thread
+.task-tree-threads.json
 .task-tree-runs/
 llm-task-tree/widget-report.json
 llm-task-tree/api-bridge-log.txt
