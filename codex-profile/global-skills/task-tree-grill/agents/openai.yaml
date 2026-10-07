@@ -1,3 +1,4 @@
-display_name: Task Tree Grill
-short_description: Build, repair, and quality-check task-tree.md before execution.
-default_prompt: Use this skill to clarify the current task into a Markdown task graph, decide Current/Next/NextPlan, handle rollback drift, and ensure the next node has inputs, outputs, metrics, and skill routing before execution.
+interface:
+  display_name: "任务树澄清台"
+  short_description: "通过逐项澄清建立、修复并检查执行前的任务树当前状态"
+  default_prompt: "使用 $task-tree-grill 把当前任务澄清为任务图并检查执行前的状态。"

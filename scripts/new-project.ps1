@@ -286,7 +286,7 @@ Set-Content -LiteralPath (Join-Path $destinationPath 'README.md') -Value $readme
 
 $packagePath = Join-Path $destinationPath 'package.json'
 $package = Get-Content -LiteralPath $packagePath -Raw | ConvertFrom-Json -Depth 20
-foreach ($scriptName in @('deploy:codex-profile:mac', 'test:codex-profile:mac', 'check:codex-profile:mac')) {
+foreach ($scriptName in @('deploy:codex-profile:mac', 'install:codex-profile:mac', 'install:codex-profile-service:mac', 'test:codex-profile:mac', 'check:codex-profile:mac')) {
     $package.scripts.PSObject.Properties.Remove($scriptName)
 }
 $package | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $packagePath -Encoding utf8

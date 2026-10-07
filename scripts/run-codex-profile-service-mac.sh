@@ -10,6 +10,13 @@ catalog_source=${CODEX_PROFILE_SKILL_CATALOG:-$home_root/.codex/tools/skills/_ca
 if [ -f "$skill_source/_catalog_cn.json" ]; then
   export CODEX_PROFILE_SKILL_SOURCE="$skill_source"
 fi
+if [ -n "${TASK_TREE_RUNTIME_ROOT:-}" ]; then
+  export TASK_TREE_RUNTIME_ROOT
+  runtime_root="$TASK_TREE_RUNTIME_ROOT"
+fi
+if [ -n "${CODEX_PROFILE_SOURCE:-}" ]; then
+  export CODEX_PROFILE_SOURCE
+fi
 if [ -f "$catalog_source" ]; then
   export CODEX_PROFILE_SKILL_CATALOG="$catalog_source"
 fi
@@ -25,6 +32,9 @@ else
   fi
   message=$("$deploy" --home "$home_root" 2>&1)
   exit_code=$?
+  if [ "${CODEX_PROFILE_DEBUG:-0}" = "1" ]; then
+    printf '%s\n' "$message" >&2
+  fi
   set -e
   if [ "$exit_code" -eq 0 ]; then
     title="Codex 全局配置已部署"

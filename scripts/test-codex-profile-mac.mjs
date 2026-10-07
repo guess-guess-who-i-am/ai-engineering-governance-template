@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
 import { chmod, cp, mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -73,7 +72,6 @@ try {
   await cp(path.join(REPOSITORY_ROOT, "codex-profile", "mac", "hooks", "graph_skill_index.py"), path.join(home, ".codex", "hooks", "graph_skill_index.py"));
   await writeFile(path.join(home, ".codex", "skill-registry", "external-library-config.json"), JSON.stringify({ root: skillFixture, catalog: skillCatalog }));
   const graphPython = path.join(home, ".codex", "tools", "graph-tool-call-venv", "bin", "python");
-  const userGraphPython = path.join(os.homedir(), ".codex", "tools", "graph-tool-call-venv", "bin", "python");
   const graphShim = path.join(root, "graph-tool-call-python-shim");
   await writeFile(graphShim, `#!/usr/bin/env python3
 import json, pathlib, sys
@@ -91,7 +89,7 @@ elif "retrieve" in args:
     print(json.dumps([{"name":"astro-islands","description":"Build Astro islands architecture and hydration patterns","path":"external skills with spaces/acme-astro-islands/SKILL.md","score":1,"confidence":"test","keyword_score":1,"graph_score":0,"embedding_score":0,"kind":"skill","mcp_server":""}]))
 `);
   await chmod(graphShim, 0o700);
-  const graphToolPython = process.env.CODEX_GRAPH_TOOL_PYTHON || (existsSync(userGraphPython) ? userGraphPython : graphShim);
+  const graphToolPython = process.env.CODEX_GRAPH_TOOL_PYTHON || graphShim;
   const authFile = path.join(home, ".codex", "auth.json");
   const configFile = path.join(home, ".codex", "config.toml");
   const authBefore = hash(await readFile(authFile));
@@ -206,11 +204,48 @@ elif "retrieve" in args:
 
   const deployHome = path.join(root, "one-click-home");
   await seedHome(deployHome, "ONE_CLICK_SENTINEL");
+  const taskTreeRuntime = path.join(root, "task-tree-runtime");
+  await mkdir(path.join(taskTreeRuntime, "scripts"), { recursive: true });
+  await writeFile(path.join(taskTreeRuntime, "scripts", "mcp-server.mjs"), `#!/usr/bin/env node
+let input = "";
+for await (const chunk of process.stdin) input += chunk.toString();
+const requests = input.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse);
+for (const request of requests) {
+  const result = request.method === "tools/list"
+    ? { tools: [{ name: "task_tree_focus" }, { name: "task_tree_write" }] }
+    : { protocolVersion: "2025-06-18", capabilities: {} };
+  process.stdout.write(JSON.stringify({ jsonrpc: "2.0", id: request.id, result }) + "\\n");
+}
+`);
+  await writeFile(path.join(taskTreeRuntime, "scripts", "install-codex-mcp.mjs"), `#!/usr/bin/env node
+import { mkdir, writeFile } from "node:fs/promises";
+const args = process.argv.slice(2); const at = (name) => args[args.indexOf(name) + 1];
+const home = at("--codex-home"); const entry = at("--entry");
+await mkdir(home, { recursive: true });
+const configPath = home + "/config.toml";
+let config = "";
+try { config = await (await import("node:fs/promises")).readFile(configPath, "utf8"); } catch {}
+if (!config.includes("[mcp_servers.task_tree]")) {
+  config += "\\n[mcp_servers.task_tree]\\ncommand = '" + process.execPath + "'\\nargs = ['" + entry + "']\\nstartup_timeout_sec = 30\\n";
+}
+if (!/^enable_mcp_apps\\s*=\\s*true$/m.test(config)) {
+  const featureHeader = config.indexOf("[features]");
+  if (featureHeader < 0) config += "\\n[features]\\nenable_mcp_apps = true\\n";
+  else {
+    const nextHeader = config.slice(featureHeader + 10).search(/\\n\\s*\\[/);
+    const insertAt = nextHeader < 0 ? config.length : featureHeader + 10 + nextHeader;
+    config = config.slice(0, insertAt).replace(/\\s*$/, "\\n") + "enable_mcp_apps = true\\n" + config.slice(insertAt);
+  }
+}
+await writeFile(configPath, config);
+`);
+  await chmod(path.join(taskTreeRuntime, "scripts", "mcp-server.mjs"), 0o700);
+  await chmod(path.join(taskTreeRuntime, "scripts", "install-codex-mcp.mjs"), 0o700);
   const deploySource = path.join(root, "deployment-source");
   await mkdir(path.join(deploySource, "scripts"), { recursive: true });
   await mkdir(path.join(deploySource, "codex-profile"), { recursive: true });
   await writeFile(path.join(deploySource, "scripts", "deploy-codex-profile-mac.sh"), "#!/bin/sh\nexit 0\n");
-  const deploy = runShell(DEPLOYER, ["--home", deployHome], { home: deployHome, extraEnv: { CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog } });
+  const deploy = runShell(DEPLOYER, ["--home", deployHome], { home: deployHome, extraEnv: { CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog, TASK_TREE_RUNTIME_ROOT: taskTreeRuntime } });
   assert(deploy.status === 0, `one-click deployment failed: ${deploy.stderr || deploy.stdout}`);
   assert(deploy.stdout.includes("available to every Codex workspace"), "one-click deployment did not report its global workspace scope");
   const deployedRefresh = run(path.join(deployHome, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { home: deployHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
@@ -228,8 +263,8 @@ elif "retrieve" in args:
   assert(!workflow.includes("Please select one governance repository folder") && !workflow.includes("$repo/scripts/deploy-codex-profile-mac.sh"), "Finder Quick Action still depends on the selected folder being the governance repository");
   const arbitraryWorkspace = path.join(root, "arbitrary-workspace");
   await mkdir(arbitraryWorkspace, { recursive: true });
-  const arbitraryDeploy = runShell(serviceRunner, [arbitraryWorkspace], { home: deployHome });
-  assert(arbitraryDeploy.status === 0, `Finder Quick Action runner failed for an arbitrary workspace: ${arbitraryDeploy.stderr || arbitraryDeploy.stdout}`);
+  const arbitraryDeploy = runShell(serviceRunner, [arbitraryWorkspace], { home: deployHome, extraEnv: { CODEX_PROFILE_SOURCE: stagedSource, CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog, TASK_TREE_RUNTIME_ROOT: taskTreeRuntime, CODEX_PROFILE_DEBUG: "1" } });
+  assert(arbitraryDeploy.status === 0, `Finder Quick Action runner failed for an arbitrary workspace: ${arbitraryDeploy.stderr || arbitraryDeploy.stdout || `exit ${arbitraryDeploy.status}`}`);
   const serviceCheck = runShell(path.join(stagedSource, "scripts", "install-codex-profile-service-mac.sh"), ["--home", deployHome, "--check"], { home: deployHome, extraEnv: { CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog } });
   assert(serviceCheck.status === 0, `staged Finder Quick Action check failed: ${serviceCheck.stderr || serviceCheck.stdout}`);
 
@@ -302,7 +337,7 @@ elif "retrieve" in args:
   const oldAgents = await readFile(path.join(failureHome, ".codex", "AGENTS.md"));
   const oldHooks = await readFile(path.join(failureHome, ".codex", "hooks.json"));
   const oldConfig = await readFile(path.join(failureHome, ".codex", "config.toml"));
-  const failed = run(INSTALLER, ["--home", failureHome], { home: failureHome, extraEnv: { CODEX_PROFILE_TEST_FAIL_STAGE: "post-write" } });
+  const failed = run(INSTALLER, ["--home", failureHome], { home: failureHome, extraEnv: { CODEX_PROFILE_TEST_FAIL_STAGE: "post-write", CODEX_GRAPH_TOOL_PYTHON: graphToolPython } });
   assert(failed.status !== 0, "injected installation failure unexpectedly succeeded");
   assert((await readFile(path.join(failureHome, ".codex", "AGENTS.md"))).equals(oldAgents), "rollback did not restore AGENTS.md");
   assert((await readFile(path.join(failureHome, ".codex", "hooks.json"))).equals(oldHooks), "rollback did not restore hooks.json");
