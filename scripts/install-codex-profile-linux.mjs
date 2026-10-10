@@ -267,7 +267,10 @@ async function verifyInstallation(home, codexHome, operations) {
   catch { throw new Error(`Methodology publisher returned invalid JSON: ${publisher.stdout.trim()}`); }
   const hookInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const context = await run(process.execPath, [path.join(codexHome, "hooks", "hook-dispatch.mjs")], { env, input: hookInput });
-  if (context.code !== 0 || !context.stdout.includes("AUTOMATIC_TOOL_BATCHING_CONTRACT_V4")) throw new Error("Hook dispatcher did not emit the automatic batching contract");
+  const contextText = context.code === 0 ? String(JSON.parse(context.stdout).hookSpecificOutput?.additionalContext || "") : "";
+  if (!contextText.startsWith("[AUTOMATIC_TOOL_BATCHING_CONTRACT_V6]") || !contextText.includes("If 2 or more operations are independent")) throw new Error("Hook dispatcher did not emit the current automatic batching contract");
+  const anchor = (await readFile(path.join(codexHome, "prompts", "global-attention-anchor.en.md"), "utf8")).trim();
+  if (!anchor || contextText.split(anchor).length !== 2) throw new Error("Hook dispatcher did not emit the complete current reminder exactly once");
   return { validation: publication.validation, trust: await inspectHookTrust(codexHome) };
 }
 

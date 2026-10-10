@@ -85,13 +85,21 @@ try {
 
   const envArgs = { home };
   const validator = run(path.join(home, ".codex", "hooks", "validate-methodology-routing.mjs"), [], envArgs);
-  assert(validator.status === 0 && validator.stdout.includes("PASS: 127 English rules"), `127-rule validation failed: ${validator.stderr || validator.stdout}`);
+  const expectedMap = JSON.parse(await readFile(path.join(REPOSITORY_ROOT, "codex-profile", ".codex", "prompts", "global-methodology-map.json"), "utf8"));
+  assert(validator.status === 0 && validator.stdout.includes(`PASS: ${expectedMap.ruleCount} English rules`), `methodology validation failed: ${validator.stderr || validator.stdout}`);
   const contextInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const dispatcher = path.join(home, ".codex", "hooks", "hook-dispatch.mjs");
   const context = run(dispatcher, [], { ...envArgs, input: contextInput });
   const contextPayload = JSON.parse(context.stdout);
   const contextText = String(contextPayload.hookSpecificOutput.additionalContext);
-  assert(context.status === 0 && contextText.startsWith("[AUTOMATIC_TOOL_BATCHING_CONTRACT_V4]") && contextText.includes("If K >= 2, the first wave MUST") && contextText.includes("Sending only one or two") && contextText.includes("mechanically determined follow-up waves"), "automatic batching contract is absent, not first, or weakened");
+  assert(context.status === 0 && contextText.startsWith("[AUTOMATIC_TOOL_BATCHING_CONTRACT_V6]") && contextText.includes("If 2 or more operations are independent") && contextText.includes("same message") && contextText.includes("mechanically determined follow-up polls"), "automatic batching contract is absent, not first, or weakened");
+  const expectedAnchor = (await readFile(path.join(REPOSITORY_ROOT, "codex-profile", ".codex", "prompts", "global-attention-anchor.en.md"), "utf8")).trim();
+  assert(contextText.split(expectedAnchor).length === 2, "prompt dispatcher omitted, duplicated, or truncated the current reminders");
+  for (const source of ["startup", "resume", "clear", "compact"]) {
+    const event = run(dispatcher, [], { ...envArgs, input: JSON.stringify({ hook_event_name: "SessionStart", source, cwd: REPOSITORY_ROOT }) });
+    const text = event.status === 0 ? String(JSON.parse(event.stdout).hookSpecificOutput?.additionalContext || "") : "";
+    assert(text.split(expectedAnchor).length === 2, `${source} dispatcher omitted, duplicated, or truncated the current reminders`);
+  }
   const routeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Commit and push this release to GitHub", cwd: REPOSITORY_ROOT })}\n`;
   const routed = run(dispatcher, [], { ...envArgs, input: routeInput });
   const routedContext = routed.status === 0
