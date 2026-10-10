@@ -24,6 +24,8 @@ macOS 检索使用按需启动的单个常驻 Python worker，同一用户的不
 
 自适应并发契约会逐轮注入。`context-refresh` 把英文契约放在每次用户提示附加上下文的最前面，不再判断用户是否提到“并发”。契约要求先识别依赖与风险，优先把同类只读查询融合成一次原生批量调用，而不是为了并发数制造更多终端；机械可确定的后续轮询、收集和验证可留在同一个工具编排中。简单单步任务保持单步，失败会触发回压，存在语义依赖、交互确认、审批或破坏性的步骤保持串行。
 
+固定提醒改为每 3–4 轮注入的想法已做四轮 Hook 输出实验：固定部分每轮 8,756 字节；只降低固定内容频率可减少输出字节，但模型跨轮保留和真实 token 成本尚未测得，当前频率不变。动态 Skill 路由仍需逐轮处理最新提示。证据与下一轮 A/B 设计见[实验报告](../docs/HOOK_CONTEXT_EXPERIMENT.md)。
+
 仓库还提供 `scripts/parallel-run.mjs`：输入一个带 `tasks`、`dependsOn`、`safety`、`initialConcurrency` 和 `maxConcurrency` 的 JSON 执行计划。运行器按 DAG 就绪波次调度，默认4路，成功波次逐步加1，失败或超时后减半；`stateful`、`destructive`、`rate-limited` 任务强制单独执行，并输出每一波的宽度、时间区间、退出码、超时和依赖跳过结果。20是硬上限，不是默认宽度。
 
 曾经出现过的退化根因是：新增 capability router 后，`context-refresh` 从 `user_prompt_submit:0:1` 移到 `0:2`，而 `config.toml` 只保留了 `0:0` 的信任记录，所以新任务没有执行并发契约。同时旧 PowerShell Skill 推荐器会用宽泛中文二元词扫描15471条外部索引，单次最坏约80秒。当前 dispatcher 固定每个事件只有一个入口，外部 Skill/MCP 检索使用上述常驻 GraphToolCall worker。
