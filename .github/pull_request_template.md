@@ -9,6 +9,12 @@
 - Included:
 - Excluded:
 
+## Change impact
+
+- Direct behavior changed:
+- Adjacent consumers and interfaces checked:
+- Additional risk checked when applicable (data, repetition, permissions, compatibility, performance, or other):
+
 ## Evidence
 
 - [ ] Focused checks
@@ -23,6 +29,12 @@
 - [ ] Qualitative gate for taste or intent when applicable
 
 列出实际命令、范围和结果。
+
+## Test handoff
+
+- Developer self-test:
+- Commit / build / environment / real entrypoint:
+- Test-run record when this is a staged handoff, cross-boundary test, defect fix, or release candidate:
 
 ## Risk
 

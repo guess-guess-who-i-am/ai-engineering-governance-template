@@ -30,7 +30,7 @@ function Get-LocalSkillEntries {
   $current = [IO.DirectoryInfo]::new([IO.Path]::GetFullPath($StartDirectory))
   $roots = [Collections.Generic.List[string]]::new()
   while ($null -ne $current) {
-    foreach ($relative in @("skills", ".agents\skills", "llm-task-tree\skills")) {
+    foreach ($relative in @("skills", ".agents\routed-skills", "llm-task-tree\skills")) {
       $candidate = Join-Path $current.FullName $relative
       if (Test-Path -LiteralPath $candidate -PathType Container) { $roots.Add($candidate) }
     }
@@ -226,11 +226,12 @@ try {
   $registryPath = Join-Path $codexHome "skill-registry\skills-index.json"
   if (-not (Test-Path -LiteralPath $registryPath -PathType Leaf)) { Write-EmptyResult }
   $registry = ([IO.File]::ReadAllText($registryPath, $utf8)) | ConvertFrom-Json
-  $skills = @($registry.skills)
+  $projectSkills = @(Get-LocalSkillEntries -StartDirectory ([string]$hookInput.cwd))
+  $skills = @($registry.skills) + $projectSkills
   $query = ([string]$prompt).ToLowerInvariant()
   $rcaPath = @(
     (Join-Path $codexHome "skills\root-cause-analysis\SKILL.md"),
-    (Join-Path $env:USERPROFILE ".agents\skills\root-cause-analysis\SKILL.md"),
+    (Join-Path $env:USERPROFILE ".agents\routed-skills\root-cause-analysis\SKILL.md"),
     "D:\Codex\desktop\skills\root-cause-analysis\SKILL.md"
   ) | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
   $rcaIntent = $query -match "根因分析|为什么失败|第一处分歧|实验效果不好|结果异常|反复失败|跑不通|root[ -]cause|why\s+(?:did\s+it\s+)?fail|unexpected failure"
@@ -271,8 +272,15 @@ try {
   }
   $externalIndexProperty = $registry.PSObject.Properties["externalIndexPath"]
   $externalIndexPath = if ($externalIndexProperty) { [string]$externalIndexProperty.Value } else { Join-Path $codexHome "skill-registry\external-skills.tsv" }
-  if ($externalIndexPath -and -not $localAliasMatch) {
+  if ($externalIndexPath) {
     foreach ($item in @(Get-ExternalSkillScores -IndexPath $externalIndexPath -Tokens $tokens -Query $query -Aliases $aliases -ExcludedNames $knownNames)) {
+      $allScored.Add($item)
+    }
+  }
+  $deferredIndexProperty = $registry.PSObject.Properties["deferredIndexPath"]
+  $deferredIndexPath = if ($deferredIndexProperty) { [string]$deferredIndexProperty.Value } else { Join-Path $codexHome "skill-registry\deferred-skills.tsv" }
+  if ($deferredIndexPath) {
+    foreach ($item in @(Get-ExternalSkillScores -IndexPath $deferredIndexPath -Tokens $tokens -Query $query -Aliases $aliases -ExcludedNames $knownNames)) {
       $allScored.Add($item)
     }
   }
@@ -285,18 +293,14 @@ try {
   if (-not $selected.Count) { Write-EmptyResult }
 
   $lines = [Collections.Generic.List[string]]::new()
-  $lines.Add("[CODEX_SKILL_ROUTER_V1]")
-  $lines.Add("Assistive routing only: read a full SKILL.md only when it directly applies to the latest request; do not load the whole Skill catalog.")
-  $lines.Add("Candidates:")
+  $lines.Add("[CODEX_SKILL_ROUTER_V4]")
   foreach ($item in $selected) {
     $skill = $item.Skill
     $reason = if (@($item.Matches).Count) { (@($item.Matches) -join ", ") } else { "description match" }
-    $description = (([string]$skill.description) -replace "\s+", " ").Trim()
-    $lines.Add("- $($skill.name) [score=$($item.Score); match=$reason]")
-    $lines.Add("  $description")
+    $source = if ([string]$skill.source) { [string]$skill.source } else { "unknown" }
+    $lines.Add("- $($skill.name) [source=$source; score=$($item.Score); match=$reason]")
     $lines.Add("  Read: $($skill.path)")
   }
-  $lines.Add("If none is genuinely relevant, ignore this list and continue without a specialized Skill.")
 
   $payload = [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = "UserPromptSubmit"; additionalContext = ($lines -join "`n") } }
   [Console]::Out.Write(($payload | ConvertTo-Json -Depth 6 -Compress))

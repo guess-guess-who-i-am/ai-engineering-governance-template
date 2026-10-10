@@ -4,7 +4,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$skillsRoot = Join-Path $Root '.agents/skills'
+$skillsRoot = Join-Path $Root '.agents/routed-skills'
 $validator = Join-Path $Root 'scripts/validate-skill.ps1'
 if (-not (Test-Path -LiteralPath $validator)) { throw "Missing validator: $validator" }
 

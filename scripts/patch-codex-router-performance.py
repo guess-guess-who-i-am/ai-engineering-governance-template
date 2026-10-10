@@ -35,6 +35,53 @@ def update_env(source, key, value):
     return "\n".join(output) + "\n"
 
 
+def update_route_limit(source, route, limit):
+    if not route or any(char in route for char in ",:=\n\r") or limit < 1:
+        raise ValueError("A route name and positive concurrency limit are required")
+    entries = []
+    lines = [line for line in source.splitlines()
+             if line.split("=", 1)[0].strip() == "PRIVATE_ROUTE_CONCURRENCY_LIMITS"]
+    if len(lines) > 1:
+        raise ValueError("Duplicate PRIVATE_ROUTE_CONCURRENCY_LIMITS definitions")
+    if lines:
+        for entry in lines[0].split("=", 1)[1].strip().strip("\"'").split(","):
+            if not entry.strip():
+                continue
+            name, sep, value = entry.strip().partition(":")
+            if not sep or not name.strip() or int(value) < 1:
+                raise ValueError("Invalid existing route concurrency limit")
+            if name.strip() != route:
+                entries.append(f"{name.strip()}:{int(value)}")
+    entries.append(f"{route}:{limit}")
+    return update_env(source, "PRIVATE_ROUTE_CONCURRENCY_LIMITS", ",".join(entries))
+
+
+def patch_queue_metrics(source):
+    marker = "PRIVATE_ADMISSION_TIMING_V1"
+    if marker in source:
+        return source
+    return replace_once(source,
+        '    def acquire_private_route(self):\n'
+        '        route = self.server.acquire_private_route()\n'
+        '        self._balanced_private_route = route\n'
+        '        return route\n',
+        '    def acquire_private_route(self):\n'
+        '        # PRIVATE_ADMISSION_TIMING_V1: distinguish queueing from upstream latency.\n'
+        '        started = time.monotonic()\n'
+        '        route = self.server.acquire_private_route()\n'
+        '        self._balanced_private_route = route\n'
+        '        queued = time.monotonic() - started\n'
+        '        with self.server.private_route_condition:\n'
+        '            active = self.server.private_route_active.get(route, 0)\n'
+        '            limit = self.server.cfg.private_route_concurrency_limits.get(route)\n'
+        '        sys.stderr.write(\n'
+        '            f"private admission: route={route} queue_seconds={queued:.3f} "\n'
+        '            f"active={active} limit={limit}\\n"\n'
+        '        )\n'
+        '        return route\n',
+        "private admission timing")
+
+
 def patch_router(source):
     if MARKER in source:
         return source, False
@@ -235,7 +282,12 @@ def main():
     parser.add_argument("--env", required=True)
     parser.add_argument("--routes", default="codex666,tianji,cctq")
     parser.add_argument("--backup-root")
+    parser.add_argument("--limit-route")
+    parser.add_argument("--concurrency", type=int)
+    parser.add_argument("--queue-metrics", action="store_true")
     args = parser.parse_args()
+    if bool(args.limit_route) != (args.concurrency is not None):
+        parser.error("--limit-route and --concurrency must be provided together")
 
     router = Path(args.router).resolve()
     env_file = Path(args.env).resolve()
@@ -243,10 +295,15 @@ def main():
     backup_dir = backup_root / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     source = router.read_text(encoding="utf-8")
     patched, changed = patch_router(source)
+    if args.queue_metrics:
+        patched = patch_queue_metrics(patched)
+    changed = source != patched
     if changed:
         compile(patched, str(router), "exec")
     env_source = env_file.read_text(encoding="utf-8")
     env_patched = update_env(env_source, "PRIVATE_BALANCED_ROUTES", args.routes)
+    if args.limit_route:
+        env_patched = update_route_limit(env_patched, args.limit_route, args.concurrency)
     env_changed = env_source != env_patched
 
     if changed or env_changed:

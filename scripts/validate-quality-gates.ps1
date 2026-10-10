@@ -28,6 +28,7 @@ $allowedProfiles = @('pr', 'release', 'nightly', 'qualitative', 'performance')
 $allowedPriorities = @('P0', 'P1', 'P2', 'P3')
 $ids = @{}
 $categories = @{}
+$storyRoot = Join-Path $Root 'requirements/user-stories'
 
 foreach ($gate in $config.gates) {
     if ([string]::IsNullOrWhiteSpace($gate.id) -or $gate.id -notmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$') {
@@ -38,6 +39,26 @@ foreach ($gate in $config.gates) {
     if ([string]::IsNullOrWhiteSpace($gate.category)) { throw "$($gate.id): category is required." }
     $categories[$gate.category] = $true
     if ($gate.state -notin $allowedStates) { throw "$($gate.id): unsupported state '$($gate.state)'." }
+
+    $hasStory = -not [string]::IsNullOrWhiteSpace($gate.userStory)
+    $hasCriteria = $null -ne $gate.acceptanceCriteria -and @($gate.acceptanceCriteria).Count -gt 0
+    if ($hasStory -xor $hasCriteria) {
+        throw "$($gate.id): userStory and acceptanceCriteria must be declared together."
+    }
+    if ($hasStory) {
+        if ($gate.userStory -notmatch '^US-\d{3,}$') { throw "$($gate.id): invalid userStory '$($gate.userStory)'." }
+        $storyFiles = @(Get-ChildItem -LiteralPath $storyRoot -File -Filter "$($gate.userStory)-*.md")
+        if ($storyFiles.Count -ne 1) {
+            throw "$($gate.id): userStory '$($gate.userStory)' must resolve to exactly one Story file."
+        }
+        $storyBody = Get-Content -LiteralPath $storyFiles[0].FullName -Raw
+        $storyCriteria = @([regex]::Matches($storyBody, '(?m)^### (?<id>AC-\d{3,}):') | ForEach-Object { $_.Groups['id'].Value })
+        foreach ($criterion in @($gate.acceptanceCriteria)) {
+            if ($criterion -notmatch '^AC-\d{3,}$' -or $criterion -notin $storyCriteria) {
+                throw "$($gate.id): acceptance criterion '$criterion' does not exist in $($gate.userStory)."
+            }
+        }
+    }
 
     if ($gate.state -eq 'active') {
         if (-not $gate.profiles -or -not $gate.command) { throw "$($gate.id): active gates require profiles and command." }

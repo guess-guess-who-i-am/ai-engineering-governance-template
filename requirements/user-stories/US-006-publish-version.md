@@ -33,6 +33,12 @@ risk: high
 - AC-001: file=.github/workflows/release.yml; validator=scripts/validate-release.ps1
 - AC-002: file=scripts/validate-release.ps1; workflow=.github/workflows/release.yml
 
+## 测试设计重点
+
+- 主成功路径: AC-001: 一致版本 tag 通过 release profile 后生成带证据的 Release
+- 重要失败与恢复: AC-002: tag、VERSION 或 changelog 不一致时在远程写入前失败
+- 变更影响面: 直接回归版本元数据和 Release；相邻检查受保护 tag、最小权限、质量报告、重复发布及失败不创建远程制品
+
 ## 非目标
 
 - 不在普通 PR 或未创建版本 tag 时自动发布。

@@ -108,12 +108,20 @@ function buildAnchor(rules, language) {
   return `${["# Always-on reminders — user's original wording translated into English", "", ...rules].join("\n")}\n`;
 }
 
-function buildRouter(section, language) {
+export function buildRouter(section, language) {
   const heading = language === "zh" ? "# 方法论路由中文审阅镜像" : "# Methodology router";
   const note = language === "zh"
     ? "> 只供用户审阅，不会发送给模型。实际运行源是 `global-methodology-router.en.md`。"
     : "> Generated from the Chinese methodology source. Select routes by task meaning, artifact, action, and project state—not by turn number.";
-  return `${[heading, "", note, "", normalizeText(section)].join("\n")}\n`;
+  const runtimeSection = normalizeText(section)
+    .split("\n")
+    .filter((line) => language === "zh"
+      ? !/^用户原文[：:]/.test(line.trim())
+      : !/^User(?:'s|’s) original (?:wording|words)[：:]/i.test(line.trim()))
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return `${[heading, "", note, "", runtimeSection].join("\n")}\n`;
 }
 
 function buildChineseReview(routes, rulesByRoute) {
@@ -311,6 +319,11 @@ export async function publishMethodology(config, { force = false, dryRun = false
   const chineseSections = parseRoutedSections(runtimeSource);
   const chineseRules = validateSourceSections(chineseSections, config.routes);
   if (check) {
+    const state = await readState(config.stateFile);
+    const currentSourceSha256 = sha256(runtimeSource);
+    if (state.runtimeSourceSha256 !== currentSourceSha256) {
+      throw new Error("当前中文方法论源已变化，发布结果过期；请先重新发布，再执行 --check。");
+    }
     const validation = await runPostPublish(config);
     return { status: "checked", translated: false, ruleCount: [...chineseRules.values()].reduce((sum, rules) => sum + rules.length, 0), validation };
   }

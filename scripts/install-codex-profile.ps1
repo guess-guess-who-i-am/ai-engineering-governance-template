@@ -74,11 +74,11 @@ $hooks = [ordered]@{
   description = "One stable dispatcher per event keeps Hook trust indices fixed while internally batching reminders, Skill routing, capability routing, and refresh work."
   hooks = [ordered]@{
     UserPromptSubmit = @([ordered]@{
-      hooks = @([ordered]@{ type = "command"; command = $dispatchCommand; commandWindows = $dispatchCommand; timeout = 20; statusMessage = "Loading reminders and routing in parallel"; additionalContextLimit = 14000 })
+      hooks = @([ordered]@{ type = "command"; command = $dispatchCommand; commandWindows = $dispatchCommand; timeout = 20; statusMessage = "Loading reminders and routing in parallel"; additionalContextLimit = 0 })
     })
     SessionStart = @([ordered]@{
       matcher = "^(startup|resume|clear|compact)$"
-      hooks = @([ordered]@{ type = "command"; command = $dispatchCommand; commandWindows = $dispatchCommand; timeout = 70; statusMessage = "Restoring reminders and refreshing indexes in parallel"; additionalContextLimit = 10000 })
+      hooks = @([ordered]@{ type = "command"; command = $dispatchCommand; commandWindows = $dispatchCommand; timeout = 70; statusMessage = "Restoring reminders and refreshing indexes in parallel"; additionalContextLimit = 0 })
     })
   }
 }

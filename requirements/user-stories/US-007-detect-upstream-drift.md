@@ -33,6 +33,12 @@ risk: high
 - AC-001: file=scripts/test-upstream-drift.ps1; gate=upstream-drift
 - AC-002: file=scripts/test-upstream-drift.ps1; gate=upstream-drift
 
+## 测试设计重点
+
+- 主成功路径: AC-001: 固定 commit 与远端一致时生成 current 报告
+- 重要失败与恢复: AC-002: 远端前进时保留比较证据并使门禁失败
+- 变更影响面: 直接回归 pinned/remote 比较和报告；相邻检查多来源、重复运行、网络失败，以及 lock、本地源码和镜像保持不变
+
 ## 非目标
 
 - 不自动合并、复制或重新分发上游变化。
