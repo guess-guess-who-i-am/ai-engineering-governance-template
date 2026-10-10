@@ -1,0 +1,4 @@
+interface:
+  display_name: "任务树澄清台"
+  short_description: "通过逐项澄清建立、修复并检查执行前的任务树当前状态"
+  default_prompt: "使用 $task-tree-grill 把当前任务澄清为任务图并检查执行前的状态。"

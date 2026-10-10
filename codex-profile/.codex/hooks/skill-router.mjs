@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { existsSync, realpathSync } from "node:fs";
+import { readFile, mkdir, lstat } from "node:fs/promises";
+import { createConnection } from "node:net";
 import os from "node:os";
 import path from "node:path";
-import readline from "node:readline";
-import { createReadStream } from "node:fs";
 
 async function readInput() {
   let raw = "";
@@ -54,61 +54,121 @@ function scoreSkill(skill, tokens, query, aliases) {
   return { skill, score, matches: [...new Set(matches)].slice(0, 3) };
 }
 
-function rgCandidates(indexPath, patterns) {
-  return new Promise((resolve) => {
-    const args = ["--ignore-case", "--fixed-strings", "--no-heading", "--color", "never", "--max-count", "300"];
-    for (const pattern of patterns) args.push("-e", pattern);
-    args.push("--", indexPath);
-    const child = spawn("rg", args, { windowsHide: true, stdio: ["ignore", "pipe", "ignore"] });
-    let output = "";
-    const timer = setTimeout(() => child.kill(), 3000);
-    child.stdout.on("data", (chunk) => { output += chunk.toString("utf8"); });
-    child.on("error", () => { clearTimeout(timer); resolve(null); });
-    child.on("close", (code) => {
+function workerSocketPath(graphPath) {
+  const digest = createHash("sha256").update(graphPath).digest("hex").slice(0, 24);
+  // macOS limits AF_UNIX paths; keep the socket short even for long test/workspace paths.
+  return path.join("/tmp", `codex-graph-${process.getuid()}`, `${digest}.sock`);
+}
+
+function requestGraphWorker(socketPath, payload, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const socket = createConnection(socketPath);
+    let buffer = "";
+    let settled = false;
+    const timer = setTimeout(() => {
+      socket.destroy();
+      if (!settled) { settled = true; reject(new Error(`GraphToolCall worker timed out after ${timeoutMs}ms`)); }
+    }, timeoutMs);
+    const finish = (error, value) => {
+      if (settled) return;
+      settled = true;
       clearTimeout(timer);
-      resolve([0, 1].includes(Number(code)) ? output.split(/\r?\n/).filter(Boolean).slice(0, 300) : null);
+      socket.destroy();
+      if (error) reject(error); else resolve(value);
+    };
+    socket.setEncoding("utf8");
+    socket.on("connect", () => socket.write(`${JSON.stringify(payload)}\n`));
+    socket.on("data", (chunk) => {
+      buffer += chunk;
+      const newline = buffer.indexOf("\n");
+      if (newline < 0) return;
+      try {
+        const response = JSON.parse(buffer.slice(0, newline));
+        if (!response.ok) return finish(new Error(response.error || "GraphToolCall worker failed"));
+        finish(null, response.results || []);
+      } catch (error) {
+        finish(error);
+      }
     });
+    socket.on("error", (error) => finish(error));
+    socket.on("close", () => finish(new Error("GraphToolCall worker closed the connection")));
   });
 }
 
-async function streamedCandidates(indexPath, patterns) {
-  const lines = [];
-  const reader = readline.createInterface({ input: createReadStream(indexPath, "utf8"), crlfDelay: Infinity });
-  for await (const line of reader) {
-    const lower = line.toLocaleLowerCase();
-    if (patterns.some((pattern) => lower.includes(pattern.toLocaleLowerCase()))) lines.push(line);
-    if (lines.length >= 300) break;
-  }
-  reader.close();
-  return lines;
+function startGraphWorker(graphPath, pythonPath, indexerPath, socketPath) {
+  const idleTimeout = String(Number(process.env.CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS || 0));
+  const child = spawn(pythonPath, [indexerPath, "serve", "--graph", graphPath, "--socket", socketPath, "--idle-timeout", idleTimeout], {
+    detached: true,
+    windowsHide: true,
+    stdio: "ignore",
+    env: { ...process.env, PYTHONUNBUFFERED: "1" }
+  });
+  child.on("error", (error) => process.stderr.write(`GraphToolCall startup failed: ${error.message}\n`));
+  child.unref();
 }
 
-async function externalScores(indexPath, tokens, query, aliases, excludedNames) {
-  if (!indexPath || !existsSync(indexPath)) return [];
-  const patterns = [...new Set(tokens.filter((token) => token.length >= 3).sort((a, b) => b.length - a.length))].slice(0, 16);
-  if (!patterns.length) return [];
-  const lines = await rgCandidates(indexPath, patterns) || await streamedCandidates(indexPath, patterns);
-  const best = new Map();
-  for (const line of lines) {
-    if (!line || line.startsWith("#")) continue;
-    const fields = line.split("\t");
-    if (fields.length < 8) continue;
-    const name = fields[0];
-    const normalized = name.toLocaleLowerCase();
-    if (excludedNames.has(normalized) || !existsSync(fields[6])) continue;
-    const candidate = scoreSkill({
-      id: `external:${normalized}`,
-      name,
-      description: fields[1] || fields[2] || fields[3],
-      keywords: [fields[4], fields[5], fields[7]],
-      path: fields[6],
-      source: "external-catalog",
-      rank: 100
-    }, tokens, query, aliases);
-    if (candidate.score <= 0) continue;
-    if (!best.has(normalized) || candidate.score > best.get(normalized).score) best.set(normalized, candidate);
+async function requestAfterWorkerStart(socketPath, payload, timeoutMs) {
+  const deadline = Date.now() + timeoutMs;
+  let lastError = null;
+  while (Date.now() < deadline) {
+    try {
+      return await requestGraphWorker(socketPath, payload, Math.max(1, payload.deadline - Date.now()));
+    } catch (error) {
+      lastError = error;
+      if (!["ENOENT", "ECONNREFUSED"].includes(error.code)) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
   }
-  return [...best.values()];
+  throw lastError || new Error("GraphToolCall worker did not start");
+}
+
+
+async function graphCandidates(graphPath, query, pythonPath, indexerPath, excludedNames) {
+  if (!graphPath || !existsSync(graphPath) || !existsSync(pythonPath) || !existsSync(indexerPath)) return Promise.resolve([]);
+  graphPath = realpathSync(graphPath);
+  const socketPath = workerSocketPath(graphPath);
+  await mkdir(path.dirname(socketPath), { recursive: true, mode: 0o700 });
+  const directory = await lstat(path.dirname(socketPath));
+  if (!directory.isDirectory() || directory.uid !== process.getuid() || (directory.mode & 0o077)) {
+    throw new Error("GraphToolCall socket directory must be private and owned by this user");
+  }
+  const deadline = Date.now() + 55000;
+  const payload = { query, top_k: 8, deadline };
+  const asSkills = (results) => results
+    .filter((item) => (item?.kind === "mcp" || (item?.path && existsSync(item.path))) && !excludedNames.has(String(item.name).toLocaleLowerCase()))
+    .map((item) => ({ skill: {
+      id: `external:${String(item.name).toLocaleLowerCase()}`,
+      name: item.name,
+      description: item.description,
+      keywords: [],
+      path: item.path,
+      source: "graph-tool-call",
+      rank: 100,
+      kind: item.kind || "skill",
+      mcpServer: item.mcp_server || ""
+    }, score: Math.round(Number(item.score || 0) * 1000) + (item.kind === "mcp" ? 1000 : 0), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] }));
+
+  return requestGraphWorker(socketPath, payload, 55000)
+    .catch((error) => {
+      if (!["ENOENT", "ECONNREFUSED"].includes(error.code)) throw error;
+      startGraphWorker(graphPath, pythonPath, indexerPath, socketPath);
+      return requestAfterWorkerStart(socketPath, payload, Math.min(5000, deadline - Date.now()));
+    })
+    .then(asSkills)
+    .catch((error) => {
+      process.stderr.write(`GraphToolCall routing failed (no per-request fallback): ${error.message}\n`);
+      return [];
+    });
+}
+
+function promptSkillExclusions(prompt) {
+  const selected = new Set();
+  const quoted = prompt.match(/(?:^|\s)(?:skill:|skill=|\$)([a-z0-9][a-z0-9._-]{1,100})/gi) || [];
+  for (const match of quoted) {
+    const name = match.replace(/^\s*(?:skill:|skill=|\$)/i, "").toLocaleLowerCase();
+    if (name) selected.add(name);
+  }
+  return selected;
 }
 
 try {
@@ -131,17 +191,13 @@ try {
   const tokens = queryTokens(query, stopTokens);
   const skills = Array.isArray(registry.skills) ? registry.skills : [];
   const knownNames = new Set(skills.map((skill) => String(skill.name || "").toLocaleLowerCase()));
-  const localAliasMatch = [...knownNames].some((name) => (aliases[name] || []).some((alias) => query.includes(alias)));
+  for (const name of promptSkillExclusions(prompt)) knownNames.add(name);
+  const explicitlyRouted = [...knownNames].some((name) => (aliases[name] || []).some((alias) => query.includes(alias)));
   const scored = skills.map((skill) => scoreSkill(skill, tokens, query, aliases)).filter((item) => item.score > 0);
-  if (!localAliasMatch) {
-    scored.push(...await externalScores(
-      registry.externalIndexPath || path.join(codexRoot, "skill-registry", "external-skills.tsv"),
-      tokens,
-      query,
-      aliases,
-      knownNames
-    ));
-  }
+  const indexerPath = path.join(codexRoot, "hooks", "graph_skill_index.py");
+  const pythonPath = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexRoot, "tools", "graph-tool-call-venv", "bin", "python");
+  const externalNames = new Set(Object.keys(aliases).map((name) => name.toLocaleLowerCase()));
+  scored.push(...await graphCandidates(registry.externalGraphPath, prompt, pythonPath, indexerPath, externalNames));
   scored.sort((a, b) => b.score - a.score || Number(a.skill.rank || 0) - Number(b.skill.rank || 0) || String(a.skill.name).localeCompare(String(b.skill.name)));
   if (!scored.length || scored[0].score < 6) {
     process.stdout.write("{}");
@@ -156,9 +212,12 @@ try {
   ];
   for (const item of selected) {
     const description = String(item.skill.description || "").replace(/\s+/g, " ").trim().slice(0, 280);
-    lines.push(`- ${item.skill.name} [score=${item.score}; match=${item.matches.join(", ") || "description match"}]`);
+    const routeKind = item.skill.kind === "mcp" ? `MCP/${item.skill.mcpServer}` : "Skill";
+    lines.push(`- ${item.skill.name} [${routeKind}; score=${item.score}; match=${item.matches.join(", ") || "description match"}]`);
     lines.push(`  ${description}`);
-    lines.push(`  Read: ${item.skill.path}`);
+    lines.push(item.skill.kind === "mcp"
+      ? `  Call through indexed MCP server: ${item.skill.mcpServer}/${item.skill.name}`
+      : `  Read: ${item.skill.path}`);
   }
   lines.push("If none is genuinely relevant, ignore this list and continue without a specialized Skill.");
   process.stdout.write(JSON.stringify({

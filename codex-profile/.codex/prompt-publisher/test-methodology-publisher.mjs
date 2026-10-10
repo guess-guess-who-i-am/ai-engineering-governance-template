@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { buildRuntimeSource } from "./publish-global-prompt.mjs";
 import { parseRoutedSections, validateSourceSections } from "./publish-methodology.mjs";
@@ -8,6 +9,12 @@ const config = JSON.parse(await readFile(new URL("methodology-targets.json", dir
 const source = buildRuntimeSource(await readFile(new URL(config.sourceFile, directory), "utf8"));
 const sections = parseRoutedSections(source);
 const rules = validateSourceSections(sections, config.routes);
+
+const state = JSON.parse(await readFile(new URL(config.stateFile, directory), "utf8"));
+const cache = await readFile(new URL(config.translationCacheFile, directory), "utf8");
+const digest = (value) => createHash("sha256").update(value).digest("hex");
+assert.equal(state.runtimeSourceSha256, digest(source), "published state does not match the current runtime source");
+assert.equal(state.translationSha256, digest(cache), "published state does not match the translation cache");
 
 assert.equal(sections.size, 7);
 assert.equal([...rules.values()].reduce((sum, routeRules) => sum + routeRules.length, 0), 63);

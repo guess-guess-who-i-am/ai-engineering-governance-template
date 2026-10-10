@@ -1,0 +1,4 @@
+interface:
+  display_name: "工程执行方法"
+  short_description: "依据真实信息流实施、调试并验证工程任务的完整闭环方法"
+  default_prompt: "使用 $method-engineering-execution 实施并验证这个工程任务。"
