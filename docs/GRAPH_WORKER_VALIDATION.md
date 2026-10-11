@@ -20,8 +20,13 @@
 | 完整Hook错峰，全新编号未命中结果缓存 | 100/100 | 15.27秒 | 23.56秒 | 24.97秒 |
 | 最终代码复测Hook错峰，另一组全新编号 | 100/100 | 17.41秒 | 28.15秒 | 30.23秒 |
 | 完整Hook突发，复用结果缓存 | 100/100 | 6.68秒 | 7.39秒 | 7.57秒 |
+| 独立复核，完整Hook错峰，全新编号 | 100/100 | 17.38秒 | 25.23秒 | 26.92秒 |
+| 独立复核，冷启动socket突发，全新编号 | 100/100 | 31.30秒 | 40.78秒 | 41.62秒 |
+| 独立复核，完整Hook突发，全新编号 | 100/100 | 19.25秒 | 28.93秒 | 30.13秒 |
 
 原始报告在本机 `.reports/graph-load-before.json`、`graph-load-cold-final.json`、`graph-load-pool-warm.json`、`graph-load-pool-stagger.json`、`graph-load-hook-burst-miss.json`、`graph-load-hook-stagger-miss.json`、`graph-load-hook-burst-final.json`、`graph-load-final-review.json`。冷启动报告测得4进程合计稳定RSS 4350.6 MiB（约4.25 GiB），没有测加载峰值。命中缓存成绩不能代替首次计算延迟；全部通过是本机样本结果，不能保证任意输入、无限到达速率或其他电脑都在此上界。
+
+独立复核报告为 `.reports/graph-load-continuation-stagger.json`、`graph-load-continuation-cold.json`、`graph-load-continuation-burst.json`；冷启动4进程合计稳定RSS为4347.9 MiB。完整Hook复核使用实际全局安装，worker和router文件SHA-256与提交9289463一致；另重跑11项worker回归全部通过。支持100在途请求不代表100个CPU任务同时计算；实际由4进程调度，当前100个未缓存长查询的P95仍约25–41秒，短延迟目标尚有缺口。
 
 复现完整Hook：运行上述脚本并指定 `--count 100 --long --warm --transport hook --seed <新编号>`；错峰再加 `--pattern stagger`。独立冷启动测试加 `--worker-entry codex-profile/mac/hooks/graph_skill_index.py`，不带 `--warm`，不重启IDE实验。可用 `--output .reports/<文件>.json` 保留每请求结果。四个检索进程各自常驻一份图，换取真正多核计算；没有100份图。
 

@@ -158,8 +158,10 @@ async function buildOperations(home) {
   const bundledSkillLibrary = path.join(codexHome, "tools", "skills");
   const addTree = async (sourceRoot, destinationRoot, filter = () => true) => {
     for (const source of await filesUnder(sourceRoot)) {
+      const relative = path.relative(sourceRoot, source);
+      if (relative.split(path.sep).includes("__pycache__") || /\.py[co]$/.test(source)) continue;
       if (!filter(source)) continue;
-      const destination = path.join(destinationRoot, path.relative(sourceRoot, source));
+      const destination = path.join(destinationRoot, relative);
       operations.set(destination, { destination, content: await readFile(source), mode: 0o600, source });
     }
   };
