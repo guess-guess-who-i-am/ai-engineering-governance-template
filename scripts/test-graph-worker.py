@@ -3,13 +3,17 @@
 import concurrent.futures
 import importlib.util
 import json
+import os
 from pathlib import Path
 import socket
+import signal
 import subprocess
 import sys
 import tempfile
+import threading
 import time
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 ENTRY = ROOT / 'codex-profile/mac/hooks/graph_skill_index.py'
@@ -73,6 +77,76 @@ class WorkerTests(unittest.TestCase):
         time.sleep(.2)
         self.assertEqual(sum(p.poll() is None for p in self.processes), 1)
 
+    def test_hundred_requests_burst_and_stagger(self):
+        self.start()
+        self.assertTrue(self.request()['ok'])
+        for stagger in (False, True):
+            def invoke(number):
+                if stagger:
+                    time.sleep((number // 20) * .05)
+                return self.request({'query': f'search alpha documents independent {number}'})
+            with concurrent.futures.ThreadPoolExecutor(max_workers=100) as pool:
+                results = list(pool.map(invoke, range(100)))
+            self.assertTrue(all(result['ok'] and result['results'] for result in results), results)
+            self.assertEqual(len({result['pid'] for result in results}), 1)
+            self.assertTrue(all(result['queryPid'] != result['pid'] for result in results))
+
+    def test_provider_cache_covers_rerank_and_is_bounded(self):
+        class Provider:
+            calls = []
+            def encode_batch(self, texts):
+                self.calls.append(texts)
+                return [[len(text)] for text in texts]
+        provider = Provider()
+        cached = indexer._CachedEmbeddingProvider(provider)
+        self.assertEqual(cached.encode_batch(['query', 'description']), [[5], [11]])
+        self.assertEqual(cached.encode_batch(['query', 'description', 'second']), [[5], [11], [6]])
+        self.assertEqual(provider.calls, [['query', 'description'], ['second']])
+        cached.encode_batch([str(number) for number in range(4100)])
+        self.assertEqual(len(cached._vectors), 4096)
+
+    def test_pool_recovers_after_query_process_crash(self):
+        self.start()
+        first = self.request({'query': 'alpha search'})
+        self.assertTrue(first['ok'])
+        os.kill(first['queryPid'], signal.SIGKILL)
+        time.sleep(.2)
+        recovered = self.request({'query': 'alpha independent after crash'})
+        self.assertTrue(recovered['ok'], recovered)
+        self.assertEqual(first['pid'], recovered['pid'])
+        self.assertNotEqual(first['queryPid'], recovered['queryPid'])
+
+    def test_independent_requests_overlap_in_one_worker(self):
+        worker = indexer._GraphWorker(self.graph)
+        active = 0
+        peak = 0
+        mutex = threading.Lock()
+
+        def slow_query(_payload):
+            nonlocal active, peak
+            with mutex:
+                active += 1
+                peak = max(peak, active)
+            time.sleep(.15)
+            with mutex:
+                active -= 1
+            return []
+
+        worker.query = slow_query
+        server = indexer._WorkerServer(str(self.sock), worker)
+        server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+        server_thread.start()
+        try:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=20) as pool:
+                replies = list(pool.map(lambda _: self.request(), range(20)))
+            self.assertTrue(all(reply['ok'] for reply in replies), replies)
+            self.assertGreaterEqual(peak, 2, 'one shared worker must process independent queries concurrently')
+            self.assertLessEqual(peak, server.max_concurrent_requests, 'worker concurrency must stay bounded')
+        finally:
+            server.shutdown()
+            server.server_close()
+            server_thread.join(timeout=5)
+
     def test_reload_failure_recovery_and_expired_request(self):
         self.start()
         first = self.request()
@@ -88,6 +162,34 @@ class WorkerTests(unittest.TestCase):
         self.assertFalse(self.request({'query': 'alpha', 'deadline': 0})['ok'])
         self.assertFalse(self.request({'query': 'alpha', 'top_k': 'bad'})['ok'])
         self.assertTrue(self.request()['ok'])
+
+    def test_keyword_index_preserves_library_scores(self):
+        worker = indexer._GraphWorker(self.graph)
+        engine = worker._load_if_stale()._get_retrieval_engine()
+        from graph_tool_call.retrieval.engine import RetrievalEngine
+        for query in ('search alpha documents', '中文没有关键词', 'alpha alpha search', 'documents unknown'):
+            self.assertEqual(engine._keyword_match(query), RetrievalEngine._keyword_match(engine, query))
+
+    def test_repeated_queries_coalesce_and_reload_invalidates_cache(self):
+        worker = indexer._GraphWorker(self.graph)
+        worker.query({'query': 'warm'})
+        graph = worker._graph
+        original = graph.retrieve_with_scores
+        calls = []
+        def slow(query, **kwargs):
+            calls.append(query)
+            time.sleep(.15)
+            return original(query, **kwargs)
+        with patch.object(graph, 'retrieve_with_scores', slow):
+            with concurrent.futures.ThreadPoolExecutor(max_workers=20) as pool:
+                replies = list(pool.map(lambda _: worker.query({'query': 'alpha search'}), range(20)))
+            self.assertEqual(len(calls), 1)
+            self.assertTrue(all(result == replies[0] for result in replies))
+            replies[0][0]['name'] = 'caller-mutated'
+            self.assertNotEqual(worker.query({'query': 'alpha search'})[0]['name'], 'caller-mutated')
+        self.make_graph('beta')
+        self.assertEqual(worker.query({'query': 'alpha search'})[0]['name'], 'beta')
+        self.assertEqual(worker.loads, 2)
 
     def test_crash_and_idle_restart(self):
         p = self.start()

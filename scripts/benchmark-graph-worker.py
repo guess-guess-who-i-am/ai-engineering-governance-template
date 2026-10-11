@@ -47,7 +47,7 @@ def identity(_=None):
         response = json.loads(s.makefile('rb').readline())
     assert response['ok'] and response['prefilter'], response
     assert response['results'][0]['name'] == 'resolving-merge-conflicts', response
-    return {k: response[k] for k in ('pid', 'loads', 'prefilter')} | {
+    return {k: response[k] for k in ('pid', 'queryPid', 'loads', 'prefilter')} | {
         'seconds': round(time.perf_counter()-start, 3)}
 
 
@@ -56,16 +56,21 @@ if args.restart_worker:
     command = subprocess.check_output(['ps', '-o', 'command=', '-p', str(previous['pid'])], text=True)
     assert str(root / 'hooks/graph_skill_index.py') in command and str(graph) in command
     os.kill(previous['pid'], signal.SIGTERM)
-    time.sleep(.2)
+    until = time.monotonic() + 10
+    while sock.exists() and time.monotonic() < until:
+        time.sleep(.05)
 timings = [route(str(Path.cwd())), route('/tmp'), route(str(Path.home()))]
 first = identity()
 with concurrent.futures.ThreadPoolExecutor(max_workers=20) as pool:
     wave = list(pool.map(identity, range(20)))
 assert {r['pid'] for r in wave} == {first['pid']}
 assert all(r['loads'] == first['loads'] for r in wave)
-rss_kib = int(subprocess.check_output(['ps', '-o', 'rss=', '-p', str(first['pid'])], text=True).strip())
+children = subprocess.check_output(['pgrep', '-P', str(first['pid'])], text=True).split()
+pids = [str(first['pid']), *children]
+rss_kib = sum(int(value) for value in subprocess.check_output(['ps', '-o', 'rss=', '-p', ','.join(pids)], text=True).split())
 report = {'graphBytes': graph.stat().st_size, 'hookSeconds': timings,
-          'worker': first, 'concurrentRequests': 20, 'workerProcesses': 1,
+          'worker': first, 'concurrentRequests': 20, 'supervisorProcesses': 1,
+          'queryProcessesUsed': len({r['queryPid'] for r in wave}),
           'waveSlowestSeconds': max(r['seconds'] for r in wave),
           'residentMiB': round(rss_kib/1024, 1)}
 print(json.dumps(report, ensure_ascii=False, indent=2))

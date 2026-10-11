@@ -4,13 +4,20 @@
 from __future__ import annotations
 
 import argparse
+from collections import OrderedDict
+from concurrent.futures import Future, ProcessPoolExecutor
+from concurrent.futures.process import BrokenProcessPool
+from copy import deepcopy
 import fcntl
+from functools import lru_cache
 import gc
 import hashlib
 import json
+import multiprocessing
 import os
 from pathlib import Path
 import re
+import signal
 import socket
 import socketserver
 import subprocess
@@ -211,6 +218,90 @@ def retrieve(args):
     print(json.dumps(result_records(results), ensure_ascii=False))
 
 
+def _cache_query_interpretation():
+    from graph_tool_call.retrieval import semantic_scorer
+    # Query intent is pure and repeated for thousands of candidates per request.
+    # Keep 256 recent queries, not candidate metadata or graph retrieval results.
+    for name in ("infer_query_result_shape", "infer_query_action"):
+        function = getattr(semantic_scorer, name)
+        if not hasattr(function, "cache_info"):
+            setattr(semantic_scorer, name, lru_cache(maxsize=256)(function))
+    if not hasattr(semantic_scorer.semantic_terms, 'cache_info'):
+        original = semantic_scorer.semantic_terms
+        # Tool metadata is immutable for a graph version; never expose mutable
+        # shared token sets to callers. Query text is retained only in RAM.
+        semantic_scorer.semantic_terms = lru_cache(maxsize=65536)(
+            lambda text: frozenset(original(text)))
+
+
+def _prepare_keyword_index(engine):
+    """Exact equivalent of the library fallback, indexed once per graph."""
+    postings = {}
+    for name, tool in engine._tools.items():
+        tokens = set(engine._tokenize(tool.name)) | set(engine._tokenize(tool.description))
+        for tag in tool.tags:
+            tokens.update(engine._tokenize(tag))
+        for token in tokens:
+            postings.setdefault(token, []).append(name)
+
+    def keyword_match(query):
+        tokens = set(engine._tokenize(query))
+        counts = {}
+        for token in tokens:
+            for name in postings.get(token, ()):
+                counts[name] = counts.get(name, 0) + 1
+        return {name: min(count / max(len(tokens), 1), 1.0) for name, count in counts.items()}
+
+    engine._keyword_match = keyword_match
+
+
+class _CachedEmbeddingProvider:
+    """Cache query/description vectors across all library embedding stages."""
+
+    def __init__(self, provider):
+        self._provider = provider
+        self._lock = threading.Lock()
+        self._vectors = OrderedDict()
+
+    def encode(self, text):
+        return self.encode_batch([text])[0]
+
+    def encode_batch(self, texts):
+        with self._lock:
+            missing = list(dict.fromkeys(text for text in texts if text not in self._vectors))
+            if missing:
+                vectors = self._provider.encode_batch(missing)
+                if len(vectors) != len(missing):
+                    raise ValueError('embedding provider returned an incomplete batch')
+                for text, vector in zip(missing, vectors):
+                    self._vectors[text] = tuple(vector)
+            result = [list(self._vectors[text]) for text in texts]
+            for text in texts:
+                self._vectors.move_to_end(text)
+            while len(self._vectors) > 4096:
+                self._vectors.popitem(last=False)
+            return result
+
+    def __getattr__(self, name):
+        return getattr(self._provider, name)
+
+
+class _SerializedEmbeddingIndex:
+    """Share one index, but never run its native model concurrently on Metal."""
+
+    def __init__(self, index):
+        self._index = index
+        self._encode_lock = threading.Lock()
+        self._cached_encode = lru_cache(maxsize=256)(lambda query: tuple(index.encode(query)))
+
+    def encode(self, query):
+        with self._encode_lock:
+            return self._cached_encode(query)
+
+    def __getattr__(self, name):
+        return getattr(self._index, name)
+
+
 class _GraphWorker:
     """Keep one graph and its retrieval caches alive across Hook requests."""
 
@@ -219,21 +310,49 @@ class _GraphWorker:
         self._graph: ToolGraph | None = None
         self._signature: tuple[int, int, int] | None = None
         self._lock = threading.RLock()
+        self._condition = threading.Condition(self._lock)
+        self._inflight = 0
+        self._ready = False
+        self._results = OrderedDict()
+        self._pending = {}
+        self.cache_hits = 0
+        self.coalesced = 0
+        self.peak_queries = 0
         self._last_request = time.monotonic()
         self.loads = 0
 
     def _load_if_stale(self) -> ToolGraph:
         from graph_tool_call import ToolGraph
+        _cache_query_interpretation()
         stat = self.graph_path.stat()
         signature = (stat.st_ino, stat.st_size, stat.st_mtime_ns)
         if self._graph is None or signature != self._signature:
+            # Do not keep two 15k graphs live while old queries finish.
+            while self._inflight:
+                self._condition.wait()
             # Drop old caches first: a reload must not hold two 15k graphs.
             self._graph = None
             self._signature = None
+            self._ready = False
+            self._results.clear()
             gc.collect()
             graph = ToolGraph.load(self.graph_path)
             # The serialized retrieval state does not persist this scale hook.
             graph.tune_for_scale()
+            engine = graph._get_retrieval_engine()
+            _prepare_keyword_index(engine)
+            if engine._embedding_index is not None:
+                provider = engine._embedding_index._provider
+                if provider is not None and hasattr(provider, '_get_model'):
+                    # Shared MPS inference crashes when independent requests
+                    # overlap, even with a lock around encode. Use CPU for
+                    # this small query model; graph scoring still overlaps.
+                    provider._get_model().to('cpu')
+                    import torch
+                    torch.set_num_threads(1)
+                if provider is not None:
+                    engine._embedding_index._provider = _CachedEmbeddingProvider(provider)
+                engine.set_embedding_index(_SerializedEmbeddingIndex(engine._embedding_index))
             self._graph = graph
             self._signature = signature
             self.loads += 1
@@ -244,21 +363,56 @@ class _GraphWorker:
         if not query:
             return []
         top_k = max(1, min(int(payload.get("top_k", 8)), 50))
-        with self._lock:
+        with self._condition:
             self._last_request = time.monotonic()
             graph = self._load_if_stale()
+            key = (query, top_k)
+            if key in self._results:
+                self.cache_hits += 1
+                self._results.move_to_end(key)
+                return deepcopy(self._results[key])
+            if not self._ready:
+                # GraphToolCall lazily creates BM25, prefilter and model state.
+                # Complete one real query before sharing those structures.
+                results = graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2)
+                self._ready = True
+                records = result_records(results)
+                self._results[key] = records
+                return deepcopy(records)
+            future = self._pending.get(key)
+            owner = future is None
+            if owner:
+                future = Future()
+                self._pending[key] = future
+                self._inflight += 1
+                self.peak_queries = max(self.peak_queries, self._inflight)
+            else:
+                self.coalesced += 1
+        if not owner:
+            timeout = max(0, (payload['deadline'] - time.time() * 1000) / 1000) if 'deadline' in payload else None
+            return deepcopy(future.result(timeout=timeout))
+        try:
             results = graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2)
-            return result_records(results)
+            records = result_records(results)
+            with self._condition:
+                self._results[key] = records
+                while len(self._results) > 128:
+                    self._results.popitem(last=False)
+            future.set_result(records)
+            return deepcopy(records)
+        except BaseException as error:
+            future.set_exception(error)
+            raise
+        finally:
+            with self._condition:
+                self._inflight -= 1
+                self._pending.pop(key, None)
+                self._condition.notify_all()
 
 
 class _WorkerHandler(socketserver.StreamRequestHandler):
     def handle(self):
         self.connection.settimeout(2)
-        # A stuck native model call cannot be cancelled by a Python thread.
-        # Exit the worker; the next request safely reacquires its OS lock.
-        watchdog = threading.Timer(50, lambda: os._exit(1))
-        watchdog.daemon = True
-        watchdog.start()
         try:
             line = self.rfile.readline(262145)
             if not line:
@@ -274,11 +428,15 @@ class _WorkerHandler(socketserver.StreamRequestHandler):
             graph = self.server.worker._graph
             response = {"ok": True, "results": results, "pid": os.getpid(),
                         "loads": self.server.worker.loads,
+                        "metrics": {"cacheHits": self.server.worker.cache_hits,
+                                    "coalesced": self.server.worker.coalesced,
+                                    "peakQueries": self.server.worker.peak_queries},
                         "prefilter": bool(graph and graph._get_retrieval_engine()._prefilter_enabled)}
+            if isinstance(self.server.worker, _ProcessGraphWorker):
+                response.update(self.server.worker._local.report)
         except Exception as error:
             response = {"ok": False, "error": str(error)}
         finally:
-            watchdog.cancel()
             self.server.worker._last_request = time.monotonic()
         try:
             self.wfile.write((json.dumps(response, ensure_ascii=False) + "\n").encode("utf-8"))
@@ -287,18 +445,123 @@ class _WorkerHandler(socketserver.StreamRequestHandler):
             pass
 
 
-class _WorkerServer(socketserver.UnixStreamServer):
-    # GraphToolCall mutates lazy caches: serialize retrieval, not entire tasks.
-    request_queue_size = 64
+class _WorkerServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
+    # One graph per user; independent warm queries can overlap, with bounded
+    # per-query memory and no unbounded thread fan-out from many Agents.
+    request_queue_size = 256
+    daemon_threads = False
+    block_on_close = True
+    max_concurrent_requests = 128
 
     def __init__(self, socket_path: str, worker: _GraphWorker):
         self.worker = worker
+        self._slots = threading.BoundedSemaphore(self.max_concurrent_requests)
         super().__init__(socket_path, _WorkerHandler)
+
+    def process_request(self, request, client_address):
+        self._slots.acquire()
+        try:
+            super().process_request(request, client_address)
+        except BaseException:
+            self._slots.release()
+            raise
+
+    def process_request_thread(self, request, client_address):
+        try:
+            super().process_request_thread(request, client_address)
+        finally:
+            self._slots.release()
+
+
+_process_worker = None
+
+
+def _initialize_query_process(graph_path):
+    global _process_worker
+    _process_worker = _GraphWorker(Path(graph_path))
+
+
+def _query_process(payload):
+    if payload.get('deadline', time.time() * 1000 + 1) < time.time() * 1000:
+        raise TimeoutError('request expired before retrieval')
+    records = _process_worker.query(payload)
+    return records, {'queryPid': os.getpid(), 'loads': _process_worker.loads,
+                     'prefilter': bool(_process_worker._graph and _process_worker._graph._get_retrieval_engine()._prefilter_enabled),
+                     'metrics': {'cacheHits': _process_worker.cache_hits,
+                     'coalesced': _process_worker.coalesced, 'peakQueries': _process_worker.peak_queries}}
+
+
+class _ProcessGraphWorker:
+    """One socket supervisor with a bounded persistent CPU retrieval pool."""
+
+    def __init__(self, graph_path, processes=4):
+        self._graph = None
+        self._local = threading.local()
+        self._last_request = time.monotonic()
+        self.loads = self.cache_hits = self.coalesced = self.peak_queries = 0
+        self._path = Path(graph_path)
+        self._signature = None
+        self._lock = threading.RLock()
+        self._results = OrderedDict()
+        self._pending = {}
+        self._processes = processes
+        self._pool = self._new_pool()
+
+    def _new_pool(self):
+        return ProcessPoolExecutor(max_workers=self._processes,
+            mp_context=multiprocessing.get_context('spawn'),
+            initializer=_initialize_query_process, initargs=(str(self._path),))
+
+    def _finished(self, key, future):
+        with self._lock:
+            if self._pending.get(key) is future:
+                self._pending.pop(key, None)
+            if not future.cancelled() and future.exception() is None and self._signature == key[0]:
+                self._results[key] = future.result()
+                while len(self._results) > 128:
+                    self._results.popitem(last=False)
+
+    def query(self, payload):
+        remaining = max(0, (payload['deadline'] - time.time() * 1000) / 1000) if 'deadline' in payload else 50
+        info = self._path.stat()
+        signature = (info.st_ino, info.st_size, info.st_mtime_ns)
+        key = (signature, str(payload.get('query') or '').strip(), max(1, min(int(payload.get('top_k', 8)), 50)))
+        with self._lock:
+            if self._signature != signature:
+                self._results.clear()
+                self._signature = signature
+            if key in self._results:
+                self.cache_hits += 1
+                self._results.move_to_end(key)
+                records, report = self._results[key]
+                self._local.report = report
+                return deepcopy(records)
+            future = self._pending.get(key)
+            if future is None:
+                try:
+                    future = self._pool.submit(_query_process, payload)
+                except BrokenProcessPool:
+                    self._pool.shutdown(wait=False, cancel_futures=True)
+                    self._pool = self._new_pool()
+                    self._pending.clear()
+                    future = self._pool.submit(_query_process, payload)
+                self._pending[key] = future
+            else:
+                self.coalesced += 1
+        future.add_done_callback(lambda completed: self._finished(key, completed))
+        records, report = future.result(timeout=remaining)
+        self._local.report = report
+        return deepcopy(records)
+
+    def close(self):
+        self._pool.shutdown(wait=True, cancel_futures=True)
 
 
 def serve(args):
     os.environ["HF_HUB_OFFLINE"] = "1"
     os.environ["TRANSFORMERS_OFFLINE"] = "1"
+    for name in ('OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS', 'VECLIB_MAXIMUM_THREADS'):
+        os.environ[name] = '1'
     socket_path = Path(args.socket)
     socket_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     # Never unlink the lock: all contenders must lock the same inode.
@@ -312,15 +575,17 @@ def serve(args):
 
 def _serve_locked(args, socket_path):
     socket_path.unlink(missing_ok=True)
-    worker = _GraphWorker(Path(args.graph))
+    worker = _ProcessGraphWorker(Path(args.graph))
     server = _WorkerServer(str(socket_path), worker)
     server.timeout = 1.0
     os.chmod(socket_path, 0o600)
     source = Path(__file__)
     revision = source.stat().st_mtime_ns
+    stopping = threading.Event()
+    previous_handler = signal.signal(signal.SIGTERM, lambda *_: stopping.set())
     try:
         try:
-            while True:
+            while not stopping.is_set():
                 server.handle_request()
                 if args.idle_timeout > 0 and time.monotonic() - worker._last_request >= args.idle_timeout:
                     break
@@ -332,6 +597,8 @@ def _serve_locked(args, socket_path):
             pass
     finally:
         server.server_close()
+        worker.close()
+        signal.signal(signal.SIGTERM, previous_handler)
         try:
             socket_path.unlink()
         except FileNotFoundError:

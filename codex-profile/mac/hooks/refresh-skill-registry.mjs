@@ -227,7 +227,10 @@ try {
     uniqueRoots.push(root);
   }
   const externalManifest = await refreshExternalIndex(home, codexRoot);
-  const discovered = await Promise.all(uniqueRoots.map(async (root) => ({ root, files: await skillFiles(root.path) })));
+  // The external catalog is already indexed by refreshExternalIndex. Keep the
+  // per-Hook registry small instead of mirroring 15k+ graph nodes into JSON.
+  const discovered = await Promise.all(uniqueRoots.filter((root) => root.source !== "external-library")
+    .map(async (root) => ({ root, files: await skillFiles(root.path) })));
   const skills = (await Promise.all(discovered.flatMap(({ root, files }) => files.map(async (file) => {
     const [text, metadata] = await Promise.all([readFile(file, "utf8"), stat(file)]);
     const name = frontmatterValue(text, "name");

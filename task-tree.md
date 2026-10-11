@@ -13,10 +13,10 @@
 - Output: 可迁移macOS配置、全局Skill安装源、常驻worker及右键服务；codex-profile/、安装全局配置.command，第三方库由私有skills-library恢复。
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
 - Notes: 只支持 macOS；20 是硬上限，不是首波目标。全局 Skill/MCP 经过 GraphToolCall。另一台 Mac 的重启恢复尚未实测，远程 HTTP MCP 目录发现尚未接入。
-- CurrentResult: macOS 全局固定 Hook 已改为每会话第1、4、7轮注入；动态 Skill 路由每轮运行，恢复或压缩后首轮重注入。定向频率测试和一键部署测试通过，本机第2、3轮无固定内容、第4轮恢复；GraphToolCall Worker 实际检索仍偶发连接关闭，且三轮频率的长期质量未证实，不能声称全局路由稳定或质量等价。
-- RootCauseAnalysis: 每次提示启动新进程会重复解析大图、重建索引并检查模型网络元数据；加载图又未恢复预过滤，导致全库语义扫描。原刷新只比较工具数量，内容变更容易漏掉，且全库重建会超出会话等待预算。
+- CurrentResult: macOS 全局检索已部署4个常驻进程和轻量Hook注册表；100个不同长输入突发、错峰均100/100成功，完整Hook未命中结果缓存时P95约29.25/23.56秒，冷启动最长33.14秒。10类查询排名和返回字段与原库一致。三轮提醒长期质量及另一台Mac重启恢复仍未验证，整体目标尚未完全达成。
+- RootCauseAnalysis: 原单连接、大锁和Hook重复扫描外部全库导致排队；embedding重排绕过缓存和互斥，Metal并发会崩溃。现用4进程池、图版本缓存、在途请求合并及CPU模型缓存，并删去每轮重复外部注册表。
 - CaseStudy:
-- NextIdea: 排查 GraphToolCall Worker 连接关闭，并用真实长会话持续核验三轮频率的路由与质量。
+- NextIdea: 持续监测真实长任务和完成检查的检索延迟、失败率与缓存命中，并在另一台Mac验证重启恢复和三轮提醒质量。
 - SelectedSkills:
 
 # GraphState

@@ -100,9 +100,10 @@ elif "serve" in args:
             try: connection, _ = server.accept()
             except socket.timeout: continue
             with connection:
-                connection.recv(65536)
+                payload = json.loads(connection.recv(65536))
                 if marker: pathlib.Path(marker).open("a", encoding="utf-8").write("request\\n")
-                connection.sendall((json.dumps({"ok": True, "results": [{"name":"astro-islands","description":"Build Astro islands architecture and hydration patterns","path":"external skills with spaces/acme-astro-islands/SKILL.md","score":1,"confidence":"worker","keyword_score":1,"graph_score":0,"embedding_score":0,"kind":"skill","mcp_server":""}]} ) + "\\n").encode())
+                results = [{"name":"astro-islands","description":"Build Astro islands architecture and hydration patterns","path":${JSON.stringify(path.join(skillFixture, "acme-astro-islands", "SKILL.md"))},"score":1,"confidence":"worker","keyword_score":1,"graph_score":0,"embedding_score":0,"kind":"skill","mcp_server":""}] if "astro" in payload.get("query", "").lower() else []
+                connection.sendall((json.dumps({"ok": True, "results": results}) + "\\n").encode())
     finally:
         server.close()
         try: socket_path.unlink()
@@ -203,6 +204,7 @@ for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse
   await writeFile(configFile, config);
   assert(registry.roots.every((root) => root.source !== "project"), "global registry unexpectedly includes project Skill roots");
   assert(!registry.skills.some((skill) => skill.source === "project"), "global registry unexpectedly indexes project Skills");
+  assert(!registry.skills.some((skill) => skill.source === "external-library"), "per-Hook registry must not duplicate the external graph catalog");
   assert(registry.skills.filter((skill) => skill.source === "agents").length === expectedSkills.length, `expected ${expectedSkills.length} installed global Skills in the registry`);
   for (const name of expectedSkills) assert(registry.skills.some((skill) => skill.name === name), `registry is missing ${name}`);
   const validator = run(path.join(home, ".codex", "hooks", "validate-methodology-routing.mjs"), [], envArgs);

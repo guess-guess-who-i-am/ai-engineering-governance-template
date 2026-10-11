@@ -189,7 +189,10 @@ try {
     .map(([name, values]) => [name.toLocaleLowerCase(), (values || []).map((value) => String(value).toLocaleLowerCase())]));
   const query = prompt.toLocaleLowerCase();
   const tokens = queryTokens(query, stopTokens);
-  const skills = Array.isArray(registry.skills) ? registry.skills : [];
+  // External catalog Skills already belong to the persistent GraphToolCall
+  // index. A second 15k+ JavaScript scan per Agent defeats that shared service.
+  const skills = Array.isArray(registry.skills)
+    ? registry.skills.filter((skill) => skill.source !== "external-library") : [];
   const knownNames = new Set(skills.map((skill) => String(skill.name || "").toLocaleLowerCase()));
   for (const name of promptSkillExclusions(prompt)) knownNames.add(name);
   const explicitlyRouted = [...knownNames].some((name) => (aliases[name] || []).some((alias) => query.includes(alias)));
