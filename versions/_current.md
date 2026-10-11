@@ -2,21 +2,21 @@
 
 > 这个文件是大模型和前端共同维护的任务图。每个项目一棵独立的树。
 
-## ROOT - <填写你的项目目标>
+## ROOT - macOS 全局 Codex 治理配置
 
 - Position: 120,120
 - Size: 400,520
 - Completion: 已完成
-- Problem: 如何让用户通过 Codex 逐项填写项目资料，并一键生成独立私有 GitHub 项目？
-- Approach: 先生成简短项目 brief，再用确定性脚本复制最小治理骨架、初始化 Git，并可选创建私有 GitHub 仓库；模型只负责澄清，不直接处理密钥。
-- Input: 当前治理模板、GitHub CLI 登录状态、用户的项目想法。
-- Output: 可执行的新项目向导、项目 brief、私有仓库初始化结果。
-- Metrics: 向导可重复运行；缺少必填信息时停止；新目录可通过基础检查；GitHub 创建失败不丢失本地项目。
-- Notes: 第一次使用时，请让 Agent 拆成 3-7 个节点；节点不写代码、原始数据或复杂英文术语。
-- CurrentResult: 完整工程仍已在私有 main；根 README 现已补齐配置组成、55条归类、6个自建方法 Skills、凭据边界、跨电脑安装、其他项目继承和后续同步流程。文件计数、方法论解析、文档、治理与秘密扫描均通过，“完整说明写入 README”目标已达到。
-- RootCauseAnalysis: 生成器必须从已提交模板导出，才能隔离母仓库未提交内容；定性 LLM 门禁默认排除，避免缺少新仓库 Secrets 时首推失败。
+- Problem: 如何把仓库治理配置安装成 macOS 全局 Codex 行为，并让并发、Hook、路由和全部 Skill 真正可用？
+- Approach: 全局配置继续由 Finder 右键一键部署；Skill 与 MCP 统一经过 GraphToolCall。工具执行先构造依赖 DAG，同类只读调用优先融合，普通波次从2–4路开始，成功渐增，失败或超时减半；危险、限流和共享状态任务串行，20仅为硬上限。
+- Input: 仓库中的 macOS profile、用户 Codex 目录和现有非敏感配置。
+- Output: 可迁移macOS配置、全局Skill安装源、常驻worker及右键服务；codex-profile/、安装全局配置.command，第三方库由私有skills-library恢复。
+- Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
+- Notes: 只支持 macOS；20 是硬上限，不是首波目标。全局 Skill/MCP 经过 GraphToolCall。另一台 Mac 的重启恢复尚未实测，远程 HTTP MCP 目录发现尚未接入。
+- CurrentResult: macOS全局检索已部署4个常驻进程，仓库与安装文件一致；独立复核100个不同长请求的完整Hook突发、错峰及冷启动均100/100成功，P95约28.9、25.2、40.8秒。11项worker回归通过；100请求可用，但低延迟、三轮提醒长期质量和跨Mac重启仍有验证或优化缺口。
+- RootCauseAnalysis: 原单连接、大锁和Hook重复扫描外部全库导致排队；embedding重排绕过缓存和互斥，Metal并发会崩溃。现用4进程池、图版本缓存、在途请求合并及CPU模型缓存，并删去每轮重复外部注册表。
 - CaseStudy:
-- NextIdea: 在另一台 Windows 电脑克隆私有仓库并运行安装脚本，再分别登录 GitHub 与 Codex。
+- NextIdea: 持续监测真实长任务和完成检查的检索延迟、失败率与缓存命中，并在另一台Mac验证重启恢复和三轮提醒质量。
 - SelectedSkills:
 
 # GraphState

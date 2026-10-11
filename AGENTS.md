@@ -20,7 +20,7 @@ This repository stores reusable AI engineering-governance templates. The objecti
 | Visual language | `DESIGN.md` |
 | Public interface behavior | Owning contract / schema |
 | Local implementation rules | Nearest `AGENTS.md` and existing code |
-| Specialized workflow | Triggered `.agents/skills/<name>/SKILL.md` |
+| Specialized workflow | Triggered global Skill installed from `codex-profile/global-skills/<name>/SKILL.md` |
 
 When authorities conflict, the authority closest to the real behavior and with explicit ownership wins. Do not conceal the conflict with a compatibility layer.
 
@@ -37,7 +37,7 @@ When authorities conflict, the authority closest to the real behavior and with e
 
 - Put complete third-party mirrors in `upstreams/` and do not commit them to this repository. Record sources and pinned versions in `UPSTREAMS.md` and `.reports/upstreams.json`.
 - Do not copy upstream source with unclear licensing into the core templates.
-- Skills follow `.agents/skills/README.md`; keep bodies concise and put deterministic logic in `scripts/`.
+- Skills follow `codex-profile/global-skills/README.md`; keep bodies concise and put deterministic logic in `scripts/`.
 - Do not commit tokens, cookies, API keys, `.env` files, or machine-local configuration.
 - Preserve unrelated user changes and avoid destructive Git operations.
 - Without evidence, do not claim “completed,” “fixed,” or “passed.”
@@ -139,13 +139,13 @@ Cursor: `.cursor/rules/llm-task-tree-flow-edit.mdc` · Full gate: `llm-task-tree
 1. Update the smallest relevant node(s) and/or `blocks`; for tree writes, report every persisted node/field difference as `old value → new value` from the write result.
 2. For node `Input`/`Output`, write a short Chinese description plus optional paths; do not paste raw samples or code.
 3. If flow changed, note it in the affected node's `Notes`.
-4. If any tree/subtree changed, run `powershell -NoProfile -ExecutionPolicy Bypass -File llm-task-tree/check-tree-compact.ps1 <changed tree paths>`. Non-zero exit blocks completion: semantically rewrite every reported over-budget field and rerun until it passes. Never mechanically truncate facts. Codex Stop hooks enforce this automatically; other Agents must run it explicitly.
+4. If any tree/subtree changed, run `./llm-task-tree/check-tree-compact.sh <changed tree paths>`. Non-zero exit blocks completion: semantically rewrite every reported over-budget field and rerun until it passes. Never mechanically truncate facts. Codex Stop hooks enforce this automatically; other Agents must run it explicitly.
 
 **No tree yet**
 
 Create from `llm-task-tree/templates/task-tree.starter.md`, or run **task-tree-grill** (Read tree paths above first).
 
-**UI**: `llm-task-tree/打开任务图.cmd` → **Relationship Graph | Execution Flow** for `scripts/project.json` / `scripts/run.json`.
+**UI**: `llm-task-tree/open-task-tree.command` → **Relationship Graph | Execution Flow** for `scripts/project.json` / `scripts/run.json`.
 <!-- llm-task-tree:end -->
 
 <!-- llm-task-tree:tool-calling:begin -->

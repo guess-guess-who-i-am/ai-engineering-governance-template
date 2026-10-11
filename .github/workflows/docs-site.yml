@@ -30,7 +30,7 @@ concurrency:
 
 jobs:
   browser:
-    runs-on: windows-latest
+    runs-on: macos-15
     timeout-minutes: 20
     steps:
       - name: Checkout

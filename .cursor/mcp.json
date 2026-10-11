@@ -2,7 +2,7 @@
     "mcpServers":  {
                        "task_tree":  {
                                          "type":  "stdio",
-                                         "command":  "node",
+                                         "command":  "${workspaceFolder}/llm-task-tree/run-node.sh",
                                          "args":  [
                                                       "${workspaceFolder}/llm-task-tree/mcp-server.mjs"
                                                   ]

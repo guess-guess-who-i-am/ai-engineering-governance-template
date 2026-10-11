@@ -1,0 +1,4 @@
+interface:
+  display_name: "任务树链式执行"
+  short_description: "沿授权的任务树执行链逐步运行当前节点并记录可审计结果"
+  default_prompt: "使用 $task-tree-chain-run 沿任务树执行链运行当前节点。"
