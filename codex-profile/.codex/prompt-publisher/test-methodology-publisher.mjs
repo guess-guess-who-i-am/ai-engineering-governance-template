@@ -17,11 +17,11 @@ assert.equal(state.runtimeSourceSha256, digest(source), "published state does no
 assert.equal(state.translationSha256, digest(cache), "published state does not match the translation cache");
 
 assert.equal(sections.size, 7);
-assert.equal([...rules.values()].reduce((sum, routeRules) => sum + routeRules.length, 0), 63);
+assert.equal([...rules.values()].reduce((sum, routeRules) => sum + routeRules.length, 0), 76);
 assert.deepEqual(Object.fromEntries([...rules].map(([route, routeRules]) => [route, routeRules.length])), {
-  alwaysOn: 21,
+  alwaysOn: 40,
   "method-research-evidence": 9,
-  "method-engineering-execution": 12,
+  "method-engineering-execution": 6,
   "method-evaluation-gates": 10,
   "method-github-delivery": 1,
   "method-task-tree": 10

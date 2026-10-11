@@ -141,10 +141,10 @@ function hooksDocument(codexHome) {
     description: "One stable dispatcher per event keeps Hook trust indices fixed while internally batching reminders, Skill routing, capability routing, and refresh work.",
     hooks: {
       UserPromptSubmit: [{ hooks: [
-        { type: "command", command: command("hook-dispatch.mjs"), timeout: 60, statusMessage: "Loading reminders and routing in parallel", additionalContextLimit: 14000 }
+        { type: "command", command: command("hook-dispatch.mjs"), timeout: 60, parallelSafe: true, statusMessage: "Loading reminders and routing in parallel", additionalContextLimit: 18000 }
       ] }],
       SessionStart: [{ matcher: "^(startup|resume|clear|compact)$", hooks: [
-        { type: "command", command: command("hook-dispatch.mjs"), timeout: 70, statusMessage: "Restoring reminders and refreshing indexes in parallel", additionalContextLimit: 10000 }
+        { type: "command", command: command("hook-dispatch.mjs"), timeout: 70, statusMessage: "Restoring reminders and refreshing indexes in parallel", additionalContextLimit: 15000 }
       ] }]
     }
   };

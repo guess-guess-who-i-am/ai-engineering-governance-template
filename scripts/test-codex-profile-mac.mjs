@@ -206,7 +206,7 @@ for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse
   assert(registry.skills.filter((skill) => skill.source === "agents").length === expectedSkills.length, `expected ${expectedSkills.length} installed global Skills in the registry`);
   for (const name of expectedSkills) assert(registry.skills.some((skill) => skill.name === name), `registry is missing ${name}`);
   const validator = run(path.join(home, ".codex", "hooks", "validate-methodology-routing.mjs"), [], envArgs);
-  assert(validator.status === 0 && validator.stdout.includes("PASS: 63 English rules"), `63-rule validation failed: ${validator.stderr || validator.stdout}`);
+  assert(validator.status === 0 && validator.stdout.includes("PASS: 76 English rules"), `76-rule validation failed: ${validator.stderr || validator.stdout}`);
   const contextInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const dispatcher = path.join(home, ".codex", "hooks", "hook-dispatch.mjs");
   const context = run(dispatcher, [], { ...envArgs, input: contextInput });
@@ -424,7 +424,7 @@ await writeFile(configPath, config);
     console.log(`PASS: full catalog fixture indexed ${fullManifest.skillCount}/${fullManifest.catalogSkillCount} Skills; total index bytes=${Buffer.byteLength(fullIndex)}; example route=resolving-merge-conflicts`);
   }
 
-  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 22 owned Skills, global-only registry, system and task-tree routing, merge, manifest backup, credential isolation, 63-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
+  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 22 owned Skills, global-only registry, system and task-tree routing, merge, manifest backup, credential isolation, 76-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
 } finally {
   await rm(root, { recursive: true, force: true });
 }

@@ -12,7 +12,7 @@
   "translationAttempts": 3,
   "translationRetryDelayMs": 2000,
   "registryRefreshTimeoutMs": 120000,
-  "contextLimit": 8000,
+  "contextLimit": 12000,
   "contextReserve": 500,
   "validatorFile": "../../mac/hooks/validate-methodology-routing.mjs",
   "refreshRegistryFile": "../../mac/hooks/refresh-skill-registry.mjs",

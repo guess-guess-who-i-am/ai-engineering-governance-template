@@ -13,10 +13,10 @@
 - Output: 可迁移macOS配置、全局Skill安装源、常驻worker及右键服务；codex-profile/、安装全局配置.command，第三方库由私有skills-library恢复。
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
 - Notes: 只支持 macOS；20 是硬上限，不是首波目标。全局 Skill/MCP 经过 GraphToolCall。另一台 Mac 的重启恢复尚未实测，远程 HTTP MCP 目录发现尚未接入。
-- CurrentResult: 全局 macOS 配置与常驻路由已部署；四轮 Hook 输出实测共 42,872 字节，固定提醒每轮 8,756 字节，每四轮注入一次按输出量可少 61.3%。不同任务的 Skill 推荐确实改变，动态路由仍须每轮运行。模型认证失败，跨轮保留、真实 token 与延迟尚未测得，不能宣称隔轮策略安全；详见 docs/HOOK_CONTEXT_EXPERIMENT.md。
+- CurrentResult: macOS 全局固定 Hook 已改为每会话第1、4、7轮注入；动态 Skill 路由每轮运行，恢复或压缩后首轮重注入。定向频率测试和一键部署测试通过，本机第2、3轮无固定内容、第4轮恢复；GraphToolCall Worker 实际检索仍偶发连接关闭，且三轮频率的长期质量未证实，不能声称全局路由稳定或质量等价。
 - RootCauseAnalysis: 每次提示启动新进程会重复解析大图、重建索引并检查模型网络元数据；加载图又未恢复预过滤，导致全库语义扫描。原刷新只比较工具数量，内容变更容易漏掉，且全库重建会超出会话等待预算。
 - CaseStudy:
-- NextIdea: 待独立模型会话认证恢复后，用同一四轮任务序列对比每轮与每四轮固定注入，测真实 token、缓存、延迟、路由和规则遵守，再决定频率。
+- NextIdea: 排查 GraphToolCall Worker 连接关闭，并用真实长会话持续核验三轮频率的路由与质量。
 - SelectedSkills:
 
 # GraphState
