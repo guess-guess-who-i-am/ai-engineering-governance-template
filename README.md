@@ -2,6 +2,8 @@
 
 一个面向 Codex 和其他 Agent Skills 兼容工具的工程治理起点，将常驻规则、领域语义、设计上下文、按需 Skills、确定性门禁和可执行 Flow 分层组织。
 
+Windows 图路由安装与真实验收现使用 [Windows 配置说明](docs/CODEX_PROFILE_WINDOWS.md)。它保留每轮英文提醒、最多四候选和现有方法论；通过 `hooks/list` 核查信任，而不是把安装成功当自动采用成功。旧 Windows 安装入口现在调用同一事务式 Node 安装器。
+
 ## 已包含
 
 - `AGENTS.md`：任务路由、权威顺序和验证预算。

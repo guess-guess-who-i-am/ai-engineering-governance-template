@@ -35,6 +35,11 @@ jobs:
       - name: Run PR quality profile
         shell: pwsh
         run: ./scripts/check.ps1
+      - name: Test Windows installation contracts and real command overlap
+        shell: pwsh
+        run: |
+          node scripts/test-windows-profile.mjs
+          node scripts/test-parallel-run.mjs
       - name: Upload quality evidence
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

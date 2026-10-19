@@ -17,6 +17,7 @@
 | ID | 名称 | 类型 | 用途/消费者 | 负责人 | 位置或逻辑引用 | 数据等级 | 容量/费用 | 健康与恢复 | 复审/失效条件 | 清理动作 | 状态 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | `RES-001` | `待填写` | `service/data/model/gpu/account/artifact` | `US-001` | `待填写` | `不写凭据和临时签名 URL` | `public/internal/sensitive/secret` | `按实际填写` | `待填写` | `日期、里程碑或条件` | `待填写` | `Proposed` |
+| `RES-002` | Windows 全局 Skill 图检索 | `service/model/artifact` | 用户、项目和外部 Skill 统一路由 | 本机 Codex 配置维护者 | 用户目录 `.codex/skill-registry`，Python 路径由本机 `graph-runtime.json` 指定 | internal；端点认证值只存在受 ACL 保护的本机目录 | 2 个 CPU 检索进程；首次实测后记录内存；无逐次远程 embedding 费用 | 事务安装备份、缓存内容摘要、操作系统单实例锁、认证健康检查 | 运行时/模型版本改变、内存异常或路由回归时复审 | 用认证 stop 请求退出服务；按安装 manifest 恢复受管文件；不删除 Skill 库 | Proposed |
 
 状态使用：`Proposed`、`Temporary`、`Active`、`Retiring`、`Retired`。
 

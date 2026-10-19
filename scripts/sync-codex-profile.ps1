@@ -11,6 +11,12 @@ $bundleRoot = Join-Path $repositoryRoot "codex-profile"
 $codexHome = Join-Path $UserHome ".codex"
 $agentsHome = Join-Path $UserHome ".agents"
 
+if (Test-Path -LiteralPath (Join-Path $codexHome 'skill-registry/graph-runtime.json')) {
+  if (-not $Check) { throw 'The Windows graph runtime is repository-owned. Use the methodology-only snapshot script; never copy Windows runtime files over Linux sources.' }
+  & node (Join-Path $PSScriptRoot 'install-codex-profile-windows.mjs') --home $UserHome --check --json
+  exit $LASTEXITCODE
+}
+
 $codexFiles = @(
   "AGENTS.md",
   "hooks/hook-dispatch.mjs",

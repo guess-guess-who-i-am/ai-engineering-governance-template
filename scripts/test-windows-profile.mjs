@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {mkdtemp,mkdir,writeFile,readFile,rm,symlink} from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {selectCandidates} from '../codex-profile/windows/hooks/skill-router.mjs';
+import {projectMetadata} from '../codex-profile/windows/hooks/skill-metadata.mjs';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const temporary=await mkdtemp(path.join(os.tmpdir(),'windows-profile-regression-'));
+const file=path.join(temporary,'fixture.md');await writeFile(file,'existing');
+try{
+  const results=Array.from({length:8},(_,i)=>({name:'skill-'+i,path:file,semanticScore:0.9-i/100,rank:10}));
+  assert.equal(selectCandidates(results,'specific engineering research').length,4);
+  const precedence=selectCandidates([{name:'same',path:file,source:'user',rank:10,semanticScore:0.8},{name:'same',path:file,source:'project',rank:0,semanticScore:0.7}],'engineering');
+  assert.equal(precedence[0].source,'project');
+  assert.equal(selectCandidates([{name:'absent',path:path.join(temporary,'absent'),semanticScore:1}],'engineering').length,0);
+  const directory=path.join(temporary,'.agents/routed-skills/new-skill');await mkdir(directory,{recursive:true});
+  await writeFile(path.join(directory,'SKILL.md'),'---\nname: new-skill\ndescription: first description\n---\n');
+  const first=await projectMetadata(temporary);assert(first.some(x=>x.name==='new-skill'));
+  await writeFile(path.join(directory,'SKILL.md'),'---\nname: new-skill\ndescription: changed description\n---\n');
+  const changed=await projectMetadata(temporary);assert.notEqual(first.find(x=>x.name==='new-skill').sha256,changed.find(x=>x.name==='new-skill').sha256);
+  const linked=path.join(temporary,'linked hooks');
+  await symlink(path.join(root,'codex-profile/windows/hooks'),linked,'junction');
+  const linkedRouter=spawnSync(process.execPath,[path.join(linked,'skill-router.mjs')],{input:JSON.stringify({hook_event_name:'UserPromptSubmit',prompt:'hello'}),encoding:'utf8'});
+  assert.equal(linkedRouter.status,0,linkedRouter.stderr);assert.deepEqual(JSON.parse(linkedRouter.stdout),{});
+  const linkedRefresh=spawnSync(process.execPath,[path.join(linked,'refresh-skill-registry.mjs')],{input:'{}',encoding:'utf8',env:{...process.env,CODEX_SKIP_EXTERNAL_INDEX_REFRESH:'1'}});
+  assert.equal(linkedRefresh.status,0,linkedRefresh.stderr);assert.deepEqual(JSON.parse(linkedRefresh.stdout),{});
+  const badHome=path.join(temporary,'rollback user');await mkdir(path.join(badHome,'.codex'),{recursive:true});
+  await writeFile(path.join(badHome,'.codex/AGENTS.md'),'KEEP_AGENT');
+  await writeFile(path.join(badHome,'.codex/hooks.json'),JSON.stringify({hooks:{Stop:[{hooks:[{type:'command',command:'KEEP_STOP'}]}]}}));
+  const installer=path.join(root,'scripts/install-codex-profile-windows.mjs');
+  const failed=spawnSync(process.execPath,[installer,'--home',badHome,'--python',process.execPath,'--library-root',root,'--json'],{encoding:'utf8',env:{...process.env,CODEX_PROFILE_TEST_FAIL_STAGE:'post-write'}});
+  assert.notEqual(failed.status,0);assert.equal(await readFile(path.join(badHome,'.codex/AGENTS.md'),'utf8'),'KEEP_AGENT');
+  assert((await readFile(path.join(badHome,'.codex/hooks.json'),'utf8')).includes('KEEP_STOP'));
+  console.log('PASS: four-candidate cap, project ownership, missing paths, content invalidation, junction entrypoints, and failed-install rollback');
+}finally{await rm(temporary,{recursive:true,force:true});}

@@ -91,7 +91,7 @@ function defaultHandlers(eventName, codexRoot) {
     return { file, timeoutMs };
   };
   const handlers = eventName === "UserPromptSubmit"
-    ? [own("context-refresh", 7000), own("skill-router", 12000)]
+    ? [own("context-refresh", 7000), own("skill-router", process.platform === "win32" ? 55000 : 12000)]
     : eventName === "SessionStart"
       ? [own("context-refresh", 7000), own("refresh-skill-registry", 65000)]
       : [];
@@ -141,7 +141,9 @@ try {
       process.stderr.write(`Hook dispatcher child ${result.file}: ${result.error || result.stderr.trim()}\n`);
     }
   }
-  const contexts = results.map((result) => result.context.trim()).filter(Boolean);
+  const contexts = results.map((result) => result.error
+    ? `[HOOK_HANDLER_ERROR] ${path.basename(result.file)} failed: ${result.error}. Diagnose and repair the failed handler, then rerun it; do not claim its Skill or capability was loaded.`
+    : result.context.trim()).filter(Boolean);
   if (!contexts.length) process.stdout.write("{}");
   else process.stdout.write(JSON.stringify({
     hookSpecificOutput: { hookEventName: eventName, additionalContext: deduplicateSkillCandidates(contexts.join("\n\n")) }

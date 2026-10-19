@@ -1,0 +1,3 @@
+graph-tool-call[embedding]==0.46.0
+sentence-transformers==6.1.0
+portalocker==3.2.0

@@ -1,5 +1,7 @@
 # 可迁移 Codex 全局配置
 
+Windows 最新入口为 `scripts/deploy-codex-profile-windows.ps1`，完整说明见 `docs/CODEX_PROFILE_WINDOWS.md`。下文原有轻量索引说明仍用于未切换图运行时的旧环境与 Linux；新 Windows 不再逐轮调用远程 embedding 排序，也不把 Windows 运行时回写到共享 Linux 文件。中文方法论只用 `scripts/snapshot-methodology.mjs` 同步生成结果。安装后必须核查 Hook 信任；用户未批准前不能宣称普通会话已自动使用。
+
 这个目录是当前全局方法论系统的可迁移快照，同时支持 Windows 和 Linux。它包含：
 
 - 全局 `AGENTS.md`；
