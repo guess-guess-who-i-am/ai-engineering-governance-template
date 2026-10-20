@@ -14,13 +14,14 @@
 
 ## 必需的 Windows 绑定
 
-macOS 的 Unix socket、fcntl 文件锁、POSIX Python 路径、Node 启动引号和权限位不能直接用于 Windows。适配器只在这些边界改动：
+macOS 的 Unix socket、fcntl 文件锁、POSIX Python 路径、Node 启动引号和权限位不能直接用于 Windows。适配器处理这些边界，并按后续用户要求增加启动预热；Prompt、提醒节奏、评分和选择算法保持原版：
 
 1. Unix socket 换为仅绑定回环地址的认证连接；端点文件位于用户 ACL 保护目录，认证值不打印、不上传。
 2. 文件锁由 portalocker 调用 Windows 锁；保留单实例和进程池，不重写检索算法。
 3. Python 改为原生 Windows 虚拟环境路径；模型使用已下载的本地原版缓存，后台任务继承正确路径。
 4. Windows 启动引号、隐藏后台窗口和 TOML 路径解析；不加入评分修正。
 5. 共享 dispatcher 中仅 Windows 才存在的旧 capability PowerShell 默认路径改为与 macOS 一样的空默认值，避免额外注入上一版推荐器。显式配置仍遵循原版行为。
+6. Windows 原生进程池启动时实际初始化并加载四份图，而不只是配置四个最大槽位。四个不同进程完成预热后才发布就绪端点；预热超时明确失败。首次等待端点的期限由 5 秒扩展到原请求已有的 55 秒总期限，不增加逐查询降级路径。
 
 Finder 快速操作是 macOS 系统功能，不能原样运行在 Windows；本机使用可重用的原生部署入口，不能把 Finder 服务宣称为已在 Windows 安装。
 
@@ -30,6 +31,8 @@ Finder 快速操作是 macOS 系统功能，不能原样运行在 Windows；本�
 git worktree add --detach .reports/upstream-macos-0cd7d48 0cd7d48d90c24a0cf8d0515b8b0dd871fcaac7b2
 node scripts/install-mac-profile-on-windows.mjs --source .reports/upstream-macos-0cd7d48 --library E:/skills
 node scripts/install-mac-profile-on-windows.mjs --check
+node scripts/prewarm-mac-worker.mjs
+node scripts/test-mac-worker-residency.mjs
 node scripts/test-mac-profile-on-windows.mjs
 node scripts/test-mac-routed-tool.mjs
 ```
@@ -49,6 +52,22 @@ node scripts/test-mac-routed-tool.mjs
 本机最终清单已确认 15,471 个外部 Skill、24 个用户 Skill（22 个基线 Skill 加原有两个）和 31 个 MCP 工具；目录另有 1 条缺失文件，按原版缺失计数记录，未冒充可用文件。正式 Router 推荐任务树焦点工具后，真实调用已返回结果。热态四轮回归无检索错误；首次新图重载曾出现 55 秒超时，失败结果保存在本机 `.reports/mac-parity-first-with-timeout.json`，不能用后续热态成功抹去冷态限制。
 
 普通新会话的 Hook 自动执行仍需用户确认信任；安装器不会写入信任哈希或使用 bypass 参数。尚未证明三轮提醒的长期保持质量、跨机器重启恢复、任意中文任务的最优路由或模型端到端提速。恢复、信任和图更新状态必须分别验证。
+
+## 2026-10-20：修复“容量四个，却只加载一个”
+
+此前 Windows 与原版 macOS 都配置四个进程容量，但原生进程池可按需创建；“参数为四”不是“四份图均已加载”的证据。本次按用户要求增加显式预热，检索算法不改。真实健康回执报告四个不同 PID，各加载图一次；八个带唯一标识、避免结果缓存的检索请求区间重叠，并实际由这四个进程处理。样本约 2.65–3.49 秒，不能与缓存命中的约 3 毫秒混为一谈，也不是模型端到端耗时。
+
+`--check` 现在还要求认证状态接口确认四个已预热进程存在；预热命令会启动缺失服务，单纯只读检查不会偷偷把缺失服务说成已驻留。证据为本机 `.reports/mac-worker-residency.json`。
+
+本轮五个已知独立工具调用通过同一个 `functions.exec` 的 `Promise.all` 同时提交，时间区间重叠；界面一张封装工具卡并不等于一条内部操作。该波工具调用证据位于本机 `.reports/parallel-tool-wave-20261020.json`。存在真实依赖、先读必要 Skill 或需要用户确认的步骤仍应串行；不能为凑数量虚构任务。
+
+9 份用户 Prompt、22 个 Skill 及提醒脚本仍逐字节一致。当前 `hooks/list` 却显示用户 SessionStart 为 untrusted、UserPromptSubmit 为 modified：文件相同与实际注入相同不是同一个验收。用户需要在 Codex 的 `/hooks` 中确认这两个用户 Hook，之后才能测自然任务的自动调度遵守率。平台系统指令、Windows/Mac 工具定义与操作系统环境不属于这些可复制 Prompt 文件；本实现不能保证整个模型输入逐字相同。
+
+### 本轮任务树实际写回
+
+- ROOT / CurrentResult：Windows 采用 macOS 原版：9 份 Prompt、22 个 Skill 一致，76 条规则及第 1、4 轮提醒、每轮路由测试通过。普通任务自动读取 Skill，正式 Router 推荐后实际调用任务树工具成功，31 个 MCP 已入图。Hook 信任待用户确认，冷启动曾 55 秒超时；尚不能宣称所有普通会话自动注入或稳定低延迟。 → 9 份 Prompt 与22个 Skill 仍与 macOS 基线逐字一致。Windows 已改为4个进程启动时加载图并常驻，8个未缓存请求实测由4个进程处理；本轮还实际并发提交5个工具调用。两个用户 Hook 仍未获信任，自动提醒注入尚未完成验收，不能宣称所有会话都会按并发规则执行。
+- ROOT / RootCauseAnalysis：Windows 的路径、文件锁和进程通信必须适配，当前保留 macOS 原文与评分，仅替换平台绑定。原版新图重载曾触发 55 秒超时，热态闭环成功不代表冷态延迟已解决。 → 此前把四进程容量当作四个已加载进程，且把文件一致误当作运行时注入一致。现已验证4个进程预热，剩余注入断点是用户 Hook 的未信任或已修改状态，不应通过重复改写 Prompt 掩盖。
+- ROOT / NextIdea：用户确认两个用户级 Hook 后，复测普通会话自动注入及三轮提醒；保持原版评分和 Prompt 不变。 → 用户在 Codex 中确认 SessionStart 与 UserPromptSubmit 两个用户 Hook 后，复测普通任务的实际注入和独立工具批次；保留原版 Prompt 与评分。
 
 ## 任务树写回回执
 

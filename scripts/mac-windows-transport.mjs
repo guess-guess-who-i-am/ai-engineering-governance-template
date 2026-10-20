@@ -23,7 +23,7 @@ export function requestGraphWorkerRaw(socketPath,payload,timeoutMs){
     const timer=setTimeout(()=>finish(new Error(`GraphToolCall worker timed out after ${timeoutMs}ms`)),timeoutMs);
     socket.setEncoding('utf8');socket.on('connect',()=>socket.write(JSON.stringify({...payload,_token:endpoint.token})+'\n'));
     socket.on('data',chunk=>{buffer+=chunk;const newline=buffer.indexOf('\n');if(newline<0)return;try{const response=JSON.parse(buffer.slice(0,newline));if(!response.ok)throw new Error(response.error||'GraphToolCall worker failed');finish(null,response);}catch(error){finish(error);}});
-    socket.on('error',error=>finish(error));socket.on('close',()=>finish(new Error('GraphToolCall worker closed the connection')));
+    socket.on('error',error=>finish(error));socket.on('close',()=>finish(Object.assign(new Error('GraphToolCall worker closed the connection'),{code:'ECONNRESET'})));
   });
 }
 export function startGraphWorker(graphPath,pythonPath,indexerPath,socketPath){

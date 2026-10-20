@@ -1,4 +1,4 @@
-/** Deploy the pinned macOS profile, changing operating-system bindings only. */
+/** Keep pinned macOS prompts/scoring; adapt Windows bindings and eagerly warm its pool. */
 import {readFile,writeFile,readdir,mkdir,cp,copyFile,rename,stat} from 'node:fs/promises';
 import {spawn} from 'node:child_process';
 import {createHash} from 'node:crypto';
@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {realpathSync} from 'node:fs';
+import {ensureWarmWorker} from './prewarm-mac-worker.mjs';
 
 const here=path.dirname(fileURLToPath(import.meta.url));
 export const PIN='0cd7d48d90c24a0cf8d0515b8b0dd871fcaac7b2';
@@ -20,12 +21,17 @@ export function adaptWorker(raw){
  source=source.replaceAll('fcntl.flock(', 'fcntl.lock(').replaceAll('except BlockingIOError:', 'except fcntl.exceptions.LockException:');
  source=source.replace('socketserver.UnixStreamServer','socketserver.TCPServer');
  source=replaceOne(source,'            results = self.server.worker.query(payload)',
-  '            if not hmac.compare_digest(str(payload.pop("_token", "")), self.server.token):\n                raise PermissionError("Worker authentication failed")\n            results = self.server.worker.query(payload)');
+  '            if not hmac.compare_digest(str(payload.pop("_token", "")), self.server.token):\n                raise PermissionError("Worker authentication failed")\n            if payload.get("_op") in ("status", "stop"):\n                response = {"ok": True, "pid": os.getpid(), "ready": True, "warmWorkers": self.server.worker._warm_reports}\n                if payload["_op"] == "stop":\n                    self.server.stopping.set()\n                self.wfile.write((json.dumps(response) + "\\n").encode("utf-8"))\n                self.wfile.flush()\n                return\n            results = self.server.worker.query(payload)');
  source=replaceOne(source,'        super().__init__(socket_path, _WorkerHandler)',
   '        self.token = secrets.token_hex(32)\n        super().__init__(("127.0.0.1", 0), _WorkerHandler)');
  source=replaceOne(source,'    os.chmod(socket_path, 0o600)',
   '    # The Windows installer protects the containing directory with a user-only ACL.\n    endpoint = {"host":"127.0.0.1", "port":server.server_address[1], "token":server.token, "pid":os.getpid()}\n    temporary = socket_path.with_name(socket_path.name + f".{os.getpid()}.tmp")\n    temporary.write_text(json.dumps(endpoint), encoding="utf-8")\n    os.replace(temporary, socket_path)');
  source=source.replace('subprocess.run([args.node, args.script], check=True,','subprocess.run([args.node, args.script], check=True, creationflags=subprocess.CREATE_NO_WINDOW,');
+ source=replaceOne(source,'def _initialize_query_process(graph_path):\n    global _process_worker\n    _process_worker = _GraphWorker(Path(graph_path))',
+  'def _initialize_query_process(graph_path, warm_barrier):\n    global _process_worker, _warm_report, _warm_barrier\n    _warm_barrier = warm_barrier\n    _process_worker = _GraphWorker(Path(graph_path))\n    _process_worker.query({"query": "Diagnose a reproducible software bug", "top_k": 8, "deadline": time.time() * 1000 + 180000})\n    _warm_report = {"pid": os.getpid(), "loads": _process_worker.loads, "ready": True}\n    warm_barrier.wait(timeout=180)\n\ndef _ready_query_process():\n    _warm_barrier.wait(timeout=180)\n    return _warm_report');
+ source=replaceOne(source,'    def _new_pool(self):\n        return ProcessPoolExecutor(max_workers=self._processes,\n            mp_context=multiprocessing.get_context(\'spawn\'),\n            initializer=_initialize_query_process, initargs=(str(self._path),))',
+  '    def _new_pool(self):\n        context = multiprocessing.get_context("spawn")\n        barrier = context.Barrier(self._processes)\n        pool = ProcessPoolExecutor(max_workers=self._processes,\n            mp_context=context, initializer=_initialize_query_process,\n            initargs=(str(self._path), barrier))\n        futures = [pool.submit(_ready_query_process) for _ in range(self._processes)]\n        try:\n            reports = [future.result(timeout=180) for future in futures]\n            self._warm_reports = sorted({report["pid"]: report for report in reports}.values(), key=lambda report: report["pid"])\n            if len(self._warm_reports) != self._processes:\n                raise RuntimeError("Not every retrieval process completed warm-up")\n        except BaseException:\n            pool.shutdown(wait=False, cancel_futures=True)\n            raise\n        return pool');
+ source=replaceOne(source,'    stopping = threading.Event()','    stopping = threading.Event()\n    server.stopping = stopping');
  return source;
 }
 export function adaptRouter(raw){
@@ -35,6 +41,7 @@ export function adaptRouter(raw){
  source=source.slice(0,start)+source.slice(end);
  source=replaceOne(source,'#!/usr/bin/env node\n','#!/usr/bin/env node\nimport {workerSocketPath, requestGraphWorker, startGraphWorker} from "./mac-windows-transport.mjs";\n');
  source=replaceOne(source,'  if (!directory.isDirectory() || directory.uid !== process.getuid() || (directory.mode & 0o077)) {','  if (!directory.isDirectory()) {');
+ source=replaceOne(source,'Math.min(5000, deadline - Date.now())','Math.min(55000, deadline - Date.now())');
  return source;
 }
 export function adaptRefresh(raw){
@@ -131,8 +138,9 @@ async function main(){
  }
  const installed=await run(process.execPath,[path.join(nativeSource,'scripts/install-codex-profile-mac.mjs'),'--home',home,'--json',...(check?['--check']:[])],{env});
  console.log(installed.stdout.trim());
- if(check)return;
+ if(check){console.log(JSON.stringify({phase:'worker-residency-checked',...await ensureWarmWorker(root,{start:false})}));return;}
  await copyFile(path.join(rawSource,'scripts/parallel-run.mjs'),path.join(root,'tools/parallel-run.mjs'));
+ console.log(JSON.stringify({phase:'worker-prewarmed',...await ensureWarmWorker(root)}));
  // Retire only the old platform-specific modules that this repository installed.
  const manifest=JSON.parse(await readFile(path.join(root,'skill-registry/mac-source.json'),'utf8'));
  for(const name of ['graph-client.mjs','skill-metadata.mjs'])if(await exists(path.join(root,'hooks',name))){await mkdir(path.join(manifest.backup,'retired-windows'),{recursive:true});await rename(path.join(root,'hooks',name),path.join(manifest.backup,'retired-windows',name));}

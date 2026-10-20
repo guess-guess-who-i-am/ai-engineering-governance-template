@@ -1,0 +1,40 @@
+import assert from 'node:assert/strict';
+import {realpath,readFile,writeFile} from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import {performance} from 'node:perf_hooks';
+import {randomUUID} from 'node:crypto';
+import {createConnection} from 'node:net';
+import {ensureWarmWorker} from './prewarm-mac-worker.mjs';
+import {workerSocketPath,requestGraphWorkerRaw} from './mac-windows-transport.mjs';
+
+const root=process.env.CODEX_HOME||path.join(os.homedir(),'.codex');
+const before=await ensureWarmWorker(root);
+assert.equal(new Set(before.workers.map(worker=>worker.pid)).size,4);
+assert(before.workers.every(worker=>worker.ready&&worker.loads===1));
+const endpoint=workerSocketPath(await realpath(path.join(root,'skill-registry/skills.graph.json')));
+const runId=randomUUID();
+const requests=await Promise.all(Array.from({length:8},async(_,index)=>{
+ const started=performance.now(),startedAt=Date.now();
+ const result=await requestGraphWorkerRaw(endpoint,{query:`Diagnose reproducible software bug acceptance case ${index}; trace ${runId}`,top_k:8,deadline:Date.now()+55000},55000);
+ assert(result.results?.length,'Real query returned no candidates');
+ assert.equal(result.loads,1,'Query reloaded the graph unexpectedly');
+ return {queryPid:result.queryPid,supervisorPid:result.pid,startedAt,endedAt:Date.now(),milliseconds:Math.round(performance.now()-started),loads:result.loads};
+}));
+const after=await ensureWarmWorker(root);
+assert.equal(after.supervisorPid,before.supervisorPid);
+assert.deepEqual(after.workers.map(w=>w.pid),before.workers.map(w=>w.pid));
+assert(requests.every(r=>before.workers.some(w=>w.pid===r.queryPid)));
+assert.equal(new Set(requests.map(r=>r.queryPid)).size,4,'Real independent queries did not use all four resident workers');
+assert(Math.max(...requests.map(r=>r.startedAt))<Math.min(...requests.map(r=>r.endedAt)),'Independent request intervals did not overlap');
+const address=JSON.parse(await readFile(endpoint,'utf8'));
+const denied=await new Promise((resolve,reject)=>{
+ const socket=createConnection({host:address.host,port:address.port});let buffer='';
+ socket.setEncoding('utf8');socket.setTimeout(5000,()=>{socket.destroy();reject(new Error('Authentication test timed out'));});
+ socket.on('connect',()=>socket.write(JSON.stringify({_op:'status',_token:'invalid',deadline:Date.now()+5000})+'\n'));
+ socket.on('error',reject);socket.on('data',data=>{buffer+=data;if(!buffer.includes('\n'))return;socket.destroy();resolve(JSON.parse(buffer.split('\n')[0]));});
+});
+assert.equal(denied.ok,false,'Unauthenticated worker control request was accepted');
+const result={runId,uniqueUncachedInputs:true,ready:true,warmWorkers:before.workers,residentSupervisor:before.supervisorPid,requests,distinctQueryProcesses:new Set(requests.map(r=>r.queryPid)).size,authenticationRejected:true,scoring:'upstream unchanged'};
+await writeFile('.reports/mac-worker-residency.json',JSON.stringify(result,null,2)+'\n');
+console.log(JSON.stringify(result));

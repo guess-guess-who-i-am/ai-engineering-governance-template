@@ -8,7 +8,10 @@ const worker=normalize(await readFile(path.join(source,'codex-profile/mac/hooks/
 const native=adaptWorker(worker);
 const section=(text,start,end)=>text.slice(text.indexOf(start),text.indexOf(end,text.indexOf(start)));
 assert.equal(section(native,'def catalog_rows(', 'class _WorkerHandler'),section(worker,'def catalog_rows(', 'class _WorkerHandler'));
-assert.equal(section(native,'def _query_process(', 'def serve('),section(worker,'def _query_process(', 'def serve('));
+assert.equal(section(native,'def _query_process(', 'class _ProcessGraphWorker'),section(worker,'def _query_process(', 'class _ProcessGraphWorker'));
+assert.equal(section(native,'    def _finished(', 'def serve('),section(worker,'    def _finished(', 'def serve('));
+assert(native.includes('warm_barrier.wait(timeout=180)'));
+assert(native.includes('Not every retrieval process completed warm-up'));
 assert(native.includes('Worker authentication failed'));assert(native.includes('socketserver.TCPServer'));
 const router=normalize(await readFile(path.join(source,'codex-profile/.codex/hooks/skill-router.mjs'),'utf8'));
 const adapted=adaptRouter(router);
@@ -20,4 +23,4 @@ assert(refresh.includes('SENTENCE_TRANSFORMERS_HOME'));assert(refresh.includes('
 const dispatch=adaptDispatcher(await readFile(path.join(source,'codex-profile/.codex/hooks/hook-dispatch.mjs'),'utf8'));
 assert(!dispatch.includes('E:\\\\能力归纳概括'));
 assert.throws(()=>adaptRouter('not the pinned source'));
-console.log(JSON.stringify({sourceCommit:PIN,workerRankingUnchanged:true,routerSelectionUnchanged:true,windowsTransportOnly:true,sourceMismatchRejected:true}));
+console.log(JSON.stringify({sourceCommit:PIN,workerRankingUnchanged:true,routerSelectionUnchanged:true,windowsBindingsAndEagerWarmup:true,sourceMismatchRejected:true}));

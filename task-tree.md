@@ -13,10 +13,10 @@
 - Output: 可迁移macOS配置、全局Skill安装源、常驻worker及右键服务；codex-profile/、安装全局配置.command，第三方库由私有skills-library恢复。
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
 - Notes: 最新要求是在 Windows 直接采用 GitHub 的 macOS 版本；跨机重启与三轮提醒的长期保持效果仍未验证。
-- CurrentResult: Windows 采用 macOS 原版：9 份 Prompt、22 个 Skill 一致，76 条规则及第 1、4 轮提醒、每轮路由测试通过。普通任务自动读取 Skill，正式 Router 推荐后实际调用任务树工具成功，31 个 MCP 已入图。Hook 信任待用户确认，冷启动曾 55 秒超时；尚不能宣称所有普通会话自动注入或稳定低延迟。
-- RootCauseAnalysis: Windows 的路径、文件锁和进程通信必须适配，当前保留 macOS 原文与评分，仅替换平台绑定。原版新图重载曾触发 55 秒超时，热态闭环成功不代表冷态延迟已解决。
+- CurrentResult: 9 份 Prompt 与22个 Skill 仍与 macOS 基线逐字一致。Windows 已改为4个进程启动时加载图并常驻，8个未缓存请求实测由4个进程处理；本轮还实际并发提交5个工具调用。两个用户 Hook 仍未获信任，自动提醒注入尚未完成验收，不能宣称所有会话都会按并发规则执行。
+- RootCauseAnalysis: 此前把四进程容量当作四个已加载进程，且把文件一致误当作运行时注入一致。现已验证4个进程预热，剩余注入断点是用户 Hook 的未信任或已修改状态，不应通过重复改写 Prompt 掩盖。
 - CaseStudy:
-- NextIdea: 用户确认两个用户级 Hook 后，复测普通会话自动注入及三轮提醒；保持原版评分和 Prompt 不变。
+- NextIdea: 用户在 Codex 中确认 SessionStart 与 UserPromptSubmit 两个用户 Hook 后，复测普通任务的实际注入和独立工具批次；保留原版 Prompt 与评分。
 - SelectedSkills:
 
 # GraphState
