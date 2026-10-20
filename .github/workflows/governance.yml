@@ -30,6 +30,10 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/test-hook-cadence-mac.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/test-methodology-target-ownership.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node codex-profile/.codex/prompt-publisher/test-methodology-publisher.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/test-parallel-run.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/test-routing-fusion.mjs

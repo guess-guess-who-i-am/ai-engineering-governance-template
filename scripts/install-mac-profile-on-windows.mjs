@@ -17,12 +17,14 @@ export const POLICY_FILES=[
  'codex-profile/mac/hooks/graph_skill_index.py',
  'codex-profile/mac/hooks/refresh-skill-registry.mjs',
  'codex-profile/mac/hooks/context-refresh.mjs',
+ 'codex-profile/mac/hooks/validate-methodology-routing.mjs',
  'codex-profile/.codex/prompt-publisher/publish-methodology.mjs',
  'codex-profile/.codex/prompt-publisher/methodology-targets.json',
  'codex-profile/.codex/prompt-publisher/README.zh.md',
  'codex-profile/.codex/prompt-publisher/methodology-translation-cache.en.md',
  'codex-profile/.codex/prompt-publisher/methodology-state.json',
  'codex-profile/global-skills/verify-before-completion/SKILL.md',
+ ...['method-research-evidence','method-engineering-execution','method-evaluation-gates','method-github-delivery','method-task-tree'].map(name=>'codex-profile/global-skills/'+name+'/SKILL.md'),
  ...['global-methodology-source.zh.md','global-every-turn.zh.md','global-every-turn.en.md','global-attention-anchor.zh.md','global-attention-anchor.en.md','global-methodology-router.zh.md','global-methodology-router.en.md','global-methodology-routing-review.zh.md','global-methodology-map.json'].map(name=>'codex-profile/.codex/prompts/'+name)
 ];
 export async function stagePolicyUpdates(root,nativeSource){

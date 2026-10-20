@@ -4,7 +4,7 @@
   "chineseReviewSource": "global-every-turn.zh.md",
   "chineseEditorSource": "global-methodology-source.zh.md",
   "chineseReviewDocument": "global-methodology-routing-review.zh.md",
-  "ruleCount": 76,
+  "ruleCount": 77,
   "translationPolicy": "Each routed rule must be an exact line from the English translation source; summaries do not substitute for source wording.",
   "routes": {
     "alwaysOn": [
@@ -66,10 +66,10 @@
       52,
       53,
       54,
-      55
+      55,
+      56
     ],
     "method-evaluation-gates": [
-      56,
       57,
       58,
       59,
@@ -78,13 +78,13 @@
       62,
       63,
       64,
-      65
-    ],
-    "method-github-delivery": [
+      65,
       66
     ],
+    "method-github-delivery": [
+      67
+    ],
     "method-task-tree": [
-      67,
       68,
       69,
       70,
@@ -93,7 +93,8 @@
       73,
       74,
       75,
-      76
+      76,
+      77
     ]
   }
 }

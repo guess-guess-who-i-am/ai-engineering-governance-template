@@ -11,6 +11,7 @@ Apply every rule below when this Skill is selected. These are the user's origina
 
 ## User's original wording — English translation
 
+- Could you look at how to change the prompt so that calls can be reused, are less fragmented, and handle many things in a single call?
 - When installing anything, prioritize drives D, E, and F
 - If there is a code or engineering problem, first look up related questions on StackOverflow and then solve it; do not just make changes on your own without looking it up.
 - Make architecture decisions for the long term. Temporary solutions of the form “do this first and replace it later” are not acceptable.

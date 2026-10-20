@@ -6,19 +6,17 @@ import path from "node:path";
 const home = os.homedir();
 const codexRoot = process.env.CODEX_HOME || path.join(home, ".codex");
 const prompts = path.join(codexRoot, "prompts");
-const targets = {
-  alwaysOn: path.join(prompts, "global-attention-anchor.en.md"),
-  "method-research-evidence": path.join(home, ".agents", "skills", "method-research-evidence", "SKILL.md"),
-  "method-engineering-execution": path.join(home, ".agents", "skills", "method-engineering-execution", "SKILL.md"),
-  "method-evaluation-gates": path.join(home, ".agents", "skills", "method-evaluation-gates", "SKILL.md"),
-  "method-github-delivery": path.join(home, ".agents", "skills", "method-github-delivery", "SKILL.md"),
-  "method-task-tree": path.join(home, ".agents", "skills", "method-task-tree", "SKILL.md")
-};
 
 function lines(text) { return text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n").split("\n"); }
 function rules(text) { return lines(text).filter((line) => line.startsWith("- ")); }
 
 try {
+  // Validate the publisher's actual consumers, not an unrelated home-directory install.
+  const configDirectory = path.join(codexRoot, "prompt-publisher");
+  const config = JSON.parse(await readFile(path.join(configDirectory, "methodology-targets.json"), "utf8"));
+  const targets = Object.fromEntries(config.routes.map((route) => [route.id,
+    route.skillFile ? path.resolve(configDirectory, route.skillFile)
+      : path.resolve(configDirectory, config.outputs.anchorEnglish)]));
   const [sourceText, chineseText, chineseAnchorText, reviewText, mapText, ...targetTexts] = await Promise.all([
     readFile(path.join(prompts, "global-every-turn.en.md"), "utf8"),
     readFile(path.join(prompts, "global-every-turn.zh.md"), "utf8"),

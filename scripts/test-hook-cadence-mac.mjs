@@ -72,5 +72,17 @@ for (let turn = 1; turn <= 4; turn += 1) {
   const context = JSON.parse(result.stdout).hookSpecificOutput?.additionalContext || '';
   assert.ok(context.includes(`ROUTE:${turn}`), `dynamic route missing on turn ${turn}`);
   assert.equal(fixed(context), turn === 1 || turn === 4);
+  assert.ok(context.includes('Collect all currently known, ready, independent operations'), `ready-set batching missing on turn ${turn}`);
+  assert.ok(context.includes('queries together'), `search batching missing on turn ${turn}`);
+  assert.ok(context.includes('known URLs together'), `page batching missing on turn ${turn}`);
+  assert.ok(context.includes('schema'), `host-specific limits missing on turn ${turn}`);
+  if (turn === 1 || turn === 4) {
+    assert.ok(context.includes('Do not make one model round trip per item'));
+    assert.ok(context.includes('partial failures'));
+    assert.ok(context.includes('semantic interpretation'));
+  } else {
+    assert.ok(context.includes('Preserve dependencies and serial safety'));
+    assert.ok(context.length < 850, 'compact turn must not receive the full scheduling contract');
+  }
 }
-console.log('PASS: cadence 1/4, retry, session isolation, no-ID fallback, compact and resume reset.');
+console.log('PASS: cadence 1/4, retry, isolation, recovery and ready-set/search/page batching on every prompt.');

@@ -10,7 +10,7 @@ const prompt=args[3];
 await mkdir(path.join(cwd,'.reports'),{recursive:true});
 const markers=['ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4','GLOBAL_ALWAYS_ON_ORIGINAL_EN_V3','CODEX_SKILL_ROUTER_V2'];
 const child=spawn('codex',['app-server','--stdio'],{windowsHide:true,stdio:['pipe','pipe','pipe']});
-const events=[],hooks=[],commands=new Map(),messages=[],nativeTimings=[];
+const events=[],hooks=[],commands=new Map(),messages=[],nativeTimings=[],webSearches=[];
 let buffer='',stderr='',threadId='',settled=false;
 const started=Date.now();
 const send=value=>child.stdin.write(JSON.stringify(value)+'\n');
@@ -23,7 +23,7 @@ const finish=async(error)=>{
  let active=0,maxConcurrentCommands=0;for(const [,delta]of timings){active+=delta;maxConcurrentCommands=Math.max(maxConcurrentCommands,active);}
  const nativeEvents=nativeTimings.flatMap(x=>[[x.startedAt,1],[x.endedAt,-1]]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
  let nativeActive=0,maxNativeChildConcurrency=0;for(const [,delta]of nativeEvents){nativeActive+=delta;maxNativeChildConcurrency=Math.max(maxNativeChildConcurrency,nativeActive);}
- const evidence={threadId,fixture,prompt,elapsedMs:Date.now()-started,success:!error,error:error?.message||'',markers:Object.fromEntries(markers.map(m=>[m,combined.includes(m)])),hooks:hooks.map(h=>({eventName:h.eventName,status:h.status,source:h.source,durationMs:h.durationMs,markers:markers.filter(m=>(h.entries||[]).some(e=>e.text?.includes(m)))})),commands:[...commands.values()],maxConcurrentCommands,nativeTimings,maxNativeChildConcurrency,final,finalChars:Array.from(final).length,visibleFinalChars:Array.from(final.replace(/\[([^\]]*)\]\([^)]*\)/g,'$1')).length,stderr:stderr.slice(-2500)};
+ const evidence={threadId,fixture,prompt,elapsedMs:Date.now()-started,success:!error,error:error?.message||'',markers:Object.fromEntries(markers.map(m=>[m,combined.includes(m)])),hooks:hooks.map(h=>({eventName:h.eventName,status:h.status,source:h.source,durationMs:h.durationMs,markers:markers.filter(m=>(h.entries||[]).some(e=>e.text?.includes(m)))})),commands:[...commands.values()],maxConcurrentCommands,nativeTimings,maxNativeChildConcurrency,webSearches,maxSearchBatchQueries:Math.max(0,...webSearches.filter(x=>x.action?.type==='search').map(x=>Array.isArray(x.action.queries)?x.action.queries.length:x.action.query?1:0)),final,finalChars:Array.from(final).length,visibleFinalChars:Array.from(final.replace(/\[([^\]]*)\]\([^)]*\)/g,'$1')).length,stderr:stderr.slice(-2500)};
  if(!error&&(!evidence.markers[markers[0]]||!evidence.markers[markers[1]]||!evidence.markers[markers[2]]))evidence.success=false,evidence.error='Missing automatic Hook input markers';
  if(!final)evidence.success=false,evidence.error||='No final answer';
  if(hooks.filter(h=>h.source==='user'&&['sessionStart','userPromptSubmit'].includes(h.eventName)&&h.status==='completed').length!==2)evidence.success=false,evidence.error||='Both user Hook lifecycle events must complete';
@@ -44,6 +44,7 @@ child.stdout.on('data',chunk=>{buffer+=chunk;let end;while((end=buffer.indexOf('
  if(msg.id===4)activeTurnId=msg.result?.turn?.id||'';
  if(msg.method==='hook/completed'){hooks.push(msg.params.run);console.log(JSON.stringify({hook:msg.params.run.eventName,status:msg.params.run.status,durationMs:msg.params.run.durationMs,entries:msg.params.run.entries?.length||0}));}
  if(msg.method==='item/started'&&msg.params?.item?.type==='commandExecution'){const item=msg.params.item;commands.set(item.id,{id:item.id,command:item.command,startedAt:Date.now()});console.log('Tool: '+item.command);}
+ if(msg.method==='item/completed'&&msg.params?.item?.type==='webSearch'){const item=msg.params.item;webSearches.push({id:item.id,query:item.query,action:item.action,completedAt:Date.now()});console.log('Web action: '+JSON.stringify(item.action));}
  if(msg.method==='item/completed'){const item=msg.params?.item;if(item?.type==='commandExecution'){commands.set(item.id,{...commands.get(item.id),command:item.command,completedAt:Date.now(),exitCode:item.exitCode});for(const match of (item.aggregatedOutput||'').matchAll(/TEST_CHILD_TIMING (\{[^\n]+\})/g)){try{nativeTimings.push(JSON.parse(match[1]));}catch{}}}if(item?.type==='agentMessage')messages.push(item);}
  if(msg.method==='turn/completed')finish(msg.params.turn?.status==='completed'?null:new Error('Turn status: '+msg.params.turn?.status));
 }});
