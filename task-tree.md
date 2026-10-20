@@ -13,10 +13,10 @@
 - Output: 可迁移macOS配置、全局Skill安装源、常驻worker及右键服务；codex-profile/、安装全局配置.command，第三方库由私有skills-library恢复。
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
 - Notes: 最新要求是在 Windows 直接采用 GitHub 的 macOS 版本；跨机重启与三轮提醒的长期保持效果仍未验证。
-- CurrentResult: 9 份 Prompt 与22个 Skill 仍与 macOS 基线逐字一致。Windows 已改为4个进程启动时加载图并常驻，8个未缓存请求实测由4个进程处理；本轮还实际并发提交5个工具调用。两个用户 Hook 仍未获信任，自动提醒注入尚未完成验收，不能宣称所有会话都会按并发规则执行。
-- RootCauseAnalysis: 此前把四进程容量当作四个已加载进程，且把文件一致误当作运行时注入一致。现已验证4个进程预热，剩余注入断点是用户 Hook 的未信任或已修改状态，不应通过重复改写 Prompt 掩盖。
+- CurrentResult: 9份Prompt与22个Skill仍与macOS基线一致，4个预热检索进程通过8个未缓存请求验证。用户授权后已通过正式界面批准两个用户Hook，并修复Windows启动命令；新会话实际注入三个标记，普通任务回答236字。该任务8次命令仍串行，模型自动并发及长期跨机会话效果不能宣称完成。
+- RootCauseAnalysis: 此前直接运行脚本绕过了Codex实际使用的PowerShell命令层，未发现引号路径缺少调用符，信任通过后仍启动失败。已补真实命令回归并修复安装器；注入成功不等于模型必然采用并发。
 - CaseStudy:
-- NextIdea: 用户在 Codex 中确认 SessionStart 与 UserPromptSubmit 两个用户 Hook 后，复测普通任务的实际注入和独立工具批次；保留原版 Prompt 与评分。
+- NextIdea: 保持macOS原版Prompt和评分，用确有独立分支的普通任务测量模型工具重叠，定位自动并发仍串行的边界。
 - SelectedSkills:
 
 # GraphState

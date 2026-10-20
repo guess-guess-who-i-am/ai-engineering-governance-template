@@ -22,6 +22,7 @@ macOS 的 Unix socket、fcntl 文件锁、POSIX Python 路径、Node 启动引�
 4. Windows 启动引号、隐藏后台窗口和 TOML 路径解析；不加入评分修正。
 5. 共享 dispatcher 中仅 Windows 才存在的旧 capability PowerShell 默认路径改为与 macOS 一样的空默认值，避免额外注入上一版推荐器。显式配置仍遵循原版行为。
 6. Windows 原生进程池启动时实际初始化并加载四份图，而不只是配置四个最大槽位。四个不同进程完成预热后才发布就绪端点；预热超时明确失败。首次等待端点的期限由 5 秒扩展到原请求已有的 55 秒总期限，不增加逐查询降级路径。
+7. Codex 实际通过 PowerShell 执行 Hook 命令，带引号的可执行路径前必须加调用符 `&`；参数用单引号保护，并将路径内部的单引号加倍。回归覆盖 Windows PowerShell 与 PowerShell 7、中文、空格、单引号及其他 Shell 特殊字符；不能用直接启动 Node 的成功替代这个边界测试。
 
 Finder 快速操作是 macOS 系统功能，不能原样运行在 Windows；本机使用可重用的原生部署入口，不能把 Finder 服务宣称为已在 Windows 安装。
 
@@ -35,6 +36,7 @@ node scripts/prewarm-mac-worker.mjs
 node scripts/test-mac-worker-residency.mjs
 node scripts/test-mac-profile-on-windows.mjs
 node scripts/test-mac-routed-tool.mjs
+node scripts/test-mac-windows-hook-command.mjs
 ```
 
 首次入口需要干净的固定提交工作区、完整 Skill 库、原生 Python 环境和原版 embedding 模型。源文件固化到 `.codex/tools/macos-profile-source`，平台适配结果在 `.codex/tools/macos-profile-native`。对应关系和备份位置保存在本机 `.codex/skill-registry/mac-source.json`。原始 Git 源与适配结果分开保存，避免改写 Prompt 或评分后仍称“原版”。
@@ -51,7 +53,7 @@ node scripts/test-mac-routed-tool.mjs
 
 本机最终清单已确认 15,471 个外部 Skill、24 个用户 Skill（22 个基线 Skill 加原有两个）和 31 个 MCP 工具；目录另有 1 条缺失文件，按原版缺失计数记录，未冒充可用文件。正式 Router 推荐任务树焦点工具后，真实调用已返回结果。热态四轮回归无检索错误；首次新图重载曾出现 55 秒超时，失败结果保存在本机 `.reports/mac-parity-first-with-timeout.json`，不能用后续热态成功抹去冷态限制。
 
-普通新会话的 Hook 自动执行仍需用户确认信任；安装器不会写入信任哈希或使用 bypass 参数。尚未证明三轮提醒的长期保持质量、跨机器重启恢复、任意中文任务的最优路由或模型端到端提速。恢复、信任和图更新状态必须分别验证。
+每台机器的 Hook 信任独立保存；安装器不会写入信任哈希或使用 bypass 参数。2026-10-20 本机用户明确委托代办后，已通过正式 CLI 审查界面逐个批准两个用户 Hook，且新会话已收到真实上下文。项目 Hook 未同时批准。尚未证明三轮提醒的长期保持质量、跨机器重启恢复、任意中文任务的最优路由或模型端到端提速。恢复、信任、实际启动和图更新状态必须分别验证。
 
 ## 2026-10-20：修复“容量四个，却只加载一个”
 
@@ -61,15 +63,35 @@ node scripts/test-mac-routed-tool.mjs
 
 本轮五个已知独立工具调用通过同一个 `functions.exec` 的 `Promise.all` 同时提交，时间区间重叠；界面一张封装工具卡并不等于一条内部操作。该波工具调用证据位于本机 `.reports/parallel-tool-wave-20261020.json`。存在真实依赖、先读必要 Skill 或需要用户确认的步骤仍应串行；不能为凑数量虚构任务。
 
-9 份用户 Prompt、22 个 Skill 及提醒脚本仍逐字节一致。当前 `hooks/list` 却显示用户 SessionStart 为 untrusted、UserPromptSubmit 为 modified：文件相同与实际注入相同不是同一个验收。用户需要在 Codex 的 `/hooks` 中确认这两个用户 Hook，之后才能测自然任务的自动调度遵守率。平台系统指令、Windows/Mac 工具定义与操作系统环境不属于这些可复制 Prompt 文件；本实现不能保证整个模型输入逐字相同。
+9 份用户 Prompt、22 个 Skill 及提醒脚本仍逐字节一致。首次 `hooks/list` 显示用户 SessionStart 为 untrusted、UserPromptSubmit 为 modified；后续已正式批准并修复 PowerShell 启动边界，详见下一节。文件相同、已信任、实际注入和模型采用必须分别验收。平台系统指令、Windows/Mac 工具定义与操作系统环境不属于这些可复制 Prompt 文件；本实现不能保证整个模型输入逐字相同。
 
-### 本轮任务树实际写回
+## 2026-10-20：委托批准与真实启动验收
+
+本机用户明确授权代办后，使用 Codex CLI 的 Review hooks 界面，按事件和来源核对后，分别批准用户 SessionStart 与 UserPromptSubmit。未选择 Trust all，未使用 bypass，未手工生成或写入信任哈希，未批准项目的 UserPromptSubmit/Stop。批准前的本机配置备份在 `.codex/backups/hook-trust-delegated/20261020-before-review`；不上传此备份或信任记录。
+
+第一次真实新会话揭示两层问题：批准成功后，两个 Hook 仍返回退出码 1。复现证明旧命令把双引号路径直接交给 PowerShell，缺少调用符而触发解析错误；先前安装测试直接启动 Node，绕过了真正失败的命令层。现已修复 Windows 安装适配器，重新安装仅改变 hooks.json，并通过同一正式界面重新批准已变更的两个用户 Hook。新启动命令为 `& 'Node绝对路径' 'dispatcher绝对路径'`。本轮安装回滚备份为 `.codex/backups/portable-profile/20261020T043234Z`。
+
+回归先对旧实现失败，再对新实现通过；Windows CI 已加入命令层测试，并明确检查每条测试命令的退出码。9 份 Prompt、22 个 Skill、第 1/4 轮固定提醒及每轮路由仍通过原文与节奏验证。四个常驻检索进程的八个唯一未缓存请求实际重叠，约 1.1–3.1 秒；这不是模型端到端时间。
+
+真实任务未提示并发、精简或使用 Skill，只要求检查订单统计偏大并用现有测试验证。新会话两个用户 Hook 均 completed，分别约 1.50/1.58 秒；上下文确有 `GLOBAL_ALWAYS_ON_ORIGINAL_EN_V3`、`ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4` 和 `CODEX_SKILL_ROUTER_V2` 三个标记。模型自动读取调试与工程 Skill，准确复现问题，最终回答 236 字；该样本端到端约 109 秒，8 次外层命令执行仍没有时间重叠，不能宣称模型自动高并发已达成。
+
+可复用脚本再跑同一自然任务也通过：两个 Hook 约 0.55/0.72 秒，三个标记齐全，回答 259 字，端到端约 101 秒；4 次外层命令的最大重叠仍为 1。最新证据文件对应这次复测，不把更快的 Hook 耗时当成模型端到端速度。
+
+可复用实际入口测试如下，仅对专用的只读测试项目执行；会调用真实模型并产生调用费用。脚本不修改 Hook 信任，不自动批准任何新 Hook。它记录注入标记、Hook 生命周期、命令时间、实际重叠及回答字数；退出成功只表示 Hook 注入与自然任务完成，不代表已达到指定并发数或回答字数。
+
+```powershell
+node scripts/test-codex-hook-runtime.mjs --cwd <只读测试项目路径> --prompt "检查这个项目的订单统计问题，用已有测试验证判断；不修改文件。"
+```
+
+本机证据为 `.reports/trusted-hook-live-result.json` 和 `.reports/trusted-hook-live-events.jsonl`；修复前的失败保存在 `.reports/trusted-hook-before-command-fix.json` 及配套事件文件。原始本机日志不上传。外层命令区间只衡量外层命令重叠，不推断内部脚本或模型服务的并行度。
+
+### 历史任务树写回（批准前的实际回执，不是当前状态）
 
 - ROOT / CurrentResult：Windows 采用 macOS 原版：9 份 Prompt、22 个 Skill 一致，76 条规则及第 1、4 轮提醒、每轮路由测试通过。普通任务自动读取 Skill，正式 Router 推荐后实际调用任务树工具成功，31 个 MCP 已入图。Hook 信任待用户确认，冷启动曾 55 秒超时；尚不能宣称所有普通会话自动注入或稳定低延迟。 → 9 份 Prompt 与22个 Skill 仍与 macOS 基线逐字一致。Windows 已改为4个进程启动时加载图并常驻，8个未缓存请求实测由4个进程处理；本轮还实际并发提交5个工具调用。两个用户 Hook 仍未获信任，自动提醒注入尚未完成验收，不能宣称所有会话都会按并发规则执行。
 - ROOT / RootCauseAnalysis：Windows 的路径、文件锁和进程通信必须适配，当前保留 macOS 原文与评分，仅替换平台绑定。原版新图重载曾触发 55 秒超时，热态闭环成功不代表冷态延迟已解决。 → 此前把四进程容量当作四个已加载进程，且把文件一致误当作运行时注入一致。现已验证4个进程预热，剩余注入断点是用户 Hook 的未信任或已修改状态，不应通过重复改写 Prompt 掩盖。
 - ROOT / NextIdea：用户确认两个用户级 Hook 后，复测普通会话自动注入及三轮提醒；保持原版评分和 Prompt 不变。 → 用户在 Codex 中确认 SessionStart 与 UserPromptSubmit 两个用户 Hook 后，复测普通任务的实际注入和独立工具批次；保留原版 Prompt 与评分。
 
-## 任务树写回回执
+## 历史任务树写回回执
 
 以下为本次服务端实际落盘的字段变化，未改动 GraphState 焦点，也未新建执行流程：
 
@@ -82,3 +104,11 @@ node scripts/test-mac-routed-tool.mjs
 - ROOT / CurrentResult 最后写回：Windows 已采用同一 macOS 基线，9 份 Prompt、22 个 Skill 原文一致，四轮验证第 1、4 轮固定提醒且每轮路由。普通只读任务已自动读取调试与工程 Skill 并复现错误。MCP 新目录入图及 Hook 信任仍未通过，尚不能宣称全链路自动可用。 → Windows 采用 macOS 原版：9 份 Prompt、22 个 Skill 一致，76 条规则及第 1、4 轮提醒、每轮路由测试通过。普通任务自动读取 Skill，正式 Router 推荐后实际调用任务树工具成功，31 个 MCP 已入图。Hook 信任待用户确认，冷启动曾 55 秒超时；尚不能宣称所有普通会话自动注入或稳定低延迟。
 - ROOT / RootCauseAnalysis 最后写回：Windows 的路径、文件锁和进程通信不能直接执行 macOS 实现，当前仅适配平台绑定，不改原文与评分。MCP 目录发现不等于图更新成功，必须核对新图与真实调用。 → Windows 的路径、文件锁和进程通信必须适配，当前保留 macOS 原文与评分，仅替换平台绑定。原版新图重载曾触发 55 秒超时，热态闭环成功不代表冷态延迟已解决。
 - ROOT / NextIdea 最后写回：完成原版模型的 MCP 入图并验证推荐到实际调用闭环，待用户确认 Hook 信任后再测普通新会话自动使用。 → 用户确认两个用户级 Hook 后，复测普通会话自动注入及三轮提醒；保持原版评分和 Prompt 不变。
+
+## 2026-10-20 本次任务树实际回执
+
+以下仅据本轮服务端 `changes` 生成，焦点和执行流程未改：
+
+- ROOT / CurrentResult：9 份 Prompt 与22个 Skill 仍与 macOS 基线逐字一致。Windows 已改为4个进程启动时加载图并常驻，8个未缓存请求实测由4个进程处理；本轮还实际并发提交5个工具调用。两个用户 Hook 仍未获信任，自动提醒注入尚未完成验收，不能宣称所有会话都会按并发规则执行。 → 9份Prompt与22个Skill仍与macOS基线一致，4个预热检索进程通过8个未缓存请求验证。用户授权后已通过正式界面批准两个用户Hook，并修复Windows启动命令；新会话实际注入三个标记，普通任务回答236字。该任务8次命令仍串行，模型自动并发及长期跨机会话效果不能宣称完成。
+- ROOT / RootCauseAnalysis：此前把四进程容量当作四个已加载进程，且把文件一致误当作运行时注入一致。现已验证4个进程预热，剩余注入断点是用户 Hook 的未信任或已修改状态，不应通过重复改写 Prompt 掩盖。 → 此前直接运行脚本绕过了Codex实际使用的PowerShell命令层，未发现引号路径缺少调用符，信任通过后仍启动失败。已补真实命令回归并修复安装器；注入成功不等于模型必然采用并发。
+- ROOT / NextIdea：用户在 Codex 中确认 SessionStart 与 UserPromptSubmit 两个用户 Hook 后，复测普通任务的实际注入和独立工具批次；保留原版 Prompt 与评分。 → 保持macOS原版Prompt和评分，用确有独立分支的普通任务测量模型工具重叠，定位自动并发仍串行的边界。

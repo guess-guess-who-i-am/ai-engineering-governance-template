@@ -25,8 +25,13 @@ jobs:
         shell: pwsh
         run: |
           node scripts/test-mac-windows-bindings.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/test-mac-windows-hook-command.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/test-hook-cadence-mac.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/test-parallel-run.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
   portable-profile-macos:
     runs-on: macos-15

@@ -64,7 +64,9 @@ export function adaptDispatcher(raw){
 }
 export function adaptInstaller(raw,previousAgentsHash){
  let source=hiddenChildren(nativePythonPath(normalized(raw)));
- source=replaceOne(source,'  return `\'${String(value).replaceAll("\'", `\'"\'"\'`)}\'`;','  return `"${String(value)}"`;');
+ source=replaceOne(source,'  return `\'${String(value).replaceAll("\'", `\'"\'"\'`)}\'`;','  return `\'${String(value).replaceAll("\'", "\'\'")}\'`;');
+ source=replaceOne(source,'  const command = (name) => `${shellQuote(process.execPath)} ${shellQuote(path.join(codexHome, "hooks", name))}`;',
+  '  const command = (name) => `& ${shellQuote(process.execPath)} ${shellQuote(path.join(codexHome, "hooks", name))}`;');
  source=replaceOne(source,'  const currentAgents = await exists(agentsDestination) ? await readFile(agentsDestination, "utf8") : "";',
   `  let currentAgents = await exists(agentsDestination) ? await readFile(agentsDestination, "utf8") : "";\n  if (sha256(currentAgents) === ${JSON.stringify(previousAgentsHash)}) currentAgents = "";`);
  // Logical C: paths can resolve to a D: junction. Absolute route targets retain
