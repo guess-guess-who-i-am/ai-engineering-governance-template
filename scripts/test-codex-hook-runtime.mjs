@@ -1,6 +1,7 @@
 import {spawn} from 'node:child_process';
 import {writeFile,mkdir} from 'node:fs/promises';
 import path from 'node:path';
+import {summarizeCodexLatency} from './codex-latency.mjs';
 
 const cwd=process.cwd();
 const args=process.argv.slice(2);
@@ -24,6 +25,7 @@ const finish=async(error)=>{
  const nativeEvents=nativeTimings.flatMap(x=>[[x.startedAt,1],[x.endedAt,-1]]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]);
  let nativeActive=0,maxNativeChildConcurrency=0;for(const [,delta]of nativeEvents){nativeActive+=delta;maxNativeChildConcurrency=Math.max(maxNativeChildConcurrency,nativeActive);}
  const evidence={threadId,fixture,prompt,elapsedMs:Date.now()-started,success:!error,error:error?.message||'',markers:Object.fromEntries(markers.map(m=>[m,combined.includes(m)])),hooks:hooks.map(h=>({eventName:h.eventName,status:h.status,source:h.source,durationMs:h.durationMs,markers:markers.filter(m=>(h.entries||[]).some(e=>e.text?.includes(m)))})),commands:[...commands.values()],maxConcurrentCommands,nativeTimings,maxNativeChildConcurrency,webSearches,maxSearchBatchQueries:Math.max(0,...webSearches.filter(x=>x.action?.type==='search').map(x=>Array.isArray(x.action.queries)?x.action.queries.length:x.action.query?1:0)),final,finalChars:Array.from(final).length,visibleFinalChars:Array.from(final.replace(/\[([^\]]*)\]\([^)]*\)/g,'$1')).length,stderr:stderr.slice(-2500)};
+ evidence.latency=summarizeCodexLatency(events,started,Date.now());
  if(!error&&(!evidence.markers[markers[0]]||!evidence.markers[markers[1]]||!evidence.markers[markers[2]]))evidence.success=false,evidence.error='Missing automatic Hook input markers';
  if(!final)evidence.success=false,evidence.error||='No final answer';
  if(hooks.filter(h=>h.source==='user'&&['sessionStart','userPromptSubmit'].includes(h.eventName)&&h.status==='completed').length!==2)evidence.success=false,evidence.error||='Both user Hook lifecycle events must complete';

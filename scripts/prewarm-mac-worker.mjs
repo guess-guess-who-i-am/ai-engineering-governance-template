@@ -2,20 +2,22 @@ import {readFile,realpath,stat} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {createHash} from 'node:crypto';
 import {workerSocketPath,requestGraphWorkerRaw,startGraphWorker} from './mac-windows-transport.mjs';
 
 export async function ensureWarmWorker(root=process.env.CODEX_HOME||path.join(os.homedir(),'.codex'),{start=true}={}){
  const manifest=JSON.parse(await readFile(path.join(root,'skill-registry/mac-source.json'),'utf8'));
  const graph=await realpath(path.join(root,'skill-registry/skills.graph.json'));
  const endpoint=workerSocketPath(graph),deadline=Date.now()+240000;
+ const expectedRuntime=createHash('sha256').update(await readFile(path.join(root,'hooks/graph_skill_index.py'))).digest('hex');
  let launch=null,lastLaunchAt=0;
  while(Date.now()<deadline){
   try{
    const expectedVersion=(await stat(graph,{bigint:true})).mtimeNs.toString();
    const status=await requestGraphWorkerRaw(endpoint,{_op:'status',deadline:Date.now()+5000},5000);
    if(!status.ready||status.warmWorkers?.length!==4)throw new Error('Worker must report four fully loaded retrieval processes');
-   if(status.warmWorkers.some(worker=>worker.graphMtimeNs!==expectedVersion)){
-    if(!start)throw new Error('Resident processes do not match the current graph generation');
+   if(status.runtimeSha256!==expectedRuntime||status.warmWorkers.some(worker=>worker.graphMtimeNs!==expectedVersion)){
+    if(!start)throw new Error('Resident processes do not match the current graph/runtime generation');
     await requestGraphWorkerRaw(endpoint,{_op:'stop',deadline:Date.now()+5000},5000);
     for(let attempt=0;attempt<80;attempt++){
      await new Promise(resolve=>setTimeout(resolve,250));
@@ -24,7 +26,7 @@ export async function ensureWarmWorker(root=process.env.CODEX_HOME||path.join(os
     launch=startGraphWorker(graph,manifest.python,path.join(root,'hooks/graph_skill_index.py'),endpoint);lastLaunchAt=Date.now();
     continue;
    }
-   return {ready:true,supervisorPid:status.pid,workers:status.warmWorkers};
+   return {ready:true,supervisorPid:status.pid,workers:status.warmWorkers,runtimeSha256:status.runtimeSha256};
   }catch(error){
    if(!['ENOENT','ECONNREFUSED','ECONNRESET'].includes(error.code))throw error;
    if(!start)throw error;

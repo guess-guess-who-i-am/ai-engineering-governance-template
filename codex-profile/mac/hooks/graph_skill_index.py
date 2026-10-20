@@ -13,6 +13,7 @@ from functools import lru_cache
 import gc
 import hashlib
 import json
+import math
 import multiprocessing
 import os
 from pathlib import Path
@@ -20,6 +21,8 @@ import re
 import signal
 import socket
 import socketserver
+import sqlite3
+import struct
 import subprocess
 import sys
 import threading
@@ -28,6 +31,7 @@ import warnings
 
 # Import GraphToolCall only after the worker owns the inter-process lock.
 EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+RUNTIME_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
 
 def attach_embedding_index(graph, previous=None, previous_model=""):
@@ -297,10 +301,12 @@ def _prepare_keyword_index(engine):
 class _CachedEmbeddingProvider:
     """Cache query/description vectors across all library embedding stages."""
 
-    def __init__(self, provider):
+    def __init__(self, provider, *, cache_path=None, descriptions=()):
         self._provider = provider
         self._lock = threading.Lock()
         self._vectors = OrderedDict()
+        self._descriptions = frozenset(descriptions)
+        self._persistent = _DescriptionVectorCache(cache_path, model=getattr(provider, 'model_name', EMBEDDING_MODEL)) if cache_path is not None else None
 
     def encode(self, text):
         return self.encode_batch([text])[0]
@@ -308,12 +314,21 @@ class _CachedEmbeddingProvider:
     def encode_batch(self, texts):
         with self._lock:
             missing = list(dict.fromkeys(text for text in texts if text not in self._vectors))
+            static = [text for text in missing if text in self._descriptions]
+            persisted = self._persistent.get_many(static) if self._persistent and static else {}
+            self._vectors.update(persisted)
+            missing = [text for text in missing if text not in persisted]
             if missing:
                 vectors = self._provider.encode_batch(missing)
                 if len(vectors) != len(missing):
                     raise ValueError('embedding provider returned an incomplete batch')
+                static_vectors = {}
                 for text, vector in zip(missing, vectors):
                     self._vectors[text] = tuple(vector)
+                    if text in self._descriptions:
+                        static_vectors[text] = vector
+                if self._persistent and static_vectors:
+                    self._persistent.put_many(static_vectors)
             result = [list(self._vectors[text]) for text in texts]
             for text in texts:
                 self._vectors.move_to_end(text)
@@ -323,6 +338,58 @@ class _CachedEmbeddingProvider:
 
     def __getattr__(self, name):
         return getattr(self._provider, name)
+
+    def close(self):
+        if self._persistent is not None:
+            self._persistent.close()
+
+
+class _DescriptionVectorCache:
+    """Shared exact-description memoization; never persist user queries."""
+
+    def __init__(self, file, model=EMBEDDING_MODEL, revision='e8f8c211226b894fcb81acc59f3b34ba3efd5f42'):
+        Path(file).parent.mkdir(parents=True, exist_ok=True)
+        self._namespace = f'description-f32-v1\0{model}\0{revision}\0'
+        self._connection = sqlite3.connect(str(file), timeout=5, check_same_thread=False)
+        self._connection.execute('PRAGMA journal_mode=WAL')
+        # Derived cache only: preserve consistency without fsync on every miss.
+        self._connection.execute('PRAGMA synchronous=NORMAL')
+        self._connection.execute('CREATE TABLE IF NOT EXISTS vectors (key TEXT PRIMARY KEY, vector BLOB NOT NULL, created REAL NOT NULL)')
+        self._connection.commit()
+
+    def _key(self, text):
+        return hashlib.sha256((self._namespace + text).encode('utf-8')).hexdigest()
+
+    def get_many(self, texts):
+        if not texts:
+            return {}
+        keys = {self._key(text): text for text in texts}
+        placeholders = ','.join('?' for _ in keys)
+        rows = self._connection.execute(f'SELECT key,vector FROM vectors WHERE key IN ({placeholders})', list(keys))
+        result = {}
+        for key, raw in rows:
+            if not raw or len(raw) % 4:
+                raise RuntimeError('corrupt description vector cache')
+            vector = struct.unpack(f'<{len(raw) // 4}f', raw)
+            if not all(math.isfinite(value) for value in vector):
+                raise RuntimeError('non-finite description vector cache')
+            result[keys[key]] = vector
+        return result
+
+    def put_many(self, vectors):
+        rows = []
+        for text, vector in vectors.items():
+            if not vector or not all(math.isfinite(value) for value in vector):
+                raise RuntimeError('invalid description vector')
+            rows.append((self._key(text), struct.pack(f'<{len(vector)}f', *vector), time.time()))
+        with self._connection:
+            self._connection.executemany('INSERT OR IGNORE INTO vectors VALUES (?,?,?)', rows)
+            count = self._connection.execute('SELECT COUNT(*) FROM vectors').fetchone()[0]
+            if count > 32768:
+                self._connection.execute('DELETE FROM vectors WHERE key IN (SELECT key FROM vectors ORDER BY created LIMIT ?)', (count - 32768,))
+
+    def close(self):
+        self._connection.close()
 
 
 class _SerializedEmbeddingIndex:
@@ -370,6 +437,10 @@ class _GraphWorker:
             while self._inflight:
                 self._condition.wait()
             # Drop old caches first: a reload must not hold two 15k graphs.
+            if self._graph is not None:
+                old_index = self._graph._get_retrieval_engine()._embedding_index
+                if old_index is not None and isinstance(old_index._provider, _CachedEmbeddingProvider):
+                    old_index._provider.close()
             self._graph = None
             self._signature = None
             self._ready = False
@@ -390,7 +461,9 @@ class _GraphWorker:
                     import torch
                     torch.set_num_threads(1)
                 if provider is not None:
-                    engine._embedding_index._provider = _CachedEmbeddingProvider(provider)
+                    engine._embedding_index._provider = _CachedEmbeddingProvider(provider,
+                        cache_path=self.graph_path.with_suffix('.rerank.sqlite3'),
+                        descriptions=(tool.description for tool in graph.tools.values() if tool.description))
                 engine.set_embedding_index(_SerializedEmbeddingIndex(engine._embedding_index))
             self._graph = graph
             self._signature = signature

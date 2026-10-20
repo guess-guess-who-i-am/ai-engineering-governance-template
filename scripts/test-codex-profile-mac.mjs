@@ -208,7 +208,8 @@ for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse
   assert(registry.skills.filter((skill) => skill.source === "agents").length === expectedSkills.length, `expected ${expectedSkills.length} installed global Skills in the registry`);
   for (const name of expectedSkills) assert(registry.skills.some((skill) => skill.name === name), `registry is missing ${name}`);
   const validator = run(path.join(home, ".codex", "hooks", "validate-methodology-routing.mjs"), [], envArgs);
-  assert(validator.status === 0 && validator.stdout.includes("PASS: 76 English rules"), `76-rule validation failed: ${validator.stderr || validator.stdout}`);
+  const ruleState = JSON.parse(await readFile(path.join(home, '.codex', 'prompt-publisher', 'methodology-state.json'), 'utf8'));
+  assert(validator.status === 0 && validator.stdout.includes(`PASS: ${ruleState.ruleCount} English rules`), `Published-rule validation failed: ${validator.stderr || validator.stdout}`);
   const contextInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const dispatcher = path.join(home, ".codex", "hooks", "hook-dispatch.mjs");
   const context = run(dispatcher, [], { ...envArgs, input: contextInput });

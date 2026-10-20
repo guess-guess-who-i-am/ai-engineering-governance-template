@@ -1,6 +1,6 @@
 # AI Engineering Governance Template
 
-Windows 采用 macOS 基线及明确批准的共享策略修复，入口见 [部署说明](docs/MAC_PROFILE_WINDOWS_DEPLOYMENT.md)。当前已修复中文路由、跨通道分数、并发口径、项目 Hook 和启动竞态；研究依据、实际证据及限制见 [修复报告](docs/ROUTING_AND_EXECUTION_REPAIR.md)。不能再把当前策略说成与旧基线逐字完全相同。
+Windows 采用 macOS 基线及明确批准的共享策略修复，入口见 [部署说明](docs/MAC_PROFILE_WINDOWS_DEPLOYMENT.md)。当前已修复中文路由、跨通道分数、并发口径、项目 Hook 和启动竞态；研究依据、实际证据及限制见 [修复报告](docs/ROUTING_AND_EXECUTION_REPAIR.md)。搜索、Hook与模型等待的分层计时及重复向量计算修复见 [延时根因分析](docs/SEARCH_LATENCY_RCA.zh.md)。不能再把当前策略说成与旧基线逐字完全相同。
 
 一个面向 Codex 和其他 Agent Skills 兼容工具的工程治理起点，将常驻规则、领域语义、设计上下文、按需 Skills、确定性门禁和可执行 Flow 分层组织。
 
@@ -53,7 +53,7 @@ Windows 采用 macOS 基线及明确批准的共享策略修复，入口见 [部
 - 全局 `AGENTS.md`：只放进入项目时需要读取一次的跨项目规则和渐进加载原则。
 - 中文唯一编辑源：`codex-profile/.codex/prompts/global-methodology-source.zh.md`，保留用户中文原文，是以后增删改方法论的唯一人工入口。
 - 英文运行文件：常驻提醒、完整方法论档案、方法论路由和映射文件；由中文源逐行翻译生成，不用润色摘要代替原文。
-- 每轮 Hook：每次用户提示执行动态路由和执行提醒；固定英文原文按第1、4、7轮加载，会话启动、恢复、清理和压缩时重置恢复。76条仍有效；并发条目仅移除冲突的旧数值，其余原句保留，完整旧句另存非运行审阅区。
+- 每轮 Hook：每次用户提示执行动态路由和执行提醒；固定英文原文按第1、4、7轮加载，会话启动、恢复、清理和压缩时重置恢复。77条仍有效（含新增的批次调用原话）；并发条目仅移除冲突的旧数值，其余原句保留，完整旧句另存非运行审阅区。
 - 稳定 Hook dispatcher：`UserPromptSubmit` 和 `SessionStart` 各只注册一个入口，内部并发执行常驻提醒、Skill 推荐、可选 capability 推荐和索引刷新。以后增加内部路由不会移动 Hook 索引并使已有信任记录错位。
 - 全局调用路由：所有自有/第三方 Skill 和已注册 MCP 的 `tools/list` 工具都先进入本机 GraphToolCall 关系图；每次提示先检索图，再读取命中的 `SKILL.md` 或调用对应 MCP server，不允许绕过索引直接发现外部 Skill/MCP。索引扫描用户级 Codex、`~/.agents/skills`、插件和配置中的 MCP，不扫描项目目录。
 - 全局图由 15,471 个第三方 Skill、22 个仓库自有治理 Skill 和已发现的 MCP 工具共同构成；Skill 全部安装到用户级全局目录，所有工作区共享同一套能力，不把 Skill 绑定到某个项目目录。
