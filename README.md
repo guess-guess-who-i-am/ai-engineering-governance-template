@@ -1,5 +1,7 @@
 # AI Engineering Governance Template
 
+Windows 直接采用同一 macOS 基线的安装入口、原文一致性与真实使用证据见 [部署说明](docs/MAC_PROFILE_WINDOWS_DEPLOYMENT.md)。仅适配操作系统绑定，不另改 Prompt、提醒节奏、Skill 选择或图检索评分。
+
 一个面向 Codex 和其他 Agent Skills 兼容工具的工程治理起点，将常驻规则、领域语义、设计上下文、按需 Skills、确定性门禁和可执行 Flow 分层组织。
 
 最后更新：2026-09-23

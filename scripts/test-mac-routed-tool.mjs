@@ -1,0 +1,34 @@
+import {readFile,writeFile} from 'node:fs/promises';
+import {spawn} from 'node:child_process';
+import path from 'node:path';
+import os from 'node:os';
+import assert from 'node:assert/strict';
+const root=process.env.CODEX_HOME||path.join(os.homedir(),'.codex');
+const query='Show the current task graph focus and execution scope using task_tree_focus';
+const hook=await new Promise((resolve,reject)=>{
+ const child=spawn(process.execPath,[path.join(root,'hooks/hook-dispatch.mjs')],{windowsHide:true,stdio:['pipe','pipe','pipe']});let stdout='',stderr='';
+ const timer=setTimeout(()=>{child.kill();reject(new Error('Hook deadline exceeded'));},65000);
+ child.stdout.on('data',c=>stdout+=c);child.stderr.on('data',c=>stderr+=c);child.on('error',reject);child.on('close',code=>{clearTimeout(timer);code===0?resolve({stdout,stderr}):reject(new Error(stderr));});
+ child.stdin.end(JSON.stringify({hook_event_name:'UserPromptSubmit',prompt:query,cwd:process.cwd(),session_id:'mac-route-tool-'+Date.now(),turn_id:'1'}));
+});
+const context=JSON.parse(hook.stdout).hookSpecificOutput?.additionalContext||'';
+await writeFile('.reports/mac-mcp-route-context.txt',context);
+assert(context.includes('Call through indexed MCP server: task_tree/task_tree_focus'),'Original Router did not recommend the read-only task focus tool: '+hook.stderr+' '+context.slice(context.indexOf('[CODEX_SKILL_ROUTER_V2]')));
+const catalog=JSON.parse(await readFile(path.join(root,'skill-registry/mcp-tools.json'),'utf8'));
+assert(catalog.tools.some(t=>t.name==='task_tree_focus'&&t.server==='task_tree'));
+const config=await readFile(path.join(root,'config.toml'),'utf8');
+const block=config.match(/\[mcp_servers\.task_tree\]([\s\S]*?)(?=\n\[|$)/)?.[1]||'';
+const command=block.match(/command\s*=\s*'([^']+)'/)?.[1];
+const entry=block.match(/args\s*=\s*\['([^']+)'\]/)?.[1];
+assert(command&&entry,'Task tree runtime paths could not be resolved');
+const response=await new Promise((resolve,reject)=>{
+ const child=spawn(command,[entry],{cwd:process.cwd(),windowsHide:true,stdio:['pipe','pipe','pipe']});let buffer='',settled=false,stderr='';
+ const finish=(error,value)=>{if(settled)return;settled=true;clearTimeout(timer);child.kill();error?reject(error):resolve(value);};
+ const timer=setTimeout(()=>finish(new Error('MCP call timed out: '+stderr.slice(-300))),30000);
+ const send=msg=>child.stdin.write(JSON.stringify(msg)+'\n');child.stderr.on('data',c=>stderr+=c);child.on('error',finish);
+ child.stdout.on('data',chunk=>{buffer+=chunk;let end;while((end=buffer.indexOf('\n'))>=0){let msg;try{msg=JSON.parse(buffer.slice(0,end));}catch{}buffer=buffer.slice(end+1);if(msg?.id===1){send({jsonrpc:'2.0',method:'notifications/initialized'});send({jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'task_tree_focus',arguments:{}}});}if(msg?.id===2){if(msg.error||msg.result?.isError)finish(new Error(JSON.stringify(msg.error||msg.result)));else finish(null,msg.result);}}});
+ send({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-06-18',capabilities:{},clientInfo:{name:'mac-native-e2e',version:'1'}}});
+});
+const result={query,recommendedTool:'task_tree/task_tree_focus',actualToolCallSucceeded:true,resultBlocks:response.content?.length||0,automaticModelAdoption:'not established; Codex trust approval is separate'};
+await writeFile('.reports/mac-routed-tool-e2e.json',JSON.stringify(result,null,2)+'\n');
+console.log(JSON.stringify(result));

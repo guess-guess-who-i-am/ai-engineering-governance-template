@@ -6,17 +6,17 @@
 
 - Position: 120,120
 - Size: 400,520
-- Completion: 已完成
+- Completion: 进行中
 - Problem: 如何把仓库治理配置安装成 macOS 全局 Codex 行为，并让并发、Hook、路由和全部 Skill 真正可用？
 - Approach: 全局配置继续由 Finder 右键一键部署；Skill 与 MCP 统一经过 GraphToolCall。工具执行先构造依赖 DAG，同类只读调用优先融合，普通波次从2–4路开始，成功渐增，失败或超时减半；危险、限流和共享状态任务串行，20仅为硬上限。
 - Input: 仓库中的 macOS profile、用户 Codex 目录和现有非敏感配置。
 - Output: 可迁移macOS配置、全局Skill安装源、常驻worker及右键服务；codex-profile/、安装全局配置.command，第三方库由私有skills-library恢复。
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
-- Notes: 只支持 macOS；20 是硬上限，不是首波目标。全局 Skill/MCP 经过 GraphToolCall。另一台 Mac 的重启恢复尚未实测，远程 HTTP MCP 目录发现尚未接入。
-- CurrentResult: macOS全局检索已部署4个常驻进程，仓库与安装文件一致；独立复核100个不同长请求的完整Hook突发、错峰及冷启动均100/100成功，P95约28.9、25.2、40.8秒。11项worker回归通过；100请求可用，但低延迟、三轮提醒长期质量和跨Mac重启仍有验证或优化缺口。
-- RootCauseAnalysis: 原单连接、大锁和Hook重复扫描外部全库导致排队；embedding重排绕过缓存和互斥，Metal并发会崩溃。现用4进程池、图版本缓存、在途请求合并及CPU模型缓存，并删去每轮重复外部注册表。
+- Notes: 最新要求是在 Windows 直接采用 GitHub 的 macOS 版本；跨机重启与三轮提醒的长期保持效果仍未验证。
+- CurrentResult: Windows 采用 macOS 原版：9 份 Prompt、22 个 Skill 一致，76 条规则及第 1、4 轮提醒、每轮路由测试通过。普通任务自动读取 Skill，正式 Router 推荐后实际调用任务树工具成功，31 个 MCP 已入图。Hook 信任待用户确认，冷启动曾 55 秒超时；尚不能宣称所有普通会话自动注入或稳定低延迟。
+- RootCauseAnalysis: Windows 的路径、文件锁和进程通信必须适配，当前保留 macOS 原文与评分，仅替换平台绑定。原版新图重载曾触发 55 秒超时，热态闭环成功不代表冷态延迟已解决。
 - CaseStudy:
-- NextIdea: 持续监测真实长任务和完成检查的检索延迟、失败率与缓存命中，并在另一台Mac验证重启恢复和三轮提醒质量。
+- NextIdea: 用户确认两个用户级 Hook 后，复测普通会话自动注入及三轮提醒；保持原版评分和 Prompt 不变。
 - SelectedSkills:
 
 # GraphState
