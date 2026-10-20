@@ -16,11 +16,15 @@ const VALID_SAFETY = new Set(["read-only", ...SERIAL_SAFETY]);
 const specPath = process.argv[2];
 
 if (!specPath) {
-  console.error("Usage: parallel-run.mjs plan.json");
+  console.error("Usage: parallel-run.mjs plan.json (or - for a JSON plan on stdin)");
   process.exit(2);
 }
 
-const plan = JSON.parse(await readFile(specPath, "utf8"));
+let planText = '';
+if (specPath === '-') {
+  for await (const chunk of process.stdin) planText += chunk.toString('utf8');
+} else planText = await readFile(specPath, 'utf8');
+const plan = JSON.parse(planText);
 if (!plan || typeof plan !== "object" || Array.isArray(plan)) {
   throw new Error("plan.json must be an object");
 }
@@ -85,6 +89,7 @@ function runTask(task, wave) {
   return new Promise((resolve) => {
     const startedAt = Date.now();
     const child = spawn(task.command, task.args, {
+      windowsHide: true,
       cwd: task.cwd || process.cwd(),
       env: { ...process.env, ...(task.env || {}) },
       stdio: ["ignore", "pipe", "pipe"]

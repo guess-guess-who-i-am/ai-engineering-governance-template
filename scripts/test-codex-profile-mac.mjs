@@ -84,7 +84,7 @@ if "build" in args:
     output = pathlib.Path(value("--output"))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("{}\\n", encoding="utf-8")
-    print(json.dumps({"schemaVersion":"graph-tool-call-skills/1","graphToolCallVersion":"test-shim","embedding":"sentence-transformers/all-MiniLM-L6-v2","catalogSkillCount":2,"skillCount":1,"externalSkillCount":1,"ownedSkillCount":0,"mcpToolCount":0,"missingSkillCount":1,"invalidSkillCount":0,"graphPath":str(output)}))
+    print(json.dumps({"schemaVersion":"graph-tool-call-skills/1","graphToolCallVersion":"test-shim","embedding":"sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2","catalogSkillCount":2,"skillCount":1,"externalSkillCount":1,"ownedSkillCount":0,"mcpToolCount":0,"missingSkillCount":1,"invalidSkillCount":0,"graphPath":str(output)}))
 elif "serve" in args:
     socket_path = pathlib.Path(value("--socket"))
     socket_path.parent.mkdir(parents=True, exist_ok=True)

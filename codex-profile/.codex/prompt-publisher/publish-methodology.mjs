@@ -305,12 +305,13 @@ async function runPostPublish(config) {
   return validate.stdout.trim();
 }
 
-export async function publishMethodology(config, { force = false, dryRun = false, check = false } = {}) {
+export async function publishMethodology(config, { force = false, dryRun = false, check = false, translationFile = '' } = {}) {
   const sourceText = await readFile(config.sourceFile, "utf8");
   const runtimeSource = buildRuntimeSource(sourceText);
   const chineseSections = parseRoutedSections(runtimeSource);
   const chineseRules = validateSourceSections(chineseSections, config.routes);
   if (check) {
+    if (translationFile) throw new Error('--check cannot accept a translation input');
     const state = await readState(config.stateFile);
     if (state.runtimeSourceSha256 !== sha256(runtimeSource)) {
       throw new Error("方法论状态过期：当前中文源与 methodology-state.json 不一致；请先运行发布器更新翻译缓存和生成物");
@@ -333,7 +334,11 @@ export async function publishMethodology(config, { force = false, dryRun = false
   const state = await readState(config.stateFile);
   let translatedDocument = "";
   let translated = false;
-  if (!force && state.runtimeSourceSha256 === runtimeSourceSha256 && existsSync(config.translationCacheFile)) {
+  if (translationFile) {
+    translatedDocument = `${normalizeText(await readFile(path.resolve(translationFile), 'utf8'))}\n`;
+    validateTranslation(runtimeSource, translatedDocument);
+    translated = true;
+  } else if (!force && state.runtimeSourceSha256 === runtimeSourceSha256 && existsSync(config.translationCacheFile)) {
     translatedDocument = `${normalizeText(await readFile(config.translationCacheFile, "utf8"))}\n`;
     validateTranslation(runtimeSource, translatedDocument);
   } else {
@@ -419,6 +424,10 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === "--config") options.configFile = argv[++index];
+    else if (arg === "--translation-file") {
+      options.translationFile = argv[++index];
+      if (!options.translationFile || options.translationFile.startsWith('--')) throw new Error('--translation-file requires a file');
+    }
     else if (arg === "--force") options.force = true;
     else if (arg === "--dry-run") options.dryRun = true;
     else if (arg === "--check") options.check = true;

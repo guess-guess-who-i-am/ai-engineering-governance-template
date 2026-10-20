@@ -32,6 +32,12 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/test-parallel-run.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/test-routing-fusion.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/test-parallel-stdin.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/test-worker-startup-race.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
   portable-profile-macos:
     runs-on: macos-15

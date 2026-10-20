@@ -1,7 +1,8 @@
-import { existsSync, readFileSync } from "node:fs";
+import { loadTaskTreeModule } from "../../llm-task-tree/runtime-location.mjs";
+import { snapshotWorkspace } from './workspace-snapshot.mjs';
+import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
 
 async function readStdinJson() {
   let text = "";
@@ -23,31 +24,6 @@ function locateRoot(start) {
   }
 }
 
-async function loadRuntimeModule(root, name) {
-  const hookDir = path.dirname(fileURLToPath(import.meta.url));
-  const candidates = [
-    path.join(root, "server", name),
-    path.join(root, "llm-task-tree", "server", name),
-    path.resolve(hookDir, "../../server", name)
-  ];
-  const configFile = path.join(root, "llm-task-tree", "task-tree.config.json");
-  if (existsSync(configFile)) {
-    try {
-      const config = JSON.parse(readFileSync(configFile, "utf8").replace(/^\uFEFF/, ""));
-      if (config.sharedKitDir) {
-        const sharedKit = path.resolve(path.dirname(configFile), String(config.sharedKitDir));
-        candidates.push(path.join(sharedKit, "server", name));
-      }
-    } catch {
-      // A malformed project config should not hide a valid local runtime candidate.
-    }
-  }
-  const kitPathFile = path.join(root, "llm-task-tree", "setup-task-tree.kitpath");
-  if (existsSync(kitPathFile)) candidates.push(path.join(readFileSync(kitPathFile, "utf8").trim(), "server", name));
-  const target = candidates.find((candidate) => existsSync(candidate));
-  if (!target) throw new Error(`task-tree runtime module not found: ${name}`);
-  return import(pathToFileURL(target).href);
-}
 
 function reportMarkdown(status) {
   const repairLines = status.repairs?.length ? status.repairs.map((item) => `- AUTO ${item.code}: ${item.message}`) : ["- 无自动修复"];
@@ -58,8 +34,8 @@ function reportMarkdown(status) {
 
 const input = await readStdinJson();
 const root = locateRoot(input.cwd || process.cwd());
-const { auditTurnMaintenance, repairTurnMaintenance } = await loadRuntimeModule(root, "maintenance.js");
-const { diffWorkspaceSnapshots, snapshotWorkspace } = await loadRuntimeModule(root, "turn-tracker.js");
+const { auditTurnMaintenance, repairTurnMaintenance } = await loadTaskTreeModule(root, "maintenance.js");
+const { diffWorkspaceSnapshots } = await loadTaskTreeModule(root, "turn-tracker.js");
 const markerFile = path.join(root, ".task-tree-maintenance", "turns", `${safe(input.session_id)}-${safe(input.turn_id)}.json`);
 const marker = existsSync(markerFile) ? JSON.parse(await readFile(markerFile, "utf8")) : { startedAtMs: Date.now() - 60_000 };
 const currentSnapshot = await snapshotWorkspace(root);

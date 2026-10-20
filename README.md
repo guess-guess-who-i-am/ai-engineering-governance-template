@@ -1,10 +1,10 @@
 # AI Engineering Governance Template
 
-Windows 直接采用同一 macOS 基线的安装入口、原文一致性与真实使用证据见 [部署说明](docs/MAC_PROFILE_WINDOWS_DEPLOYMENT.md)。仅适配操作系统绑定，不另改 Prompt、提醒节奏、Skill 选择或图检索评分。
+Windows 采用 macOS 基线及明确批准的共享策略修复，入口见 [部署说明](docs/MAC_PROFILE_WINDOWS_DEPLOYMENT.md)。当前已修复中文路由、跨通道分数、并发口径、项目 Hook 和启动竞态；研究依据、实际证据及限制见 [修复报告](docs/ROUTING_AND_EXECUTION_REPAIR.md)。不能再把当前策略说成与旧基线逐字完全相同。
 
 一个面向 Codex 和其他 Agent Skills 兼容工具的工程治理起点，将常驻规则、领域语义、设计上下文、按需 Skills、确定性门禁和可执行 Flow 分层组织。
 
-最后更新：2026-09-23
+最后更新：2026-10-20
 
 ## 已包含
 
@@ -20,7 +20,7 @@ Windows 直接采用同一 macOS 基线的安装入口、原文一致性与真�
 - `TESTING.md`：功能、契约、E2E、可访问性、性能、安全、供应链和发布证据体系。
 - `UPSTREAMS.md`：第三方研究仓库与更新机制。
 - `.github/`：CI、Issue 和 PR 模板。
-- `codex-profile/`：仅面向 macOS 的全局 Codex Hook、中文方法论源、英文生成物、推荐器和发布器；安装器还合并实时搜索、Hooks、多 Agent 和最多20并发 Agent 的安全上限，并从唯一 Skill 版本源安装全部22个全局 Skills；不含任何登录态或密钥。
+- `codex-profile/`：共享的全局 Hook、中文方法论源、英文生成物、推荐器和发布器，具有 macOS 部署及单独的 Windows 绑定；22个受管理全局 Skill。普通工具并发与 Agent 数量分别计量，不把20个 Agent 槽位当成工具已并发；不含任何登录态或密钥。
 - `qualitative/`：带正反样例校准的 LLM 定性门禁。
 - `quality/findings.json`：P0–P3 问题、稳定 fingerprint、责任人和生命周期契约。
 - `design/catalog.json`：74 条固定 commit、许可证和来源路径的设计参考。
@@ -46,14 +46,14 @@ Windows 直接采用同一 macOS 基线的安装入口、原文一致性与真�
 
 ## 跨电脑复用 Codex 全局配置
 
-当前完整工程保存在公开仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是受保护的 `main`。`codex-profile/` 是本机 macOS 全局 Codex 配置的可迁移版本；安装后 Skill 只从用户级目录加载，不从项目目录加载。
+当前完整工程保存在仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是受保护的 `main`；本次修复在 `codex/mac-profile-on-windows`。`codex-profile/` 是可迁移配置的版本源；安装后受管理 Skill 从用户级目录加载，不把版本源重复暴露为项目 Skill。
 
 ### 仓库中具体保存了什么
 
 - 全局 `AGENTS.md`：只放进入项目时需要读取一次的跨项目规则和渐进加载原则。
 - 中文唯一编辑源：`codex-profile/.codex/prompts/global-methodology-source.zh.md`，保留用户中文原文，是以后增删改方法论的唯一人工入口。
 - 英文运行文件：常驻提醒、完整方法论档案、方法论路由和映射文件；由中文源逐行翻译生成，不用润色摘要代替原文。
-- 每轮 Hook：每次用户提示重新注入英文常驻提醒和方法论路由；会话启动、恢复、清理和压缩时也会恢复这些内容。
+- 每轮 Hook：每次用户提示执行动态路由和执行提醒；固定英文原文按第1、4、7轮加载，会话启动、恢复、清理和压缩时重置恢复。76条仍有效；并发条目仅移除冲突的旧数值，其余原句保留，完整旧句另存非运行审阅区。
 - 稳定 Hook dispatcher：`UserPromptSubmit` 和 `SessionStart` 各只注册一个入口，内部并发执行常驻提醒、Skill 推荐、可选 capability 推荐和索引刷新。以后增加内部路由不会移动 Hook 索引并使已有信任记录错位。
 - 全局调用路由：所有自有/第三方 Skill 和已注册 MCP 的 `tools/list` 工具都先进入本机 GraphToolCall 关系图；每次提示先检索图，再读取命中的 `SKILL.md` 或调用对应 MCP server，不允许绕过索引直接发现外部 Skill/MCP。索引扫描用户级 Codex、`~/.agents/skills`、插件和配置中的 MCP，不扫描项目目录。
 - 全局图由 15,471 个第三方 Skill、22 个仓库自有治理 Skill 和已发现的 MCP 工具共同构成；Skill 全部安装到用户级全局目录，所有工作区共享同一套能力，不把 Skill 绑定到某个项目目录。

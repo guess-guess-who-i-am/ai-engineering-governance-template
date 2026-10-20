@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import vm from 'node:vm';
+const source=await readFile(new URL('../codex-profile/.codex/hooks/skill-router.mjs',import.meta.url),'utf8');
+const start=source.indexOf('function fuseCandidates('),end=source.indexOf('\nfunction workerSocketPath(',start);
+assert(start>=0&&end>start);
+const fuse=vm.runInNewContext(source.slice(start,end)+'\nfuseCandidates');
+const item=(name,score,kind='skill')=>({skill:{name,path:kind==='skill'?'/skills/'+name:'',kind,mcpServer:kind==='mcp'?'server':''},score,matches:[]});
+const names=rows=>Array.from(rows,x=>x.skill.name);
+assert.equal(names(fuse([item('frontend',12)],[item('irrelevant-mcp',0.02,'mcp'),item('frontend',0.01)]))[0],'frontend');
+assert.deepEqual(names(fuse([item('a',99),item('b',50)],[item('b',0.04),item('c',0.02)])),names(fuse([item('a',99000),item('b',50000)],[item('b',400),item('c',200)])),'Changing a channel scale must not change the merged order');
+assert.equal(fuse([item('a',12),item('a',11)],[item('a',0.01)]).length,1);
+assert.equal(fuse([item('a',12)],[item('a',0.01)],new Set(['a'])).length,0);
+assert.equal(fuse(Array.from({length:10},(_,i)=>item('x'+i,20-i)),[]).length,4);
+assert.equal(fuse([item('same',9)],[item('same',1,'mcp')]).length,2,'Skill and MCP identities must not collide');
+assert.equal(names(fuse([item('related',9)],[item('related',2),{...item('requested',1,'mcp'),explicit:true}]))[0],'requested','An exact requested capability outranks incidental overlap, without a type bonus');
+console.log('PASS: rank fusion is scale-independent, removes MCP type bias, deduplicates identities, respects explicit selection and caps at four.');

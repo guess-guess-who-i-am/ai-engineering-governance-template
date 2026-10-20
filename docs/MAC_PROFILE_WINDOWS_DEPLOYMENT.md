@@ -2,19 +2,19 @@
 
 基线：GitHub `codex/macos-global-deploy` 的 `0cd7d48d90c24a0cf8d0515b8b0dd871fcaac7b2`。
 
-这是采用 macOS 版本，不是继续维护上一版 Windows 方法论。9 份 Prompt 和 22 个全局 Skill 正文与基线逐字节一致；提醒调度脚本也逐字节一致。安装后的规则映射为 76 条，包含 40 条固定提醒。旧的 124 条 Windows 配置已完整备份，不和当前版本混合注入。
+当前是此不可变基线加 `routing-repair-v3-20261020` 策略修复。9份Prompt和22个Skill按声明的有效源校验，不再冒称与旧提交全部逐字相同；76条规则、40条固定提醒均保留，其中并发句仅移除冲突的旧数值，其余原句保留，完整旧句另存审阅区。旧124条Windows配置不混入。当前证据和限制以 [修复报告](ROUTING_AND_EXECUTION_REPAIR.md) 为准；下方旧回执为历史，不是现状。
 
-## 保持原版的部分
+## 保留的行为与明确批准的修复
 
 - 固定提醒在同一会话第 1、4、7 等轮出现；动态 Skill/MCP 路由每轮执行。没有稳定会话 ID 时，按原版逻辑每轮保留固定提醒。
-- 普通只读工具波次从 2–4 路开始，成功后渐增，失败后减半；20 为上限而不是利用率目标。
+- 普通只读波次从可执行独立任务数与4的较小值开始，成功后渐增，失败后减半；20为上限而不是利用率目标。优先原生批量，Shell-only宿主可通过标准输入使用Node执行器。
 - 22 个全局 Skill 安装到用户 `.agents/skills`，不再套用上一版 Windows 的项目优先排序与语义阈值。
-- 原版 GraphToolCall 评分、类别预筛、缓存、请求合并和四进程检索池；模型仍为 `sentence-transformers/all-MiniLM-L6-v2`。
+- 保留GraphToolCall图、类别预筛、缓存、请求合并和四进程池；改用固定revision的多语MiniLM-L12，并对独立召回通道做排名融合，不再给MCP固定加分或屏蔽已有别名的图候选。
 - macOS 安装器的实时搜索、Hook、多 Agent、Agent 启用与 20 并发 Agent 上限等非敏感配置合并；已有模型、账号与其他配置保留。
 
 ## 必需的 Windows 绑定
 
-macOS 的 Unix socket、fcntl 文件锁、POSIX Python 路径、Node 启动引号和权限位不能直接用于 Windows。适配器处理这些边界，并按后续用户要求增加启动预热；Prompt、提醒节奏、评分和选择算法保持原版：
+macOS 的 Unix socket、fcntl 文件锁、POSIX Python 路径、Node 启动引号和权限位不能直接用于 Windows。绑定差异与上面的共享策略变更分别记录，不能混称全都原样不动：
 
 1. Unix socket 换为仅绑定回环地址的认证连接；端点文件位于用户 ACL 保护目录，认证值不打印、不上传。
 2. 文件锁由 portalocker 调用 Windows 锁；保留单实例和进程池，不重写检索算法。
@@ -43,7 +43,7 @@ node scripts/test-mac-windows-hook-command.mjs
 
 首次备份在本机 `.codex/backups/mac-direct/20261019T080253Z`；原生 macOS 安装事务另有逐文件 manifest。备份包含机器配置，应只在本机受保护目录恢复，不能提交到仓库。先核对目标与后续用户修改，再恢复选定版本；不要整体覆盖用户目录。
 
-## 已验证与尚未验证
+## 切换初期的验证记录（历史）
 
 已通过：9 份 Prompt、22 个 Skill 的字节一致性，原版提醒/调度脚本一致性，四轮固定提醒与每轮动态路由、原版 DAG 调度的真实重叠/依赖/回压测试，以及仓库本地门禁。任务树 MCP 已注册并真实发现 18 个工具。
 

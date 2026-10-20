@@ -34,5 +34,6 @@ export function startGraphWorker(graphPath,pythonPath,indexerPath,socketPath){
       detached:true,windowsHide:true,stdio:['ignore',log,log],env:{...process.env,PYTHONUNBUFFERED:'1',PYTHONUTF8:'1',SENTENCE_TRANSFORMERS_HOME:path.join(root,'tools/embedding-models')}
     });
     child.on('error',error=>process.stderr.write(`GraphToolCall startup failed: ${error.message}\n`));child.unref();
+    return child;
   }finally{closeSync(log);}
 }

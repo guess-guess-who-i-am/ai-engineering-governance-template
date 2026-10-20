@@ -35,6 +35,6 @@ const denied=await new Promise((resolve,reject)=>{
  socket.on('error',reject);socket.on('data',data=>{buffer+=data;if(!buffer.includes('\n'))return;socket.destroy();resolve(JSON.parse(buffer.split('\n')[0]));});
 });
 assert.equal(denied.ok,false,'Unauthenticated worker control request was accepted');
-const result={runId,uniqueUncachedInputs:true,ready:true,warmWorkers:before.workers,residentSupervisor:before.supervisorPid,requests,distinctQueryProcesses:new Set(requests.map(r=>r.queryPid)).size,authenticationRejected:true,scoring:'upstream unchanged'};
+const result={runId,uniqueUncachedInputs:true,ready:true,warmWorkers:before.workers,residentSupervisor:before.supervisorPid,requests,distinctQueryProcesses:new Set(requests.map(r=>r.queryPid)).size,authenticationRejected:true,scoring:'GraphToolCall with the declared embedding model; router fusion is verified separately'};
 await writeFile('.reports/mac-worker-residency.json',JSON.stringify(result,null,2)+'\n');
 console.log(JSON.stringify(result));

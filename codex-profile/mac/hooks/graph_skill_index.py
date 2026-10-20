@@ -27,6 +27,36 @@ import time
 import warnings
 
 # Import GraphToolCall only after the worker owns the inter-process lock.
+EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
+
+def attach_embedding_index(graph, previous=None, previous_model=""):
+    """Re-encode only changed canonical tool text; never mix model spaces."""
+    from graph_tool_call.retrieval.embedding import EmbeddingIndex, SentenceTransformerProvider
+    old_index = previous._get_retrieval_engine()._embedding_index if previous is not None else None
+    can_reuse = previous_model == EMBEDDING_MODEL and old_index is not None and getattr(old_index._provider, 'model_name', None) == EMBEDDING_MODEL
+    provider = old_index._provider if can_reuse else SentenceTransformerProvider(EMBEDDING_MODEL)
+    index = EmbeddingIndex(provider=provider)
+    changed_names, changed_texts = [], []
+    reused = 0
+    for name, tool in graph.tools.items():
+        text = index._tool_text(tool)
+        old_tool = previous.tools.get(name) if can_reuse else None
+        if old_tool is not None and name in old_index._embeddings and old_index._tool_text(old_tool) == text:
+            index.add(name, old_index._embeddings[name])
+            reused += 1
+        else:
+            changed_names.append(name)
+            changed_texts.append(text)
+    if changed_texts:
+        vectors = provider.encode_batch(changed_texts)
+        if len(vectors) != len(changed_names):
+            raise ValueError("Embedding provider returned an incomplete rebuild")
+        for name, vector in zip(changed_names, vectors):
+            index.add(name, vector)
+    graph._get_retrieval_engine().set_embedding_index(index)
+    graph.tune_for_scale()
+    return {"reusedVectors": reused, "encodedVectors": len(changed_names)}
 
 
 def catalog_rows(catalog: Path):
@@ -153,10 +183,18 @@ def build(args):
         mcp_records = data.get("tools", []) if isinstance(data, dict) else []
     graph = graph_from_records(records, mcp_records)
     embedding = "disabled"
+    embedding_work = {}
     if args.embedding:
-        graph.enable_embedding("sentence-transformers/all-MiniLM-L6-v2")
-        graph.tune_for_scale()
-        embedding = "sentence-transformers/all-MiniLM-L6-v2"
+        previous = None
+        previous_model = ""
+        previous_manifest = output.with_suffix(".manifest.json")
+        if output.is_file() and previous_manifest.is_file():
+            from graph_tool_call import ToolGraph
+            previous_model = json.loads(previous_manifest.read_text(encoding="utf-8")).get("embedding", "")
+            if previous_model == EMBEDDING_MODEL:
+                previous = ToolGraph.load(output)
+        embedding_work = attach_embedding_index(graph, previous, previous_model)
+        embedding = EMBEDDING_MODEL
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = output.with_suffix(output.suffix + f".{os.getpid()}.tmp")
     graph.save(temporary, metadata={"skill_count": len(records), "catalog": str(catalog)})
@@ -169,6 +207,7 @@ def build(args):
         "schemaVersion": "graph-tool-call-skills/1",
         "graphToolCallVersion": "0.46.0",
         "embedding": embedding,
+        **embedding_work,
         "generatedAt": __import__("datetime").datetime.now().astimezone().isoformat(),
         "rootPath": str(root.resolve()),
         "catalogPath": str(catalog.resolve()),

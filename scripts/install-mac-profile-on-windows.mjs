@@ -10,6 +10,51 @@ import {ensureWarmWorker} from './prewarm-mac-worker.mjs';
 
 const here=path.dirname(fileURLToPath(import.meta.url));
 export const PIN='0cd7d48d90c24a0cf8d0515b8b0dd871fcaac7b2';
+export const POLICY_FILES=[
+ 'scripts/parallel-run.mjs',
+ 'scripts/install-task-tree-mcp-mac.mjs',
+ 'codex-profile/.codex/hooks/skill-router.mjs',
+ 'codex-profile/mac/hooks/graph_skill_index.py',
+ 'codex-profile/mac/hooks/refresh-skill-registry.mjs',
+ 'codex-profile/mac/hooks/context-refresh.mjs',
+ 'codex-profile/.codex/prompt-publisher/publish-methodology.mjs',
+ 'codex-profile/.codex/prompt-publisher/methodology-targets.json',
+ 'codex-profile/.codex/prompt-publisher/README.zh.md',
+ 'codex-profile/.codex/prompt-publisher/methodology-translation-cache.en.md',
+ 'codex-profile/.codex/prompt-publisher/methodology-state.json',
+ 'codex-profile/global-skills/verify-before-completion/SKILL.md',
+ ...['global-methodology-source.zh.md','global-every-turn.zh.md','global-every-turn.en.md','global-attention-anchor.zh.md','global-attention-anchor.en.md','global-methodology-router.zh.md','global-methodology-router.en.md','global-methodology-routing-review.zh.md','global-methodology-map.json'].map(name=>'codex-profile/.codex/prompts/'+name)
+];
+export async function stagePolicyUpdates(root,nativeSource){
+ const policySource=path.join(root,'tools/macos-profile-policy');const policyFiles=[];
+ for(const file of POLICY_FILES){const bytes=await readFile(path.resolve(here,'..',file));for(const destination of [policySource,nativeSource]){await mkdir(path.dirname(path.join(destination,file)),{recursive:true});await writeFile(path.join(destination,file),bytes);}policyFiles.push({file,sha256:digest(bytes)});}
+ return {policySource,policyFiles,policyRevision:'routing-repair-v3-20261020'};
+}
+export const adaptTaskTreeInstaller=source=>hiddenChildren(normalized(source));
+export async function registerTaskTreeRuntime(root,{check=false}={}){
+ const config=await readFile(path.join(root,'config.toml'),'utf8');
+ const block=config.match(/\[mcp_servers\.task_tree\]([\s\S]*?)(?=\n\[|$)/)?.[1]||'';
+ const literal=block.match(/args\s*=\s*\['([^']+)'\]/)?.[1];
+ const basic=block.match(/args\s*=\s*(\["[^\n]+\])/ )?.[1];
+ const entry=literal||(basic?JSON.parse(basic)[0]:'');
+ if(!entry)throw new Error('Registered task_tree MCP entry is missing');
+ const runtime=path.resolve(path.dirname(entry),'..');
+ for(const relative of ['context/turn-tracker.js','context/turn-context.js','platform/execution-scope.js','task-tree/tree-quality.js','task-tree/maintenance.js'])await stat(path.join(runtime,'ide/backend',relative));
+ if(check){const actual=JSON.parse(await readFile(path.join(root,'skill-registry/task-tree-runtime.json'),'utf8'));if(path.resolve(actual.root)!==runtime)throw new Error('Task-tree runtime pointer differs from the registered MCP');return runtime;}
+ await mkdir(path.join(root,'skill-registry'),{recursive:true});
+ await writeFile(path.join(root,'skill-registry/task-tree-runtime.json'),JSON.stringify({root:runtime,source:'registered task_tree MCP entry'},null,2)+'\n');
+ return runtime;
+}
+export async function prepareRoutingIndex(root,manifest){
+ const env={...process.env,CODEX_HOME:root,CODEX_GRAPH_TOOL_PYTHON:manifest.python,SENTENCE_TRANSFORMERS_HOME:manifest.modelCache,HF_HUB_OFFLINE:'0',TRANSFORMERS_OFFLINE:'0',HF_HUB_DISABLE_IMPLICIT_TOKEN:'1',PYTHONUTF8:'1',OMP_NUM_THREADS:'4',MKL_NUM_THREADS:'4',OPENBLAS_NUM_THREADS:'4'};
+ const cached=await run(manifest.python,[path.join(here,'cache-routing-model.py'),'--codex-home',root],{env});
+ console.log(cached.stdout.trim());
+ const refresh=await run(process.execPath,[path.join(root,'hooks/refresh-skill-registry.mjs')],{env:{...env,CODEX_SKILL_REGISTRY_FOREGROUND:'1',CODEX_SKIP_EXTERNAL_INDEX_REFRESH:'0',HF_HUB_OFFLINE:'1',TRANSFORMERS_OFFLINE:'1'},input:'{}',timeout:1200000});
+ if(/skipped:|failed:|timed out/i.test(refresh.stderr))throw new Error('Registry rebuild failed: '+refresh.stderr);
+ const state=JSON.parse(await readFile(path.join(root,'skill-registry/external-skills-manifest.json'),'utf8'));
+ if(state.embedding!=='sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')throw new Error('Multilingual graph generation was not installed');
+ console.log(JSON.stringify({phase:'graph-current',embedding:state.embedding,reusedVectors:state.reusedVectors,encodedVectors:state.encodedVectors}));
+}
 const normalized=value=>value.replace(/\r\n/g,'\n');
 const digest=value=>createHash('sha256').update(value).digest('hex');
 function replaceOne(source,old,value){if(source.split(old).length!==2)throw new Error('Pinned source anchor changed: '+old.slice(0,90));return source.replace(old,value);}
@@ -28,7 +73,7 @@ export function adaptWorker(raw){
   '    # The Windows installer protects the containing directory with a user-only ACL.\n    endpoint = {"host":"127.0.0.1", "port":server.server_address[1], "token":server.token, "pid":os.getpid()}\n    temporary = socket_path.with_name(socket_path.name + f".{os.getpid()}.tmp")\n    temporary.write_text(json.dumps(endpoint), encoding="utf-8")\n    os.replace(temporary, socket_path)');
  source=source.replace('subprocess.run([args.node, args.script], check=True,','subprocess.run([args.node, args.script], check=True, creationflags=subprocess.CREATE_NO_WINDOW,');
  source=replaceOne(source,'def _initialize_query_process(graph_path):\n    global _process_worker\n    _process_worker = _GraphWorker(Path(graph_path))',
-  'def _initialize_query_process(graph_path, warm_barrier):\n    global _process_worker, _warm_report, _warm_barrier\n    _warm_barrier = warm_barrier\n    _process_worker = _GraphWorker(Path(graph_path))\n    _process_worker.query({"query": "Diagnose a reproducible software bug", "top_k": 8, "deadline": time.time() * 1000 + 180000})\n    _warm_report = {"pid": os.getpid(), "loads": _process_worker.loads, "ready": True}\n    warm_barrier.wait(timeout=180)\n\ndef _ready_query_process():\n    _warm_barrier.wait(timeout=180)\n    return _warm_report');
+  'def _initialize_query_process(graph_path, warm_barrier):\n    global _process_worker, _warm_report, _warm_barrier\n    _warm_barrier = warm_barrier\n    _process_worker = _GraphWorker(Path(graph_path))\n    _process_worker.query({"query": "Diagnose a reproducible software bug", "top_k": 8, "deadline": time.time() * 1000 + 180000})\n    _warm_report = {"pid": os.getpid(), "loads": _process_worker.loads, "ready": True, "graphMtimeNs": str(_process_worker._signature[2])}\n    warm_barrier.wait(timeout=180)\n\ndef _ready_query_process():\n    _warm_barrier.wait(timeout=180)\n    return _warm_report');
  source=replaceOne(source,'    def _new_pool(self):\n        return ProcessPoolExecutor(max_workers=self._processes,\n            mp_context=multiprocessing.get_context(\'spawn\'),\n            initializer=_initialize_query_process, initargs=(str(self._path),))',
   '    def _new_pool(self):\n        context = multiprocessing.get_context("spawn")\n        barrier = context.Barrier(self._processes)\n        pool = ProcessPoolExecutor(max_workers=self._processes,\n            mp_context=context, initializer=_initialize_query_process,\n            initargs=(str(self._path), barrier))\n        futures = [pool.submit(_ready_query_process) for _ in range(self._processes)]\n        try:\n            reports = [future.result(timeout=180) for future in futures]\n            self._warm_reports = sorted({report["pid"]: report for report in reports}.values(), key=lambda report: report["pid"])\n            if len(self._warm_reports) != self._processes:\n                raise RuntimeError("Not every retrieval process completed warm-up")\n        except BaseException:\n            pool.shutdown(wait=False, cancel_futures=True)\n            raise\n        return pool');
  source=replaceOne(source,'    stopping = threading.Event()','    stopping = threading.Event()\n    server.stopping = stopping');
@@ -124,24 +169,32 @@ async function main(){
     await mkdir(path.join(destination,'scripts'),{recursive:true});
     for(const name of ['install-codex-profile-mac.mjs','install-task-tree-mcp-mac.mjs','parallel-run.mjs','ensure-global-skill-library.mjs','test-hook-cadence-mac.mjs','test-parallel-run.mjs'])await copyFile(path.join(source,'scripts',name),path.join(destination,'scripts',name));
   }
+  const policy=await stagePolicyUpdates(root,nativeSource);
   const edits=[
     ['codex-profile/mac/hooks/graph_skill_index.py',adaptWorker],
     ['codex-profile/.codex/hooks/skill-router.mjs',adaptRouter],
     ['codex-profile/mac/hooks/refresh-skill-registry.mjs',adaptRefresh],
     ['codex-profile/.codex/hooks/hook-dispatch.mjs',adaptDispatcher],
     ['scripts/install-codex-profile-mac.mjs',text=>adaptInstaller(text,previousAgentsHash)],
-    ['scripts/install-task-tree-mcp-mac.mjs',hiddenChildren]
+    ['scripts/install-task-tree-mcp-mac.mjs',adaptTaskTreeInstaller]
   ];
   const adaptations=[];
-  for(const [relative,transform]of edits){const original=await readFile(path.join(rawSource,relative),'utf8');const adapted=transform(original);await write(path.join(nativeSource,relative),adapted);adaptations.push({file:relative,upstreamSha256:digest(original),nativeSha256:digest(adapted)});}
+  for(const [relative,transform]of edits){const original=await readFile(path.join(rawSource,relative),'utf8');const effective=await readFile(path.join(nativeSource,relative),'utf8');const adapted=transform(effective);await write(path.join(nativeSource,relative),adapted);adaptations.push({file:relative,upstreamSha256:digest(original),policySha256:digest(effective),nativeSha256:digest(adapted)});}
   await copyFile(path.join(here,'mac-windows-transport.mjs'),path.join(nativeSource,'codex-profile/mac/hooks/mac-windows-transport.mjs'));
-  await write(path.join(root,'skill-registry/mac-source.json'),JSON.stringify({commit:PIN,branch:'codex/macos-global-deploy',source:rawSource,nativeSource,library,python,modelCache,backup,adaptations},null,2)+'\n');
+  await write(path.join(root,'skill-registry/mac-source.json'),JSON.stringify({commit:PIN,branch:'codex/macos-global-deploy',source:rawSource,nativeSource,library,python,modelCache,backup,adaptations,...policy},null,2)+'\n');
   console.log(JSON.stringify({phase:'backed-up',backup,commit:PIN}));
  }
  const installed=await run(process.execPath,[path.join(nativeSource,'scripts/install-codex-profile-mac.mjs'),'--home',home,'--json',...(check?['--check']:[])],{env});
  console.log(installed.stdout.trim());
- if(check){console.log(JSON.stringify({phase:'worker-residency-checked',...await ensureWarmWorker(root,{start:false})}));return;}
- await copyFile(path.join(rawSource,'scripts/parallel-run.mjs'),path.join(root,'tools/parallel-run.mjs'));
+ if(check){await registerTaskTreeRuntime(root,{check:true});console.log(JSON.stringify({phase:'worker-residency-checked',...await ensureWarmWorker(root,{start:false})}));return;}
+ if(!(await readFile(path.join(root,'config.toml'),'utf8')).includes('[mcp_servers.task_tree]')){
+  const mcp=await run(process.execPath,[path.join(nativeSource,'scripts/install-task-tree-mcp-mac.mjs'),'--home',home,'--json'],{env});
+  console.log(mcp.stdout.trim());
+ }
+ await registerTaskTreeRuntime(root);
+ const active=JSON.parse(await readFile(path.join(root,'skill-registry/mac-source.json'),'utf8'));
+ await prepareRoutingIndex(root,active);
+ await copyFile(path.join(nativeSource,'scripts/parallel-run.mjs'),path.join(root,'tools/parallel-run.mjs'));
  console.log(JSON.stringify({phase:'worker-prewarmed',...await ensureWarmWorker(root)}));
  // Retire only the old platform-specific modules that this repository installed.
  const manifest=JSON.parse(await readFile(path.join(root,'skill-registry/mac-source.json'),'utf8'));

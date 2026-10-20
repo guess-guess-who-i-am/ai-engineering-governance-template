@@ -75,12 +75,13 @@ function stableJson(value) {
 
 async function graphInputsHash(ownedRoot, mcpTools) {
   const hash = createHash("sha256");
-  // Hash content, not timestamps/counts: an edited Skill or MCP schema must
-  // invalidate the graph even when the number of tools stays unchanged.
+  // Only fields consumed by graph construction own its fingerprint. Skill
+  // body changes still update the registry hash, but do not re-embed metadata.
   for (const file of await skillFiles(ownedRoot)) {
     hash.update(path.relative(ownedRoot, file));
     hash.update("\0");
-    hash.update(await readFile(file));
+    const text = await readFile(file, 'utf8');
+    hash.update(JSON.stringify({ name: frontmatterValue(text, 'name'), description: frontmatterValue(text, 'description') }));
     hash.update("\0");
   }
   const canonicalTools = mcpTools.map((tool) => JSON.stringify(stableJson(tool))).sort();
@@ -144,7 +145,7 @@ async function refreshExternalIndex(home, codexRoot) {
     const current = JSON.parse(await readFile(manifestPath, "utf8"));
     if (current.schemaVersion === "graph-tool-call-skills/1" && current.catalogPath === catalog &&
         current.rootPath === root && current.catalogLength === sourceStat.size &&
-        current.catalogMtimeMs === sourceStat.mtimeMs && current.catalogSha256 === sourceHash && current.embedding === "sentence-transformers/all-MiniLM-L6-v2" &&
+        current.catalogMtimeMs === sourceStat.mtimeMs && current.catalogSha256 === sourceHash && current.embedding === "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2" &&
         current.graphPath === graphIndex && current.graphInputsSha256 === inputsHash && await exists(graphIndex) && await exists(mcpCatalog)) return current;
   } catch { /* Rebuild a missing or stale index. */ }
 

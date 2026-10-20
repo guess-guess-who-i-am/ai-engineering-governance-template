@@ -36,31 +36,31 @@
       "id": "method-research-evidence",
       "titleZh": "研究与论文证据方法",
       "titleEn": "Research evidence method",
-      "skillFile": "../../../.agents/skills/method-research-evidence/SKILL.md"
+      "skillFile": "../../global-skills/method-research-evidence/SKILL.md"
     },
     {
       "id": "method-engineering-execution",
       "titleZh": "工程实现方法",
       "titleEn": "Engineering execution method",
-      "skillFile": "../../../.agents/skills/method-engineering-execution/SKILL.md"
+      "skillFile": "../../global-skills/method-engineering-execution/SKILL.md"
     },
     {
       "id": "method-evaluation-gates",
       "titleZh": "评价与门禁方法",
       "titleEn": "Evaluation gates method",
-      "skillFile": "../../../.agents/skills/method-evaluation-gates/SKILL.md"
+      "skillFile": "../../global-skills/method-evaluation-gates/SKILL.md"
     },
     {
       "id": "method-github-delivery",
       "titleZh": "GitHub交付方法",
       "titleEn": "GitHub delivery method",
-      "skillFile": "../../../.agents/skills/method-github-delivery/SKILL.md"
+      "skillFile": "../../global-skills/method-github-delivery/SKILL.md"
     },
     {
       "id": "method-task-tree",
       "titleZh": "任务树方法",
       "titleEn": "Task tree method",
-      "skillFile": "../../../.agents/skills/method-task-tree/SKILL.md"
+      "skillFile": "../../global-skills/method-task-tree/SKILL.md"
     }
   ]
 }

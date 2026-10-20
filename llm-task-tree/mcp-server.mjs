@@ -7,6 +7,7 @@ import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { resolveTaskTreeRuntime } from './runtime-location.mjs';
 
 const stubDir = import.meta.dirname;
 const configFile = path.join(stubDir, "task-tree.config.json");
@@ -17,8 +18,7 @@ if (!existsSync(configFile)) {
 
 const config = JSON.parse((await readFile(configFile, "utf8")).replace(/^\uFEFF/, ""));
 const projectRoot = path.resolve(stubDir, String(config.projectRoot || ".."));
-const sharedKitSetting = process.env.TASK_TREE_KIT_DIR || String(config.sharedKitDir || "");
-const sharedKit = sharedKitSetting ? path.resolve(projectRoot, sharedKitSetting) : "";
+const sharedKit = await resolveTaskTreeRuntime(projectRoot);
 const entry = sharedKit ? path.join(sharedKit, "scripts", "mcp-server.mjs") : "";
 if (!entry || !existsSync(entry)) {
   process.stderr.write(`shared kit MCP server missing: ${entry || "(no sharedKitDir)"}\n`);

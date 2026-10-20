@@ -40,6 +40,7 @@ function scoreSkill(skill, tokens, query, aliases) {
   const name = String(skill.name || "").toLocaleLowerCase();
   const haystack = `${skill.name || ""} ${skill.description || ""} ${(skill.keywords || []).join(" ")}`.toLocaleLowerCase();
   let score = 0;
+  let direct = false;
   const matches = [];
   for (const token of tokens) {
     if (!haystack.includes(token)) continue;
@@ -49,9 +50,34 @@ function scoreSkill(skill, tokens, query, aliases) {
   }
   if (exactName(query, name)) { score += 24; matches.push("exact name"); }
   for (const alias of aliases[name] || []) {
-    if (query.includes(alias.toLocaleLowerCase())) { score += 12; if (matches.length < 3) matches.push(alias); }
+    if (query.includes(alias.toLocaleLowerCase())) { direct = true; score += 12; if (matches.length < 3) matches.push(alias); }
   }
-  return { skill, score, matches: [...new Set(matches)].slice(0, 3) };
+  return { skill, score, direct, explicit: exactName(query, name), matches: [...new Set(matches)].slice(0, 3) };
+}
+
+// SIGIR'09 reciprocal-rank fusion: channel magnitudes and capability kinds
+// are not comparable. Merge independent ranked evidence, then deduplicate.
+function fuseCandidates(local, semantic, excludedNames = new Set()) {
+  const merged = new Map();
+  for (const list of [local, semantic]) {
+    const seen = new Set();
+    list.sort((a, b) => b.score - a.score || String(a.skill.name).localeCompare(String(b.skill.name)));
+    for (const [index, item] of list.entries()) {
+      const name = String(item.skill.name).toLocaleLowerCase();
+      if (excludedNames.has(name)) continue;
+      const key = item.skill.kind === 'mcp' ? `mcp:${item.skill.mcpServer}:${name}` : `skill:${item.skill.path || name}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const current = merged.get(key) || { ...item, score: 0, matches: [] };
+      current.explicit ||= item.explicit;
+      current.direct ||= item.direct;
+      current.score += 1 / (60 + index + 1);
+      current.matches = [...new Set([...current.matches, ...item.matches])].slice(0, 3);
+      merged.set(key, current);
+    }
+  }
+  return [...merged.values()].sort((a, b) => Number(Boolean(b.explicit)) - Number(Boolean(a.explicit)) || b.score - a.score || Number(Boolean(b.direct)) - Number(Boolean(a.direct)) || String(a.skill.name).localeCompare(String(b.skill.name))).slice(0, 4)
+    .map(item => ({ ...item, score: Math.round(item.score * 1000000) }));
 }
 
 function workerSocketPath(graphPath) {
@@ -136,6 +162,8 @@ async function graphCandidates(graphPath, query, pythonPath, indexerPath, exclud
   const payload = { query, top_k: 8, deadline };
   const asSkills = (results) => results
     .filter((item) => (item?.kind === "mcp" || (item?.path && existsSync(item.path))) && !excludedNames.has(String(item.name).toLocaleLowerCase()))
+    .filter((item) => item.confidence !== 'low' || exactName(query, String(item.name).toLocaleLowerCase()))
+    .filter((item) => exactName(query, String(item.name).toLocaleLowerCase()) || Number(item.keyword_score) > 0 || Number(item.embedding_score) >= 0.42)
     .map((item) => ({ skill: {
       id: `external:${String(item.name).toLocaleLowerCase()}`,
       name: item.name,
@@ -146,7 +174,7 @@ async function graphCandidates(graphPath, query, pythonPath, indexerPath, exclud
       rank: 100,
       kind: item.kind || "skill",
       mcpServer: item.mcp_server || ""
-    }, score: Math.round(Number(item.score || 0) * 1000) + (item.kind === "mcp" ? 1000 : 0), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] }));
+    }, score: Number(item.score || 0), explicit: exactName(query, String(item.name).toLocaleLowerCase()), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] }));
 
   return requestGraphWorker(socketPath, payload, 55000)
     .catch((error) => {
@@ -178,10 +206,15 @@ try {
     process.stdout.write("{}");
     process.exit(0);
   }
+  if (/^(?:你好|您好|谢谢(?:你|您)?|感谢(?:你|您)?|hi|hello|thanks|thank you)[\s!！。.,，]*$/i.test(prompt)) {
+    process.stdout.write("{}");
+    process.exit(0);
+  }
   const codexRoot = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
-  const [registry, ruleDocument] = await Promise.all([
+  const [registry, ruleDocument, mcpCatalog] = await Promise.all([
     readFile(path.join(codexRoot, "skill-registry", "skills-index.json"), "utf8").then(JSON.parse),
-    readFile(path.join(codexRoot, "skill-registry", "routing-rules.json"), "utf8").then(JSON.parse)
+    readFile(path.join(codexRoot, "skill-registry", "routing-rules.json"), "utf8").then(JSON.parse),
+    readFile(path.join(codexRoot, 'skill-registry', 'mcp-tools.json'), 'utf8').then(JSON.parse)
   ]);
   const stopTokens = new Set((ruleDocument._stopTokens || []).map((item) => String(item).toLocaleLowerCase()));
   const aliases = Object.fromEntries(Object.entries(ruleDocument)
@@ -193,21 +226,17 @@ try {
   // index. A second 15k+ JavaScript scan per Agent defeats that shared service.
   const skills = Array.isArray(registry.skills)
     ? registry.skills.filter((skill) => skill.source !== "external-library") : [];
-  const knownNames = new Set(skills.map((skill) => String(skill.name || "").toLocaleLowerCase()));
-  for (const name of promptSkillExclusions(prompt)) knownNames.add(name);
-  const explicitlyRouted = [...knownNames].some((name) => (aliases[name] || []).some((alias) => query.includes(alias)));
-  const scored = skills.map((skill) => scoreSkill(skill, tokens, query, aliases)).filter((item) => item.score > 0);
+  skills.push(...(mcpCatalog.tools || []).map(tool => ({name:tool.name,description:tool.description||'',kind:'mcp',mcpServer:tool.server,source:'indexed-mcp',rank:30,keywords:[]})));
+  const excludedNames = promptSkillExclusions(prompt);
+  const scored = skills.map((skill) => scoreSkill(skill, tokens, query, aliases)).filter((item) => item.score >= 6);
   const indexerPath = path.join(codexRoot, "hooks", "graph_skill_index.py");
   const pythonPath = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexRoot, "tools", "graph-tool-call-venv", "bin", "python");
-  const externalNames = new Set(Object.keys(aliases).map((name) => name.toLocaleLowerCase()));
-  scored.push(...await graphCandidates(registry.externalGraphPath, prompt, pythonPath, indexerPath, externalNames));
-  scored.sort((a, b) => b.score - a.score || Number(a.skill.rank || 0) - Number(b.skill.rank || 0) || String(a.skill.name).localeCompare(String(b.skill.name)));
-  if (!scored.length || scored[0].score < 6) {
+  const semantic = await graphCandidates(registry.externalGraphPath, prompt, pythonPath, indexerPath, excludedNames);
+  const selected = fuseCandidates(scored, semantic, excludedNames);
+  if (!selected.length) {
     process.stdout.write("{}");
     process.exit(0);
   }
-  const minimum = Math.max(6, Math.floor(scored[0].score * 0.55));
-  const selected = scored.filter((item) => item.score >= minimum).slice(0, 4);
   const lines = [
     "[CODEX_SKILL_ROUTER_V2]",
     "Assistive routing only: read a full SKILL.md only when it directly applies to the latest request; do not load the whole Skill catalog.",

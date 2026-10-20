@@ -16,5 +16,5 @@ description: Select and execute proportionate evidence before claiming a task co
 7. Record command, scope, result, and limitations. A command that did not run is not evidence.
 8. Claim completion only when every requested behavior has evidence and no required work remains. Otherwise state the exact blocker or unverified surface.
 
-Run `scripts/verify-repository.ps1` for this template. Read [references/evidence-ladder.md](references/evidence-ladder.md) when selecting checks.
+At this template's release boundary, run its actual entry `scripts/check.ps1`; for a focused edit, run the checks owned by that boundary. Do not assume other projects contain this script. Read [references/evidence-ladder.md](references/evidence-ladder.md) when selecting checks.
 

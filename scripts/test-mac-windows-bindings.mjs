@@ -23,4 +23,4 @@ assert(refresh.includes('SENTENCE_TRANSFORMERS_HOME'));assert(refresh.includes('
 const dispatch=adaptDispatcher(await readFile(path.join(source,'codex-profile/.codex/hooks/hook-dispatch.mjs'),'utf8'));
 assert(!dispatch.includes('E:\\\\能力归纳概括'));
 assert.throws(()=>adaptRouter('not the pinned source'));
-console.log(JSON.stringify({sourceCommit:PIN,workerRankingUnchanged:true,routerSelectionUnchanged:true,windowsBindingsAndEagerWarmup:true,sourceMismatchRejected:true}));
+console.log(JSON.stringify({baselineCommit:PIN,comparisonSource:source,workerPolicyPreservedAcrossPlatforms:true,routerPolicyPreservedAcrossPlatforms:true,windowsBindingsAndEagerWarmup:true,sourceMismatchRejected:true}));

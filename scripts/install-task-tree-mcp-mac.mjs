@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { access, mkdir, readFile, rename, rm } from "node:fs/promises";
+import { access, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -136,6 +136,8 @@ async function install(options) {
       "--codex-home", codexHome
     ], { timeoutMs: 30000 });
     if (registration.code !== 0) throw new Error(`task_tree MCP registration failed: ${registration.stderr.trim() || registration.stdout.trim()}`);
+    await mkdir(path.join(codexHome,'skill-registry'),{recursive:true});
+    await writeFile(path.join(codexHome,'skill-registry/task-tree-runtime.json'),JSON.stringify({root:runtime,source:'registered task_tree MCP entry'},null,2)+'\n');
   }
   await verifyConfig(options.home, entry);
   const toolCount = await verifyProtocol(entry);

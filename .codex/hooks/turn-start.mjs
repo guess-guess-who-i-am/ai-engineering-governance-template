@@ -1,7 +1,8 @@
-import { existsSync, readFileSync } from "node:fs";
+import { loadTaskTreeModule } from "../../llm-task-tree/runtime-location.mjs";
+import { snapshotWorkspace } from './workspace-snapshot.mjs';
+import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
 
 async function readStdinJson() {
   let text = "";
@@ -23,38 +24,12 @@ function locateRoot(start) {
   }
 }
 
-async function loadRuntimeModule(root, name) {
-  const hookDir = path.dirname(fileURLToPath(import.meta.url));
-  const candidates = [
-    path.join(root, "server", name),
-    path.join(root, "llm-task-tree", "server", name),
-    path.resolve(hookDir, "../../server", name)
-  ];
-  const configFile = path.join(root, "llm-task-tree", "task-tree.config.json");
-  if (existsSync(configFile)) {
-    try {
-      const config = JSON.parse(readFileSync(configFile, "utf8").replace(/^\uFEFF/, ""));
-      if (config.sharedKitDir) {
-        const sharedKit = path.resolve(path.dirname(configFile), String(config.sharedKitDir));
-        candidates.push(path.join(sharedKit, "server", name));
-      }
-    } catch {
-      // A malformed project config should not hide a valid local runtime candidate.
-    }
-  }
-  const kitPathFile = path.join(root, "llm-task-tree", "setup-task-tree.kitpath");
-  if (existsSync(kitPathFile)) candidates.push(path.join(readFileSync(kitPathFile, "utf8").trim(), "server", name));
-  const target = candidates.find((candidate) => existsSync(candidate));
-  if (!target) throw new Error(`task-tree runtime module not found: ${name}`);
-  return import(pathToFileURL(target).href);
-}
 
 const input = await readStdinJson();
 const root = locateRoot(input.cwd || process.cwd());
-const [{ snapshotWorkspace }, { buildTaskTreeCheckpointContext }, { createExecutionScopeStore }] = await Promise.all([
-  loadRuntimeModule(root, "turn-tracker.js"),
-  loadRuntimeModule(root, "turn-context.js"),
-  loadRuntimeModule(root, "execution-scope.js")
+const [{ buildTaskTreeCheckpointContext }, { createExecutionScopeStore }] = await Promise.all([
+  loadTaskTreeModule(root, "turn-context.js"),
+  loadTaskTreeModule(root, "execution-scope.js")
 ]);
 const dir = path.join(root, ".task-tree-maintenance", "turns");
 await mkdir(dir, { recursive: true });
@@ -84,7 +59,7 @@ await writeFile(path.join(dir, `${safe(input.session_id)}-${safe(input.turn_id)}
 const scopeId = String(process.env.TASK_TREE_EXECUTION_SCOPE || "").trim();
 const executionScope = scopeId ? await createExecutionScopeStore({ projectRoot: root }).get(scopeId) : null;
 const nodes = activeTreeMarkdown
-  ? (await loadRuntimeModule(root, "tree-quality.js")).parseTreeNodeFields(activeTreeMarkdown)
+  ? (await loadTaskTreeModule(root, "tree-quality.js")).parseTreeNodeFields(activeTreeMarkdown)
   : [];
 const assignedNodes = (executionScope?.targetNodeIds || []).map((nodeId) => {
   const node = nodes.find((item) => item.id === nodeId);

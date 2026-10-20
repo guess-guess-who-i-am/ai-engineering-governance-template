@@ -1,5 +1,7 @@
 # macOS 全局 GraphToolCall worker 验证
 
+本页保留早期 macOS 实测；图规模、编码器和冷启动数据不是新策略的性能保证。2026-10-20 后的策略、Windows绑定及本机证据见 [修复报告](ROUTING_AND_EXECUTION_REPAIR.md)。
+
 ## 已验证行为
 
 图文件约248 MB，15511工具的全局路由已部署到用户级 Hook。第一次 UserPromptSubmit 启动共享服务：一个 Unix socket 入口、4个常驻 CPU 检索进程，不同工作区和Agent复用服务。支持128个在途连接与256个等待连接，实际计算由4进程分担。默认一直驻留；重启后首次提示重新拉起，当前不注册登录启动的 LaunchAgent。

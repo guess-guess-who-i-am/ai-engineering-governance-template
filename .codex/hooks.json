@@ -5,8 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .codex/hooks/turn-start.mjs",
-            "commandWindows": "node .codex/hooks/turn-start.mjs",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/turn-start.mjs\"",
+            "commandWindows": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/turn-start.mjs\"",
             "timeout": 10
           }
         ]
@@ -17,8 +17,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .codex/hooks/stop-postflight.mjs",
-            "commandWindows": "node .codex/hooks/stop-postflight.mjs",
+            "command": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/stop-postflight.mjs\"",
+            "commandWindows": "node \"$(git rev-parse --show-toplevel)/.codex/hooks/stop-postflight.mjs\"",
             "timeout": 30
           }
         ]

@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
+const entry=new URL('./parallel-run.mjs',import.meta.url);
+const run=input=>spawnSync(process.execPath,[fileURLToPath(entry),'-'],{input:JSON.stringify(input),encoding:'utf8',windowsHide:true});
+const plan={initialConcurrency:4,tasks:Array.from({length:6},(_,i)=>({id:'read-'+i,command:process.execPath,args:['-e','console.log(process.pid)'],safety:'read-only'}))};
+const result=run(plan);assert.equal(result.status,0,result.stderr);
+const report=JSON.parse(result.stdout);assert.equal(report.peakConcurrency,4);assert.equal(report.count,6);assert.equal(report.failedCount,0);
+assert(report.results.some((first,i)=>report.results.some((second,j)=>i!==j&&first.startedAt<second.endedAt&&second.startedAt<first.endedAt)));
+assert.notEqual(run({...plan,initialConcurrency:21}).status,0);
+console.log('PASS: read-only stdin plans execute real overlapping children and reject concurrency beyond the hard ceiling.');

@@ -1,4 +1,3 @@
 {
-    "projectRoot":  "..",
-    "sharedKitDir":  "../llm-task-tree-macos/llm-task-tree-kit"
+    "projectRoot":  ".."
 }
