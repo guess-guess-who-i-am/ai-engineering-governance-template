@@ -2,6 +2,8 @@
 
 2026-10-22。问题是“为什么上次复测失败”，不是重新把组件搜索速度当作完整模型任务速度。
 
+后续将首选候选接为本轮执行动作后，两个不含工具名的自然任务已实际自动合批调用；详见 [自动采用实测](TECHNICAL_RESEARCH_AUTO_ADOPTION.zh.md)。下文保留此前失败的证据，不将后续成功改写成当时已经通过。
+
 ## 1. 已确定的旧失败边界
 
 原自然任务 `01a161a7-3cb1-7673-a048-2290c70b49f6`：technical_research于事件观察起点后约1.0秒报告ready；两个用户Hook共约1.66秒。模型随后在约58.9、141.1、215.2秒报告responseStreamDisconnected，详情分别为Request failed、Request timed out、Request failed；HTTP状态均未暴露。240秒由测试预算中断，网页搜索和资料MCP调用均为0。

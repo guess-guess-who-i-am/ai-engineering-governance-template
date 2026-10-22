@@ -8,6 +8,8 @@ Windows 采用 macOS 基线及明确批准的共享策略修复，入口见 [部
 
 Stack Overflow、GitHub仓库与论文可复用 [技术资料批量检索入口](docs/TECHNICAL_RESEARCH_PERFORMANCE.zh.md)：一次最多20项，候选池与模型可见卡片分离；缓存毫秒级和首次联网秒级分别记录，不把它冒称通用网页全文搜索。
 
+资料工具成为路由首选后附加本轮执行说明，不再只展示可忽略名单；两个未指定工具的自然任务已自动合批调用，使用边界及未达标项见 [自动采用实测](docs/TECHNICAL_RESEARCH_AUTO_ADOPTION.zh.md)。
+
 最后更新：2026-10-20
 
 ## 已包含

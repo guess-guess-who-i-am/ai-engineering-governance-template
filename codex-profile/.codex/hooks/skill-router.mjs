@@ -80,6 +80,13 @@ function fuseCandidates(local, semantic, excludedNames = new Set()) {
     .map(item => ({ ...item, score: Math.round(item.score * 1000000) }));
 }
 
+function capabilityAction(selected) {
+  const tool = selected[0]?.skill;
+  if (tool?.kind !== 'mcp' || tool.mcpServer !== 'technical_research' || tool.name !== 'technical_research_batch') return '';
+  return `[SELECTED_CAPABILITY_ACTION_V1]
+When this turn needs external discovery of Stack Overflow questions, GitHub repositories or papers, use the selected technical_research/technical_research_batch as the first retrieval action, before equivalent web searches. The user need not name this tool. Discover its callable through the session's exposed MCP/tool interface, then submit independent source/query pairs together (1–20); use short queries and omit optional parameters unless needed. Use refresh for current facts; otherwise prefer explicitly dated cache. Read necessary Skills first, then execute rather than only promising to search. Use web afterwards for decisive original pages or uncovered sources. Do not call it when the user forbids retrieval, existing evidence suffices, the task is GitHub writing, or only general web/news is needed. If unavailable or failing, report that evidence and limits; never pretend it ran.`;
+}
+
 function workerSocketPath(graphPath) {
   const digest = createHash("sha256").update(graphPath).digest("hex").slice(0, 24);
   // macOS limits AF_UNIX paths; keep the socket short even for long test/workspace paths.
@@ -251,6 +258,8 @@ try {
       ? `  Call through indexed MCP server: ${item.skill.mcpServer}/${item.skill.name}`
       : `  Read: ${item.skill.path}`);
   }
+  const action = capabilityAction(selected);
+  if (action) lines.push(action);
   lines.push("If none is genuinely relevant, ignore this list and continue without a specialized Skill.");
   process.stdout.write(JSON.stringify({
     hookSpecificOutput: { hookEventName: "UserPromptSubmit", additionalContext: lines.join("\n") }
