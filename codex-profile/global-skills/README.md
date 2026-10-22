@@ -1,12 +1,13 @@
 # Skill 目录
 
 Skills 是按需加载的专项工作流，不是常驻规则集合。
-本目录是22个自有 Skill 的唯一版本源。macOS 部署器把它们安装到 `~/.agents/skills`；下游项目不复制本目录，运行时注册表也不扫描项目 Skill。
+本目录是23个自有 Skill 的唯一版本源（22个治理 Skill 与互补并行搜索）。macOS 部署器把它们安装到 `~/.agents/skills`；下游项目不复制本目录，运行时注册表也不扫描项目 Skill。
 
 | Skill | 任务 |
 |---|---|
 | `clarify-before-build` | 高影响实现前冻结目标、边界与验收证据 |
 | `systematic-debugging` | 沿信息流定位首个偏差并建立回归证据 |
+| `parallel-web-research` | 按资料类型互补免费技术 API 与网页搜索，只补缺失方向 |
 | `evolve-contracts` | 统一演进跨组件契约、实现与端到端证据 |
 | `build-designed-interface` | 依据 brief 与 `DESIGN.md` 实现完整界面 |
 | `verify-before-completion` | 将完成声明映射到真实消费者与充分证据 |

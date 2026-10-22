@@ -1,0 +1,4 @@
+interface:
+  display_name: "互补并行搜索"
+  short_description: "按资料类型融合免费技术接口与网页搜索，保留并行、来源和失败证据"
+  default_prompt: "使用 $parallel-web-research 并行发现资料，只补查缺失方向并核验关键原文。"

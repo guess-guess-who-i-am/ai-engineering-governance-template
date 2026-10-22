@@ -35,7 +35,8 @@ const GLOBAL_SKILLS = [
   "task-tree-chain-run",
   "task-tree-core-state",
   "task-tree-grill",
-  "task-tree-subtree-run"
+  "task-tree-subtree-run",
+  "parallel-web-research"
 ];
 const GLOBAL_CONFIG = {
   root: { web_search: 'web_search = "live"' },

@@ -82,7 +82,9 @@ function fuseCandidates(local, semantic, excludedNames = new Set()) {
 
 function capabilityAction(selected) {
   const tool = selected[0]?.skill;
-  if (tool?.kind !== 'mcp' || tool.mcpServer !== 'technical_research' || tool.name !== 'technical_research_batch') return '';
+  if (tool?.kind !== 'mcp' || tool.mcpServer !== 'technical_research' || !['technical_research_batch','complementary_search_batch'].includes(tool.name)) return '';
+  if (tool.name === 'complementary_search_batch') return `[SELECTED_CAPABILITY_ACTION_V1]
+Use the selected technical_research/complementary_search_batch for external source discovery this turn: batch independent source/query pairs (1–20). English repo/SO uses APIs with missing-direction web supplements; Chinese uses free web; papers combine API and web. Read the relevant parallel-web-research Skill first. Use refresh for live facts. Inspect per-operation errors and provenance, then read decisive originals. Do not call when the user forbids retrieval or evidence already suffices. No paid fallback. If unavailable, use only the session's actually exposed web tools and report the limitation.`;
   return `[SELECTED_CAPABILITY_ACTION_V1]
 When this turn needs external discovery of Stack Overflow questions, GitHub repositories or papers, use the selected technical_research/technical_research_batch as the first retrieval action, before equivalent web searches. The user need not name this tool. Discover its callable through the session's exposed MCP/tool interface, then submit independent source/query pairs together (1–20); use short queries and omit optional parameters unless needed. Use refresh for current facts; otherwise prefer explicitly dated cache. Read necessary Skills first, then execute rather than only promising to search. Use web afterwards for decisive original pages or uncovered sources. Do not call it when the user forbids retrieval, existing evidence suffices, the task is GitHub writing, or only general web/news is needed. If unavailable or failing, report that evidence and limits; never pretend it ran.`;
 }

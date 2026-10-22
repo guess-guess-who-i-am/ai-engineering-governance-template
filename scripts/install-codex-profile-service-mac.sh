@@ -74,6 +74,10 @@ if [ "$check" -eq 1 ]; then
       install-codex-profile-mac.sh \
       install-codex-profile-mac.mjs \
       install-task-tree-mcp-mac.mjs \
+      install-technical-research.mjs \
+      technical-research.mjs \
+      complementary-search.mjs \
+      technical-research-mcp.mjs \
       ensure-global-skill-library.mjs \
       install-codex-profile-service-mac.sh \
     run-codex-profile-service-mac.sh \
@@ -83,6 +87,11 @@ if [ "$check" -eq 1 ]; then
       if ! /usr/bin/cmp -s "$repository_root/scripts/$script" "$source_destination/scripts/$script"; then
         source_current=0
         break
+      fi
+    done
+    for manifest in package.json package-lock.json; do
+      if ! /usr/bin/cmp -s "$repository_root/$manifest" "$source_destination/$manifest"; then
+        source_current=0
       fi
     done
     if [ -n "$skills_source" ] && [ -d "$skills_source" ] && [ -d "$skills_destination" ]; then
@@ -149,6 +158,10 @@ if [ "$repository_root" != "$source_destination" ]; then
     install-codex-profile-mac.sh \
     install-codex-profile-mac.mjs \
     install-task-tree-mcp-mac.mjs \
+    install-technical-research.mjs \
+    technical-research.mjs \
+    complementary-search.mjs \
+    technical-research-mcp.mjs \
     ensure-global-skill-library.mjs \
     install-codex-profile-service-mac.sh \
     run-codex-profile-service-mac.sh \
@@ -157,6 +170,8 @@ if [ "$repository_root" != "$source_destination" ]; then
   do
     /usr/bin/ditto "$repository_root/scripts/$script" "$source_temporary/scripts/$script"
   done
+  /usr/bin/ditto "$repository_root/package.json" "$source_temporary/package.json"
+  /usr/bin/ditto "$repository_root/package-lock.json" "$source_temporary/package-lock.json"
   /bin/chmod 700 "$source_temporary/scripts"/*.sh "$source_temporary/scripts"/*.mjs
   /bin/rm -rf "$source_destination"
   /bin/mv "$source_temporary" "$source_destination"

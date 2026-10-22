@@ -5,9 +5,14 @@ import os from 'node:os';
 import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
+import {upgradeSearchRouting} from './install-technical-research.mjs';
+import {adaptRouter} from './install-mac-profile-on-windows.mjs';
 
 const file = new URL('../codex-profile/.codex/hooks/skill-router.mjs', import.meta.url);
 const source = await readFile(file, 'utf8');
+assert.equal(upgradeSearchRouting(source,source),source,'current router must remain byte-identical');
+assert.equal(upgradeSearchRouting(adaptRouter(source),source),adaptRouter(source),'Windows transport binding must remain byte-identical');
+assert.throws(()=>upgradeSearchRouting('unsupported router',source),/explicit migration/);
 const start = source.indexOf('function capabilityAction(');
 assert(start >= 0, 'a selected capability must have an execution decision, not only a candidate card');
 const end = source.indexOf('\nfunction workerSocketPath(', start);
@@ -21,6 +26,17 @@ assert(action([research]).includes('[SELECTED_CAPABILITY_ACTION_V1]'));
 assert(action([research]).includes('1–20'));
 assert(action([research]).includes('user forbids'));
 assert(action([research]).length < 1100, 'conditional adoption must stay small');
+const complementary={skill:{...research.skill,name:'complementary_search_batch'}};
+assert(action([complementary]).includes('No paid fallback'));
+assert.equal(action([{skill:{...complementary.skill,mcpServer:'other'}}]),'');
+const older=source.slice(0,start)+source.slice(end);
+const withoutCatalog=older.replace('const [registry, ruleDocument, mcpCatalog]', 'const [registry, ruleDocument]')
+ .replace(',\n    readFile(path.join(codexRoot, \'skill-registry\', \'mcp-tools.json\'), \'utf8\').then(JSON.parse)','')
+ .replace(/^  skills.push\(.*\);\n/m,'')
+ .replace('  const action = capabilityAction(selected);\n  if (action) lines.push(action);\n','');
+const upgraded=upgradeSearchRouting(withoutCatalog,source);
+assert.equal(upgradeSearchRouting(upgraded,source),upgraded,'legacy router upgrade must be idempotent');
+assert(upgraded.includes('tool.server === "technical_research" && tool.name === "complementary_search_batch"'),'legacy alias adoption must be limited to the owned complementary tool');
 
 // Run the real Hook entry against an isolated registry: no model or network.
 const root = await mkdtemp(path.join(os.tmpdir(), 'capability-adoption-'));

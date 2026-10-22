@@ -23,9 +23,11 @@ if [ -z "${CODEX_PROFILE_SKILL_SOURCE:-}" ]; then
 fi
 "$script_dir/install-codex-profile-mac.sh" "$@"
 "$node_bin" "$script_dir/install-task-tree-mcp-mac.mjs" "$@"
+"$node_bin" "$script_dir/install-technical-research.mjs" "$@" --refresh-index
 "$script_dir/install-codex-profile-service-mac.sh" "$@"
 "$script_dir/install-codex-profile-mac.sh" "$@" --check
 "$node_bin" "$script_dir/install-task-tree-mcp-mac.mjs" "$@" --check
+"$node_bin" "$script_dir/install-technical-research.mjs" "$@" --check
 "$script_dir/install-codex-profile-service-mac.sh" "$@" --check
 
 printf '%s\n' "Global Codex profile deployment passed and is available to every Codex workspace for this user."

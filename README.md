@@ -8,16 +8,18 @@ Windows 采用 macOS 基线及明确批准的共享策略修复，入口见 [部
 
 Stack Overflow、GitHub仓库与论文可复用 [技术资料批量检索入口](docs/TECHNICAL_RESEARCH_PERFORMANCE.zh.md)：一次最多20项，候选池与模型可见卡片分离；缓存毫秒级和首次联网秒级分别记录，不把它冒称通用网页全文搜索。
 
+现已新增 [免费互补搜索与安装说明](docs/COMPLEMENTARY_SEARCH.zh.md)：英文仓库/SO 优先 API，只补失败或缺失方向；中文优先网页，论文 API 与网页并行。保留原 API-only 工具，不替换现有网页搜索，也不新增付费服务。
+
 资料工具成为路由首选后附加本轮执行说明，不再只展示可忽略名单；两个未指定工具的自然任务已自动合批调用，使用边界及未达标项见 [自动采用实测](docs/TECHNICAL_RESEARCH_AUTO_ADOPTION.zh.md)。
 
-最后更新：2026-10-20
+最后更新：2026-10-22
 
 ## 已包含
 
 - `AGENTS.md`：任务路由、权威顺序和验证预算。
 - `CONTEXT.md`：稳定术语、关系与歧义裁决。
 - `DESIGN.md`：工程工具默认视觉系统。
-- `codex-profile/global-skills/`：22 个全局 Skill 的非自动发现版本源；安装后仅由用户级目录加载。
+- `codex-profile/global-skills/`：23 个全局 Skill（22 个治理 + 1 个搜索）的非自动发现版本源；安装后仅由用户级目录加载。
 - `scripts/`：治理、Skills、敏感文件和整体检查。
 - `scripts/parallel-run.mjs`：依赖感知的自适应命令调度器，默认4路、失败回压、危险任务串行，20仅为硬上限。
 - `.kest/flow/`：Markdown-native Flow 示例。
@@ -26,7 +28,7 @@ Stack Overflow、GitHub仓库与论文可复用 [技术资料批量检索入口]
 - `TESTING.md`：功能、契约、E2E、可访问性、性能、安全、供应链和发布证据体系。
 - `UPSTREAMS.md`：第三方研究仓库与更新机制。
 - `.github/`：CI、Issue 和 PR 模板。
-- `codex-profile/`：共享的全局 Hook、中文方法论源、英文生成物、推荐器和发布器，具有 macOS 部署及单独的 Windows 绑定；22个受管理全局 Skill。普通工具并发与 Agent 数量分别计量，不把20个 Agent 槽位当成工具已并发；不含任何登录态或密钥。
+- `codex-profile/`：共享的全局 Hook、中文方法论源、英文生成物、推荐器和发布器，具有 macOS 部署及单独的 Windows 绑定；23个受管理全局 Skill。普通工具并发与 Agent 数量分别计量，不把20个 Agent 槽位当成工具已并发；不含任何登录态或密钥。
 - `qualitative/`：带正反样例校准的 LLM 定性门禁。
 - `quality/findings.json`：P0–P3 问题、稳定 fingerprint、责任人和生命周期契约。
 - `design/catalog.json`：74 条固定 commit、许可证和来源路径的设计参考。
@@ -62,9 +64,9 @@ Stack Overflow、GitHub仓库与论文可复用 [技术资料批量检索入口]
 - 每轮 Hook：每次用户提示执行动态路由和执行提醒；固定英文原文按第1、4、7轮加载，会话启动、恢复、清理和压缩时重置恢复。77条仍有效（含新增的批次调用原话）；并发条目仅移除冲突的旧数值，其余原句保留，完整旧句另存非运行审阅区。
 - 稳定 Hook dispatcher：`UserPromptSubmit` 和 `SessionStart` 各只注册一个入口，内部并发执行常驻提醒、Skill 推荐、可选 capability 推荐和索引刷新。以后增加内部路由不会移动 Hook 索引并使已有信任记录错位。
 - 全局调用路由：所有自有/第三方 Skill 和已注册 MCP 的 `tools/list` 工具都先进入本机 GraphToolCall 关系图；每次提示先检索图，再读取命中的 `SKILL.md` 或调用对应 MCP server，不允许绕过索引直接发现外部 Skill/MCP。索引扫描用户级 Codex、`~/.agents/skills`、插件和配置中的 MCP，不扫描项目目录。
-- 全局图由 15,471 个第三方 Skill、22 个仓库自有治理 Skill 和已发现的 MCP 工具共同构成；Skill 全部安装到用户级全局目录，所有工作区共享同一套能力，不把 Skill 绑定到某个项目目录。
+- 全局图由第三方 Skill 库、23 个仓库自有 Skill 和已发现的 MCP 工具共同构成；实际数量以目标机索引清单为准。Skill 全部安装到用户级全局目录，所有工作区共享同一套能力，不把 Skill 绑定到某个项目目录。
 - 方法论发布器：保存中文源后自动翻译、备份、生成中英文文件、更新 Skills 和索引；失败时回滚。
-- 22个自有全局 Skills：6个方法 Skill、12个治理 Skill 和4个任务树 Skill；安装器将它们统一写入 `~/.agents/skills`。另将仓库旁私有镜像中的约15,472条第三方 Skill 目录部署到 `~/.codex/tools/skills` 并建立机器本地路由索引，不把第三方镜像打包进公开模板仓库。仓库版本源位于不会被 Codex 自动发现的 `codex-profile/global-skills`，因此项目目录不会产生同名 Skill。
+- 23个自有全局 Skills：6个方法 Skill、12个治理 Skill、4个任务树 Skill 和1个互补搜索 Skill；安装器将它们统一写入 `~/.agents/skills`。另将仓库旁私有镜像中的约15,472条第三方 Skill 目录部署到 `~/.codex/tools/skills` 并建立机器本地路由索引，不把第三方镜像打包进公开模板仓库。仓库版本源位于不会被 Codex 自动发现的 `codex-profile/global-skills`，因此项目目录不会产生同名 Skill。
 - 63条已归类方法论：常驻21条、研究9条、工程12条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
 - 迁移工具：37个受管配置文件，以及安装、同步和安装测试脚本。`codex-profile/README.zh.md` 提供独立说明。
 
@@ -94,7 +96,7 @@ cd ai-engineering-governance-template
 安装器会：
 
 1. 把目标电脑上即将覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`。
-2. 安装全局 `AGENTS.md`、非敏感 `config.toml` 默认项、Hook、中文源、英文生成物、发布器、路由配置和22个全局 Skills。
+2. 安装全局 `AGENTS.md`、非敏感 `config.toml` 默认项、Hook、中文源、英文生成物、发布器、路由配置和23个全局 Skills；搜索 MCP 使用用户级稳定运行目录。
 3. 根据目标电脑的用户目录生成 `hooks.json`，不会沿用原电脑的绝对路径。
 4. 校验63条方法论的中英文对应关系并刷新 Skill 索引。
 
@@ -121,7 +123,7 @@ cd ai-engineering-governance-template
 
 4. 检查 diff 和秘密扫描结果，再通过 PR 合并到受保护的公开 `main`。另一台电脑之后拉取最新 `main` 并重新运行安装脚本即可更新。
 
-安装测试覆盖：一键部署、全新用户目录安装、旧配置备份、非敏感配置合并、macOS Node 路径生成、22个全局 Skills 安装、全局-only 注册表、系统/任务树路由输入、自适应调度契约、Hook 重叠执行和失败回滚。独立调度器测试覆盖 DAG 顺序、4路真实重叠、失败/超时回压、危险任务串行和20路硬上限；完整仓库门禁由 macOS GitHub Actions 执行。
+安装测试覆盖：一键部署、全新用户目录安装、旧配置备份、非敏感配置合并、macOS Node 路径生成、23个全局 Skills 安装、全局-only 注册表、系统/任务树路由输入、自适应调度契约、Hook 重叠执行和失败回滚。独立调度器测试覆盖 DAG 顺序、4路真实重叠、失败/超时回压、危险任务串行和20路硬上限；完整仓库门禁由 macOS GitHub Actions 执行。
 
 Finder 右键 Quick Action 已纳入 macOS 安装测试，覆盖服务安装、文件夹输入类型、任意工作区部署、重复部署幂等和服务检查。
 

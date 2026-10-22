@@ -57,6 +57,8 @@ jobs:
         run: |
           node scripts/test-technical-research.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/test-complementary-search.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/test-technical-research-mcp.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
@@ -75,6 +77,12 @@ jobs:
           cache: npm
       - name: Test macOS global Codex profile
         run: ./scripts/test-codex-profile-mac.sh
+      - name: Test complementary search contracts on macOS
+        run: |
+          npm ci --ignore-scripts
+          node scripts/test-technical-research.mjs
+          node scripts/test-complementary-search.mjs
+          node scripts/test-technical-research-mcp.mjs
       - name: Test pinned Skill library restore on a clean home
         run: node scripts/test-global-skill-library.mjs
       - name: Test real GraphToolCall worker and candidate pool

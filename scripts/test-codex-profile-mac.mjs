@@ -152,7 +152,8 @@ elif "retrieve" in args:
     "evolve-contracts", "fix-regression-with-tdd", "model-project-domain",
     "review-governance-framework", "review-project-diff", "start-new-project",
     "systematic-debugging", "verify-before-completion", "write-pr-description",
-    "task-tree-chain-run", "task-tree-core-state", "task-tree-grill", "task-tree-subtree-run"
+    "task-tree-chain-run", "task-tree-core-state", "task-tree-grill", "task-tree-subtree-run",
+    "parallel-web-research"
   ];
   for (const name of expectedSkills) {
     const skill = await readFile(path.join(home, ".agents", "skills", name, "SKILL.md"), "utf8");
@@ -180,7 +181,10 @@ elif "retrieve" in args:
   const ownedSkillBefore = await readFile(editedOwnedSkill, "utf8");
   await writeFile(editedOwnedSkill, `${ownedSkillBefore}\nChanged fixture with the same Skill count.\n`);
   const editedRefresh = run(path.join(home, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { ...envArgs, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
-  assert(editedRefresh.status === 0 && (await stat(externalGraph)).mtimeMs !== graphStat.mtimeMs, "same-count Skill edit did not invalidate the graph");
+  assert(editedRefresh.status === 0 && (await stat(externalGraph)).mtimeMs === graphStat.mtimeMs, "body-only Skill edit unnecessarily invalidated graph metadata");
+  await writeFile(editedOwnedSkill, ownedSkillBefore.replace(/^description:/m, 'description: Updated metadata.'));
+  const metadataRefresh = run(path.join(home, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { ...envArgs, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
+  assert(metadataRefresh.status === 0 && (await stat(externalGraph)).mtimeMs !== graphStat.mtimeMs, "same-count Skill metadata edit did not invalidate the graph");
   await writeFile(editedOwnedSkill, ownedSkillBefore);
   const mcpFixture = path.join(root, "mcp-refresh-fixture.mjs");
   const mcpVersion = path.join(root, "mcp-refresh-description.txt");
@@ -215,7 +219,7 @@ for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse
   const context = run(dispatcher, [], { ...envArgs, input: contextInput });
   const contextPayload = JSON.parse(context.stdout);
   const contextText = String(contextPayload.hookSpecificOutput.additionalContext);
-  assert(context.status === 0 && contextText.startsWith("[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4]") && contextText.includes("Start ordinary read-only waves at 2-4") && contextText.includes("halve it after failures"), "adaptive scheduling contract is absent, not first, or weakened");
+  assert(context.status === 0 && contextText.startsWith("[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4]") && contextText.includes("Start ordinary read-only waves at min(4, the number of ready independent operations)") && contextText.includes("halve it after failures"), "adaptive scheduling contract is absent, not first, or weakened");
   const routeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Please push this release to GitHub", cwd: REPOSITORY_ROOT })}\n`;
   const routed = run(dispatcher, [], { ...envArgs, input: routeInput });
   assert(routed.status === 0 && routed.stdout.includes("method-github-delivery"), `GitHub methodology route did not match: ${routed.stderr || routed.stdout}`);
@@ -354,6 +358,12 @@ await writeFile(configPath, config);
   await writeFile(path.join(syncSource, "scripts", "install-codex-profile-service-mac.sh"), await readFile(path.join(SCRIPT_DIR, "install-codex-profile-service-mac.sh")));
   await writeFile(path.join(syncSource, "scripts", "install-task-tree-mcp-mac.mjs"), "process.exit(0);\n");
   await cp(path.join(SCRIPT_DIR, "ensure-global-skill-library.mjs"), path.join(syncSource, "scripts", "ensure-global-skill-library.mjs"));
+  for (const name of ["install-technical-research.mjs", "technical-research.mjs", "complementary-search.mjs", "technical-research-mcp.mjs"]) {
+    await cp(path.join(SCRIPT_DIR, name), path.join(syncSource, "scripts", name));
+  }
+  for (const name of ["package.json", "package-lock.json"]) {
+    await cp(path.join(REPOSITORY_ROOT, name), path.join(syncSource, name));
+  }
   await writeFile(path.join(syncSource, "scripts", "parallel-run.mjs"), await readFile(path.join(SCRIPT_DIR, "parallel-run.mjs"), "utf8"));
   const syncTools = path.join(syncHome, ".codex", "tools");
   const stagedProfile = path.join(syncTools, "ai-engineering-governance-template");
@@ -427,7 +437,7 @@ await writeFile(configPath, config);
     console.log(`PASS: full catalog fixture indexed ${fullManifest.skillCount}/${fullManifest.catalogSkillCount} Skills; total index bytes=${Buffer.byteLength(fullIndex)}; example route=resolving-merge-conflicts`);
   }
 
-  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 22 owned Skills, global-only registry, system and task-tree routing, merge, manifest backup, credential isolation, 76-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
+  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 23 owned Skills, global-only registry, system and task-tree routing, merge, manifest backup, credential isolation, 76-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
 } finally {
   await rm(root, { recursive: true, force: true });
 }

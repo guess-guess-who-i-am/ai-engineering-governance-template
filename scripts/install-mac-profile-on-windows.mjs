@@ -11,6 +11,9 @@ import {ensureWarmWorker} from './prewarm-mac-worker.mjs';
 const here=path.dirname(fileURLToPath(import.meta.url));
 export const PIN='0cd7d48d90c24a0cf8d0515b8b0dd871fcaac7b2';
 export const POLICY_FILES=[
+ 'package.json','package-lock.json',
+ 'scripts/install-technical-research.mjs','scripts/technical-research.mjs','scripts/complementary-search.mjs','scripts/technical-research-mcp.mjs',
+ 'codex-profile/global-skills/parallel-web-research/SKILL.md','codex-profile/global-skills/parallel-web-research/agents/openai.yaml',
  'scripts/parallel-run.mjs',
  'scripts/install-task-tree-mcp-mac.mjs',
  'codex-profile/.codex/hooks/skill-router.mjs',
@@ -189,6 +192,8 @@ async function main(){
  }
  const installed=await run(process.execPath,[path.join(nativeSource,'scripts/install-codex-profile-mac.mjs'),'--home',home,'--json',...(check?['--check']:[])],{env});
  console.log(installed.stdout.trim());
+ const search=await run(process.execPath,[path.join(nativeSource,'scripts/install-technical-research.mjs'),'--home',home,'--json',...(check?['--check']:[])],{env});
+ console.log(search.stdout.trim());
  if(check){await registerTaskTreeRuntime(root,{check:true});console.log(JSON.stringify({phase:'worker-residency-checked',...await ensureWarmWorker(root,{start:false})}));return;}
  if(!(await readFile(path.join(root,'config.toml'),'utf8')).includes('[mcp_servers.task_tree]')){
   const mcp=await run(process.execPath,[path.join(nativeSource,'scripts/install-task-tree-mcp-mac.mjs'),'--home',home,'--json'],{env});
