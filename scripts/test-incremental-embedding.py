@@ -37,6 +37,10 @@ with patch('graph_tool_call.retrieval.embedding.SentenceTransformerProvider',Pro
     assert module.attach_embedding_index(first)=={'reusedVectors':0,'encodedVectors':2}
     same=Graph({'a':tool('a','first'),'b':tool('b','second')})
     assert module.attach_embedding_index(same,first,module.EMBEDDING_MODEL)=={'reusedVectors':2,'encodedVectors':0}
+    first.engine._embedding_index._provider.model_name=module.EMBEDDING_MODEL.removeprefix('sentence-transformers/')
+    restored=Graph({'a':tool('a','first'),'b':tool('b','second')})
+    assert module.attach_embedding_index(restored,first,module.EMBEDDING_MODEL)=={'reusedVectors':2,'encodedVectors':0}, 'library-restored short model IDs must not trigger a full recode'
+    first.engine._embedding_index._provider.model_name=module.EMBEDDING_MODEL
     changed=Graph({'a':tool('a','changed'),'c':tool('c','new')})
     assert module.attach_embedding_index(changed,first,module.EMBEDDING_MODEL)=={'reusedVectors':0,'encodedVectors':2}
     assert 'b' not in changed.engine._embedding_index._embeddings

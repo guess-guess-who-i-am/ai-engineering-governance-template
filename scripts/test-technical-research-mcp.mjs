@@ -1,0 +1,43 @@
+import assert from 'node:assert/strict';
+import { mkdtemp, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { TechnicalResearch } from './technical-research.mjs';
+
+const folder=await mkdtemp(path.join(os.tmpdir(),'technical-mcp-'));
+await mkdir(folder,{recursive:true});
+const fixture='model = "fixture"\n\n[mcp_servers.other]\ncommand = "preserve-other"\n';
+await writeFile(path.join(folder,'config.toml'),fixture);
+const installer=fileURLToPath(new URL('./install-technical-research.mjs',import.meta.url));
+const install=()=>spawnSync(process.execPath,[installer],{encoding:'utf8',windowsHide:true,env:{...process.env,CODEX_HOME:folder}});
+const first=install();assert.equal(first.status,0,first.stderr);
+const installed=await readFile(path.join(folder,'config.toml'),'utf8');assert(installed.startsWith(fixture.trimEnd()));
+assert.equal((installed.match(/\[mcp_servers\.technical_research\]/g)||[]).length,1);
+const second=install();assert.equal(second.status,0,second.stderr);assert.equal(await readFile(path.join(folder,'config.toml'),'utf8'),installed,'install must be idempotent');
+const cacheDirectory=path.join(folder,'technical-research-cache');
+const seed=new TechnicalResearch({cacheDirectory,fetchImpl:async()=>new Response(JSON.stringify({items:[{full_name:'owner/project',html_url:'https://github.com/owner/project',stargazers_count:2000}]}),{status:200,headers:{'content-type':'application/json'}})});
+const queries=[{source:'github',query:'connection pooling'}];
+await seed.batch({queries,cacheMode:'refresh'});
+const transport=new StdioClientTransport({command:process.execPath,args:[fileURLToPath(new URL('./technical-research-mcp.mjs',import.meta.url))],env:{...process.env,CODEX_HOME:folder},stderr:'pipe'});
+const client=new Client({name:'technical-research-test',version:'1.0.0'});
+try{
+ await client.connect(transport);
+ const tools=await client.listTools();assert.equal(tools.tools.length,1);assert.equal(tools.tools[0].name,'technical_research_batch');
+ const output=await client.callTool({name:'technical_research_batch',arguments:{queries,cacheMode:'only'}});
+ assert.equal(output.isError,false);const result=JSON.parse(output.content[0].text);
+ assert.equal(result.cacheHits,1);assert.equal(result.selected[0].title,'owner/project');
+ assert.equal(result.operations[0].results,undefined,'full unscreened catalog must remain in artifacts');
+ assert.equal(JSON.parse(await readFile(result.artifact,'utf8')).operations[0].results.length,1);
+ const mixed=await client.callTool({name:'technical_research_batch',arguments:{queries:[...queries,{source:'github',query:'not cached'}],cacheMode:'only'}});
+ assert.equal(mixed.isError,false,'usable partial evidence must not masquerade as an overall tool failure');
+ const mixedResult=JSON.parse(mixed.content[0].text);
+ assert.equal(mixedResult.status,'cache-miss');assert.equal(mixedResult.cacheHits,1);
+ assert.equal(mixedResult.operations.filter(op=>op.status==='cache-miss').length,1);
+ const missing=await client.callTool({name:'technical_research_batch',arguments:{queries:[{source:'github',query:'missing'}],cacheMode:'only'}});
+ assert.equal(missing.isError,true);assert.equal(JSON.parse(missing.content[0].text).status,'cache-miss');
+ console.log('PASS: actual MCP handshake/tool execution, filtered context/raw evidence, no-network cache and reversible idempotent install.');
+}finally{await client.close();}

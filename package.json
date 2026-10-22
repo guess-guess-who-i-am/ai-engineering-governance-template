@@ -13,5 +13,8 @@
   "devDependencies": {
     "axe-core": "4.10.3",
     "playwright": "1.62.1"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1"
   }
 }

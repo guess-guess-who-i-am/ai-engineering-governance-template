@@ -28,6 +28,13 @@ const finish=async(error)=>{
  let nativeActive=0,maxNativeChildConcurrency=0;for(const [,delta]of nativeEvents){nativeActive+=delta;maxNativeChildConcurrency=Math.max(maxNativeChildConcurrency,nativeActive);}
  const evidence={threadId,fixture,prompt,elapsedMs:Date.now()-started,success:!error,error:error?.message||'',markers:Object.fromEntries(markers.map(m=>[m,combined.includes(m)])),hooks:hooks.map(h=>({eventName:h.eventName,status:h.status,source:h.source,durationMs:h.durationMs,markers:markers.filter(m=>(h.entries||[]).some(e=>e.text?.includes(m)))})),commands:[...commands.values()],maxConcurrentCommands,nativeTimings,maxNativeChildConcurrency,webSearches,maxSearchBatchQueries:Math.max(0,...webSearches.filter(x=>x.action?.type==='search').map(x=>Array.isArray(x.action.queries)?x.action.queries.length:x.action.query?1:0)),final,finalChars:Array.from(final).length,visibleFinalChars:Array.from(final.replace(/\[([^\]]*)\]\([^)]*\)/g,'$1')).length,stderr:stderr.slice(-2500)};
  evidence.latency=summarizeCodexLatency(events,started,Date.now());
+ evidence.technicalResearchCalls=events.filter(e=>e.method==='item/completed'&&e.params?.item?.type==='mcpToolCall'&&e.params.item.server==='technical_research').map(e=>{
+  const item=e.params.item;const text=(item.result?.content||[]).filter(c=>c.type==='text').map(c=>c.text||'').join('\n');
+  let result;try{result=JSON.parse(text);}catch{}
+  return {id:item.id,tool:item.tool,arguments:item.arguments,status:item.status,durationMs:item.durationMs,
+   returnedCount:result?.returnedCount,selectedCount:result?.selected?.length,cacheHits:result?.cacheHits,
+   batchStatus:result?.status,artifact:result?.artifact,returnedTextChars:Array.from(text).length};
+ });
  evidence.webEvidence=await webEvidence.save(path.join(cwd,'.reports'));
  evidence.failures=error?[error.message]:[];
  if(process.env.CODEX_TEST_REQUIRE_WEB_EVIDENCE==='1'&&!evidence.webEvidence.complete)evidence.failures.push('Web result/body evidence is incomplete; native completion is not evidence of result visibility');

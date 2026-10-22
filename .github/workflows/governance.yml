@@ -46,6 +46,15 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/test-worker-startup-race.mjs
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Install bounded research-tool dependencies
+        run: npm ci --ignore-scripts
+      - name: Test batched technical research and MCP boundary
+        shell: pwsh
+        run: |
+          node scripts/test-technical-research.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/test-technical-research-mcp.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
   portable-profile-macos:
     runs-on: macos-15

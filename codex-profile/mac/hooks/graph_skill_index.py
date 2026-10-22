@@ -38,7 +38,12 @@ def attach_embedding_index(graph, previous=None, previous_model=""):
     """Re-encode only changed canonical tool text; never mix model spaces."""
     from graph_tool_call.retrieval.embedding import EmbeddingIndex, SentenceTransformerProvider
     old_index = previous._get_retrieval_engine()._embedding_index if previous is not None else None
-    can_reuse = previous_model == EMBEDDING_MODEL and old_index is not None and getattr(old_index._provider, 'model_name', None) == EMBEDDING_MODEL
+    # GraphToolCall serializes the sentence-transformers provider with its
+    # namespace prefix removed. Both identifiers name the same pinned encoder.
+    old_provider_name = getattr(old_index._provider, 'model_name', None) if old_index is not None else None
+    canonical_provider_name = ('sentence-transformers/' + old_provider_name
+        if old_provider_name == EMBEDDING_MODEL.removeprefix('sentence-transformers/') else old_provider_name)
+    can_reuse = previous_model == EMBEDDING_MODEL and old_index is not None and canonical_provider_name == EMBEDDING_MODEL
     provider = old_index._provider if can_reuse else SentenceTransformerProvider(EMBEDDING_MODEL)
     index = EmbeddingIndex(provider=provider)
     changed_names, changed_texts = [], []

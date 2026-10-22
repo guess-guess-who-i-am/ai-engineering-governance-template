@@ -15,4 +15,6 @@ assert.deepEqual(result.missingStarts,['web:unknown']);
 assert.throws(()=>summarizeCodexLatency([],10,0));
 assert.equal(summarizeCodexLatency([],0,100).searchMs,0);
 assert.deepEqual(summarizeCodexLatency([item(10,'item/started','a','webSearch')],0,100).unfinished,['web:a']);
+const mcp=summarizeCodexLatency([item(10,'item/started','m','mcpToolCall'),item(35,'item/completed','m','mcpToolCall')],0,100);
+assert.equal(mcp.mcpToolMs,25);assert.equal(mcp.unattributedMs,75,'MCP work is not hidden model latency');
 console.log('PASS: latency attribution separates actual search/page/hook spans, overlap, unknown and unfinished work.');

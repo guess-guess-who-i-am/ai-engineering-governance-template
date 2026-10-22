@@ -5,7 +5,7 @@ export function summarizeCodexLatency(events, startedAt, endedAt) {
   for (const event of events) {
     const item = event.params?.item;
     const hook = event.params?.run;
-    const kind = item?.type === 'webSearch' ? 'web' : item?.type === 'commandExecution' ? 'command' : hook ? 'hook' : '';
+    const kind = item?.type === 'webSearch' ? 'web' : item?.type === 'mcpToolCall' ? 'mcp' : item?.type === 'commandExecution' ? 'command' : hook ? 'hook' : '';
     if (!kind) continue;
     const key = `${kind}:${item?.id || hook?.id}`;
     if (event.method === 'item/started' || event.method === 'hook/started') active.set(key, event.at);
@@ -27,7 +27,7 @@ export function summarizeCodexLatency(events, startedAt, endedAt) {
   return { totalMs, hookMs: union(spans.filter(s=>s.kind==='hook')),
     searchMs: union(spans.filter(s=>s.kind==='web' && s.action==='search')),
     pageAndFindMs: union(spans.filter(s=>s.kind==='web' && ['openPage','findInPage'].includes(s.action))),
-    allWebMs: union(spans.filter(s=>s.kind==='web')), measuredToolAndHookMs: union(spans),
+    allWebMs: union(spans.filter(s=>s.kind==='web')),mcpToolMs:union(spans.filter(s=>s.kind==='mcp')), measuredToolAndHookMs: union(spans),
     unattributedMs: totalMs-union(spans), spans, missingStarts, unfinished: [...active.keys()],
     limits: 'Client event spans include platform overhead. Unattributed time includes startup, model/provider waits and output; it is not proven reasoning time. Zero-duration events may be coalesced. HTTP concurrency is not observed.' };
 }

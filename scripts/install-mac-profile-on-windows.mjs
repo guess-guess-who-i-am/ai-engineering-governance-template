@@ -14,6 +14,7 @@ export const POLICY_FILES=[
  'scripts/parallel-run.mjs',
  'scripts/install-task-tree-mcp-mac.mjs',
  'codex-profile/.codex/hooks/skill-router.mjs',
+ 'codex-profile/.codex/skill-registry/routing-rules.json',
  'codex-profile/mac/hooks/graph_skill_index.py',
  'codex-profile/mac/hooks/refresh-skill-registry.mjs',
  'codex-profile/mac/hooks/context-refresh.mjs',
