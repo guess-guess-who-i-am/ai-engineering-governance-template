@@ -91,7 +91,9 @@ export class TechnicalResearch {
   }
   async batch({queries,topK=10,selectedCount=16,cacheMode='prefer',maxAgeSeconds=300,concurrency=4,timeoutMs=8000}) {
     if(!Array.isArray(queries)||queries.length<1||queries.length>20)throw new Error('queries must contain 1–20 operations');
-    for(const [key,value,min,max]of [['topK',topK,1,50],['selectedCount',selectedCount,1,100],['maxAgeSeconds',maxAgeSeconds,0,86400],['concurrency',concurrency,1,20],['timeoutMs',timeoutMs,100,30000]])if(!Number.isInteger(value)||value<min||value>max)throw new Error(key+' is outside its supported range');
+    for(const [key,value,min,max]of [['topK',topK,1,50],['selectedCount',selectedCount,1,100],['maxAgeSeconds',maxAgeSeconds,0,86400],['concurrency',concurrency,1,20],['timeoutMs',timeoutMs,100,30000]])if(!Number.isInteger(value)||value<min||value>max)
+      throw Object.assign(new RangeError(`${key} must be an integer in [${min}, ${max}]; omit optional fields to use the default`),
+        {code:'INVALID_ARGUMENT',field:key,minimum:min,maximum:max});
     if(!['prefer','refresh','only'].includes(cacheMode))throw new Error('cacheMode must be prefer, refresh or only');
     const startedAt=Date.now(),began=performance.now(),deadline=began+timeoutMs;
     const prepared=queries.map(query=>prepare(query,topK,this.endpoints));

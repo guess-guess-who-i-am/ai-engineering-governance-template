@@ -27,6 +27,12 @@ const client=new Client({name:'technical-research-test',version:'1.0.0'});
 try{
  await client.connect(transport);
  const tools=await client.listTools();assert.equal(tools.tools.length,1);assert.equal(tools.tools[0].name,'technical_research_batch');
+ const advertised=tools.tools[0].inputSchema.properties.timeoutMs;
+ const invalid=await client.callTool({name:'technical_research_batch',arguments:{queries,timeoutMs:45000}});
+ assert.equal(invalid.isError,true);
+ const validation=JSON.parse(invalid.content[0].text);
+ assert.equal(validation.code,'INVALID_ARGUMENT');assert.equal(validation.field,'timeoutMs');
+ assert.equal(validation.maximum,advertised.maximum);assert.equal(validation.minimum,advertised.minimum);
  const output=await client.callTool({name:'technical_research_batch',arguments:{queries,cacheMode:'only'}});
  assert.equal(output.isError,false);const result=JSON.parse(output.content[0].text);
  assert.equal(result.cacheHits,1);assert.equal(result.selected[0].title,'owner/project');
