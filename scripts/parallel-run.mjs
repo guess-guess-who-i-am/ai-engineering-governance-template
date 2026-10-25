@@ -2,7 +2,7 @@
 /**
  * Execute a dependency DAG in adaptive waves.
  *
- * Concurrency starts conservatively, grows after successful waves, shrinks after
+ * Known safe work starts as one ready batch, grows after successful waves, shrinks after
  * failures or timeouts, and never exceeds the hard ceiling of 20. Stateful,
  * destructive, and rate-limited tasks always run alone.
  */
@@ -10,7 +10,7 @@ import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 
 const HARD_MAX_CONCURRENCY = 20;
-const DEFAULT_INITIAL_CONCURRENCY = 4;
+const DEFAULT_INITIAL_CONCURRENCY = 8;
 const SERIAL_SAFETY = new Set(["stateful", "destructive", "rate-limited"]);
 const VALID_SAFETY = new Set(["read-only", ...SERIAL_SAFETY]);
 const specPath = process.argv[2];

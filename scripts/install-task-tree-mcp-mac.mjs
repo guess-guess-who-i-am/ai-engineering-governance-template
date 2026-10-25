@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { access, mkdir, readFile, rename, rm } from "node:fs/promises";
+import { access, cp, mkdir, readFile, rename, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -73,10 +73,14 @@ async function cloneRuntime(home) {
   await mkdir(toolsRoot, { recursive: true, mode: 0o700 });
   await rm(temporary, { recursive: true, force: true });
   const env = { ...process.env, GIT_TERMINAL_PROMPT: "0" };
-  const clone = await run("git", ["clone", "--depth", "1", "--filter=blob:none", "--sparse", TASK_TREE_REPOSITORY, temporary], { env, timeoutMs: 180000 });
+  const lock = JSON.parse(await readFile(path.join(REPOSITORY_ROOT, 'codex-profile/portable-dependencies.json'), 'utf8')).taskTree;
+  if (!lock || !/^[a-f0-9]{40}$/.test(lock.commit) || lock.repository !== TASK_TREE_REPOSITORY) throw new Error('Invalid task-tree dependency lock');
+  const clone = await run("git", ["clone", "--no-checkout", "--filter=blob:none", "--sparse", TASK_TREE_REPOSITORY, temporary], { env, timeoutMs: 180000 });
   if (clone.code !== 0) throw new Error(`task-tree runtime clone failed: ${clone.stderr.trim() || clone.stdout.trim()}`);
   const sparse = await run("git", ["-C", temporary, "sparse-checkout", "set", "llm-task-tree-kit"], { env, timeoutMs: 120000 });
   if (sparse.code !== 0) throw new Error(`task-tree sparse checkout failed: ${sparse.stderr.trim() || sparse.stdout.trim()}`);
+  const pinned = await run('git', ['-C', temporary, 'checkout', '--detach', lock.commit], { env, timeoutMs: 120000 });
+  if (pinned.code !== 0) throw new Error('task-tree pinned checkout failed');
   await rm(checkout, { recursive: true, force: true });
   await rename(temporary, checkout);
   const runtime = path.join(checkout, "llm-task-tree-kit");
@@ -120,12 +124,19 @@ async function verifyProtocol(entry) {
 }
 
 async function install(options) {
-  let runtime = await findRuntime(options.home);
+  const stable = path.join(options.home, '.codex/tools/llm-task-tree/llm-task-tree-kit');
+  let runtime = options.check && await validRuntime(stable) ? stable : await findRuntime(options.home);
   let runtimeAction = "reused";
   if (!runtime) {
     if (options.check) throw new Error("task-tree runtime is missing; run the one-click deployment while GitHub is reachable");
     runtime = await cloneRuntime(options.home);
     runtimeAction = "cloned";
+  }
+  if (!options.check && path.resolve(runtime) !== path.resolve(stable)) {
+    await mkdir(path.dirname(stable), { recursive: true, mode: 0o700 });
+    await cp(runtime, stable, { recursive: true, filter: source => !source.split(path.sep).includes('.git') });
+    runtime = stable;
+    runtimeAction = 'copied-global';
   }
   const entry = path.join(runtime, "scripts", "mcp-server.mjs");
   const codexHome = path.join(options.home, ".codex");

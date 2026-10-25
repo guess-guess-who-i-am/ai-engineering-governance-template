@@ -77,6 +77,10 @@ try {
 import json, os, pathlib, socket, sys, time
 args = sys.argv[1:]
 if "-c" in args:
+    if "tomllib" in args[args.index("-c") + 1]:
+        import tomllib
+        d = tomllib.loads(sys.stdin.read())
+        print(json.dumps([dict(name=n, command=s["command"], args=s.get("args", []), env=s.get("env", {})) for n, s in d.get("mcp_servers", {}).items() if s.get("enabled", True) and "command" in s]))
     raise SystemExit(0)
 def value(name):
     return args[args.index(name) + 1]
@@ -84,7 +88,7 @@ if "build" in args:
     output = pathlib.Path(value("--output"))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("{}\\n", encoding="utf-8")
-    print(json.dumps({"schemaVersion":"graph-tool-call-skills/1","graphToolCallVersion":"test-shim","embedding":"sentence-transformers/all-MiniLM-L6-v2","catalogSkillCount":2,"skillCount":1,"externalSkillCount":1,"ownedSkillCount":0,"mcpToolCount":0,"missingSkillCount":1,"invalidSkillCount":0,"graphPath":str(output)}))
+    print(json.dumps({"schemaVersion":"graph-tool-call-skills/1","graphToolCallVersion":"test-shim","embedding":"sentence-transformers/all-MiniLM-L6-v2","chineseEmbedding":value("--chinese-embedding") if "--chinese-embedding" in args else "","catalogSkillCount":2,"skillCount":1,"externalSkillCount":1,"ownedSkillCount":0,"mcpToolCount":0,"missingSkillCount":1,"invalidSkillCount":0,"graphPath":str(output)}))
 elif "serve" in args:
     socket_path = pathlib.Path(value("--socket"))
     socket_path.parent.mkdir(parents=True, exist_ok=True)
@@ -186,8 +190,12 @@ elif "retrieve" in args:
   const mcpVersion = path.join(root, "mcp-refresh-description.txt");
   await writeFile(mcpVersion, "version one");
   await writeFile(mcpFixture, `import { readFileSync } from 'node:fs';
-let raw = ''; for await (const chunk of process.stdin) raw += chunk;
-for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse)) {
+import { createInterface } from 'node:readline';
+let initialized = false;
+for await (const line of createInterface({ input: process.stdin })) {
+ const request = JSON.parse(line);
+ if (request.method === 'notifications/initialized') { initialized = true; continue; }
+ if (request.method === 'tools/list' && !initialized) throw new Error('initialize handshake incomplete');
  const result = request.method === 'tools/list' ? { tools: [{name:'fixture-tool',description:readFileSync(process.argv[2],'utf8'),inputSchema:{type:'object'}}] } : {protocolVersion:'2025-06-18',capabilities:{}};
  process.stdout.write(JSON.stringify({jsonrpc:'2.0',id:request.id,result})+'\\n');
 }
@@ -214,7 +222,7 @@ for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse
   const context = run(dispatcher, [], { ...envArgs, input: contextInput });
   const contextPayload = JSON.parse(context.stdout);
   const contextText = String(contextPayload.hookSpecificOutput.additionalContext);
-  assert(context.status === 0 && contextText.startsWith("[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4]") && contextText.includes("Start ordinary read-only waves at 2-4") && contextText.includes("halve it after failures"), "adaptive scheduling contract is absent, not first, or weakened");
+  assert(context.status === 0 && contextText.startsWith("[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5]") && contextText.includes("normally 5-8") && contextText.includes("halve it after failures"), "adaptive scheduling contract is absent, not first, or weakened");
   const routeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Please push this release to GitHub", cwd: REPOSITORY_ROOT })}\n`;
   const routed = run(dispatcher, [], { ...envArgs, input: routeInput });
   assert(routed.status === 0 && routed.stdout.includes("method-github-delivery"), `GitHub methodology route did not match: ${routed.stderr || routed.stdout}`);
@@ -268,13 +276,18 @@ for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse
 
   const deployHome = path.join(root, "one-click-home");
   await seedHome(deployHome, "ONE_CLICK_SENTINEL");
+  const legacyConfig = path.join(deployHome, '.codex/config.toml');
+  await writeFile(legacyConfig, (await readFile(legacyConfig, 'utf8')) + '\n[mcp_servers.serena]\ncommand = "node"\nargs = ["/managed/serena-mcp.mjs"]\nenabled = false\n');
+  const legacySkill = path.join(deployHome, '.agents/skills/navigate-code-with-serena');
+  await mkdir(legacySkill, { recursive: true });
+  await writeFile(path.join(legacySkill, 'SKILL.md'), '---\nname: navigate-code-with-serena\ndescription: retired profile fixture\n---\n');
   const taskTreeRuntime = path.join(root, "task-tree-runtime");
   await mkdir(path.join(taskTreeRuntime, "scripts"), { recursive: true });
   await writeFile(path.join(taskTreeRuntime, "scripts", "mcp-server.mjs"), `#!/usr/bin/env node
-let input = "";
-for await (const chunk of process.stdin) input += chunk.toString();
-const requests = input.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse);
-for (const request of requests) {
+import { createInterface } from 'node:readline';
+for await (const line of createInterface({ input: process.stdin })) {
+  const request = JSON.parse(line);
+  if (!('id' in request)) continue;
   const result = request.method === "tools/list"
     ? { tools: [{ name: "task_tree_focus" }, { name: "task_tree_write" }] }
     : { protocolVersion: "2025-06-18", capabilities: {} };
@@ -318,6 +331,16 @@ await writeFile(configPath, config);
   assert(deployedRegistry.skills.filter((skill) => skill.source === "agents").length === expectedSkills.length, "one-click deployment did not register all global Skills");
   const deployedConfig = await readFile(path.join(deployHome, ".codex", "config.toml"), "utf8");
   assert(deployedConfig.includes("[mcp_servers.task_tree]") && deployedConfig.includes("enable_mcp_apps = true"), "one-click deployment did not register the global task_tree MCP app");
+  assert(!deployedConfig.includes('[mcp_servers.serena]'), 'one-click deployment must not reinstall retired Serena');
+  assert(!await stat(legacySkill).catch(error => { if (error.code === 'ENOENT') return false; throw error; }), 'one-click upgrade left the retired Skill');
+  async function checkBackups(directory) {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const file = path.join(directory, entry.name);
+      if (entry.isDirectory()) await checkBackups(file);
+      else if (entry.name === 'config.toml') assert(!(await readFile(file, 'utf8')).includes('[mcp_servers.serena]'), 'normal install backed up the rejected integration');
+    }
+  }
+  await checkBackups(path.join(deployHome, '.codex/backups'));
   const stagedSource = path.join(deployHome, ".codex", "tools", "ai-engineering-governance-template");
   const serviceRunner = path.join(stagedSource, "scripts", "run-codex-profile-service-mac.sh");
   assert(await readFile(serviceRunner, "utf8").then((text) => text.includes("deploy-codex-profile-mac.sh") && text.includes("CODEX_PROFILE_SOURCE") && text.includes("CODEX_PROFILE_SKILL_SOURCE") && text.includes("CODEX_PROFILE_SKILL_CATALOG")), "one-click deployment did not stage a stable global service runner");
@@ -354,6 +377,9 @@ await writeFile(configPath, config);
   await writeFile(path.join(syncSource, "scripts", "install-task-tree-mcp-mac.mjs"), "process.exit(0);\n");
   await cp(path.join(SCRIPT_DIR, "ensure-global-skill-library.mjs"), path.join(syncSource, "scripts", "ensure-global-skill-library.mjs"));
   await writeFile(path.join(syncSource, "scripts", "parallel-run.mjs"), await readFile(path.join(SCRIPT_DIR, "parallel-run.mjs"), "utf8"));
+  for (const name of ['deploy-global-profile.mjs', 'global-profile-service.mjs', 'graph-worker-supervisor.mjs', 'install-global-profile-service.ps1', 'warm-global-graph.py', 'launch-global-profile.sh', 'retire-serena-mcp.mjs']) {
+    await cp(path.join(SCRIPT_DIR, name), path.join(syncSource, 'scripts', name));
+  }
   const syncTools = path.join(syncHome, ".codex", "tools");
   const stagedProfile = path.join(syncTools, "ai-engineering-governance-template");
   await mkdir(path.join(stagedProfile, "scripts"), { recursive: true });

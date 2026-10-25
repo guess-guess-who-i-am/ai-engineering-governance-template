@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "routing-specificity-holdout/1",
+  "limitations": ["Author-written before the new comparison; not a public or blind benchmark.", "Identity labels are incomplete proxies, not task success or semantic precision."],
+  "cases": [
+    {"id":"specific-hnsw-budget","kind":"skill","targets":["vector-index-tuning"],"en":"Our HNSW deployment exceeds its RAM budget. Measure recall and p99 latency while varying efSearch, efConstruction and M; deliver a tuning recommendation.","zh":"HNSW部署超过内存预算，分别改变efSearch、efConstruction和M，实测召回与p99延迟，交付调优建议。"},
+    {"id":"specific-triton-causal","kind":"skill","targets":["triton-cuda-attention"],"en":"Implement causal grouped-query attention in a Triton GPU kernel and verify the softmax output against a numerical reference.","zh":"用Triton GPU算子实现因果分组查询注意力，并将Softmax结果与数值参考逐项核对。"},
+    {"id":"specific-django-fixture","kind":"skill","targets":["django-tdd"],"en":"Add a Django REST regression using pytest-django, factory_boy data and a mocked HTTP dependency before repairing the endpoint.","zh":"先用pytest-django、factory_boy数据和模拟HTTP依赖为Django REST接口写回归用例，再修接口。"},
+    {"id":"specific-time-step","kind":"skill","targets":["numerical-integration"],"en":"Choose adaptive time steps for a stiff ODE with a backward implicit solver; quantify stability and truncation error.","zh":"为刚性ODE选取后向隐式求解器与自适应时间步长，量化稳定性和截断误差。"},
+    {"id":"specific-feature-team","kind":"expert","targets":["dev-pipeline-orchestrator"],"en":"Deliver an account-recovery feature with separate implementers, test-first tasks, a specification review and an independent quality review before integration.","zh":"交付账号找回功能，安排独立实现者先写测试，再分别做规格评审和独立质量评审，最后集成。"},
+    {"id":"specific-stress-team","kind":"expert","targets":["performance-testing-expert"],"en":"Build a load, stress and spike testing plan for a checkout API. Run a before/after comparison of throughput, error rate and p99 under staggered arrivals.","zh":"为结算API制定负载、压力和尖峰测试方案，测试错峰到达下调优前后的吞吐量、错误率和p99。"},
+    {"id":"specific-current-docs","kind":"mcp-service","targets":["context7"],"en":"Look up the current release's official library documentation and working examples for an API that replaced a removed function.","zh":"查询当前发行版本的官方库文档和可运行用例，找到已被移除函数的替代API。"},
+    {"id":"general-first-divergence","kind":"skill","targets":["systematic-debugging"],"en":"The observed behavior disagrees with expectations. Trace the input to its first divergent state, list competing causes and falsify them before changing anything.","zh":"实际行为与预期不符，沿输入定位首次偏离状态，列出几个可能原因并逐一证伪，查明前不要改动。"},
+    {"id":"general-regression","kind":"skill","targets":["fix-regression-with-tdd"],"en":"An existing feature broke. Reproduce it in a failing test, make the smallest repair, and rerun the regression checks.","zh":"一个原本正常的功能坏了，先用失败测试重现，做最小修复，再跑回归检查。"},
+    {"id":"general-acceptance","kind":"skill","targets":["method-evaluation-gates"],"en":"Define evidence-backed acceptance criteria for accuracy, latency and cost, including falsifiable thresholds and the unverified surfaces.","zh":"为准确率、延迟和成本制定有证据依据的验收标准，包括可证伪的阈值与尚未验证的边界。"}
+  ]
+}

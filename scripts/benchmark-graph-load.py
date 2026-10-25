@@ -105,6 +105,8 @@ def run(args):
         rows = list(pool.map(request, range(args.count)))
     times = sorted(row['seconds'] for row in rows)
     report = {'schema': 'graph-load/v1', 'count': args.count, 'pattern': args.pattern,
+        'graphSha256': hashlib.sha256(graph.read_bytes()).hexdigest(),
+        'workerSha256': hashlib.sha256(Path(args.worker_entry or codex / 'hooks/graph_skill_index.py').read_bytes()).hexdigest(),
         'transport': args.transport, 'seed': args.seed, 'warm': args.warm, 'longInputs': args.long, 'uniqueQueries': not args.repeated,
         'success': sum(row['ok'] for row in rows), 'wallSeconds': round(time.monotonic() - start, 4),
         'p50Seconds': statistics.median(times), 'p95Seconds': times[int(.95 * (len(times) - 1))],

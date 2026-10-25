@@ -70,6 +70,7 @@ async function filesUnder(root) {
   const output = [];
   async function visit(directory) {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
+      if (entry.name === '.git' || entry.name === '__pycache__' || /\.py[co]$/.test(entry.name)) continue;
       const target = path.join(directory, entry.name);
       if (entry.isDirectory()) await visit(target);
       else if (entry.isFile()) output.push(target);
@@ -98,9 +99,30 @@ function mergeManagedBlock(current, managed) {
     throw new Error("Existing AGENTS.md has an incomplete managed block; repair or remove the marker before installing.");
   }
   if (start >= 0) {
-    return `${current.slice(0, start).trimEnd()}\n\n${block}${current.slice(end + BLOCK_END.length)}`.trim() + "\n";
+    let prefix = current.slice(0, start).trimEnd();
+    const previousBody = current.slice(start + BLOCK_BEGIN.length, end).trim();
+    if (prefix === previousBody) prefix = '';
+    return `${prefix}\n\n${block}${current.slice(end + BLOCK_END.length)}`.trim() + "\n";
   }
   return current.trim() ? `${current.trimEnd()}\n\n${block}\n` : `${block}\n`;
+}
+
+export function mergeHooks(current, managed, codexHome) {
+  const result = { ...current, description: managed.description, hooks: { ...current.hooks } };
+  const dispatcher = path.join(codexHome, 'hooks/hook-dispatch.mjs').replaceAll('\\', '/').toLowerCase();
+  for (const [event, desired] of Object.entries(managed.hooks)) {
+    let replaced = false;
+    const groups = (current.hooks?.[event] || []).map(group => {
+      const own = hook => String(hook.command || '').replaceAll('\\', '/').toLowerCase().includes(dispatcher);
+      if (!(group.hooks || []).some(own)) return group;
+      const hooks = group.hooks.filter(hook => !own(hook));
+      if (!replaced) { replaced = true; return { ...desired[0], hooks: [...desired[0].hooks, ...hooks] }; }
+      return { ...group, hooks };
+    }).filter(group => group.hooks?.length);
+    if (!replaced) groups.push(...desired);
+    result.hooks[event] = groups;
+  }
+  return result;
 }
 
 function mergeConfigSection(lines, section, entries) {
@@ -135,8 +157,9 @@ function mergeGlobalConfig(current) {
   return `${lines.join("\n")}\n`;
 }
 
-function hooksDocument(codexHome) {
-  const command = (name) => `${shellQuote(process.execPath)} ${shellQuote(path.join(codexHome, "hooks", name))}`;
+export function hooksDocument(codexHome, platform = process.platform, node = process.execPath) {
+  const quote = platform === 'win32' ? (value) => `"${String(value).replaceAll('"', '\\"')}"` : shellQuote;
+  const command = (name) => `${quote(node)} ${quote(path.join(codexHome, "hooks", name))}`;
   return {
     description: "One stable dispatcher per event keeps Hook trust indices fixed while internally batching reminders, Skill routing, capability routing, and refresh work.",
     hooks: {
@@ -150,7 +173,7 @@ function hooksDocument(codexHome) {
   };
 }
 
-async function buildOperations(home) {
+export async function buildOperations(home) {
   const codexHome = path.join(home, ".codex");
   const agentsHome = path.join(home, ".agents");
   const operations = new Map();
@@ -233,7 +256,8 @@ async function buildOperations(home) {
   }
   operations.set(path.join(codexHome, "skill-registry", "external-library-config.json"), {
     destination: path.join(codexHome, "skill-registry", "external-library-config.json"),
-    content: Buffer.from(`${JSON.stringify({ root: externalSkillRoot, catalog: process.env.CODEX_EXTERNAL_SKILL_CATALOG || process.env.CODEX_PROFILE_SKILL_CATALOG || path.join(externalSkillRoot, "_catalog_cn.json") }, null, 2)}\n`),
+    content: Buffer.from(`${JSON.stringify({ root: externalSkillRoot, catalog: process.env.CODEX_EXTERNAL_SKILL_CATALOG || process.env.CODEX_PROFILE_SKILL_CATALOG || path.join(externalSkillRoot, "_catalog_cn.json"), requireComplete: process.env.CODEX_PROFILE_REQUIRE_COMPLETE === '1',
+      chineseEmbedding: process.env.CODEX_GRAPH_CHINESE_EMBEDDING ?? 'paraphrase-multilingual-MiniLM-L12-v2' }, null, 2)}\n`),
     mode: 0o600,
     source: "generated:external-library-config"
   });
@@ -288,9 +312,10 @@ async function buildOperations(home) {
   });
 
   const hooksDestination = path.join(codexHome, "hooks.json");
+  const currentHooks = await exists(hooksDestination) ? JSON.parse(await readFile(hooksDestination, 'utf8')) : {};
   operations.set(hooksDestination, {
     destination: hooksDestination,
-    content: Buffer.from(`${JSON.stringify(hooksDocument(codexHome), null, 2)}\n`),
+    content: Buffer.from(`${JSON.stringify(mergeHooks(currentHooks, hooksDocument(codexHome), codexHome), null, 2)}\n`),
     mode: 0o600,
     source: "generated:hooks"
   });
@@ -332,7 +357,7 @@ async function atomicWrite(file, content, mode) {
   await chmod(file, mode);
 }
 
-async function applyTransaction(codexHome, changes) {
+export async function applyTransaction(codexHome, changes) {
   const backupDirectory = path.join(codexHome, "backups", "portable-profile", backupId());
   await mkdir(backupDirectory, { recursive: true, mode: 0o700 });
   const manifest = {
@@ -387,8 +412,9 @@ function run(command, args, { env, input = "", timeoutMs = 30000 } = {}) {
   });
 }
 
-async function ensureGraphToolRuntime(codexHome) {
-  const graphToolPython = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexHome, "tools", "graph-tool-call-venv", "bin", "python");
+export async function ensureGraphToolRuntime(codexHome) {
+  const venvRoot = path.join(codexHome, 'tools', 'graph-tool-call-venv');
+  const graphToolPython = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(venvRoot, ...(process.platform === 'win32' ? ['Scripts', 'python.exe'] : ['bin', 'python']));
   const graphToolRequirements = path.join(codexHome, "tools", "graph-tool-call-requirements.txt");
   const requirements = "graph-tool-call[embedding]==0.46.0\nsentence-transformers==6.1.0\n";
   const python = process.env.CODEX_PYTHON || (await exists("/opt/homebrew/bin/python3") ? "/opt/homebrew/bin/python3" : "python3");
@@ -396,12 +422,16 @@ async function ensureGraphToolRuntime(codexHome) {
   await mkdir(path.dirname(graphToolRequirements), { recursive: true, mode: 0o700 });
   await writeFile(graphToolRequirements, requirements, { mode: 0o600 });
   if (!await exists(graphToolPython)) {
-    const venv = await run(python, ["-m", "venv", path.dirname(path.dirname(graphToolPython))], { timeoutMs: 120000 });
+    const venv = await run(python, ["-m", "venv", venvRoot], { timeoutMs: 120000 });
     if (venv.code !== 0) throw new Error(`Could not create isolated GraphToolCall runtime: ${venv.stderr || venv.stdout}`);
   }
   const probe = await run(graphToolPython, ["-c", "import importlib.metadata as m; assert m.version('graph-tool-call') == '0.46.0'; assert m.version('sentence-transformers') == '6.1.0'"], { timeoutMs: 30000 });
   if (probe.code === 0) return graphToolPython;
-  const install = await run(graphToolPython, ["-m", "pip", "install", "--disable-pip-version-check", "-r", graphToolRequirements], { timeoutMs: 300000 });
+  if (process.platform === 'linux') {
+    const cpu = await run(graphToolPython, ['-m', 'pip', 'install', '--disable-pip-version-check', '--index-url', 'https://download.pytorch.org/whl/cpu', 'torch==2.14.0'], { timeoutMs: 600000 });
+    if (cpu.code !== 0) throw new Error('CPU-only PyTorch installation failed: ' + (cpu.stderr || cpu.stdout));
+  }
+  const install = await run(graphToolPython, ["-m", "pip", "install", "--disable-pip-version-check", "-r", graphToolRequirements], { timeoutMs: 600000 });
   if (install.code !== 0) throw new Error(`Could not install GraphToolCall: ${install.stderr || install.stdout}`);
   return graphToolPython;
 }
@@ -423,7 +453,7 @@ async function verifyInstallation(home, codexHome, operations) {
   catch { throw new Error(`Methodology publisher returned invalid JSON: ${publisher.stdout.trim()}`); }
   const hookInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const context = await run(process.execPath, [path.join(codexHome, "hooks", "hook-dispatch.mjs")], { env, input: hookInput, timeoutMs: 300000 });
-  if (context.code !== 0 || !context.stdout.includes("ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4")) throw new Error("Hook dispatcher did not emit the adaptive scheduling contract");
+  if (context.code !== 0 || !context.stdout.includes("ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5")) throw new Error("Hook dispatcher did not emit the adaptive scheduling contract");
   return { validation: publication.validation, trust: await inspectHookTrust(codexHome) };
 }
 
@@ -439,10 +469,10 @@ async function inspectHookTrust(codexHome) {
     : { status: "action-required", reason: "start Codex interactively and approve each Hook when prompted" };
 }
 
-async function install(options) {
+export async function install(options) {
   const { codexHome, operations } = await buildOperations(options.home);
   if (options.check) {
-    const graphToolPython = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexHome, "tools", "graph-tool-call-venv", "bin", "python");
+    const graphToolPython = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexHome, "tools", "graph-tool-call-venv", ...(process.platform === 'win32' ? ['Scripts', 'python.exe'] : ['bin', 'python']));
     if (!await exists(graphToolPython)) throw new Error(`GraphToolCall runtime is missing: ${graphToolPython}`);
     const verification = await verifyInstallation(options.home, codexHome, operations);
     return { status: "current", home: options.home, codexHome, changedFiles: 0, ...verification };
@@ -488,7 +518,7 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main().catch((error) => {
   console.error(`Portable profile installation failed: ${error.message}`);
   process.exitCode = 1;
 });

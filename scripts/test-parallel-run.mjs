@@ -28,6 +28,13 @@ async function execute(name, plan, expectedStatus = 0) {
 }
 
 try {
+  const defaultWave = await execute("default-ready-batch", {
+    tasks: Array.from({ length: 8 }, (_, i) => task(`ready-${i}`, 180))
+  });
+  assert.equal(defaultWave.waves[0].taskIds.length, 8, "known independent work must not start with a small probe");
+  const starts = defaultWave.results.map(x => x.startedAt);
+  const ends = defaultWave.results.map(x => x.endedAt);
+  assert(Math.max(...starts) < Math.min(...ends), "default ready batch must actually overlap");
   const overlap = await execute("overlap", {
     initialConcurrency: 4,
     maxConcurrency: 8,

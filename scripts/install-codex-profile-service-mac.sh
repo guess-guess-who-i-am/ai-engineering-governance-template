@@ -74,11 +74,18 @@ if [ "$check" -eq 1 ]; then
       install-codex-profile-mac.sh \
       install-codex-profile-mac.mjs \
       install-task-tree-mcp-mac.mjs \
+      retire-serena-mcp.mjs \
       ensure-global-skill-library.mjs \
       install-codex-profile-service-mac.sh \
     run-codex-profile-service-mac.sh \
       test-codex-profile-mac.mjs \
-      parallel-run.mjs
+      parallel-run.mjs \
+      deploy-global-profile.mjs \
+      global-profile-service.mjs \
+      graph-worker-supervisor.mjs \
+      install-global-profile-service.ps1 \
+      warm-global-graph.py \
+      launch-global-profile.sh
     do
       if ! /usr/bin/cmp -s "$repository_root/scripts/$script" "$source_destination/scripts/$script"; then
         source_current=0
@@ -149,11 +156,18 @@ if [ "$repository_root" != "$source_destination" ]; then
     install-codex-profile-mac.sh \
     install-codex-profile-mac.mjs \
     install-task-tree-mcp-mac.mjs \
+    retire-serena-mcp.mjs \
     ensure-global-skill-library.mjs \
     install-codex-profile-service-mac.sh \
     run-codex-profile-service-mac.sh \
     test-codex-profile-mac.mjs \
-    parallel-run.mjs
+    parallel-run.mjs \
+    deploy-global-profile.mjs \
+    global-profile-service.mjs \
+    graph-worker-supervisor.mjs \
+    install-global-profile-service.ps1 \
+    warm-global-graph.py \
+    launch-global-profile.sh
   do
     /usr/bin/ditto "$repository_root/scripts/$script" "$source_temporary/scripts/$script"
   done

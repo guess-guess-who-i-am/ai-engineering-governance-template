@@ -33,7 +33,92 @@ function queryTokens(text, stopTokens) {
 function exactName(query, name) {
   if (!name || name.length < 3) return false;
   const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, "i").test(query);
+  return new RegExp(`(^|[^a-z0-9_.-])${escaped}([^a-z0-9_.-]|$)`, "i").test(query);
+}
+
+function aliasMatch(query, alias) {
+  if (!alias) return false;
+  // ASCII aliases such as CI/UI are words, not substrings of scientific/build.
+  // Han may adjoin an ASCII acronym; Han topic aliases retain span matching.
+  const escaped = alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const left = /^[a-z0-9_]/i.test(alias) ? "(^|[^a-z0-9_])" : "";
+  const right = /[a-z0-9_]$/i.test(alias) ? "([^a-z0-9_]|$)" : "";
+  return new RegExp(`${left}${escaped}${right}`, "i").test(query);
+}
+
+function activeClauses(prompt) {
+  // Quoted examples/logs and code are data, not a request to execute a Skill.
+  // Ambiguous language falls back to the graph, never an exclusion/blacklist.
+  const active = prompt.replace(/```[\s\S]*?```|`[^`]*`|“[^”]*”|「[^」]*」|"[^"\n]*"|(?<![\p{L}\p{N}])'[^'\n]*'(?![\p{L}\p{N}])/gu, " ");
+  return active.split(/[\n,，;；。!?！？]/);
+}
+
+function uncertainRequest(clause) {
+  return /\b(?:not|no|without|avoid|except|compare|comparing|versus|previously|formerly|why|whether)\b|don['’]t|不要|不用|不使用|别用|禁止|排除|无需|不需要|比较|对比|相比|以前|之前|曾经|为什么|是否/i.test(clause);
+}
+
+function requestedSkill(prompt, name) {
+  if (!name) return false;
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const named = new RegExp(`(^|[^a-z0-9_.-])${escaped}([^a-z0-9_.-]|$)`, "i");
+  const marker = new RegExp(`(?:^|[^a-z0-9_.-])(?:\\$|skill\\s*[:=]\\s*)${escaped}(?![a-z0-9_.-])`, "i");
+  const directive = new RegExp(`(?:\\b(?:use|load|invoke|apply|follow|run|read)\\s+(?:the\\s+)?|(?:使用|调用|加载|遵循|运行|用)\\s*)${escaped}(?![a-z0-9_.-])`, "i");
+  const label = new RegExp(`${escaped}\\s*(?:skill\\b|技能|工作流)`, "i");
+  for (const clause of activeClauses(prompt)) {
+    if (!named.test(clause)) continue;
+    // Conservative override contract: negation/comparison/history may still
+    // retrieve normally, but cannot force a resource ahead of task evidence.
+    if (uncertainRequest(clause)) continue;
+    if (marker.test(clause)) return true;
+    // Generic names (code/pdf/search) can denote subject matter. Require a
+    // Skill label/marker; structured names also support natural invocation.
+    if (directive.test(clause) && (/[-_:]/.test(name) || label.test(clause))) return true;
+    if (/[-_:]/.test(name) && clause.trim().toLocaleLowerCase() === name.toLocaleLowerCase()) return true;
+  }
+  return false;
+}
+
+function capabilityMatch(prompt, rule) {
+  // Typed precise triggers are not aliases: all three positive dimensions
+  // must be present in the same active clause, with explicit exclusions.
+  const groups = ['subjects', 'actions', 'objects'];
+  if (!rule || groups.some(key => !Array.isArray(rule[key]) || !rule[key].length ||
+      rule[key].some(value => typeof value !== 'string' || !value.trim()))) return false;
+  if (!Array.isArray(rule.exclude) || rule.exclude.some(value => typeof value !== 'string' || !value.trim())) return false;
+  return activeClauses(prompt).some(clause => !uncertainRequest(clause) &&
+    !rule.exclude.some(term => aliasMatch(clause, term)) &&
+    groups.every(key => rule[key].some(term => aliasMatch(clause, term))));
+}
+
+const ROUTE_CATEGORY_BUDGET = Object.freeze({ expert: 2, skill: 4, mcp: 2 });
+
+function routeCategory(item) {
+  const kind = String(item?.skill?.kind || '').toLocaleLowerCase();
+  if (kind === 'expert') return 'expert';
+  if (kind === 'mcp' || kind === 'mcp-service') return 'mcp';
+  return 'skill';
+}
+
+function selectCategoryBudget(items) {
+  // Diversify only the already-ranked result set. This does not expand graph
+  // retrieval or manufacture a missing category; absent candidates stay absent.
+  const seen = new Set();
+  const unique = items.filter(item => {
+    const key = item.skill.moduleId ? `module:${item.skill.moduleId}` : routeCategory(item) === 'mcp'
+      ? `mcp:${item.skill.mcpServer || ''}/${item.skill.name}` : `skill:${item.skill.name}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  const selected = new Set();
+  const counts = { expert: 0, skill: 0, mcp: 0 };
+  for (const item of unique) {
+    const category = routeCategory(item);
+    if (counts[category] >= ROUTE_CATEGORY_BUDGET[category]) continue;
+    selected.add(item);
+    counts[category] += 1;
+  }
+  return unique.filter(item => selected.has(item));
 }
 
 function scoreSkill(skill, tokens, query, aliases) {
@@ -49,20 +134,30 @@ function scoreSkill(skill, tokens, query, aliases) {
   }
   if (exactName(query, name)) { score += 24; matches.push("exact name"); }
   for (const alias of aliases[name] || []) {
-    if (query.includes(alias.toLocaleLowerCase())) { score += 12; if (matches.length < 3) matches.push(alias); }
+    if (aliasMatch(query, alias)) { score += 12; if (matches.length < 3) matches.push(alias); }
   }
   return { skill, score, matches: [...new Set(matches)].slice(0, 3) };
 }
 
 function workerSocketPath(graphPath) {
+  if (process.platform === 'win32') return graphPath + '.worker.json';
   const digest = createHash("sha256").update(graphPath).digest("hex").slice(0, 24);
   // macOS limits AF_UNIX paths; keep the socket short even for long test/workspace paths.
   return path.join("/tmp", `codex-graph-${process.getuid()}`, `${digest}.sock`);
 }
 
-function requestGraphWorker(socketPath, payload, timeoutMs) {
+async function requestGraphWorker(socketPath, payload, timeoutMs) {
+  let endpoint = socketPath;
+  if (process.platform === 'win32') {
+    const config = JSON.parse(await readFile(socketPath, 'utf8'));
+    if (config.host !== '127.0.0.1' || !Number.isInteger(config.port) || config.port < 1 || config.port > 65535 || !/^[a-f0-9]{64}$/.test(config.token)) {
+      throw new Error('Invalid private graph worker endpoint');
+    }
+    endpoint = { host: config.host, port: config.port };
+    payload = { ...payload, token: config.token };
+  }
   return new Promise((resolve, reject) => {
-    const socket = createConnection(socketPath);
+    const socket = createConnection(endpoint);
     let buffer = "";
     let settled = false;
     const timer = setTimeout(() => {
@@ -96,6 +191,29 @@ function requestGraphWorker(socketPath, payload, timeoutMs) {
 }
 
 function startGraphWorker(graphPath, pythonPath, indexerPath, socketPath) {
+  const managedGraph = path.join(os.homedir(), ".codex", "skill-registry", "skills.graph.json");
+  const managedUnit = path.join(os.homedir(), ".config", "systemd", "user", "codex-graph-worker.service");
+  const launchAgent = path.join(os.homedir(), 'Library/LaunchAgents/com.codex.global-graph.plist');
+  const windowsTask = path.join(os.homedir(), '.codex/hooks/graph-worker-task.xml');
+  if (graphPath === managedGraph && ((process.platform === 'darwin' && existsSync(launchAgent)) || (process.platform === 'win32' && existsSync(windowsTask)))) {
+    const command = process.platform === 'darwin' ? '/bin/launchctl' : 'schtasks.exe';
+    const args = process.platform === 'darwin' ? ['kickstart', `gui/${process.getuid()}/com.codex.global-graph`] : ['/Run', '/TN', 'CodexGlobalGraph'];
+    const child = spawn(command, args, { detached: true, windowsHide: true, stdio: 'ignore' });
+    child.on('error', error => process.stderr.write(`GraphToolCall service startup failed: ${error.message}\n`));
+    child.unref();
+    return;
+  }
+  if (process.platform === "linux" && graphPath === managedGraph && existsSync(managedUnit)) {
+    // Never race the service manager with an untracked default-size pool.
+    // --no-block starts (or joins) the existing activation without delaying the
+    // socket retry loop; systemd owns CPU/memory limits and crash recovery.
+    const child = spawn("systemctl", ["--user", "start", "--no-block", "codex-graph-worker.service"], {
+      detached: true, windowsHide: true, stdio: "ignore"
+    });
+    child.on("error", (error) => process.stderr.write(`GraphToolCall service startup failed: ${error.message}\n`));
+    child.unref();
+    return;
+  }
   const idleTimeout = String(Number(process.env.CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS || 0));
   const child = spawn(pythonPath, [indexerPath, "serve", "--graph", graphPath, "--socket", socketPath, "--idle-timeout", idleTimeout], {
     detached: true,
@@ -123,19 +241,19 @@ async function requestAfterWorkerStart(socketPath, payload, timeoutMs) {
 }
 
 
-async function graphCandidates(graphPath, query, pythonPath, indexerPath, excludedNames) {
+async function graphCandidates(graphPath, query, pythonPath, indexerPath) {
   if (!graphPath || !existsSync(graphPath) || !existsSync(pythonPath) || !existsSync(indexerPath)) return Promise.resolve([]);
   graphPath = realpathSync(graphPath);
   const socketPath = workerSocketPath(graphPath);
   await mkdir(path.dirname(socketPath), { recursive: true, mode: 0o700 });
   const directory = await lstat(path.dirname(socketPath));
-  if (!directory.isDirectory() || directory.uid !== process.getuid() || (directory.mode & 0o077)) {
+  if (!directory.isDirectory() || (process.platform !== 'win32' && (directory.uid !== process.getuid() || (directory.mode & 0o077)))) {
     throw new Error("GraphToolCall socket directory must be private and owned by this user");
   }
   const deadline = Date.now() + 55000;
   const payload = { query, top_k: 8, deadline };
   const asSkills = (results) => results
-    .filter((item) => (item?.kind === "mcp" || (item?.path && existsSync(item.path))) && !excludedNames.has(String(item.name).toLocaleLowerCase()))
+    .filter((item) => item?.kind === "mcp" || (item?.path && existsSync(item.path)))
     .map((item) => ({ skill: {
       id: `external:${String(item.name).toLocaleLowerCase()}`,
       name: item.name,
@@ -145,8 +263,14 @@ async function graphCandidates(graphPath, query, pythonPath, indexerPath, exclud
       source: "graph-tool-call",
       rank: 100,
       kind: item.kind || "skill",
-      mcpServer: item.mcp_server || ""
-    }, score: Math.round(Number(item.score || 0) * 1000) + (item.kind === "mcp" ? 1000 : 0), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] }));
+      mcpServer: item.mcp_server || "",
+      moduleId: item.module_id || "",
+      packageRoot: item.package_root || "",
+      availability: item.availability,
+      dependencies: item.dependencies,
+      memberCount: Array.isArray(item.members) ? item.members.length : 0,
+      resourceSource: item.source
+    }, score: Math.round(Number(item.score || 0) * 1000), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] }));
 
   return requestGraphWorker(socketPath, payload, 55000)
     .catch((error) => {
@@ -159,16 +283,6 @@ async function graphCandidates(graphPath, query, pythonPath, indexerPath, exclud
       process.stderr.write(`GraphToolCall routing failed (no per-request fallback): ${error.message}\n`);
       return [];
     });
-}
-
-function promptSkillExclusions(prompt) {
-  const selected = new Set();
-  const quoted = prompt.match(/(?:^|\s)(?:skill:|skill=|\$)([a-z0-9][a-z0-9._-]{1,100})/gi) || [];
-  for (const match of quoted) {
-    const name = match.replace(/^\s*(?:skill:|skill=|\$)/i, "").toLocaleLowerCase();
-    if (name) selected.add(name);
-  }
-  return selected;
 }
 
 try {
@@ -185,7 +299,7 @@ try {
   ]);
   const stopTokens = new Set((ruleDocument._stopTokens || []).map((item) => String(item).toLocaleLowerCase()));
   const aliases = Object.fromEntries(Object.entries(ruleDocument)
-    .filter(([name]) => name !== "_stopTokens")
+    .filter(([name, values]) => !name.startsWith('_') && Array.isArray(values))
     .map(([name, values]) => [name.toLocaleLowerCase(), (values || []).map((value) => String(value).toLocaleLowerCase())]));
   const query = prompt.toLocaleLowerCase();
   const tokens = queryTokens(query, stopTokens);
@@ -193,34 +307,48 @@ try {
   // index. A second 15k+ JavaScript scan per Agent defeats that shared service.
   const skills = Array.isArray(registry.skills)
     ? registry.skills.filter((skill) => skill.source !== "external-library") : [];
-  const knownNames = new Set(skills.map((skill) => String(skill.name || "").toLocaleLowerCase()));
-  for (const name of promptSkillExclusions(prompt)) knownNames.add(name);
-  const explicitlyRouted = [...knownNames].some((name) => (aliases[name] || []).some((alias) => query.includes(alias)));
   const scored = skills.map((skill) => scoreSkill(skill, tokens, query, aliases)).filter((item) => item.score > 0);
   const indexerPath = path.join(codexRoot, "hooks", "graph_skill_index.py");
-  const pythonPath = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexRoot, "tools", "graph-tool-call-venv", "bin", "python");
-  const externalNames = new Set(Object.keys(aliases).map((name) => name.toLocaleLowerCase()));
-  scored.push(...await graphCandidates(registry.externalGraphPath, prompt, pythonPath, indexerPath, externalNames));
+  const pythonPath = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexRoot, "tools", "graph-tool-call-venv", ...(process.platform === 'win32' ? ['Scripts', 'python.exe'] : ['bin', 'python']));
+  const graphScored = await graphCandidates(registry.externalGraphPath, prompt, pythonPath, indexerPath);
   scored.sort((a, b) => b.score - a.score || Number(a.skill.rank || 0) - Number(b.skill.rank || 0) || String(a.skill.name).localeCompare(String(b.skill.name)));
-  if (!scored.length || scored[0].score < 6) {
+  if (!graphScored.length && (!scored.length || scored[0].score < 6)) {
     process.stdout.write("{}");
     process.exit(0);
   }
-  const minimum = Math.max(6, Math.floor(scored[0].score * 0.55));
-  const selected = scored.filter((item) => item.score >= minimum).slice(0, 4);
+  // Lexical aliases and graph RRF scores have different scales. Preserve one
+  // explicitly requested workflow, then use the graph's own ranking. Topic
+  // aliases are fallback evidence only: they must not consume task slots by
+  // masquerading as explicit invocations. No type/name-specific rank bonuses.
+  const explicit = [...scored, ...graphScored].filter(item => requestedSkill(prompt, item.skill.name));
+  const direct = scored.filter(item => capabilityMatch(prompt,
+    ruleDocument._capabilityRoutes?.[String(item.skill.name).toLocaleLowerCase()]))
+    .map(item => ({ ...item, matches: ['capability subject + action + object'] }));
+  const minimum = Math.max(6, Math.floor((scored[0]?.score || 0) * 0.55));
+  const ranked = [...explicit, ...direct, ...graphScored,
+    ...scored.filter(item => item.score >= minimum)];
+  const selected = selectCategoryBudget(ranked);
   const lines = [
     "[CODEX_SKILL_ROUTER_V2]",
-    "Assistive routing only: read a full SKILL.md only when it directly applies to the latest request; do not load the whole Skill catalog.",
+    "Assistive routing: match the latest task's action and intended output; Skill and service names are optional. Load directly fitting entries and follow their workflows. Complete expert modules retain their original team, roles and artifact flow. Load only selected work, never the whole catalog.",
     "Candidates:"
   ];
   for (const item of selected) {
     const description = String(item.skill.description || "").replace(/\s+/g, " ").trim().slice(0, 280);
-    const routeKind = item.skill.kind === "mcp" ? `MCP/${item.skill.mcpServer}` : "Skill";
+    const routeKind = item.skill.kind === "mcp" ? `MCP/${item.skill.mcpServer}` : item.skill.kind === "expert" ? "Complete expert module" : item.skill.kind === "mcp-service" ? "MCP service module" : "Skill";
     lines.push(`- ${item.skill.name} [${routeKind}; score=${item.score}; match=${item.matches.join(", ") || "description match"}]`);
     lines.push(`  ${description}`);
     lines.push(item.skill.kind === "mcp"
       ? `  Call through indexed MCP server: ${item.skill.mcpServer}/${item.skill.name}`
       : `  Read: ${item.skill.path}`);
+    if (item.skill.moduleId) {
+      lines.push(`  Module: ${item.skill.moduleId}; package: ${item.skill.packageRoot}; members: ${item.skill.memberCount}; availability: ${JSON.stringify(item.skill.availability)}`);
+      const auditName = item.skill.kind === "expert" ? "experts-audit.json" : item.skill.kind === "mcp-service" ? "mcp-audit.json" : "skills-audit.json";
+      lines.push(`  Audit evidence: ${path.join(codexRoot, "resource-evidence", auditName)}; package integrity: ${path.join(codexRoot, "resource-evidence", "package-integrity.json")}`);
+      lines.push("  Indexed is not execution-verified. Read the module's prerequisites and availability; do not claim it or an MCP service is callable until its dependencies and actual call are verified.");
+      if (item.skill.availability?.state === "known-helper-failure") lines.push("  Known helper failure: read the audit's specific failing helper and input before using this module. Do not treat that helper's result as reliable; unrelated functions remain unverified, not automatically failed or passed.");
+      if (item.skill.kind === "expert") lines.push("  When selected, read the entry above once: it contains the original primary role verbatim. Announce the expert name and execute its original workflow; load original members/Skills only as that workflow requires. Do not translate tools or introduce a host mapping. Report any unavailable required tool and blocked step. Loading or timeout never implies task completion.");
+    }
   }
   lines.push("If none is genuinely relevant, ignore this list and continue without a specialized Skill.");
   process.stdout.write(JSON.stringify({

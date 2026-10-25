@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "resource-service-identity-challenge/1",
+  "frozenBeforeQueries": true,
+  "limitations": ["Targeted explicit-service constraint checks, not an independent general semantic benchmark", "Names and capabilities checked against existing descriptors; no live service calls", "Negative cases require fallback equality, not successful task execution"],
+  "cases": [
+    {"id":"disk-service", "kind":"mcp-service", "targets":["baidu-netdisk"], "expectedGuard":"baidu-netdisk", "en":"Use the baidu-netdisk connector to find the invoice files in my cloud drive.", "zh":"通过baidu-netdisk连接器查找我网盘中的发票文件。"},
+    {"id":"crm-service", "kind":"mcp-service", "targets":["ShareCRM"], "expectedGuard":"sharecrm", "en":"Read the customer record and its follow-up history via the ShareCRM connector.", "zh":"通过ShareCRM连接器读取客户资料和跟进记录。"},
+    {"id":"commerce-service", "kind":"mcp-service", "targets":["LinkFox"], "expectedGuard":"linkfox", "en":"Use the LinkFox MCP connector to research competing products in cross-border ecommerce.", "zh":"通过LinkFox的MCP连接器调研跨境电商竞品。"},
+    {"id":"legal-service", "kind":"mcp-service", "targets":["LawyerOne"], "expectedGuard":"lawyerone", "en":"Find the LawyerOne MCP connector for looking up statutes and similar cases.", "zh":"查找LawyerOne的MCP连接器，检索法规和类似案例。"},
+    {"id":"notes-service", "kind":"mcp-service", "targets":["notion"], "expectedGuard":"notion", "en":"Through the NOTION connector, retrieve the page containing our release decisions.", "zh":"通过NOTION连接器读取记录版本发布决策的页面。"},
+    {"id":"repository-service", "kind":"mcp-service", "targets":["github"], "expectedGuard":"github", "en":"Use the GitHub MCP connector to read review comments on the specified pull request.", "zh":"用GitHub的MCP连接器查看指定PR上的评审评论。"},
+    {"id":"negative-negation", "expectedGuard":null, "en":"Do not use the Notion MCP connector; read the local Markdown file.", "zh":"不要使用Notion的MCP连接器，读取本地Markdown文件。"},
+    {"id":"negative-multiple-platforms", "expectedGuard":null, "en":"Compare the Notion and GitHub MCP connectors for migration planning.", "zh":"对比Notion和GitHub两个MCP连接器的迁移条件。"},
+    {"id":"negative-source-development", "expectedGuard":null, "en":"Fix a response parser in the baidu-netdisk MCP adapter source code.", "zh":"修复baidu-netdisk MCP适配器源码中的响应解析问题。"},
+    {"id":"negative-substring", "expectedGuard":null, "en":"Use a connector called supernotion to retrieve a page.", "zh":"使用叫supernotion的连接器读取页面。"},
+    {"id":"negative-compatibility", "expectedGuard":null, "en":"Use a Notion-compatible connector from another provider.", "zh":"使用另一家提供的Notion-compatible连接器。"},
+    {"id":"negative-incidental", "expectedGuard":null, "en":"Investigate a slow parser in the application hosted on GitHub.", "zh":"排查托管在GitHub上的应用中解析器变慢的原因。"},
+    {"id":"negative-alternatives", "expectedGuard":null, "en":"Find an alternative to the ShareCRM connector.", "zh":"寻找ShareCRM连接器的替代方案。"},
+    {"id":"negative-docs", "expectedGuard":null, "en":"Read documentation about implementing a LinkFox MCP connector.", "zh":"阅读关于实现LinkFox MCP连接器的文档。"}
+  ]
+}

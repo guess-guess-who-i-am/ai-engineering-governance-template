@@ -25,7 +25,12 @@ function invoke({ event = 'UserPromptSubmit', session = 'A', turn = '', source =
 }
 const fixed = (context) => context.includes('FIXED_ANCHOR') && context.includes('FIXED_ROUTER');
 
-assert.equal(fixed(invoke({ turn: '1' })), true);
+const first = invoke({ turn: '1' });
+assert.equal(fixed(first), true);
+assert.ok(first.startsWith('[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5]'));
+assert.ok(first.includes('normally 5-8'));
+assert.ok(first.includes('Do not require a 1-2-call probe or a 2-4-call warm-up'));
+assert.ok(first.includes('halve it after failures'));
 assert.equal(fixed(invoke({ turn: '2' })), false);
 assert.equal(fixed(invoke({ turn: '3' })), false);
 assert.equal(fixed(invoke({ turn: '3' })), false, 'retry must not advance cadence');
@@ -33,10 +38,18 @@ assert.equal(fixed(invoke({ turn: '4' })), true);
 assert.equal(fixed(invoke({ session: 'B', turn: '1' })), true, 'sessions are isolated');
 assert.equal(fixed(invoke({ session: '', turn: '1' })), true, 'unknown sessions fail open');
 
-assert.equal(fixed(invoke({ event: 'SessionStart', source: 'compact' })), true);
+await writeFile(path.join(codexHome, 'prompts/global-attention-anchor.en.md'), 'FIXED_ANCHOR\nUPDATED_RULE');
+assert.equal(fixed(invoke({ turn: '5' })), true, 'changed policy must refresh an existing session immediately');
+assert.equal(fixed(invoke({ turn: '6' })), false, 'policy refresh starts a new three-turn cadence');
+
+const compact = invoke({ event: 'SessionStart', source: 'compact' });
+assert.equal(fixed(compact), true);
+assert.ok(compact.startsWith('[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5]'), 'mid-turn compaction must restore scheduling without a new user prompt');
 assert.equal(fixed(invoke({ turn: '5' })), true, 'first prompt after compaction reinjects');
 assert.equal(fixed(invoke({ turn: '6' })), false);
-assert.equal(fixed(invoke({ event: 'SessionStart', source: 'resume' })), true);
+const resumed = invoke({ event: 'SessionStart', source: 'resume' });
+assert.equal(fixed(resumed), true);
+assert.ok(resumed.startsWith('[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5]'));
 assert.equal(fixed(invoke({ turn: '7' })), true, 'first prompt after resume reinjects');
 
 const brokenHome = path.join(home, 'broken-state');

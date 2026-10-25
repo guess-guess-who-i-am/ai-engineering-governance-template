@@ -35,10 +35,14 @@ async function validateCatalog(root, catalog, expectedHash) {
 
 export async function ensureSkillLibrary({ home = os.homedir(), sourceRoot = repositoryRoot, env = process.env, check = false } = {}) {
   const explicit = env.CODEX_PROFILE_SKILL_SOURCE || env.CODEX_EXTERNAL_SKILL_ROOT;
-  const candidates = explicit ? [explicit] : [path.resolve(sourceRoot, "..", "skills"), path.join(home, ".codex", "tools", "skills")];
+  const candidates = explicit ? [explicit] : [path.resolve(sourceRoot, "..", "skills"), path.join(home, '.codex/tools/skill-library-source'), path.join(home, ".codex", "tools", "skills")];
   for (const root of candidates) {
     const catalog = env.CODEX_PROFILE_SKILL_CATALOG || env.CODEX_EXTERNAL_SKILL_CATALOG || path.join(root, "_catalog_cn.json");
-    if (await exists(catalog)) return { ...await validateCatalog(root, catalog), action: "reused" };
+    if (await exists(catalog)) {
+      const pinned = !explicit && root === path.join(home, '.codex/tools/skill-library-source');
+      const hash = pinned ? JSON.parse(await readFile(path.join(sourceRoot, 'codex-profile/portable-dependencies.json'), 'utf8')).skillLibrary.catalogSha256 : undefined;
+      return { ...await validateCatalog(root, catalog, hash), action: pinned ? 'reused-pinned' : 'reused' };
+    }
   }
   if (explicit) throw new Error("Configured Skill library/catalog is missing; refusing an incomplete deployment");
   if (check) throw new Error("Global Skill library is missing; deploy once with access to the private skills-library repository");

@@ -50,7 +50,7 @@ async function withSessionState(codexRoot, sessionId, update) {
   } finally { await rm(lock, { recursive: true, force: true }); }
 }
 
-async function includeFixedContext(codexRoot, input, eventName) {
+async function includeFixedContext(codexRoot, input, eventName, policySha256) {
   const sessionId = String(input.session_id || "").trim();
   if (!sessionId) return true; // No stable identity: never silently suppress reminders.
   try {
@@ -59,11 +59,18 @@ async function includeFixedContext(codexRoot, input, eventName) {
         state.count = 0;
         state.lastTurnId = "";
         state.lastInclude = true;
+        state.policySha256 = policySha256;
       });
       return true;
     }
     const turnId = String(input.turn_id || "").trim();
     return await withSessionState(codexRoot, sessionId, (state) => {
+      if (state.policySha256 !== policySha256) {
+        state.count = 0;
+        state.lastTurnId = "";
+        state.lastInclude = true;
+        state.policySha256 = policySha256;
+      }
       if (turnId && state.lastTurnId === turnId) return Boolean(state.lastInclude);
       state.count = (Number.isSafeInteger(state.count) && state.count >= 0 ? state.count : 0) + 1;
       state.lastTurnId = turnId;
@@ -87,13 +94,14 @@ function findProjectFile(startDirectory, fileName) {
   }
 }
 
-const batchingContract = `[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4]
-Apply this execution contract on every user turn and before every later tool wave. Twenty is a hard safety ceiling, never a utilization target.
+const batchingContract = `[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5]
+Optimize end-to-end task latency on every turn and later tool wave, not terminal count. Twenty is a hard safety ceiling, never a utilization target; honor lower applicable limits.
 - First build the smallest useful dependency DAG: identify prerequisites, independent branches, shared mutable state, rate limits, destructive effects, and the result that each consumer actually needs.
 - Prefer one native batched tool request for homogeneous reads or searches. Do not open extra terminals when a multi-query API, one bounded command, or one shared process can perform the same independent work.
-- Start ordinary read-only waves at 2-4 concurrent operations. Increase width gradually only after successful low-contention waves; halve it after failures, timeouts, rate limits, or resource contention. Never exceed 20.
+- Dispatch already-known safe independent work together, normally 5-8 operations when that many are ready; when fewer are ready, dispatch those together. Do not require a 1-2-call probe or a 2-4-call warm-up for established read-only interfaces. Increase width when useful and permitted; halve it after failures, timeouts, rate limits, or resource contention. Never exceed 20, and do not treat the configured ceiling as a reason to invent work.
 - Execute only ready DAG nodes in each wave. Keep stateful, destructive, rate-limited, approval-gated, uncertain, or mutually interfering operations at concurrency 1 unless the owning interface explicitly guarantees safe parallelism.
 - Use one outer \`functions.exec\` when it reduces model round trips, and use \`Promise.all\` only for operations proven independent. Continue mechanically determined polling, collection, and verification inside that envelope.
+- If the platform exposes no batch wrapper, use its real concurrent tool-call interface or bounded child processes in one terminal call. A single outer call can contain many concurrent operations; do not mistake wrapper count for execution width.
 - Return to the model when results require semantic interpretation, the graph changes, uncertainty appears, user input is required, or a destructive decision must be made.
 - Read a required primary Skill completely first. After edits, batch independent checks, but preserve producer-consumer order and run the narrowest evidence capable of falsifying the claim.
 - Record wave membership, concurrency width, timings, exit codes, retries, timeouts, and skipped dependency consumers. Real overlap is evidence; a configured maximum is not.
@@ -113,13 +121,14 @@ try {
 
   const codexRoot = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
   const parts = [];
-  const includeFixed = await includeFixedContext(codexRoot, input, eventName);
+  const [anchor, router] = await Promise.all([
+    optionalText(path.join(codexRoot, "prompts", "global-attention-anchor.en.md")),
+    optionalText(path.join(codexRoot, "prompts", "global-methodology-router.en.md"))
+  ]);
+  const policySha256 = createHash("sha256").update(JSON.stringify([batchingContract, anchor, router])).digest("hex");
+  const includeFixed = await includeFixedContext(codexRoot, input, eventName, policySha256);
   if (includeFixed) {
-    if (eventName === "UserPromptSubmit") parts.push(batchingContract);
-    const [anchor, router] = await Promise.all([
-      optionalText(path.join(codexRoot, "prompts", "global-attention-anchor.en.md")),
-      optionalText(path.join(codexRoot, "prompts", "global-methodology-router.en.md"))
-    ]);
+    if (eventName === "UserPromptSubmit" || ["compact", "resume"].includes(String(input.source || ""))) parts.push(batchingContract);
     if (anchor) parts.push(`[GLOBAL_ALWAYS_ON_ORIGINAL_EN_V3]\n${anchor}`);
     if (router) parts.push(`[GLOBAL_METHODOLOGY_ROUTER_EN_V3]\n${router}`);
   }

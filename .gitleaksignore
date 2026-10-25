@@ -1,0 +1,13 @@
+# Frozen retrieval sampling keys are deterministic SHA-256 identifiers, not credentials.
+scripts/resource-retrieval-unseen.json:generic-api-key:25
+scripts/resource-retrieval-unseen.json:generic-api-key:35
+scripts/resource-retrieval-unseen.json:generic-api-key:45
+scripts/resource-retrieval-unseen.json:generic-api-key:55
+scripts/resource-retrieval-unseen.json:generic-api-key:65
+scripts/resource-retrieval-unseen.json:generic-api-key:75
+scripts/resource-retrieval-unseen.json:generic-api-key:85
+scripts/resource-retrieval-unseen.json:generic-api-key:95
+scripts/resource-retrieval-unseen.json:generic-api-key:105
+scripts/resource-retrieval-unseen.json:generic-api-key:115
+scripts/resource-retrieval-unseen.json:generic-api-key:125
+scripts/resource-retrieval-unseen.json:generic-api-key:135

@@ -13,6 +13,7 @@ import tempfile
 import threading
 import time
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,12 +46,57 @@ class WorkerTests(unittest.TestCase):
         g.save(tmp)
         tmp.replace(self.graph)
 
-    def start(self, idle=0):
+    def start(self, idle=0, processes=4):
         p = subprocess.Popen([sys.executable, str(ENTRY), 'serve', '--graph', str(self.graph),
-                              '--socket', str(self.sock), '--idle-timeout', str(idle)],
+                              '--socket', str(self.sock), '--idle-timeout', str(idle), '--processes', str(processes)],
                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         self.processes.append(p)
         return p
+
+    def test_configurable_pool_bounds(self):
+        invalid = subprocess.run([sys.executable, str(ENTRY), 'serve', '--graph', str(self.graph),
+                                  '--socket', str(self.sock), '--processes', '21'], capture_output=True)
+        self.assertNotEqual(invalid.returncode, 0)
+        self.start(processes=2)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as pool:
+            rows = list(pool.map(lambda n: self.request({'query': f'alpha search independent {n}'}), range(20)))
+        self.assertTrue(all(row['ok'] for row in rows))
+        self.assertEqual(len({row['queryPid'] for row in rows}), 2)
+        self.assertTrue(all(row['readyLanguages'] == ['en', 'zh'] for row in rows))
+
+    def test_incomplete_catalog_never_replaces_last_good_graph(self):
+        catalog = self.root / 'catalog.json'
+        catalog.write_text(json.dumps({'skills': [{'name': 'missing', 'dir': 'not-transferred'}]}))
+        before = self.graph.read_bytes()
+        with self.assertRaisesRegex(ValueError, 'Catalog incomplete'):
+            indexer.build(SimpleNamespace(root=str(self.root), catalog=str(catalog), output=str(self.graph), require_complete=True))
+        self.assertEqual(self.graph.read_bytes(), before)
+
+    def test_existing_non_strict_catalog_contract_is_preserved(self):
+        catalog = self.root / 'catalog.json'
+        catalog.write_text(json.dumps({'skills': [{'name': 'missing', 'dir': 'not-transferred'}]}))
+        # Existing macOS callers explicitly accept reported missing entries;
+        # completeness enforcement belongs to the new Linux deployment policy.
+        with patch.object(indexer, 'graph_from_records', side_effect=RuntimeError('build reached')):
+            with self.assertRaisesRegex(RuntimeError, 'build reached'):
+                indexer.build(SimpleNamespace(root=str(self.root), catalog=str(catalog), output=str(self.graph),
+                                              owned_root='', mcp_catalog=''))
+
+    def test_linux_lowercase_skill_and_escape_protection(self):
+        folder = self.root / 'lowercase'
+        folder.mkdir()
+        target = folder / 'skill.md'
+        target.write_text('source skill')
+        self.assertEqual(indexer.safe_path(self.root, 'lowercase'), target.resolve())
+        self.assertIsNone(indexer.safe_path(self.root, '../outside'))
+        outside = self.root.parent / f'outside-{os.getpid()}.md'
+        try:
+            outside.write_text('not a skill in the library')
+            target.unlink()
+            target.symlink_to(outside)
+            self.assertIsNone(indexer.safe_path(self.root, 'lowercase'))
+        finally:
+            outside.unlink(missing_ok=True)
 
     def request(self, payload=None):
         until = time.monotonic() + 10
@@ -105,6 +151,22 @@ class WorkerTests(unittest.TestCase):
         cached.encode_batch([str(number) for number in range(4100)])
         self.assertEqual(len(cached._vectors), 4096)
 
+    def test_precomputed_descriptions_never_encode_or_evict(self):
+        class Provider:
+            calls = []
+            def encode_batch(self, texts):
+                self.calls.append(texts)
+                return [[len(text)] for text in texts]
+        provider = Provider()
+        cached = indexer._CachedEmbeddingProvider(provider, {'static description': [123]})
+        self.assertEqual(cached.encode_batch(['new query', 'static description']), [[9], [123]])
+        self.assertEqual(provider.calls, [['new query']])
+        cached.encode_batch([str(n) for n in range(4100)])
+        result = cached.encode_batch(['static description'])
+        result[0][0] = -1
+        self.assertEqual(cached.encode('static description'), [123])
+        self.assertNotIn('static description', cached._vectors)
+
     def test_pool_recovers_after_query_process_crash(self):
         self.start()
         first = self.request({'query': 'alpha search'})
@@ -155,6 +217,7 @@ class WorkerTests(unittest.TestCase):
         second = self.request()
         self.assertEqual((second['pid'], second['loads']), (first['pid'], 2))
         self.assertEqual(second['results'][0]['name'], 'beta')
+        self.assertEqual(second['readyLanguages'], ['en', 'zh'])
         self.graph.write_text('{bad')
         self.assertFalse(self.request()['ok'])
         self.make_graph('gamma')
@@ -173,7 +236,7 @@ class WorkerTests(unittest.TestCase):
     def test_repeated_queries_coalesce_and_reload_invalidates_cache(self):
         worker = indexer._GraphWorker(self.graph)
         worker.query({'query': 'warm'})
-        graph = worker._graph
+        graph = worker._english_graph
         original = graph.retrieve_with_scores
         calls = []
         def slow(query, **kwargs):
@@ -211,7 +274,7 @@ class WorkerTests(unittest.TestCase):
         graph.save(self.graph)
         worker = indexer._GraphWorker(self.graph)
         loaded = worker._load_if_stale()
-        engine = loaded._get_retrieval_engine()
+        engine = worker._english_graph._get_retrieval_engine()
         self.assertTrue(engine._prefilter_enabled)
         pools = []
         original = engine._maybe_prefilter
@@ -229,6 +292,8 @@ class WorkerTests(unittest.TestCase):
         marker = self.root / 'refresh-calls.txt'
         script.write_text('import os,time\nfrom pathlib import Path\n'
                           'assert os.environ["CODEX_SKILL_REGISTRY_FOREGROUND"] == "1"\n'
+                          'assert os.environ["HF_HUB_OFFLINE"] == "1"\n'
+                          'assert 1 <= int(os.environ["OMP_NUM_THREADS"]) <= 20\n'
                           f'with Path({str(marker)!r}).open("a") as f: f.write("refresh\\n")\n'
                           'time.sleep(2)\n')
         for _ in range(20):

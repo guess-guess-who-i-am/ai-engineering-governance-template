@@ -1,5 +1,15 @@
 {
   "schemaVersion": "codex-portable-dependencies/1",
+  "chineseEmbedding": {
+    "repository": "https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "model": "paraphrase-multilingual-MiniLM-L12-v2",
+    "testedRevision": "e8f8c211226b894fcb81acc59f3b34ba3efd5f42",
+    "license": "Apache-2.0"
+  },
+  "taskTree": {
+    "repository": "https://github.com/guess-guess-who-i-am/llm-task-tree.git",
+    "commit": "553bac4de52865b089ae24e26fbc75dcd2268fd1"
+  },
   "skillLibrary": {
     "repository": "https://github.com/guess-guess-who-i-am/skills-library.git",
     "commit": "4d830510d26e57bc303e9aeeac53d18e6c4687bf",
