@@ -35,7 +35,7 @@ async function loadRuntimeModule(root, name) {
     try {
       const config = JSON.parse(readFileSync(configFile, "utf8").replace(/^\uFEFF/, ""));
       if (config.sharedKitDir) {
-        const sharedKit = path.resolve(path.dirname(configFile), String(config.sharedKitDir));
+        const sharedKit = path.resolve(root, String(config.sharedKitDir));
         candidates.push(path.join(sharedKit, "server", name));
       }
     } catch {

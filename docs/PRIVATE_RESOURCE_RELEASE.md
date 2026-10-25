@@ -24,4 +24,10 @@ node scripts/export-resource-packages.mjs --source "$HOME/.codex/resource-packag
 
 ## 自动化真实使用状态
 
-直接运行 Hook 脚本只证明脚本可运行，不证明 Codex 每轮会执行。2026-10-25 的 app-server ephemeral turn 检查发现全局两个 Hook 为 `modified`（未获信任），项目 `userPromptSubmit` Hook 因 shell 找不到 `node` 以 exit 127 失败；专家任务 turn 在 120 秒内未完成。不要宣称真实 Hook 或专家工作流已验收；须在 Codex 官方信任界面批准并修正解释器路径后重测。
+直接运行 Hook 脚本只证明脚本可运行，不证明 Codex 每轮会执行。2026-10-25 的 app-server 检查发现全局 Hook 为 `modified`（未获信任），项目 `userPromptSubmit` Hook 因 shell 找不到 `node` 以 exit 127 失败。已加项目 Node 启动器，绝对路径回退单测通过；配置变更后仍需客户端重新信任。
+
+2026-10-26 去掉验收器的 120 秒本地定时器后，显式点名专家的只读真实 turn 在 213,734 ms 自然完成：读取完整 `performance-testing-expert` 原入口与测量 JSON，并给出队列容量的 p95/吞吐对照分析。这个结果证明专家完整入口可由模型使用，且本项目没有专家 turn 硬超时。
+
+随后经 Codex 客户端批准后，app-server 确认全局与项目 4 个 Hook 均为 `trusted`。不点名专家的真实请求在 5,214 ms 自动推荐 `performance-testing-expert`、`apm-performance-expert`，并读取专家原始 `MODULE.md`；但该 turn 24 分钟无事件，最终分析未验收。期间发现仓库 Hook 的 `sharedKitDir` 被错误地相对 `llm-task-tree/` 解析，导致 UserPromptSubmit exit 1；改为按项目根解析后，隔离项目的 UserPromptSubmit/Stop Hook 测试及真实 Hook 测试通过。再次真实回放时两类 Hook 都成功，路由用时 44,012 ms，但模型随后启动 `mcpToolCall` 后无完成事件；具体工具名和 MCP 等待原因仍未确认。故自动路由与专家入口加载已验证，端到端专家分析仍未通过。
+
+Codex 上游 issue [#54872](https://github.com/openai/codex/issues/54872) 讨论的是 `PreToolUse`/`PermissionRequest` 同步策略 Hook 的有限 wall-clock 等待，不是模型专家执行 turn；不得用它推断专家有同样时限。该议题记录省略 timeout 仍会采用有限默认值，也不代表无限等待已在此安装版本支持。

@@ -16,10 +16,10 @@
   - 暂停三平台检查与Git发布，先处理110用户级Codex，不影响其他用户。
   - 110清缓存释放17.62 GiB，已切KPOCE并刷新后台；API请求24.416秒完成，真实Codex首次90秒超时、重测11.395秒完成，模型代理和worker保留。
   - 194为KPOCE主路由、duck备用；duck的403不回退，认证和代理不变，整机重启未实测。
-- CurrentResult: Hook已改为结果集内类别配额：最多2个完整专家、4个Skill、2个MCP，总上限8，GraphToolCall仍top_k=8且不补造缺失类别。隔离配额测试与27条旧路由测试通过；全局真实任务分别输出1/4/0、0/4/0、2/4/0。
-- RootCauseAnalysis: 类别配额只缓解泛候选占满上下文，不修复上游漏召回；目标专家未进候选池或融合已降序时仍不可见。
+- CurrentResult: 4 个 Hook 均 trusted。未点名 turn 的路由自动命中专家并读到原入口，但 24 分钟未完成；修复共享路径后两类 Hook 均成功，第二次路由 44 秒命中两个专家候选，却停在未完成的 MCP 调用，未读专家且未验收最终分析。
+- RootCauseAnalysis: 已确认并修复仓库 Hook 将项目根相对 sharedKitDir 按 llm-task-tree 子目录解析的问题。剩余真实 turn 停在 app-server 的 mcpToolCall，缺少工具名与完成事件，尚不能确认是哪个 MCP 或调度环节阻塞。
 - CaseStudy:
-- NextIdea: 用真实任务回放观察类别配额的上下文成本和专家可见性；若需提升召回，再单独评估候选池边界，不在本策略内扩大检索。
+- NextIdea: 增强回放对 MCP 工具名、参数摘要和返回事件的记录，再隔离复现停住的调用；在该调用完成后验证专家是否产出并应用分析。
 - SelectedSkills:
 
 # GraphState
