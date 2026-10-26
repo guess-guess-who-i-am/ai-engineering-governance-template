@@ -452,7 +452,7 @@ await writeFile(configPath, config);
     console.log(`PASS: full catalog fixture indexed ${fullManifest.skillCount}/${fullManifest.catalogSkillCount} Skills; total index bytes=${Buffer.byteLength(fullIndex)}; example route=resolving-merge-conflicts`);
   }
 
-  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 22 owned Skills, global-only registry, system and task-tree routing, merge, manifest backup, credential isolation, 76-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
+  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, repository-owned Skill coverage, global-only registry, system and task-tree routing, merge, manifest backup, credential isolation, 76-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
 } finally {
   await rm(root, { recursive: true, force: true });
 }

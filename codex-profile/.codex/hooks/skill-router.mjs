@@ -345,6 +345,36 @@ async function graphCandidates(graphPath, query, pythonPath, indexerPath) {
     });
 }
 
+export function renderRoutingContext(selected, codexRoot) {
+  const lines = [
+    "[CODEX_SKILL_ROUTER_V2]",
+    "Assistive routing: match the latest task's action and intended output; Skill and service names are optional. Load directly fitting entries and follow their workflows. Complete expert modules retain their original team, roles and artifact flow. Load only selected work, never the whole catalog."
+  ];
+  if (selected.some(item => item.skill.moduleId)) {
+    lines.push(`Audit evidence: ${path.join(codexRoot, 'resource-evidence')} — experts: experts-audit.json; Skills: skills-audit.json; MCP services: mcp-audit.json; package integrity: package-integrity.json.`);
+    lines.push("For every module: Indexed is not execution-verified. Read its prerequisites and availability; do not claim a module or MCP service is callable until its dependencies and actual call are verified.");
+  }
+  if (selected.some(item => item.skill.kind === 'expert')) {
+    lines.push("For a selected expert, read its entry once: it contains the original primary role verbatim. Announce its name and execute its original workflow; load original members/Skills only as required. Do not translate tools or introduce a host mapping. Report unavailable required tools and blocked steps. Loading or timeout never implies completion.");
+  }
+  lines.push('Candidates:');
+  for (const item of selected) {
+    const description = String(item.skill.description || "").replace(/\s+/g, " ").trim().slice(0, 280);
+    const routeKind = item.skill.kind === "mcp" ? `MCP/${item.skill.mcpServer}` : item.skill.kind === "expert" ? "Complete expert module" : item.skill.kind === "mcp-service" ? "MCP service module" : "Skill";
+    lines.push(`- ${item.skill.name} [${routeKind}; score=${item.score}; match=${item.matches.join(", ") || "description match"}]`);
+    lines.push(`  ${description}`);
+    lines.push(item.skill.kind === "mcp"
+      ? `  Call through indexed MCP server: ${item.skill.mcpServer}/${item.skill.name}`
+      : `  Read: ${item.skill.path}`);
+    if (item.skill.moduleId) {
+      lines.push(`  Module: ${item.skill.moduleId}; package: ${item.skill.packageRoot}; members: ${item.skill.memberCount}; availability: ${JSON.stringify(item.skill.availability)}`);
+      if (item.skill.availability?.state === "known-helper-failure") lines.push("  Known helper failure: read the audit's specific failing helper and input before using this module. Do not treat that helper's result as reliable; unrelated functions remain unverified, not automatically failed or passed.");
+    }
+  }
+  lines.push("If none is genuinely relevant, ignore this list and continue without a specialized Skill.");
+  return lines.join('\n');
+}
+
 if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) try {
   const input = await readInput();
   const prompt = String(input.prompt || input.user_prompt || input.message || input.text || "").trim();
@@ -393,31 +423,8 @@ if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.me
   const ranked = [...explicit, ...direct, ...graphScored,
     ...scored.filter(item => item.score >= minimum)];
   const selected = selectCategoryBudget(ranked);
-  const lines = [
-    "[CODEX_SKILL_ROUTER_V2]",
-    "Assistive routing: match the latest task's action and intended output; Skill and service names are optional. Load directly fitting entries and follow their workflows. Complete expert modules retain their original team, roles and artifact flow. Load only selected work, never the whole catalog.",
-    "Candidates:"
-  ];
-  for (const item of selected) {
-    const description = String(item.skill.description || "").replace(/\s+/g, " ").trim().slice(0, 280);
-    const routeKind = item.skill.kind === "mcp" ? `MCP/${item.skill.mcpServer}` : item.skill.kind === "expert" ? "Complete expert module" : item.skill.kind === "mcp-service" ? "MCP service module" : "Skill";
-    lines.push(`- ${item.skill.name} [${routeKind}; score=${item.score}; match=${item.matches.join(", ") || "description match"}]`);
-    lines.push(`  ${description}`);
-    lines.push(item.skill.kind === "mcp"
-      ? `  Call through indexed MCP server: ${item.skill.mcpServer}/${item.skill.name}`
-      : `  Read: ${item.skill.path}`);
-    if (item.skill.moduleId) {
-      lines.push(`  Module: ${item.skill.moduleId}; package: ${item.skill.packageRoot}; members: ${item.skill.memberCount}; availability: ${JSON.stringify(item.skill.availability)}`);
-      const auditName = item.skill.kind === "expert" ? "experts-audit.json" : item.skill.kind === "mcp-service" ? "mcp-audit.json" : "skills-audit.json";
-      lines.push(`  Audit evidence: ${path.join(codexRoot, "resource-evidence", auditName)}; package integrity: ${path.join(codexRoot, "resource-evidence", "package-integrity.json")}`);
-      lines.push("  Indexed is not execution-verified. Read the module's prerequisites and availability; do not claim it or an MCP service is callable until its dependencies and actual call are verified.");
-      if (item.skill.availability?.state === "known-helper-failure") lines.push("  Known helper failure: read the audit's specific failing helper and input before using this module. Do not treat that helper's result as reliable; unrelated functions remain unverified, not automatically failed or passed.");
-      if (item.skill.kind === "expert") lines.push("  When selected, read the entry above once: it contains the original primary role verbatim. Announce the expert name and execute its original workflow; load original members/Skills only as that workflow requires. Do not translate tools or introduce a host mapping. Report any unavailable required tool and blocked step. Loading or timeout never implies task completion.");
-    }
-  }
-  lines.push("If none is genuinely relevant, ignore this list and continue without a specialized Skill.");
   process.stdout.write(JSON.stringify({
-    hookSpecificOutput: { hookEventName: "UserPromptSubmit", additionalContext: lines.join("\n") }
+    hookSpecificOutput: { hookEventName: "UserPromptSubmit", additionalContext: renderRoutingContext(selected, codexRoot) }
   }));
 } catch (error) {
   process.stderr.write(`Skill router skipped: ${error.message}\n`);

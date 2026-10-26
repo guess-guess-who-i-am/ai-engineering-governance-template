@@ -48,7 +48,7 @@ async function route(prompt) {
   assert.equal(err, '');
   const context = JSON.parse(out).hookSpecificOutput?.additionalContext || '';
   if (context.includes('[Complete expert module;')) {
-    assert.match(context, /read the entry above once/);
+    assert.match(context, /read (?:its|the) entry (?:above )?once/);
     assert.match(context, /Do not translate tools or introduce a host mapping/);
     assert.doesNotMatch(context, /Use Codex equivalent agent\/tool APIs/);
   }

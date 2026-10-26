@@ -22,7 +22,11 @@ parser.add_argument('--report', type=Path, default=ROOT / f'.reports/retrieval-p
 args = parser.parse_args()
 sock = f'/tmp/codex-graph-{os.getuid()}/{hashlib.sha256(str(GRAPH).encode()).hexdigest()[:24]}.sock'
 manifest = json.loads((CODEX / 'skill-registry/external-skills-manifest.json').read_text())
-assert manifest['ownedSkillCount'] == 22, manifest['ownedSkillCount']
+required_owned = {path.name for path in (ROOT / 'codex-profile/global-skills').iterdir() if path.is_dir()}
+registry = json.loads((CODEX / 'skill-registry/skills-index.json').read_text())
+installed_owned = {row['name'] for row in registry['skills'] if row.get('source') == 'agents'}
+assert required_owned <= installed_owned, sorted(required_owned - installed_owned)
+assert manifest['ownedSkillCount'] >= len(required_owned), manifest['ownedSkillCount']
 mcp = json.loads((CODEX / 'skill-registry/mcp-tools.json').read_text())['tools']
 assert mcp and all(tool['server'] != 'serena' for tool in mcp)
 assert not (HOME / '.agents/skills/navigate-code-with-serena/SKILL.md').exists()
@@ -30,7 +34,6 @@ config = tomllib.loads((CODEX / 'config.toml').read_text())
 assert 'serena' not in config.get('mcp_servers', {})
 for relative in ['tools/serena-mcp.mjs', 'tools/serena-runtime.json', 'tools/serena-navigation']:
     assert not (CODEX / relative).exists(), relative
-registry = json.loads((CODEX / 'skill-registry/skills-index.json').read_text())
 assert all(row['name'] != 'navigate-code-with-serena' for row in registry['skills'])
 
 def request(query):
