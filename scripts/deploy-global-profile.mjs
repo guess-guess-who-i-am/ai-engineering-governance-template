@@ -114,15 +114,18 @@ export async function deploy({ home = os.homedir(), check = false, noService = f
   if (!noTaskTree) await run(process.execPath, [path.join(repository, 'scripts/install-task-tree-mcp-mac.mjs'), '--home', home, ...(check ? ['--check'] : [])], { env });
   // Windows endpoint ACL is established before any worker can create its token.
   if (!noService && process.platform === 'win32') await service({ home, check, resources });
-  await run(process.execPath, [path.join(root, 'hooks/refresh-skill-registry.mjs')], { env, timeout: 1200000 });
+  const graphPython = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(root, 'tools/graph-tool-call-venv', ...(process.platform === 'win32' ? ['Scripts', 'python.exe'] : ['bin', 'python']));
+  await run(graphPython, [path.join(root, 'hooks/graph_skill_index.py'), 'refresh',
+    '--lock', path.join(root, 'skill-registry/refresh.lock'), '--node', process.execPath,
+    '--script', path.join(root, 'hooks/refresh-skill-registry.mjs'), '--wait-timeout', '1200'],
+  { env, timeout: 1200000 });
   const manifest = JSON.parse(await readFile(path.join(root, 'skill-registry/external-skills-manifest.json'), 'utf8'));
   if (manifest.missingSkillCount || manifest.invalidSkillCount || manifest.ownedSkillCount < 22 || manifest.embedding !== 'sentence-transformers/all-MiniLM-L6-v2') {
     throw new Error('全量图验收失败；没有宣称安装完成。');
   }
   if (!noService && process.platform !== 'win32') await service({ home, check, resources });
   if (!noService) {
-    const python = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(root, 'tools/graph-tool-call-venv', ...(process.platform === 'win32' ? ['Scripts', 'python.exe'] : ['bin', 'python']));
-    await run(python, [path.join(root, 'hooks/warm-global-graph.py'), '--graph', path.join(root, 'skill-registry/skills.graph.json'), '--processes', String(resources.processes)], { env, timeout: 180000 });
+    await run(graphPython, [path.join(root, 'hooks/warm-global-graph.py'), '--graph', path.join(root, 'skill-registry/skills.graph.json'), '--processes', String(resources.processes)], { env, timeout: 180000 });
   }
   if (!check) {
     const stable = path.join(root, 'tools/ai-engineering-governance-template');

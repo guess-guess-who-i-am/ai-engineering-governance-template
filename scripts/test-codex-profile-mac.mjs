@@ -227,7 +227,7 @@ for await (const line of createInterface({ input: process.stdin })) {
   const routed = run(dispatcher, [], { ...envArgs, input: routeInput });
   assert(routed.status === 0 && routed.stdout.includes("method-github-delivery"), `GitHub methodology route did not match: ${routed.stderr || routed.stdout}`);
   const unrelated = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n` });
-  assert(unrelated.status === 0 && unrelated.stdout.trim() === "{}", "unrelated prompt received a methodology recommendation");
+  assert(unrelated.status === 0 && unrelated.stdout.trim() === "{}", `unrelated prompt route failed: ${JSON.stringify({ status: unrelated.status, error: unrelated.error?.message, signal: unrelated.signal, stderr: unrelated.stderr, stdout: unrelated.stdout })}`);
   const installSkillInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "请安装 skill", cwd: REPOSITORY_ROOT })}\n`;
   const installSkill = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: installSkillInput });
   assert(installSkill.status === 0 && installSkill.stdout.includes("skill-installer"), `system skill-installer route did not match: ${installSkill.stderr || installSkill.stdout}`);

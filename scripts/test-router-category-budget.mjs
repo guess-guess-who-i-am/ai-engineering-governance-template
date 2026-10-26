@@ -39,6 +39,7 @@ const server = createServer(socket => {
     if (!raw.includes('\n')) return;
     const request = JSON.parse(raw.split('\n')[0]);
     assert.equal(request.top_k, 8, 'category budgeting must not increase graph top_k');
+    assert.deepEqual(request.category_slots, { expert: 2, skill: 4, mcp: 2 }, 'GraphToolCall must rank each category into its own fixed slots');
     socket.end(JSON.stringify({ ok: true, results: candidates }) + '\n');
   });
 });

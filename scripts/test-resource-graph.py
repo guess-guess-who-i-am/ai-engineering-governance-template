@@ -11,7 +11,9 @@ import subprocess
 import sys
 import tempfile
 import threading
+import time
 import unittest
+from unittest import mock
 from contextlib import redirect_stdout
 from io import StringIO
 from types import SimpleNamespace
@@ -117,6 +119,106 @@ class ResourceGraphTests(unittest.TestCase):
         actual = graph.retrieve_with_scores('研究团队完整工作流', top_k=1)
         self.assertEqual(indexer.result_records(actual)[0]['module_id'], 'fixture-expert')
 
+    def test_category_slots_select_each_kind_before_global_top_k(self):
+        class Engine:
+            def __init__(self):
+                self._tools = {
+                    **{f'expert-{i}': SimpleNamespace(metadata={'kind': 'expert'}) for i in range(3)},
+                    **{f'skill-{i}': SimpleNamespace(metadata={'kind': 'skill'}) for i in range(5)},
+                    **{f'mcp-{i}': SimpleNamespace(metadata={'kind': 'mcp-service'}) for i in range(3)},
+                }
+
+            def _build_candidates(self, final_scores, keyword_scores, graph_scores,
+                                  embedding_scores, annotation_scores, semantic_scores, top_k):
+                from graph_tool_call.retrieval.ranking import stable_score_items
+                return [name for name, _ in stable_score_items(final_scores)[:top_k]]
+
+        engine = Engine()
+        slots = indexer.prepare_category_slot_retrieval(engine)
+        scores = {name: 100 - i for i, name in enumerate(engine._tools)}
+        args = (scores, {}, {}, {}, {}, {})
+
+        baseline = engine._build_candidates(*args, 8)
+        self.assertEqual(len(baseline), 8)
+        self.assertEqual(sum(engine._tools[name].metadata['kind'] == 'expert' for name in baseline), 3)
+
+        token = slots.set({'expert': 2, 'skill': 4, 'mcp': 2})
+        try:
+            selected = engine._build_candidates(*args, 8)
+        finally:
+            slots.reset(token)
+        categories = [engine._tools[name].metadata['kind'] for name in selected]
+        self.assertEqual(len(selected), 8)
+        self.assertEqual(categories.count('expert'), 2)
+        self.assertEqual(categories.count('skill'), 4)
+        self.assertEqual(categories.count('mcp-service'), 2)
+        self.assertEqual(selected, ['expert-0', 'expert-1', 'skill-0', 'skill-1', 'skill-2', 'skill-3', 'mcp-0', 'mcp-1'])
+
+    def test_category_semantic_leaders_enter_fixed_prefilter_cap(self):
+        import numpy as np
+
+        names = [f'skill-{i}' for i in range(10)] + ['expert-a', 'expert-b', 'mcp-a', 'mcp-b']
+        values = [0.99 - i * 0.01 for i in range(10)] + [0.30, 0.29, 0.20, 0.19]
+        tools = {
+            name: SimpleNamespace(metadata={'kind': 'expert' if name.startswith('expert') else
+                'mcp-service' if name.startswith('mcp') else 'skill'})
+            for name in names
+        }
+
+        class Index:
+            size = len(names)
+
+            def __init__(self):
+                self._names = names
+                self._matrix = np.asarray(values, dtype=np.float32).reshape(-1, 1)
+
+            def _ensure_matrix(self):
+                pass
+
+            def encode(self, query):
+                return [1.0]
+
+            def search(self, query_vector, top_k):
+                return [(name, score) for name, score in zip(names, values)][:top_k]
+
+        class Prefilter:
+            _max_pool = 8
+            _embedding_index = Index()
+            _tools = tools
+
+            def candidate_pool(self, query, intent, bm25_top, *, resource_scored=None):
+                return set(names[:8])
+
+        class Engine:
+            _tools = tools
+
+            def __init__(self):
+                self.prefilter = Prefilter()
+
+            def _get_prefilter(self):
+                return self.prefilter
+
+            def _build_candidates(self, *args):
+                return []
+
+            def _compute_embedding_scores(self, query, top_k, restrict=None):
+                return {}
+
+        engine = Engine()
+        slots = indexer.prepare_category_slot_retrieval(engine)
+        indexer.prepare_semantic_candidate_guard(engine)
+        token = slots.set({'expert': 2, 'skill': 4, 'mcp': 2})
+        try:
+            pool = engine._get_prefilter().candidate_pool('fixture query', None, [])
+            semantic = engine._compute_embedding_scores('fixture query', 8, pool)
+        finally:
+            slots.reset(token)
+        self.assertEqual(len(pool), 8)
+        self.assertEqual(pool, {'expert-a', 'expert-b', 'skill-0', 'skill-1', 'skill-2', 'skill-3', 'mcp-a', 'mcp-b'})
+        self.assertEqual(set(semantic), pool, 'category leaders past the global embedding cutoff must still reach fusion')
+        self.assertEqual(engine._compute_embedding_scores('fixture query', 8), {},
+            'category-scoped scores must not leak into a later unscoped request')
+
     def test_invalid_catalog_never_replaces_previous_graph(self):
         self.output.write_bytes(b'last-good-graph')
         for mutation in ('duplicate', 'missing-entry', 'invalid-kind'):
@@ -132,6 +234,18 @@ class ResourceGraphTests(unittest.TestCase):
                 indexer.build(self.args())
             self.assertEqual(self.output.read_bytes(), b'last-good-graph')
             self.modules = original
+
+    def test_refresh_waits_for_the_shared_lock_before_rebuilding(self):
+        lock = self.root / 'refresh.lock'
+        attempts = iter((False, False, True))
+        args = SimpleNamespace(lock=lock, wait_timeout=1, node='node', script='refresh.mjs')
+        with mock.patch.object(indexer, 'acquire_process_lock', side_effect=lambda _lock: next(attempts)) as acquire, \
+             mock.patch.object(indexer.subprocess, 'run') as run:
+            started = time.monotonic()
+            indexer.refresh(args)
+        self.assertEqual(acquire.call_count, 3)
+        self.assertGreaterEqual(time.monotonic() - started, 0.15)
+        run.assert_called_once()
 
     @unittest.skipIf(os.name == 'nt', 'Unix socket Hook fixture')
     def test_router_preserves_complete_module_and_availability(self):
@@ -166,8 +280,8 @@ class ResourceGraphTests(unittest.TestCase):
                 env={**os.environ, 'CODEX_HOME': str(self.root), 'CODEX_GRAPH_TOOL_PYTHON': sys.executable},
                 text=True, capture_output=True, timeout=10, check=True)
             context = json.loads(response.stdout)['hookSpecificOutput']['additionalContext']
-            for expected in ('Complete expert module', 'complete original module workflow',
-                             'not-execution-tested', 'unsupported host-only', 'members: 1', str(module['path'])):
+            for expected in ('Complete expert module', 'original primary role verbatim',
+                             'not-execution-tested', 'members: 1', str(module['path'])):
                 self.assertIn(expected, context)
         finally:
             server.close()

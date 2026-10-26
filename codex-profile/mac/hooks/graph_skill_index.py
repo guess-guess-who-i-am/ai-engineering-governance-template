@@ -581,35 +581,123 @@ def prepare_sparse_bm25(engine):
 
 
 def prepare_semantic_candidate_guard(engine):
-    """Keep semantic top-50 alongside BM25 top-50 within the existing cap.
+    """Keep category-local semantic leaders alongside global recall guards.
 
-    The upstream category cap can drop an embedding-only category member by
-    its tool-name order. Protect actual query-vector neighbours instead. This
-    wraps the owning pool boundary, before Chinese fusion saves its ContextVar;
-    adding candidates outside _maybe_prefilter would leave that context stale.
+    One shared embedding matrix is scored once, then independently partitioned
+    by resource kind. This prevents a dominant kind from occupying every
+    semantic slot without growing the upstream candidate pool.
     """
     from graph_tool_call.retrieval.ranking import stable_score_items
     prefilter = engine._get_prefilter()
     if getattr(prefilter, '_codex_semantic_guard', False):
         return
     original = prefilter.candidate_pool
+    category_scores_context = ContextVar('category_semantic_scores', default=None)
+    original_embedding_scores = engine._compute_embedding_scores
+
+    def compute_embedding_scores(query, top_k, restrict=None):
+        scoped = category_scores_context.get()
+        slots_context = getattr(engine, '_codex_category_slots', None)
+        if not slots_context or not slots_context.get() or scoped is None or scoped[0] != query or scoped[1] is None:
+            return original_embedding_scores(query, top_k, restrict)
+        import numpy as np
+
+        _query, names, similarities, category_scores = scoped
+        depth = top_k * 3 if restrict is None else max(top_k * 3, len(restrict))
+        take = min(depth, len(names))
+        if take < len(names):
+            positions = np.argpartition(-similarities, take - 1)[:take].tolist()
+            positions.sort(key=lambda i: (-float(similarities[i]), names[i].casefold(), names[i]))
+        else:
+            positions = sorted(range(len(names)), key=lambda i: (-float(similarities[i]), names[i].casefold(), names[i]))
+        scores = {names[i]: float(similarities[i]) for i in positions
+                  if restrict is None or names[i] in restrict}
+        for name, score in category_scores.items():
+            if restrict is None or name in restrict:
+                scores[name] = score
+        return scores
+
+    engine._compute_embedding_scores = compute_embedding_scores
+
+    def semantic_hits(index, query, quotas, global_limit):
+        """Return global and category-local cosine scores from one matrix pass."""
+        import numpy as np
+
+        if index is None or getattr(index, 'size', 0) <= 0:
+            return None, {}, {}
+        try:
+            index._ensure_matrix()
+            names = index._names
+            if not names or index._matrix is None:
+                return None, {}, {}
+            query_vector = np.asarray(index.encode(query), dtype=np.float32)
+            norm = float(np.linalg.norm(query_vector))
+            if norm == 0:
+                return None, {}, {}
+            similarities = index._matrix @ (query_vector / norm)
+            global_take = min(global_limit, len(names))
+            if global_take < len(names):
+                global_positions = np.argpartition(-similarities, global_take - 1)[:global_take].tolist()
+            else:
+                global_positions = list(range(len(names)))
+            global_positions.sort(key=lambda i: (-float(similarities[i]), names[i].casefold(), names[i]))
+            groups = {'expert': [], 'skill': [], 'mcp': []}
+            for position, name in enumerate(names):
+                tool = prefilter._tools.get(name)
+                if tool is None:
+                    continue
+                kind = str((tool.metadata or {}).get('kind', 'skill')).casefold()
+                group = 'expert' if kind == 'expert' else 'mcp' if kind in ('mcp', 'mcp-service') else 'skill'
+                groups[group].append(position)
+            selected = set()
+            for group, limit in quotas.items():
+                positions = groups[group]
+                if not positions or limit <= 0:
+                    continue
+                values = similarities[positions]
+                take = min(limit, len(positions))
+                if take < len(positions):
+                    local = np.argpartition(-values, take - 1)[:take]
+                    positions = [positions[int(i)] for i in local]
+                positions.sort(key=lambda i: (-float(similarities[i]), names[i].casefold(), names[i]))
+                selected.update(names[i] for i in positions[:take])
+            category_scores = {name: float(similarities[names.index(name)]) for name in selected}
+            return (names, similarities), {names[i] for i in global_positions}, category_scores
+        except (AttributeError, ImportError, TypeError, ValueError):
+            return None, {}, {}
 
     def candidate_pool(query, intent, bm25_top, *, resource_scored=None):
         pool = original(query, intent, bm25_top, resource_scored=resource_scored)
         index = prefilter._embedding_index
-        if pool is None or index is None or getattr(index, 'size', 0) <= 0:
+        slots_context = getattr(engine, '_codex_category_slots', None)
+        quotas = slots_context.get() if slots_context is not None else None
+        if not quotas or index is None or getattr(index, 'size', 0) <= 0:
             return pool
+        global_quota = sum(quotas.values())
         cap = prefilter._max_pool
         lexical = {name for name in (bm25_top or []) if name in prefilter._tools}
-        slots = max(0, min(50, cap - len(lexical)))
-        if not slots:
+        slots = max(0, min(50, cap - len(lexical) - global_quota))
+        matrix_state, semantic, category_scores = semantic_hits(index, query, quotas, slots)
+        category_scores_context.set((query, *matrix_state, category_scores) if matrix_state else None)
+        if pool is None:
+            return None
+        category_hits = set(category_scores)
+        if not semantic and not category_hits:
             return pool
-        try:
-            hits = index.search(index.encode(query), top_k=slots)
-        except (ValueError, ImportError):
-            return pool  # Preserve the upstream optional-embedding failure path.
-        semantic = {name for name, _ in hits if name in prefilter._tools}
-        protected = lexical | semantic
+        if slots == 0:
+            protected = lexical | category_hits
+            if protected.issubset(pool):
+                return pool
+            keep = set(protected)
+            priority = [name for name, _ in stable_score_items(resource_scored or {}) if name in pool]
+            priority.extend(sorted(pool, key=lambda name: (name.casefold(), name)))
+            for name in priority:
+                if len(keep) >= cap:
+                    break
+                keep.add(name)
+            return keep
+        semantic = {name for name in semantic if name in prefilter._tools}
+        protected = lexical | semantic | category_hits
         if protected.issubset(pool):
             return pool
         keep = set(protected)
@@ -625,6 +713,64 @@ def prepare_semantic_candidate_guard(engine):
 
     prefilter.candidate_pool = candidate_pool
     prefilter._codex_semantic_guard = True
+    engine._codex_category_embedding_scores_context = category_scores_context
+
+
+def prepare_category_slot_retrieval(engine):
+    """Select category quotas at GraphToolCall's final candidate boundary.
+
+    Scores still come from one shared graph pass. A request-local ContextVar
+    prevents concurrent Hook requests from leaking category limits.
+    """
+    if getattr(engine, '_codex_category_slots', None) is not None:
+        return engine._codex_category_slots
+    from graph_tool_call.retrieval.ranking import stable_score_items
+    slots_context = ContextVar('graph_category_slots', default=None)
+    original = engine._build_candidates
+
+    def category(name):
+        kind = str((engine._tools.get(name).metadata or {}).get('kind', 'skill')
+                   if engine._tools.get(name) is not None else 'skill').casefold()
+        if kind == 'expert':
+            return 'expert'
+        if kind in ('mcp', 'mcp-service'):
+            return 'mcp'
+        return 'skill'
+
+    def build(final_scores, keyword_scores, graph_scores, embedding_scores,
+              annotation_scores, semantic_scores, top_k):
+        limits = slots_context.get()
+        if not limits or sum(limits.values()) != top_k:
+            return original(final_scores, keyword_scores, graph_scores,
+                            embedding_scores, annotation_scores, semantic_scores, top_k)
+        remaining = dict(limits)
+        selected = {}
+        for name, score in stable_score_items(final_scores):
+            kind = category(name)
+            if remaining.get(kind, 0) <= 0:
+                continue
+            selected[name] = score
+            remaining[kind] -= 1
+            if not any(remaining.values()):
+                break
+        return original(selected, keyword_scores, graph_scores, embedding_scores,
+                        annotation_scores, semantic_scores, top_k)
+
+    engine._build_candidates = build
+    engine._codex_category_slots = slots_context
+    return slots_context
+
+
+def normalize_category_slots(value, top_k):
+    if value is None:
+        return None
+    if not isinstance(value, dict) or set(value) != {'expert', 'skill', 'mcp'}:
+        raise ValueError('category_slots must contain expert, skill, and mcp')
+    if any(type(count) is not int or count < 0 for count in value.values()):
+        raise ValueError('category_slots values must be non-negative integers')
+    if sum(value.values()) != top_k:
+        raise ValueError('category_slots must sum to top_k')
+    return dict(value)
 
 
 def prepare_service_identity_routing(engine):
@@ -908,6 +1054,8 @@ class _GraphWorker:
                 engine.set_embedding_index(_SerializedEmbeddingIndex(chinese_index))
             prepare_semantic_candidate_guard(self._english_graph._get_retrieval_engine())
             prepare_semantic_candidate_guard(engine)
+            prepare_category_slot_retrieval(self._english_graph._get_retrieval_engine())
+            prepare_category_slot_retrieval(engine)
             prepare_chinese_retrieval(engine)
             prepare_service_identity_routing(english_engine)
             prepare_service_identity_routing(engine)
@@ -931,13 +1079,15 @@ class _GraphWorker:
         if not query:
             return []
         top_k = max(1, min(int(payload.get("top_k", 8)), 50))
+        category_slots = normalize_category_slots(payload.get('category_slots'), top_k)
+        slots_key = tuple(sorted(category_slots.items())) if category_slots is not None else None
         with self._condition:
             self._last_request = time.monotonic()
             graph = self._load_if_stale()
             language = 'zh' if re.search(r'[\u3400-\u4dbf\u4e00-\u9fff]', query) else 'en'
             if language == 'en':
                 graph = self._english_graph
-            key = (query, top_k)
+            key = (query, top_k, slots_key)
             if key in self._results:
                 self.cache_hits += 1
                 self._results.move_to_end(key)
@@ -945,7 +1095,15 @@ class _GraphWorker:
             if language not in self._ready_languages:
                 # GraphToolCall lazily creates BM25, prefilter and model state.
                 # Complete one real query before sharing those structures.
-                results = graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2)
+                engine = graph._get_retrieval_engine()
+                semantic_context = engine._codex_category_embedding_scores_context
+                semantic_token = semantic_context.set(None)
+                token = engine._codex_category_slots.set(category_slots)
+                try:
+                    results = graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2)
+                finally:
+                    engine._codex_category_slots.reset(token)
+                    semantic_context.reset(semantic_token)
                 self._ready = True
                 self._ready_languages.add(language)
                 records = result_records(results)
@@ -964,7 +1122,15 @@ class _GraphWorker:
             timeout = max(0, (payload['deadline'] - time.time() * 1000) / 1000) if 'deadline' in payload else None
             return deepcopy(future.result(timeout=timeout))
         try:
-            results = graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2)
+            engine = graph._get_retrieval_engine()
+            semantic_context = engine._codex_category_embedding_scores_context
+            semantic_token = semantic_context.set(None)
+            token = engine._codex_category_slots.set(category_slots)
+            try:
+                results = graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2)
+            finally:
+                engine._codex_category_slots.reset(token)
+                semantic_context.reset(semantic_token)
             records = result_records(results)
             with self._condition:
                 self._results[key] = records
@@ -1135,7 +1301,10 @@ class _ProcessGraphWorker:
         remaining = max(0, (payload['deadline'] - time.time() * 1000) / 1000) if 'deadline' in payload else 50
         info = self._path.stat()
         signature = (info.st_ino, info.st_size, info.st_mtime_ns)
-        key = (signature, str(payload.get('query') or '').strip(), max(1, min(int(payload.get('top_k', 8)), 50)))
+        top_k = max(1, min(int(payload.get('top_k', 8)), 50))
+        category_slots = normalize_category_slots(payload.get('category_slots'), top_k)
+        slots_key = tuple(sorted(category_slots.items())) if category_slots is not None else None
+        key = (signature, str(payload.get('query') or '').strip(), top_k, slots_key)
         with self._lock:
             if self._signature != signature:
                 self._results.clear()
@@ -1227,8 +1396,13 @@ def refresh(args):
     lock_path = Path(args.lock)
     lock_path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     with open(lock_path, "a+") as lock:
-        if not acquire_process_lock(lock):
-            return
+        deadline = time.monotonic() + args.wait_timeout
+        while not acquire_process_lock(lock):
+            if args.wait_timeout <= 0:
+                return
+            if time.monotonic() >= deadline:
+                raise TimeoutError("Timed out waiting for the global Skill index refresh lock")
+            time.sleep(0.1)
         index_threads = int(os.environ.get("CODEX_GRAPH_INDEX_THREADS", min(8, os.cpu_count() or 1)))
         if not 1 <= index_threads <= 20:
             raise ValueError("CODEX_GRAPH_INDEX_THREADS must be 1-20")
@@ -1273,6 +1447,8 @@ def main():
     refresh_parser.add_argument("--lock", required=True)
     refresh_parser.add_argument("--node", required=True)
     refresh_parser.add_argument("--script", required=True)
+    refresh_parser.add_argument("--wait-timeout", type=float, default=0,
+                                help="Wait up to this many seconds for an existing refresh before rebuilding")
     refresh_parser.set_defaults(func=refresh)
     args = parser.parse_args()
     args.func(args)

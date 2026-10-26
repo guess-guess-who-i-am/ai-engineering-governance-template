@@ -49,5 +49,8 @@
   "manage-global-methodology": ["编辑方法论", "修改方法论", "新增方法论", "删除方法论", "移动方法论", "发布方法论", "全局方法论", "编辑全局prompt", "methodology editor", "methodology publisher"],
   "tool-call-batching": ["并发", "高并发", "并发调用", "工具调用", "工具往返", "批量工具", "执行慢", "运行慢", "Promise.all", "tool batching", "parallel tool calls"],
   "pdf": ["\u8bfb\u53d6 PDF", "PDF", "pdf"],
-  "docx": ["Word \u6587\u6863", "docx", "word document"]
+  "docx": ["Word \u6587\u6863", "docx", "word document"],
+  "technical_research_batch": ["API-only", "仅技术API"],
+  "complementary_search_batch": ["Stack Overflow", "StackOverflow", "高star", "高 star", "CCF-A", "CCF A", "查仓库", "成熟库", "论文检索", "技术资料", "互补搜索", "technical research"],
+  "parallel-web-research": ["并行搜索", "联网研究", "搜索资料", "查论文"]
 }

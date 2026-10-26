@@ -2,10 +2,70 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, realpathSync } from "node:fs";
-import { readFile, mkdir, lstat } from "node:fs/promises";
+import { readFile, mkdir, lstat, open } from "node:fs/promises";
 import { createConnection } from "node:net";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from 'node:url';
+
+function isFollowup(prompt) {
+  if (prompt.length > 100) return false;
+  // Sticky tokenization avoids catastrophic backtracking on near-miss input.
+  const token = /好的?|可以|行|那么|那|就|请|嗯|是的|对|都|也|再|先|直接|帮我|把|按照|照|按|这个|这些|那个|那些|上述|上面|前面|继续|还是|仍然|执行|修改|改|做|修|统一|部署|测试|验证|完成|一下|吧|啊|呢|了|的|办|开始|用|方案|推荐|\s|[，。！!,.?？:：]/uy;
+  let offset = 0;
+  while (offset < prompt.length) {
+    token.lastIndex = offset;
+    const match = token.exec(prompt);
+    if (!match) break;
+    offset = token.lastIndex;
+  }
+  return offset === prompt.length ||
+    /^(?:yes|ok(?:ay)?|please|then|go ahead|continue|do (?:it|that)|proceed)(?:[\s,.!]+(?:please|then|with (?:it|that)|as discussed|continue|do (?:it|that)|proceed))*[\s,.!]*$/i.test(prompt);
+}
+
+// A short deictic reply is not a standalone search query. Read only a bounded
+// tail of the transcript supplied by Codex, never persist prompts or scan all
+// sessions. History is retrieval data, not authority to revive old actions.
+export async function routingQuery(input, prompt) {
+  const reply = prompt.match(/^<send_user_message_question_reply>\s*([\s\S]*?)\s*<\/send_user_message_question_reply>\s*$/);
+  if (reply) {
+    const answers = JSON.parse(reply[1]);
+    if (!Array.isArray(answers)) throw new Error('Question reply must be an array');
+    // The question supplies the missing referent; IDs and transport keys do not.
+    const resolved = answers.map(answer => [answer.question, answer.answer]
+      .filter(value => typeof value === 'string').join('\n')).filter(Boolean).join('\n');
+    if (!resolved) return '';
+    prompt = resolved;
+  }
+  if (!isFollowup(prompt)) return prompt;
+  if (!input.transcript_path) return '';
+  const file = await open(input.transcript_path, 'r');
+  let text;
+  try {
+    const info = await file.stat();
+    if (!info.isFile()) throw new Error('Routing transcript is not a regular file');
+    const size = Math.min(info.size, 1024 * 1024), offset = info.size - size;
+    const buffer = Buffer.alloc(size);
+    const { bytesRead } = await file.read(buffer, 0, size, offset);
+    text = buffer.subarray(0, bytesRead).toString('utf8');
+    if (offset) text = text.slice(text.indexOf('\n') + 1);
+  } finally { await file.close(); }
+  const prior = [];
+  for (const line of text.split('\n')) {
+    if (!line.trim()) continue;
+    let record;
+    try { record = JSON.parse(line); } catch { continue; } // tail can end mid-record
+    const message = record.type === 'response_item' ? record.payload : undefined;
+    if (message?.type !== 'message' || message.role !== 'user') continue;
+    const value = (message.content || []).filter(c => c.type === 'input_text').map(c => c.text || '').join('\n').trim();
+    if (!value || value === prompt || isFollowup(value) || value.startsWith('<') || value.startsWith('# AGENTS.md')) continue;
+    // Do not copy obvious credentials from conversation history into retrieval.
+    if (/\b(?:sk-[a-z0-9_-]{12,}|(?:api[_-]?key|token|password|authorization)\s*[:=])|[?&](?:token|key)=/i.test(value)) continue;
+    prior.push(value);
+  }
+  const task = prior.at(-1);
+  return task ? `${task.slice(0, 1600)}\n${prompt}` : '';
+}
 
 async function readInput() {
   let raw = "";
@@ -251,7 +311,7 @@ async function graphCandidates(graphPath, query, pythonPath, indexerPath) {
     throw new Error("GraphToolCall socket directory must be private and owned by this user");
   }
   const deadline = Date.now() + 55000;
-  const payload = { query, top_k: 8, deadline };
+  const payload = { query, top_k: 8, category_slots: { expert: 2, skill: 4, mcp: 2 }, deadline };
   const asSkills = (results) => results
     .filter((item) => item?.kind === "mcp" || (item?.path && existsSync(item.path)))
     .map((item) => ({ skill: {
@@ -285,11 +345,16 @@ async function graphCandidates(graphPath, query, pythonPath, indexerPath) {
     });
 }
 
-try {
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) try {
   const input = await readInput();
   const prompt = String(input.prompt || input.user_prompt || input.message || input.text || "").trim();
   if (input.hook_event_name !== "UserPromptSubmit" || !prompt) {
     process.stdout.write("{}");
+    process.exit(0);
+  }
+  const retrievalQuery = await routingQuery(input, prompt);
+  if (!retrievalQuery) {
+    process.stdout.write('{}');
     process.exit(0);
   }
   const codexRoot = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
@@ -301,7 +366,7 @@ try {
   const aliases = Object.fromEntries(Object.entries(ruleDocument)
     .filter(([name, values]) => !name.startsWith('_') && Array.isArray(values))
     .map(([name, values]) => [name.toLocaleLowerCase(), (values || []).map((value) => String(value).toLocaleLowerCase())]));
-  const query = prompt.toLocaleLowerCase();
+  const query = retrievalQuery.toLocaleLowerCase();
   const tokens = queryTokens(query, stopTokens);
   // External catalog Skills already belong to the persistent GraphToolCall
   // index. A second 15k+ JavaScript scan per Agent defeats that shared service.
@@ -310,7 +375,7 @@ try {
   const scored = skills.map((skill) => scoreSkill(skill, tokens, query, aliases)).filter((item) => item.score > 0);
   const indexerPath = path.join(codexRoot, "hooks", "graph_skill_index.py");
   const pythonPath = process.env.CODEX_GRAPH_TOOL_PYTHON || path.join(codexRoot, "tools", "graph-tool-call-venv", ...(process.platform === 'win32' ? ['Scripts', 'python.exe'] : ['bin', 'python']));
-  const graphScored = await graphCandidates(registry.externalGraphPath, prompt, pythonPath, indexerPath);
+  const graphScored = await graphCandidates(registry.externalGraphPath, retrievalQuery, pythonPath, indexerPath);
   scored.sort((a, b) => b.score - a.score || Number(a.skill.rank || 0) - Number(b.skill.rank || 0) || String(a.skill.name).localeCompare(String(b.skill.name)));
   if (!graphScored.length && (!scored.length || scored[0].score < 6)) {
     process.stdout.write("{}");

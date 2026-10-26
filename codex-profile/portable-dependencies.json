@@ -12,7 +12,7 @@
   },
   "skillLibrary": {
     "repository": "https://github.com/guess-guess-who-i-am/skills-library.git",
-    "commit": "4d830510d26e57bc303e9aeeac53d18e6c4687bf",
+    "commit": "2aeaf07b5dcb2dff6203ef88cf8357e19b0f7f96",
     "catalogSha256": "dd63f1d8b8ec26b6b6bd4ff2bdf5fd52c637964b1f7c202a746465cbebdbd54c",
     "private": true
   }
