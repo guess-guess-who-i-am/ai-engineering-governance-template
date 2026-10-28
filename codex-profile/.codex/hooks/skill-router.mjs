@@ -352,10 +352,9 @@ export function renderRoutingContext(selected, codexRoot) {
   ];
   if (selected.some(item => item.skill.moduleId)) {
     lines.push(`Audit evidence: ${path.join(codexRoot, 'resource-evidence')} — experts: experts-audit.json; Skills: skills-audit.json; MCP services: mcp-audit.json; package integrity: package-integrity.json.`);
-    lines.push("For every module: Indexed is not execution-verified. Read its prerequisites and availability; do not claim a module or MCP service is callable until its dependencies and actual call are verified.");
   }
   if (selected.some(item => item.skill.kind === 'expert')) {
-    lines.push("For a selected expert, read its entry once: it contains the original primary role verbatim. Announce its name and execute its original workflow; load original members/Skills only as required. Do not translate tools or introduce a host mapping. Report unavailable required tools and blocked steps. Loading or timeout never implies completion.");
+    lines.push("For a selected expert, read its entry once: it contains the original primary role verbatim. Announce its name and execute its original workflow; load original members/Skills only as required.");
   }
   lines.push('Candidates:');
   for (const item of selected) {
@@ -368,7 +367,7 @@ export function renderRoutingContext(selected, codexRoot) {
       : `  Read: ${item.skill.path}`);
     if (item.skill.moduleId) {
       lines.push(`  Module: ${item.skill.moduleId}; package: ${item.skill.packageRoot}; members: ${item.skill.memberCount}; availability: ${JSON.stringify(item.skill.availability)}`);
-      if (item.skill.availability?.state === "known-helper-failure") lines.push("  Known helper failure: read the audit's specific failing helper and input before using this module. Do not treat that helper's result as reliable; unrelated functions remain unverified, not automatically failed or passed.");
+      if (item.skill.availability?.state === "known-helper-failure") lines.push("  Known helper failure: read the audit's specific failing helper and input before using this module.");
     }
   }
   lines.push("If none is genuinely relevant, ignore this list and continue without a specialized Skill.");

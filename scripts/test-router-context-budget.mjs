@@ -15,7 +15,10 @@ const items = [fixture('expert-a', 'expert'), fixture('expert-b', 'expert'),
   })];
 const context = renderRoutingContext(items, '/fixture/global');
 assert.equal((context.match(/^- /gm) || []).length, 8);
-assert.equal((context.match(/Indexed is not execution-verified/g) || []).length, 1);
+for (const removed of ['Indexed is not execution-verified', 'do not claim a module',
+  'Loading or timeout never implies completion', 'unrelated functions remain unverified']) {
+  assert.ok(!context.includes(removed), removed);
+}
 assert.equal((context.match(/original primary role verbatim/g) || []).length, 1);
 for (const item of items) {
   const { skill } = item;
@@ -29,4 +32,4 @@ for (const file of ['skills-audit.json', 'experts-audit.json', 'mcp-audit.json',
 const plain = renderRoutingContext([fixture('plain', 'skill', { moduleId: '' })], '/fixture/global');
 assert.ok(!plain.includes('Audit evidence'));
 assert.ok(!plain.includes('original primary role verbatim'));
-console.log('PASS shared guidance once; 8 candidates, original entries, availability and failure warnings preserved');
+console.log('PASS concise routing guidance; 8 candidates, original entries, availability and specific failures preserved');

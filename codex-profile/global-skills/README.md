@@ -21,7 +21,7 @@ Skills 是按需加载的专项工作流，不是常驻规则集合。
 | `method-research-evidence` | 路由论文、研究设计和科学证据工作 |
 | `method-engineering-execution` | 路由实现、架构、调试和集成工作 |
 | `method-evaluation-gates` | 路由验收、指标、测试和定性门禁工作 |
-| `method-github-delivery` | 路由经授权的提交、推送和 GitHub 交付 |
+| `method-github-delivery` | 路由用户要求或项目规则要求的提交、推送和 GitHub 交付 |
 | `method-task-tree` | 仅在存在任务树状态时加载任务图方法 |
 | `task-tree-chain-run` | 沿任务树执行链运行一个节点 |
 | `task-tree-core-state` | 精简任务树并保留决策相关状态 |
