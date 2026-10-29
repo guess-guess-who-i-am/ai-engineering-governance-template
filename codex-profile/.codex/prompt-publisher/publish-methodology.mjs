@@ -125,8 +125,8 @@ function buildChineseReview(routes, rulesByRoute) {
     "## 运行关系",
     "",
     "1. 进入项目时，Codex 一次性读取全局和当前项目的 `AGENTS.md`；运行文件使用英文。",
-    "2. 每次用户提示，以及会话启动、恢复、清理和压缩时，Hook 重复注入英文常驻原文和英文方法论路由。",
-    "3. Skill 推荐器每次只给出最多4个匹配候选、原因、简介和路径，不注入完整 Skill 索引。",
+    "2. 每次用户提示检索候选；有稳定会话标识时常驻提醒每3轮注入一次，会话启动、恢复、清理和压缩时重新注入。",
+    "3. 推荐器最多给出8个匹配候选：专家2个、Skill 4个、MCP 2个，附原因、简介和路径，不注入完整索引。",
     "4. 命中专项路由后，Codex 才完整读取对应的英文 `method-*` Skill。完整方法论档案不会整包注入。",
     ""
   ];
@@ -212,7 +212,6 @@ async function writeReplacing(file, content) {
   const temporary = `${file}.methodology-${process.pid}.tmp`;
   await writeFile(temporary, content, "utf8");
   try {
-    await rm(file, { force: true });
     await rename(temporary, file);
   } catch (error) {
     await rm(temporary, { force: true });
@@ -280,7 +279,7 @@ async function rollback(originals) {
   }
 }
 
-async function runPostPublish(config) {
+async function runPostPublish(config, { refresh = true } = {}) {
   const invocation = (file) => {
     const extension = path.extname(file).toLowerCase();
     if ([".js", ".cjs", ".mjs"].includes(extension)) return { command: process.execPath, args: [file] };
@@ -293,15 +292,17 @@ async function runPostPublish(config) {
     throw new Error(`不支持的发布后脚本类型：${file}`);
   };
   const validator = invocation(config.validatorFile);
+  validator.args.push("--config", config.configFile);
   const validate = await runProcess(validator.command, validator.args, { timeoutMs: 30000 });
   if (validate.code !== 0) throw new Error(`方法论完整性校验失败：${`${validate.stderr}\n${validate.stdout}`.trim()}`);
+  if (!refresh || !config.refreshRegistryFile) return validate.stdout.trim();
   const refreshInput = `${JSON.stringify({ hook_event_name: "SessionStart", source: "startup", cwd: path.dirname(config.sourceFile) })}\n`;
   const refresher = invocation(config.refreshRegistryFile);
-  const refresh = await runProcess(refresher.command, refresher.args, {
+  const refreshed = await runProcess(refresher.command, refresher.args, {
     input: refreshInput,
     timeoutMs: Number(config.registryRefreshTimeoutMs || 120000)
   });
-  if (refresh.code !== 0) throw new Error(`Skill 索引刷新失败：${`${refresh.stderr}\n${refresh.stdout}`.trim()}`);
+  if (refreshed.code !== 0) throw new Error(`Skill 索引刷新失败：${`${refreshed.stderr}\n${refreshed.stdout}`.trim()}`);
   return validate.stdout.trim();
 }
 
@@ -310,31 +311,21 @@ export async function publishMethodology(config, { force = false, dryRun = false
   const runtimeSource = buildRuntimeSource(sourceText);
   const chineseSections = parseRoutedSections(runtimeSource);
   const chineseRules = validateSourceSections(chineseSections, config.routes);
-  if (check) {
-    const state = await readState(config.stateFile);
-    if (state.runtimeSourceSha256 !== sha256(runtimeSource)) {
+  const runtimeSourceSha256 = sha256(runtimeSource);
+  const state = await readState(config.stateFile);
+  let translatedDocument = "";
+  let translated = false;
+  if (check || (!force && state.runtimeSourceSha256 === runtimeSourceSha256 && existsSync(config.translationCacheFile))) {
+    if (state.runtimeSourceSha256 !== runtimeSourceSha256) {
       throw new Error("方法论状态过期：当前中文源与 methodology-state.json 不一致；请先运行发布器更新翻译缓存和生成物");
     }
     if (!existsSync(config.translationCacheFile)) {
       throw new Error("方法论翻译缓存缺失；请先运行发布器生成 translation cache");
     }
-    const cachedTranslation = `${normalizeText(await readFile(config.translationCacheFile, "utf8"))}\n`;
-    if (state.translationSha256 !== sha256(cachedTranslation)) {
+    translatedDocument = `${normalizeText(await readFile(config.translationCacheFile, "utf8"))}\n`;
+    if (state.translationSha256 !== sha256(translatedDocument)) {
       throw new Error("方法论状态过期：翻译缓存与 methodology-state.json 不一致；请先运行发布器");
     }
-    validateTranslation(runtimeSource, cachedTranslation);
-    const translatedSections = parseRoutedSections(cachedTranslation);
-    assertTranslatedSections(chineseSections, translatedSections, config.routes);
-    const validation = await runPostPublish(config);
-    return { status: "checked", translated: false, ruleCount: [...chineseRules.values()].reduce((sum, rules) => sum + rules.length, 0), validation };
-  }
-
-  const runtimeSourceSha256 = sha256(runtimeSource);
-  const state = await readState(config.stateFile);
-  let translatedDocument = "";
-  let translated = false;
-  if (!force && state.runtimeSourceSha256 === runtimeSourceSha256 && existsSync(config.translationCacheFile)) {
-    translatedDocument = `${normalizeText(await readFile(config.translationCacheFile, "utf8"))}\n`;
     validateTranslation(runtimeSource, translatedDocument);
   } else {
     const result = await translateWithCodex(runtimeSource, config);
@@ -373,7 +364,14 @@ export async function publishMethodology(config, { force = false, dryRun = false
     const current = await readFile(route.skillFile, "utf8");
     artifacts.set(route.skillFile, replaceSkillRules(current, route.id, englishRules.get(route.id)));
   }
-  const outputsCurrent = (await Promise.all([...artifacts].map(([file, content]) => contentEquals(file, content)))).every(Boolean);
+  const comparisons = await Promise.all([...artifacts].map(async ([file, content]) => ({ file, equal: await contentEquals(file, content) })));
+  const drift = comparisons.filter(item => !item.equal).map(item => item.file);
+  const outputsCurrent = drift.length === 0;
+  if (check) {
+    if (drift.length) throw new Error(`方法论生成物与当前源/翻译不一致：${drift.join(", ")}；请运行发布器修复漂移`);
+    const validation = await runPostPublish(config, { refresh: false });
+    return { status: "checked", translated: false, ruleCount, contextCharacters, validation };
+  }
   if (!force && state.runtimeSourceSha256 === runtimeSourceSha256 && outputsCurrent) {
     return {
       status: "already-current",

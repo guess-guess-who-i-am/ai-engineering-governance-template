@@ -66,11 +66,12 @@ async function exists(file) {
   catch { return false; }
 }
 
-async function filesUnder(root) {
+async function filesUnder(root, excludedDirectories = []) {
   const output = [];
   async function visit(directory) {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
       if (entry.name === '.git' || entry.name === '__pycache__' || /\.py[co]$/.test(entry.name)) continue;
+      if (entry.isDirectory() && excludedDirectories.includes(entry.name)) continue;
       const target = path.join(directory, entry.name);
       if (entry.isDirectory()) await visit(target);
       else if (entry.isFile()) output.push(target);
@@ -177,10 +178,16 @@ export async function buildOperations(home) {
   const codexHome = path.join(home, ".codex");
   const agentsHome = path.join(home, ".agents");
   const operations = new Map();
-  const externalSkillRoot = process.env.CODEX_EXTERNAL_SKILL_ROOT || process.env.CODEX_PROFILE_SKILL_SOURCE || path.join(home, ".codex", "tools", "skills");
+  let installedLibrary = {};
+  try { installedLibrary = JSON.parse(await readFile(path.join(codexHome, 'skill-registry/external-library-config.json'), 'utf8')); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
+  const explicitRoot = process.env.CODEX_EXTERNAL_SKILL_ROOT || process.env.CODEX_PROFILE_SKILL_SOURCE;
+  const externalSkillRoot = explicitRoot || installedLibrary.root || path.join(home, ".codex", "tools", "skills");
+  const externalCatalog = process.env.CODEX_EXTERNAL_SKILL_CATALOG || process.env.CODEX_PROFILE_SKILL_CATALOG ||
+    (!explicitRoot && installedLibrary.catalog) || path.join(externalSkillRoot, '_catalog_cn.json');
   const bundledSkillLibrary = path.join(codexHome, "tools", "skills");
-  const addTree = async (sourceRoot, destinationRoot, filter = () => true) => {
-    for (const source of await filesUnder(sourceRoot)) {
+  const addTree = async (sourceRoot, destinationRoot, filter = () => true, excludedDirectories = []) => {
+    for (const source of await filesUnder(sourceRoot, excludedDirectories)) {
       const relative = path.relative(sourceRoot, source);
       if (relative.split(path.sep).includes("__pycache__") || /\.py[co]$/.test(source)) continue;
       if (!filter(source)) continue;
@@ -189,7 +196,9 @@ export async function buildOperations(home) {
     }
   };
 
-  await addTree(path.join(PROFILE_ROOT, ".codex", "prompts"), path.join(codexHome, "prompts"));
+  // History belongs to the machine that created it, not the portable profile.
+  // Prune before traversal so large backup trees cost no reads or allocations.
+  await addTree(path.join(PROFILE_ROOT, ".codex", "prompts"), path.join(codexHome, "prompts"), () => true, ['backups']);
   await addTree(
     path.join(PROFILE_ROOT, ".codex", "prompt-publisher"),
     path.join(codexHome, "prompt-publisher"),
@@ -256,8 +265,9 @@ export async function buildOperations(home) {
   }
   operations.set(path.join(codexHome, "skill-registry", "external-library-config.json"), {
     destination: path.join(codexHome, "skill-registry", "external-library-config.json"),
-    content: Buffer.from(`${JSON.stringify({ root: externalSkillRoot, catalog: process.env.CODEX_EXTERNAL_SKILL_CATALOG || process.env.CODEX_PROFILE_SKILL_CATALOG || path.join(externalSkillRoot, "_catalog_cn.json"), requireComplete: process.env.CODEX_PROFILE_REQUIRE_COMPLETE === '1',
-      chineseEmbedding: process.env.CODEX_GRAPH_CHINESE_EMBEDDING ?? 'paraphrase-multilingual-MiniLM-L12-v2' }, null, 2)}\n`),
+    content: Buffer.from(`${JSON.stringify({ root: externalSkillRoot, catalog: externalCatalog,
+      requireComplete: process.env.CODEX_PROFILE_REQUIRE_COMPLETE === undefined ? installedLibrary.requireComplete === true : process.env.CODEX_PROFILE_REQUIRE_COMPLETE === '1',
+      chineseEmbedding: process.env.CODEX_GRAPH_CHINESE_EMBEDDING ?? installedLibrary.chineseEmbedding ?? 'paraphrase-multilingual-MiniLM-L12-v2' }, null, 2)}\n`),
     mode: 0o600,
     source: "generated:external-library-config"
   });

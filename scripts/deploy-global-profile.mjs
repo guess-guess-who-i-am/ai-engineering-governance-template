@@ -46,6 +46,11 @@ async function writeManaged(file, body, home, check) {
   await rename(temporary, file);
 }
 
+export async function copyPortableProfile(source, destination) {
+  const history = path.join(source, '.codex/prompts/backups');
+  await cp(source, destination, { recursive: true, filter: file => file !== history });
+}
+
 async function service({ home, check, resources }) {
   const root = path.join(home, '.codex');
   const spec = serviceDocument({ platform: process.platform, home, resources });
@@ -131,7 +136,7 @@ export async function deploy({ home = os.homedir(), check = false, noService = f
     const stable = path.join(root, 'tools/ai-engineering-governance-template');
     if (repository !== stable) {
       await mkdir(path.join(stable, 'scripts'), { recursive: true, mode: 0o700 });
-      await cp(path.join(repository, 'codex-profile'), path.join(stable, 'codex-profile'), { recursive: true });
+      await copyPortableProfile(path.join(repository, 'codex-profile'), path.join(stable, 'codex-profile'));
       for (const name of scripts) await copyFile(path.join(repository, 'scripts', name), path.join(stable, 'scripts', name));
     }
   }

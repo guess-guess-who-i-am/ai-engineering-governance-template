@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from "node:child_process";
-import { access, cp, mkdir, readFile, rename, rm } from "node:fs/promises";
+import { access, cp, mkdir, readFile, realpath, rename, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -133,10 +133,18 @@ async function install(options) {
     runtimeAction = "cloned";
   }
   if (!options.check && path.resolve(runtime) !== path.resolve(stable)) {
-    await mkdir(path.dirname(stable), { recursive: true, mode: 0o700 });
-    await cp(runtime, stable, { recursive: true, filter: source => !source.split(path.sep).includes('.git') });
+    const installedIdentity = await realpath(stable).catch(error => {
+      if (error.code === 'ENOENT') return '';
+      throw error;
+    });
+    // Different path spellings can refer to the same existing runtime.
+    // Copying a directory over its own symbolic link fails with EISDIR.
+    if (await realpath(runtime) !== installedIdentity) {
+      await mkdir(path.dirname(stable), { recursive: true, mode: 0o700 });
+      await cp(runtime, stable, { recursive: true, filter: source => !source.split(path.sep).includes('.git') });
+      runtimeAction = 'copied-global';
+    }
     runtime = stable;
-    runtimeAction = 'copied-global';
   }
   const entry = path.join(runtime, "scripts", "mcp-server.mjs");
   const codexHome = path.join(options.home, ".codex");

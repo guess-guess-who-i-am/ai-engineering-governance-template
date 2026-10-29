@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
-import { chmod, cp, mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { chmod, cp, mkdtemp, mkdir, readFile, readlink, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -324,6 +324,13 @@ await writeFile(configPath, config);
   await writeFile(path.join(deploySource, "scripts", "deploy-codex-profile-mac.sh"), "#!/bin/sh\nexit 0\n");
   const deploy = runShell(DEPLOYER, ["--home", deployHome], { home: deployHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython, CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog, TASK_TREE_RUNTIME_ROOT: taskTreeRuntime } });
   assert(deploy.status === 0, `one-click deployment failed: ${deploy.stderr || deploy.stdout}`);
+  const linkedRuntime = path.join(deployHome, '.codex/tools/llm-task-tree/llm-task-tree-kit');
+  await rm(linkedRuntime, { recursive: true, force: true });
+  await symlink(taskTreeRuntime, linkedRuntime, 'dir');
+  const linkedInstall = run(path.join(SCRIPT_DIR, 'install-task-tree-mcp-mac.mjs'), ['--home', deployHome, '--json'],
+    { home: deployHome, extraEnv: { TASK_TREE_RUNTIME_ROOT: taskTreeRuntime } });
+  assert(linkedInstall.status === 0, `same-realpath task-tree redeployment failed: ${linkedInstall.stderr}`);
+  assert(await readlink(linkedRuntime) === taskTreeRuntime, 'existing task-tree symlink must be retained');
   assert(deploy.stdout.includes("available to every Codex workspace"), "one-click deployment did not report its global workspace scope");
   const deployedRefresh = run(path.join(deployHome, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { home: deployHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
   assert(deployedRefresh.status === 0, `one-click SessionStart refresh failed: ${deployedRefresh.stderr || deployedRefresh.stdout}`);

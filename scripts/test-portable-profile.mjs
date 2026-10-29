@@ -20,6 +20,8 @@ try {
   await writeFile(path.join(library, '_catalog_cn.json'), '{"skills":[]}');
   process.env.CODEX_PROFILE_SKILL_SOURCE = library;
   const plan = await buildOperations(home);
+  assert.equal(plan.operations.some(item => item.destination.startsWith(path.join(root, 'prompts', 'backups') + path.sep)), false,
+    'deployment must exclude publisher history rather than copying machine-local backups');
   const changes = [];
   for (const operation of plan.operations) {
     let original = null;
@@ -38,6 +40,15 @@ try {
   assert.deepEqual(mergeHooks(hooks, managed, root), hooks, 'hook merge must be idempotent and keep indices');
   const checked = await buildOperations(home);
   for (const item of checked.operations) assert.deepEqual(await readFile(item.destination), item.content, 'drift: ' + item.destination);
+  const externalConfig = path.join(root, 'skill-registry/external-library-config.json');
+  const custom = { root: library, catalog: path.join(library, '_catalog_cn.json'), requireComplete: true, chineseEmbedding: '' };
+  await writeFile(externalConfig, JSON.stringify(custom));
+  const oldSource = process.env.CODEX_PROFILE_SKILL_SOURCE;
+  delete process.env.CODEX_PROFILE_SKILL_SOURCE;
+  const preserved = await buildOperations(home);
+  process.env.CODEX_PROFILE_SKILL_SOURCE = oldSource;
+  assert.deepEqual(JSON.parse(preserved.operations.find(item => item.destination === externalConfig).content), custom,
+    'repeat installation without shell overrides must retain the configured global catalog and completeness/model choices');
   const env = { ...process.env, HOME: home, USERPROFILE: home, CODEX_HOME: root, CODEX_SKIP_EXTERNAL_INDEX_REFRESH: '1' };
   const publisher = spawnSync(process.execPath, [path.join(root, 'prompt-publisher/publish-methodology.mjs'), '--config', path.join(root, 'prompt-publisher/methodology-targets.json'), '--check', '--json'], { env, encoding: 'utf8' });
   assert.equal(publisher.status, 0, publisher.stderr + publisher.stdout);

@@ -525,6 +525,25 @@ def _prepare_keyword_index(engine):
     engine._keyword_match = keyword_match
 
 
+def prepare_graph_read_cache(engine):
+    """Reuse immutable adjacency/attributes within one loaded graph version.
+
+    Only GraphSearcher's read view is wrapped. The owning graph retains its
+    original mutation API, and every graph reload creates a new view/cache.
+    Cache cardinality is bounded by the finite nodes/directions of that graph.
+    GraphSearcher only reads these returned records; no scoring is replaced.
+    """
+    source = engine._searcher._graph
+    if getattr(source, '_codex_read_cache', False):
+        return
+    view = copy(source)
+    view.get_edges_from = lru_cache(maxsize=None)(
+        lambda node_id, direction='both': tuple(source.get_edges_from(node_id, direction)))
+    view.get_node_attrs = lru_cache(maxsize=None)(source.get_node_attrs)
+    view._codex_read_cache = True
+    engine._searcher._graph = view
+
+
 def prepare_sparse_bm25(engine):
     """Replace only BM25.score with exact, precomputed sparse contributions."""
     import math
@@ -868,7 +887,11 @@ def prepare_chinese_retrieval(engine):
         for term, frequency in bm25._tf_maps[name].items():
             df = bm25._doc_freqs[term]
             idf = math.log((bm25._n_docs - df + .5) / (df + .5) + 1.0)
-            contribution = idf * frequency * (bm25._k1 + 1.0) / (frequency + bm25._k1 * (1.0 - bm25._b + bm25._b * length / bm25._avg_dl))
+            # Match upstream parentheses: floating-point multiplication is
+            # not associative, even though the algebraic formulas agree.
+            numerator = frequency * (bm25._k1 + 1.0)
+            denominator = frequency + bm25._k1 * (1.0 - bm25._b + bm25._b * length / bm25._avg_dl)
+            contribution = idf * numerator / denominator
             postings.setdefault(term, []).append((i, contribution))
     postings = {term: (np.fromiter((i for i, _ in rows), dtype=np.int32),
                        np.fromiter((v for _, v in rows), dtype=np.float64)) for term, rows in postings.items()}
@@ -1041,6 +1064,9 @@ class _GraphWorker:
             self._graph = graph
             self._english_graph = english_retrieval_graph(graph)
             english_engine = self._english_graph._get_retrieval_engine()
+            prepare_graph_read_cache(engine)
+            # Both language channels traverse the same immutable ontology.
+            english_engine._searcher._graph = engine._searcher._graph
             prepare_sparse_bm25(english_engine)
             english_provider = english_engine._embedding_index
             if english_provider is not None:

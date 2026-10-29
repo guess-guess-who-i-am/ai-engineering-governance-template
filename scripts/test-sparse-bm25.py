@@ -62,6 +62,21 @@ class SparseBM25Contract(unittest.TestCase):
     def test_empty_corpus(self):
         self.assert_exact(BM25Scorer({}), ['', 'search files', 'the and for'])
 
+    def test_chinese_sparse_matches_upstream_arithmetic_exactly(self):
+        from types import SimpleNamespace
+        tools = [ToolSchema(name=f'doc_{n}', description=('files ' * (1 + n % 7)) + ('引用' * (2 + n % 3))) for n in range(30)]
+        bm25 = BM25Scorer({tool.name: tool for tool in tools}, tokenizer=INDEXER.chinese_tokenize)
+        engine = SimpleNamespace(_get_bm25=lambda: bm25,
+            _maybe_prefilter=lambda *args, **kwargs: None,
+            _fuse_and_filter=lambda sources: sources,
+            _searcher=SimpleNamespace(expand_from_seeds=lambda *args, **kwargs: []))
+        queries = ['核验引用引用 论文', '中文引用hypotenuse文件', 'search files search files files',
+                   'area under the curve', '龘靐齉 zzzzqqqq', 'the and for', '']
+        expected = {q: BM25Scorer.score(bm25, q) for q in queries}
+        INDEXER.prepare_chinese_retrieval(engine)
+        for query in queries:
+            self.assertEqual(bm25.score(query), expected[query], query)
+
     def test_install_is_idempotent(self):
         bm25 = self.scorer()
         first = install(bm25)
