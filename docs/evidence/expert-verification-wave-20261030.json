@@ -1,0 +1,44 @@
+{
+  "schema": "expert-verification-wave/v1",
+  "checks": [
+    {
+      "file": "test-router-followup-context.mjs",
+      "startMs": 0,
+      "endMs": 306,
+      "exit_code": 0,
+      "wall_time_seconds": 0.135814209
+    },
+    {
+      "file": "test-router-context-budget.mjs",
+      "startMs": 1,
+      "endMs": 297,
+      "exit_code": 0,
+      "wall_time_seconds": 0.100483958
+    },
+    {
+      "file": "test-router-category-budget.mjs",
+      "startMs": 1,
+      "endMs": 378,
+      "exit_code": 0,
+      "wall_time_seconds": 0.207972
+    },
+    {
+      "file": "test-router-specificity.mjs",
+      "startMs": 1,
+      "endMs": 902,
+      "exit_code": 0,
+      "wall_time_seconds": 0.74138825
+    },
+    {
+      "file": "test-expert-entry.mjs",
+      "startMs": 1,
+      "endMs": 644,
+      "exit_code": 0,
+      "wall_time_seconds": 0.48029
+    }
+  ],
+  "retries": 0,
+  "timeouts": 0,
+  "skippedDependencyConsumers": [],
+  "scope": "Five independent focused checks; per-command start/end measured by orchestrator. Semantic evaluation and model experiments remain separate."
+}

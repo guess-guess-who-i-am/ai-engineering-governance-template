@@ -1,0 +1,52 @@
+{
+  "schema": "expert-context-deployment/v1",
+  "hookBeforeSha256": "6c1aabb64c913d1eec3fa5cbe12b196de3c256291372996dccbb6bc4896b0fb7",
+  "hookAfterSha256": "40daaf83c0c3f3bae085aff941e7d4a92e3df3e8513346946db946a1ba27c92e",
+  "unchanged": {
+    "skill-registry/skills.graph.json": "9ba3056fe3af40e4f6d004b879bf047034faa67dcdecef356647237f10efcb91",
+    "skill-registry/resource-modules.json": "2c435af0ce21181cb4f8d892a3cf6cbf0651575f3148782705f044ec9f3f3520",
+    "hooks.json": "9dfb951d24f99763598b2054e8ea9f2e19b11894eae93c9d3a9ec8ae08c231ec",
+    "hooks/hook-dispatch.mjs": "42e2c7db16a15d112eea521a4181639125f6c20d3de74fc15b4ea034ce6d7a2a"
+  },
+  "atomicReplace": true,
+  "workerRestarted": false,
+  "trustConfigurationChanged": false,
+  "dispatcher": {
+    "schema": "expert-global-dispatch-check/v1",
+    "exitCode": 0,
+    "stderr": "",
+    "ms": 220.9091660042759,
+    "outsideRepository": true,
+    "contextBytes": 19297,
+    "expectedExpertsReturned": true,
+    "ideClientTurnVerified": false
+  },
+  "originalEntries": {
+    "experts": 447,
+    "ready": 446,
+    "blocked": 1,
+    "stale": 0
+  },
+  "directRoutes": [
+    {
+      "name": "dev-pipeline-orchestrator",
+      "moduleId": "expert:dev-pipeline-orchestrator:2e0997ee6c39c8ae",
+      "originalRoleLoadedVerbatim": true,
+      "originalBytes": 11180,
+      "primarySha256": "e4fddc1de49614c7058767c94b180acdddaed9851688f2fb1867d94c26a70ec0",
+      "hookAndEntryMs": 2431.5730839999997,
+      "expertWorkflowExecuted": false
+    },
+    {
+      "name": "performance-testing-expert",
+      "moduleId": "expert:performance-testing-expert:797e43814b6296bc",
+      "originalRoleLoadedVerbatim": true,
+      "originalBytes": 12216,
+      "primarySha256": "8ac93bffa14b596758d70b65ddd8530454c54b4db0d5b312e3834d4ae7d30dbd",
+      "hookAndEntryMs": 2707.3754580000004,
+      "expertWorkflowExecuted": false
+    }
+  ],
+  "directVerificationScope": "Actual global router and one-read original-role loading; not expert business execution or an IDE model turn",
+  "fullPrGates": 15
+}

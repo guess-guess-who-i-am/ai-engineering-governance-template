@@ -1,0 +1,1093 @@
+{
+  "schema": "expert-applicability-review/v1",
+  "reviewer": {
+    "identity": "current primary LLM (Codex), not an independent judge",
+    "method": "Original-role scope and requirement-by-requirement review; labels are model judgments with exact source quotes. Candidate identity and mode were visible.",
+    "limitations": [
+      "Directed development scenarios; no independent blinded labeling or population accuracy claim.",
+      "Runtime prerequisites and expert artifacts were not executed; all such states remain unknown/not-run.",
+      "Semantic uncertainty is retained rather than forced into a correct/incorrect binary."
+    ]
+  },
+  "runSha256": "ce9511c41182095108f4c05acfb791b305d84052ae0935d65118ba8807b55e65",
+  "packets": [
+    {
+      "id": "23464fe59f03c6fca0da",
+      "moduleId": "expert:career-broker:2e2dc85f6d8748bc",
+      "name": "career-broker",
+      "task": "修复 Skill/MCP 图路由的专家推荐，逐席核对原角色适用性，审计评价指标和测试证据。\n我感觉你的评价指标有问题，就是你认为的正确推荐了，可能不是真正的正确推荐了？要不然你现在的什么48/68为什么还是推荐不到想要的？我感觉评价指标有问题你仔细根因分析一下，看看是不是这个问题？",
+      "requirements": {
+        "validity": "审计Skill/MCP专家推荐评价是否测真实适用性",
+        "evidence": "逐席对照角色职责与测试证据"
+      },
+      "roleSha256": "4f3a63e35f3d52c27d5036c5c7bc51ed983eb06210b24cb925d6061086d62d79"
+    },
+    {
+      "id": "4f6cebf95a1716213644",
+      "moduleId": "expert:topic-evaluator:fb0a6f559714acf3",
+      "name": "topic-evaluator",
+      "task": "修复 Skill/MCP 图路由的专家推荐，逐席核对原角色适用性，审计评价指标和测试证据。\n我感觉你的评价指标有问题，就是你认为的正确推荐了，可能不是真正的正确推荐了？要不然你现在的什么48/68为什么还是推荐不到想要的？我感觉评价指标有问题你仔细根因分析一下，看看是不是这个问题？",
+      "requirements": {
+        "validity": "审计Skill/MCP专家推荐评价是否测真实适用性",
+        "evidence": "逐席对照角色职责与测试证据"
+      },
+      "roleSha256": "769d0b41e9d186ab5535f547f5d818a81d045c660aca4290c9e5545f0863e270"
+    },
+    {
+      "id": "df40292cf0e13a2b326b",
+      "moduleId": "expert:career-broker:2e2dc85f6d8748bc",
+      "name": "career-broker",
+      "task": "修复 Skill/MCP 图路由的专家推荐，逐席核对原角色适用性，审计评价指标和测试证据。\n我感觉你的评价指标有问题，就是你认为的正确推荐了，可能不是真正的正确推荐了？要不然你现在的什么48/68为什么还是推荐不到想要的？我感觉评价指标有问题你仔细根因分析一下，看看是不是这个问题？",
+      "requirements": {
+        "validity": "审计Skill/MCP专家推荐评价是否测真实适用性",
+        "evidence": "逐席对照角色职责与测试证据"
+      },
+      "roleSha256": "4f3a63e35f3d52c27d5036c5c7bc51ed983eb06210b24cb925d6061086d62d79"
+    },
+    {
+      "id": "51703456f33a1498be6d",
+      "moduleId": "expert:metamorphosis-practitioner:9e6424b2b234d176",
+      "name": "metamorphosis-practitioner",
+      "task": "修复 Skill/MCP 图路由的专家推荐，逐席核对原角色适用性，审计评价指标和测试证据。\n我感觉你的评价指标有问题，就是你认为的正确推荐了，可能不是真正的正确推荐了？要不然你现在的什么48/68为什么还是推荐不到想要的？我感觉评价指标有问题你仔细根因分析一下，看看是不是这个问题？",
+      "requirements": {
+        "validity": "审计Skill/MCP专家推荐评价是否测真实适用性",
+        "evidence": "逐席对照角色职责与测试证据"
+      },
+      "roleSha256": "1d8eda2644d2ddb422441461070cdef2902870fcc4c51be38f321657374604de"
+    },
+    {
+      "id": "7f4837c70594e7845f4c",
+      "moduleId": "expert:litigation-legal:a95e463b1b07d4a2",
+      "name": "litigation-legal",
+      "task": "线上支付突然大面积失败，请统一指挥事故止损、值班恢复，记录影响用户与时间线，事后交付根因和整改复盘。\n这个问题还没有恢复，请继续排查，保留处理时间线，确保最终有可验证的整改产物。",
+      "requirements": {
+        "recover": "指挥线上支付生产事故止损和恢复",
+        "record": "记录时间线、影响与复盘整改"
+      },
+      "roleSha256": "3dca159dca265fa44e6bf5ee8be960777a404611dcc33ba1eabc3052aaffe732"
+    },
+    {
+      "id": "8804b02b187a78b6f883",
+      "moduleId": "expert:code:a38a5046906be139",
+      "name": "code",
+      "task": "线上支付突然大面积失败，请统一指挥事故止损、值班恢复，记录影响用户与时间线，事后交付根因和整改复盘。\n这个问题还没有恢复，请继续排查，保留处理时间线，确保最终有可验证的整改产物。",
+      "requirements": {
+        "recover": "指挥线上支付生产事故止损和恢复",
+        "record": "记录时间线、影响与复盘整改"
+      },
+      "roleSha256": "bf1bb10c73682f1d1c017047719ab3f29a7325dc81713a280441ff64f0a7a102"
+    },
+    {
+      "id": "0144fe9f4634668c3da7",
+      "moduleId": "expert:sdk-log-expert:d6ec4e9c18990bfb",
+      "name": "sdk-log-expert",
+      "task": "线上支付突然大面积失败，请统一指挥事故止损、值班恢复，记录影响用户与时间线，事后交付根因和整改复盘。\n这个问题还没有恢复，请继续排查，保留处理时间线，确保最终有可验证的整改产物。",
+      "requirements": {
+        "recover": "指挥线上支付生产事故止损和恢复",
+        "record": "记录时间线、影响与复盘整改"
+      },
+      "roleSha256": "e94c198002b447bb253e88ed4c4ad5e528bcd6e8fe301f42d2482eb1f366cd96"
+    },
+    {
+      "id": "85ebee5056a51dbec385",
+      "moduleId": "expert:incident-response-commander:4ff0a57b742f876b",
+      "name": "incident-response-commander",
+      "task": "线上支付突然大面积失败，请统一指挥事故止损、值班恢复，记录影响用户与时间线，事后交付根因和整改复盘。\n这个问题还没有恢复，请继续排查，保留处理时间线，确保最终有可验证的整改产物。",
+      "requirements": {
+        "recover": "指挥线上支付生产事故止损和恢复",
+        "record": "记录时间线、影响与复盘整改"
+      },
+      "roleSha256": "c0d524163c0a154ef1ed412a3d67279fe5b0542d9af58ec24ef10b47f22715f6"
+    },
+    {
+      "id": "7c2191feacd0a7bab31c",
+      "moduleId": "expert:evidence-collector:1fe137d39fcca248",
+      "name": "evidence-collector",
+      "task": "多租户后台中客户A能猜编号访问客户B的账单，请分析越权、威胁模型并提供修补和攻击复现验证。\n这个方案再检查一下，别只修这一个入口，相关攻击路径和验证证据都要覆盖。",
+      "requirements": {
+        "authorization": "诊断多租户账单越权与相关攻击路径",
+        "verification": "修补应用授权并提供可复现验证证据"
+      },
+      "roleSha256": "671a80a342c4281b163b977cfbda45254085d6df896b6a09d19bc80a395c8543"
+    },
+    {
+      "id": "1026ea384cbddb72f468",
+      "moduleId": "expert:soe:6587b54d7a1d0585",
+      "name": "soe",
+      "task": "多租户后台中客户A能猜编号访问客户B的账单，请分析越权、威胁模型并提供修补和攻击复现验证。\n这个方案再检查一下，别只修这一个入口，相关攻击路径和验证证据都要覆盖。",
+      "requirements": {
+        "authorization": "诊断多租户账单越权与相关攻击路径",
+        "verification": "修补应用授权并提供可复现验证证据"
+      },
+      "roleSha256": "d142d79029eb180e94b865c86872ae3f14783630f4bc6f92934d71cd3674f4b5"
+    },
+    {
+      "id": "7c65c6580eb745c74b94",
+      "moduleId": "expert:soe:6587b54d7a1d0585",
+      "name": "soe",
+      "task": "多租户后台中客户A能猜编号访问客户B的账单，请分析越权、威胁模型并提供修补和攻击复现验证。\n这个方案再检查一下，别只修这一个入口，相关攻击路径和验证证据都要覆盖。",
+      "requirements": {
+        "authorization": "诊断多租户账单越权与相关攻击路径",
+        "verification": "修补应用授权并提供可复现验证证据"
+      },
+      "roleSha256": "d142d79029eb180e94b865c86872ae3f14783630f4bc6f92934d71cd3674f4b5"
+    },
+    {
+      "id": "4fdab445de6154f12597",
+      "moduleId": "expert:tianyu-account-guardian:16825d5dfbac2f33",
+      "name": "tianyu-account-guardian",
+      "task": "多租户后台中客户A能猜编号访问客户B的账单，请分析越权、威胁模型并提供修补和攻击复现验证。\n这个方案再检查一下，别只修这一个入口，相关攻击路径和验证证据都要覆盖。",
+      "requirements": {
+        "authorization": "诊断多租户账单越权与相关攻击路径",
+        "verification": "修补应用授权并提供可复现验证证据"
+      },
+      "roleSha256": "af05793a1046a5078dd6f5b3d963d628942ef5fd353ee7faeb85ee0f0ab56fab"
+    },
+    {
+      "id": "3aebf891a7941281721a",
+      "moduleId": "expert:academic-journal-selector:0ea0f301e60ea4bd",
+      "name": "academic-journal-selector",
+      "task": "这篇关于城市热岛与老年健康的论文摘要，需要评估中文核心与SCI投稿，交付冲稳保选刊方案和依据。\n这个结果还不够，请考虑主题匹配、收稿范围和投稿难度，把推荐理由核实清楚。",
+      "requirements": {
+        "journals": "匹配中文核心与SCI期刊并形成冲稳保方案",
+        "sources": "核验收稿范围、主题匹配和投稿依据"
+      },
+      "roleSha256": "9ed4a82a13a4550c91822df81a0775036d05937c167483e3a3c7dc30a95e6b2f"
+    },
+    {
+      "id": "a7c8527da8d15d5489d3",
+      "moduleId": "expert:test-results-analyst:232d6d14b41339a7",
+      "name": "test-results-analyst",
+      "task": "这篇关于城市热岛与老年健康的论文摘要，需要评估中文核心与SCI投稿，交付冲稳保选刊方案和依据。\n这个结果还不够，请考虑主题匹配、收稿范围和投稿难度，把推荐理由核实清楚。",
+      "requirements": {
+        "journals": "匹配中文核心与SCI期刊并形成冲稳保方案",
+        "sources": "核验收稿范围、主题匹配和投稿依据"
+      },
+      "roleSha256": "0d95f9c66ef9919f3ec1771b7c89a8dcae53fb44dfe741650d47155b1cec8a0f"
+    },
+    {
+      "id": "02222e9a7551ad0223f0",
+      "moduleId": "expert:academic-journal-selector:0ea0f301e60ea4bd",
+      "name": "academic-journal-selector",
+      "task": "这篇关于城市热岛与老年健康的论文摘要，需要评估中文核心与SCI投稿，交付冲稳保选刊方案和依据。\n这个结果还不够，请考虑主题匹配、收稿范围和投稿难度，把推荐理由核实清楚。",
+      "requirements": {
+        "journals": "匹配中文核心与SCI期刊并形成冲稳保方案",
+        "sources": "核验收稿范围、主题匹配和投稿依据"
+      },
+      "roleSha256": "9ed4a82a13a4550c91822df81a0775036d05937c167483e3a3c7dc30a95e6b2f"
+    },
+    {
+      "id": "3982368f6ef70fb7987f",
+      "moduleId": "expert:arxiv-watcher:b897ffef34bacc62",
+      "name": "arxiv-watcher",
+      "task": "这篇关于城市热岛与老年健康的论文摘要，需要评估中文核心与SCI投稿，交付冲稳保选刊方案和依据。\n这个结果还不够，请考虑主题匹配、收稿范围和投稿难度，把推荐理由核实清楚。",
+      "requirements": {
+        "journals": "匹配中文核心与SCI期刊并形成冲稳保方案",
+        "sources": "核验收稿范围、主题匹配和投稿依据"
+      },
+      "roleSha256": "dd3ae2aa49a79c3ef718df13cb9a723bbdae5f52d8e638372e74eb8cc7336d5e"
+    },
+    {
+      "id": "fd65c995eb0ddaf52d88",
+      "moduleId": "expert:fbsir-eight-seat-board:b438f256168cebde",
+      "name": "fbsir-eight-seat-board",
+      "task": "PostgreSQL订单查询很慢，使用EXPLAIN ANALYZE检查执行计划、索引和扫描行数，验证修复前后延迟。\n这个问题继续查，请保留执行计划，不要只给通用优化建议。",
+      "requirements": {
+        "plan": "解释PostgreSQL真实执行计划并定位扫描和索引问题",
+        "change": "提供索引或查询改动及前后效果验证方法"
+      },
+      "roleSha256": "6b3134e5b75c2c0800e845fd240b37bc10470352b2ce10267c8cd326ca1969cd"
+    },
+    {
+      "id": "312e74221fc51df69397",
+      "moduleId": "expert:study-planner:4c912b3fe5199627",
+      "name": "study-planner",
+      "task": "PostgreSQL订单查询很慢，使用EXPLAIN ANALYZE检查执行计划、索引和扫描行数，验证修复前后延迟。\n这个问题继续查，请保留执行计划，不要只给通用优化建议。",
+      "requirements": {
+        "plan": "解释PostgreSQL真实执行计划并定位扫描和索引问题",
+        "change": "提供索引或查询改动及前后效果验证方法"
+      },
+      "roleSha256": "e08e0513bae74334f0c149d0b27673933da95d4deb0f559400475c9afc6d554c"
+    },
+    {
+      "id": "81f46d0cc8aaa008b79e",
+      "moduleId": "expert:database-operations:6c69722e92d0745a",
+      "name": "database-operations",
+      "task": "PostgreSQL订单查询很慢，使用EXPLAIN ANALYZE检查执行计划、索引和扫描行数，验证修复前后延迟。\n这个问题继续查，请保留执行计划，不要只给通用优化建议。",
+      "requirements": {
+        "plan": "解释PostgreSQL真实执行计划并定位扫描和索引问题",
+        "change": "提供索引或查询改动及前后效果验证方法"
+      },
+      "roleSha256": "7c65c0fed75ca8ba94e63a25de37006746b27261588eadcd0fbdeba1e757bf91"
+    },
+    {
+      "id": "c1c449b0094efd31389a",
+      "moduleId": "expert:database-optimization-expert:699cd70624611702",
+      "name": "database-optimization-expert",
+      "task": "PostgreSQL订单查询很慢，使用EXPLAIN ANALYZE检查执行计划、索引和扫描行数，验证修复前后延迟。\n这个问题继续查，请保留执行计划，不要只给通用优化建议。",
+      "requirements": {
+        "plan": "解释PostgreSQL真实执行计划并定位扫描和索引问题",
+        "change": "提供索引或查询改动及前后效果验证方法"
+      },
+      "roleSha256": "f96287e950942f1d62d8229f4cdf881fc7e85bcf90448888a7bdeaf1ba3659a9"
+    },
+    {
+      "id": "6758e13fecf5e4d1d987",
+      "moduleId": "expert:exam-preparation-planner:57cfc58c078f16a0",
+      "name": "exam-preparation-planner",
+      "task": "三个月后考研，每晚两小时，数学落后、英语词汇容易忘，请制定每日可调整计划、间隔复习与每周复盘。\n这个计划需要能在落后时自动调整，今天做什么和周末怎么复盘都要具体。",
+      "requirements": {
+        "daily": "按三个月与每晚两小时约束制定可调整的复习计划",
+        "review": "间隔复习、每周复盘并按落后状态调整"
+      },
+      "roleSha256": "8b24c85d3d91cb04afdb9b5f62579e22ac1a78c0fda8c9d2650b34bea50dc13b"
+    },
+    {
+      "id": "bdee505d62f308426bd2",
+      "moduleId": "expert:news-buddy:5461ff8bc9d24907",
+      "name": "news-buddy",
+      "task": "三个月后考研，每晚两小时，数学落后、英语词汇容易忘，请制定每日可调整计划、间隔复习与每周复盘。\n这个计划需要能在落后时自动调整，今天做什么和周末怎么复盘都要具体。",
+      "requirements": {
+        "daily": "按三个月与每晚两小时约束制定可调整的复习计划",
+        "review": "间隔复习、每周复盘并按落后状态调整"
+      },
+      "roleSha256": "74da836f85f7c5e4d44ae3a0982c5421e1fee9878959886aa061ac5f84af3122"
+    },
+    {
+      "id": "568dfbf57864a51a2c16",
+      "moduleId": "expert:exam-preparation-planner:57cfc58c078f16a0",
+      "name": "exam-preparation-planner",
+      "task": "三个月后考研，每晚两小时，数学落后、英语词汇容易忘，请制定每日可调整计划、间隔复习与每周复盘。\n这个计划需要能在落后时自动调整，今天做什么和周末怎么复盘都要具体。",
+      "requirements": {
+        "daily": "按三个月与每晚两小时约束制定可调整的复习计划",
+        "review": "间隔复习、每周复盘并按落后状态调整"
+      },
+      "roleSha256": "8b24c85d3d91cb04afdb9b5f62579e22ac1a78c0fda8c9d2650b34bea50dc13b"
+    },
+    {
+      "id": "5caa216a28d04db78820",
+      "moduleId": "expert:news-buddy:5461ff8bc9d24907",
+      "name": "news-buddy",
+      "task": "三个月后考研，每晚两小时，数学落后、英语词汇容易忘，请制定每日可调整计划、间隔复习与每周复盘。\n这个计划需要能在落后时自动调整，今天做什么和周末怎么复盘都要具体。",
+      "requirements": {
+        "daily": "按三个月与每晚两小时约束制定可调整的复习计划",
+        "review": "间隔复习、每周复盘并按落后状态调整"
+      },
+      "roleSha256": "74da836f85f7c5e4d44ae3a0982c5421e1fee9878959886aa061ac5f84af3122"
+    }
+  ],
+  "expectedSeats": [
+    [
+      "metric-audit",
+      "baseline",
+      1
+    ],
+    [
+      "metric-audit",
+      "baseline",
+      2
+    ],
+    [
+      "metric-audit",
+      "candidate",
+      1
+    ],
+    [
+      "metric-audit",
+      "candidate",
+      2
+    ],
+    [
+      "incident-followup",
+      "baseline",
+      1
+    ],
+    [
+      "incident-followup",
+      "baseline",
+      2
+    ],
+    [
+      "incident-followup",
+      "candidate",
+      1
+    ],
+    [
+      "incident-followup",
+      "candidate",
+      2
+    ],
+    [
+      "security-followup",
+      "baseline",
+      1
+    ],
+    [
+      "security-followup",
+      "baseline",
+      2
+    ],
+    [
+      "security-followup",
+      "candidate",
+      1
+    ],
+    [
+      "security-followup",
+      "candidate",
+      2
+    ],
+    [
+      "journal-followup",
+      "baseline",
+      1
+    ],
+    [
+      "journal-followup",
+      "baseline",
+      2
+    ],
+    [
+      "journal-followup",
+      "candidate",
+      1
+    ],
+    [
+      "journal-followup",
+      "candidate",
+      2
+    ],
+    [
+      "database-followup",
+      "baseline",
+      1
+    ],
+    [
+      "database-followup",
+      "baseline",
+      2
+    ],
+    [
+      "database-followup",
+      "candidate",
+      1
+    ],
+    [
+      "database-followup",
+      "candidate",
+      2
+    ],
+    [
+      "exam-followup",
+      "baseline",
+      1
+    ],
+    [
+      "exam-followup",
+      "baseline",
+      2
+    ],
+    [
+      "exam-followup",
+      "candidate",
+      1
+    ],
+    [
+      "exam-followup",
+      "candidate",
+      2
+    ]
+  ],
+  "packetBindings": [
+    {
+      "seatKey": [
+        "metric-audit",
+        "baseline",
+        1
+      ],
+      "packet": "23464fe59f03c6fca0da"
+    },
+    {
+      "seatKey": [
+        "metric-audit",
+        "baseline",
+        2
+      ],
+      "packet": "4f6cebf95a1716213644"
+    },
+    {
+      "seatKey": [
+        "metric-audit",
+        "candidate",
+        1
+      ],
+      "packet": "df40292cf0e13a2b326b"
+    },
+    {
+      "seatKey": [
+        "metric-audit",
+        "candidate",
+        2
+      ],
+      "packet": "51703456f33a1498be6d"
+    },
+    {
+      "seatKey": [
+        "incident-followup",
+        "baseline",
+        1
+      ],
+      "packet": "7f4837c70594e7845f4c"
+    },
+    {
+      "seatKey": [
+        "incident-followup",
+        "baseline",
+        2
+      ],
+      "packet": "8804b02b187a78b6f883"
+    },
+    {
+      "seatKey": [
+        "incident-followup",
+        "candidate",
+        1
+      ],
+      "packet": "0144fe9f4634668c3da7"
+    },
+    {
+      "seatKey": [
+        "incident-followup",
+        "candidate",
+        2
+      ],
+      "packet": "85ebee5056a51dbec385"
+    },
+    {
+      "seatKey": [
+        "security-followup",
+        "baseline",
+        1
+      ],
+      "packet": "7c2191feacd0a7bab31c"
+    },
+    {
+      "seatKey": [
+        "security-followup",
+        "baseline",
+        2
+      ],
+      "packet": "1026ea384cbddb72f468"
+    },
+    {
+      "seatKey": [
+        "security-followup",
+        "candidate",
+        1
+      ],
+      "packet": "7c65c6580eb745c74b94"
+    },
+    {
+      "seatKey": [
+        "security-followup",
+        "candidate",
+        2
+      ],
+      "packet": "4fdab445de6154f12597"
+    },
+    {
+      "seatKey": [
+        "journal-followup",
+        "baseline",
+        1
+      ],
+      "packet": "3aebf891a7941281721a"
+    },
+    {
+      "seatKey": [
+        "journal-followup",
+        "baseline",
+        2
+      ],
+      "packet": "a7c8527da8d15d5489d3"
+    },
+    {
+      "seatKey": [
+        "journal-followup",
+        "candidate",
+        1
+      ],
+      "packet": "02222e9a7551ad0223f0"
+    },
+    {
+      "seatKey": [
+        "journal-followup",
+        "candidate",
+        2
+      ],
+      "packet": "3982368f6ef70fb7987f"
+    },
+    {
+      "seatKey": [
+        "database-followup",
+        "baseline",
+        1
+      ],
+      "packet": "fd65c995eb0ddaf52d88"
+    },
+    {
+      "seatKey": [
+        "database-followup",
+        "baseline",
+        2
+      ],
+      "packet": "312e74221fc51df69397"
+    },
+    {
+      "seatKey": [
+        "database-followup",
+        "candidate",
+        1
+      ],
+      "packet": "81f46d0cc8aaa008b79e"
+    },
+    {
+      "seatKey": [
+        "database-followup",
+        "candidate",
+        2
+      ],
+      "packet": "c1c449b0094efd31389a"
+    },
+    {
+      "seatKey": [
+        "exam-followup",
+        "baseline",
+        1
+      ],
+      "packet": "6758e13fecf5e4d1d987"
+    },
+    {
+      "seatKey": [
+        "exam-followup",
+        "baseline",
+        2
+      ],
+      "packet": "bdee505d62f308426bd2"
+    },
+    {
+      "seatKey": [
+        "exam-followup",
+        "candidate",
+        1
+      ],
+      "packet": "568dfbf57864a51a2c16"
+    },
+    {
+      "seatKey": [
+        "exam-followup",
+        "candidate",
+        2
+      ],
+      "packet": "5caa216a28d04db78820"
+    }
+  ],
+  "judgments": [
+    {
+      "case": "metric-audit",
+      "mode": "baseline",
+      "seat": 1,
+      "packet": "23464fe59f03c6fca0da",
+      "label": "irrelevant",
+      "coverage": {
+        "validity": "no",
+        "evidence": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "你的工作是：在腾讯内部职业发展这件事上，陪用户看清自己、看懂规则、拆选择、获取司内资源，并长期记住那些未来会反复用到的职业信息。"
+      ],
+      "reason": "腾讯内部职业发展、岗位与行家推荐，不是Skill/MCP检索评价。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "metric-audit",
+      "mode": "baseline",
+      "seat": 2,
+      "packet": "4f6cebf95a1716213644",
+      "label": "irrelevant",
+      "coverage": {
+        "validity": "no",
+        "evidence": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "Activate when user asks to evaluate a content topic, assess its viability, or needs go/no-go decision on a tech/digital/AI/business video topic."
+      ],
+      "reason": "评估视频内容选题的可行性、原创性与角度，不是检索系统评价有效性。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "metric-audit",
+      "mode": "candidate",
+      "seat": 1,
+      "packet": "df40292cf0e13a2b326b",
+      "label": "irrelevant",
+      "coverage": {
+        "validity": "no",
+        "evidence": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "你的工作是：在腾讯内部职业发展这件事上，陪用户看清自己、看懂规则、拆选择、获取司内资源，并长期记住那些未来会反复用到的职业信息。"
+      ],
+      "reason": "腾讯内部职业发展、岗位与行家推荐，不是Skill/MCP检索评价。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "metric-audit",
+      "mode": "candidate",
+      "seat": 2,
+      "packet": "51703456f33a1498be6d",
+      "label": "irrelevant",
+      "coverage": {
+        "validity": "no",
+        "evidence": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "these are mindset-layer problems, not methodology problems."
+      ],
+      "reason": "创业心态陪伴，明确区分心态和方法；不能审计检索计分或角色适用性。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "incident-followup",
+      "mode": "baseline",
+      "seat": 1,
+      "packet": "7f4837c70594e7845f4c",
+      "label": "irrelevant",
+      "coverage": {
+        "recover": "no",
+        "record": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "Litigation support expert for matter intake, portfolio status, chronologies, claim charts, evidence timelines, issue charts, litigation correspondence, deadline tracking, and brief sections."
+      ],
+      "reason": "诉讼时间线与证据不是生产事故指挥；领域不同。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "incident-followup",
+      "mode": "baseline",
+      "seat": 2,
+      "packet": "8804b02b187a78b6f883",
+      "label": "irrelevant",
+      "coverage": {
+        "recover": "no",
+        "record": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "只提供指导与建议，不擅自执行代码、不自动进入下一步、不未经请求委派子代理。"
+      ],
+      "reason": "编码步骤指导不支持值班指挥、事故恢复和事故复盘的完整产物。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "incident-followup",
+      "mode": "candidate",
+      "seat": 1,
+      "packet": "0144fe9f4634668c3da7",
+      "label": "irrelevant",
+      "coverage": {
+        "recover": "no",
+        "record": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "能力范围：**本地客户端日志**的解压 / 解码 / 时间线 / 诊断 / 预览。服务端事件回调、云端录制/混流/转推链路不在本专家范围内。"
+      ],
+      "reason": "限腾讯RTC客户端日志；任务没有RTC客户端日志，不能因时间线一词判断适用。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "incident-followup",
+      "mode": "candidate",
+      "seat": 2,
+      "packet": "85ebee5056a51dbec385",
+      "label": "direct",
+      "coverage": {
+        "recover": "yes",
+        "record": "yes"
+      },
+      "coverageEvidence": {
+        "recover": [
+          "Coordinate real-time incident response with defined roles: Incident Commander, Communications Lead, Technical Lead, Scribe"
+        ],
+        "record": [
+          "Every incident must produce a timeline, impact assessment, and follow-up action items within 48 hours"
+        ]
+      },
+      "citations": [
+        "Coordinate real-time incident response with defined roles: Incident Commander, Communications Lead, Technical Lead, Scribe",
+        "Every incident must produce a timeline, impact assessment, and follow-up action items within 48 hours",
+        "Facilitate blameless post-mortem meetings focused on systemic causes, not individual mistakes"
+      ],
+      "reason": "原职责覆盖生产事故指挥、影响时间线与复盘整改。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "security-followup",
+      "mode": "baseline",
+      "seat": 1,
+      "packet": "7c2191feacd0a7bab31c",
+      "label": "irrelevant",
+      "coverage": {
+        "authorization": "no",
+        "verification": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "Quality assurance specialist focused on visual evidence and reality checking",
+        "Visual evidence is the only truth that matters"
+      ],
+      "reason": "原角色围绕UI截图和视觉测试，不能用截图代替租户授权攻击及源代码修补验证。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "security-followup",
+      "mode": "baseline",
+      "seat": 2,
+      "packet": "1026ea384cbddb72f468",
+      "label": "unknown",
+      "coverage": {
+        "authorization": "unknown",
+        "verification": "unknown"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "漏洞管理、告警研判、入侵溯源、攻击分析（DDoS/勒索）、腾讯云产品日志排查、iOA 排障六大领域"
+      ],
+      "reason": "安全运营与CVE验证相关，但当前主角色不足以证实多租户业务授权代码修复及威胁模型能力；不能自动当直接适用。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "security-followup",
+      "mode": "candidate",
+      "seat": 1,
+      "packet": "7c65c6580eb745c74b94",
+      "label": "unknown",
+      "coverage": {
+        "authorization": "unknown",
+        "verification": "unknown"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "漏洞管理、告警研判、入侵溯源、攻击分析（DDoS/勒索）、腾讯云产品日志排查、iOA 排障六大领域"
+      ],
+      "reason": "安全运营与CVE验证相关，但当前主角色不足以证实多租户业务授权代码修复及威胁模型能力；不能自动当直接适用。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "security-followup",
+      "mode": "candidate",
+      "seat": 2,
+      "packet": "4fdab445de6154f12597",
+      "label": "irrelevant",
+      "coverage": {
+        "authorization": "no",
+        "verification": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "基于腾讯云 RCE 的请求总览、风险趋势、命中维度等 API，自动拉取注册/登录/裂变场景的风险数据"
+      ],
+      "reason": "RCE账号反滥用和客诉归因不同于应用多租户对象授权漏洞。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "journal-followup",
+      "mode": "baseline",
+      "seat": 1,
+      "packet": "3aebf891a7941281721a",
+      "label": "direct",
+      "coverage": {
+        "journals": "yes",
+        "sources": "yes"
+      },
+      "coverageEvidence": {
+        "journals": [
+          "自动推荐中文普通/中文核心/SCI/SSCI投稿期刊。双管道并行分析（中外刊独立匹配），冲稳保三档策略，附录用概率、审稿周期、证据链。"
+        ],
+        "sources": [
+          "自动推荐中文普通/中文核心/SCI/SSCI投稿期刊。双管道并行分析（中外刊独立匹配），冲稳保三档策略，附录用概率、审稿周期、证据链。"
+        ]
+      },
+      "citations": [
+        "自动推荐中文普通/中文核心/SCI/SSCI投稿期刊。双管道并行分析（中外刊独立匹配），冲稳保三档策略，附录用概率、审稿周期、证据链。"
+      ],
+      "reason": "原角色覆盖中文核心和SCI双管道匹配、冲稳保策略与证据链；实际所需论文资料和API尚未验证。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "journal-followup",
+      "mode": "baseline",
+      "seat": 2,
+      "packet": "a7c8527da8d15d5489d3",
+      "label": "irrelevant",
+      "coverage": {
+        "journals": "no",
+        "sources": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "Expert test analysis specialist focused on comprehensive test result evaluation, quality metrics analysis, and actionable insight generation from testing activities"
+      ],
+      "reason": "测试质量和统计评价不能代替期刊收稿范围和投稿难度核验。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "journal-followup",
+      "mode": "candidate",
+      "seat": 1,
+      "packet": "02222e9a7551ad0223f0",
+      "label": "direct",
+      "coverage": {
+        "journals": "yes",
+        "sources": "yes"
+      },
+      "coverageEvidence": {
+        "journals": [
+          "自动推荐中文普通/中文核心/SCI/SSCI投稿期刊。双管道并行分析（中外刊独立匹配），冲稳保三档策略，附录用概率、审稿周期、证据链。"
+        ],
+        "sources": [
+          "自动推荐中文普通/中文核心/SCI/SSCI投稿期刊。双管道并行分析（中外刊独立匹配），冲稳保三档策略，附录用概率、审稿周期、证据链。"
+        ]
+      },
+      "citations": [
+        "自动推荐中文普通/中文核心/SCI/SSCI投稿期刊。双管道并行分析（中外刊独立匹配），冲稳保三档策略，附录用概率、审稿周期、证据链。"
+      ],
+      "reason": "原角色覆盖中文核心和SCI双管道匹配、冲稳保策略与证据链；实际所需论文资料和API尚未验证。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "journal-followup",
+      "mode": "candidate",
+      "seat": 2,
+      "packet": "3982368f6ef70fb7987f",
+      "label": "irrelevant",
+      "coverage": {
+        "journals": "no",
+        "sources": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "Activate when the user asks to search, summarize, or track ArXiv research papers, wants a daily digest of AI/research topics, or references an ArXiv paper by ID."
+      ],
+      "reason": "ArXiv检索摘要与速报不是中文核心/SCI收稿范围核验和投稿分档。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "database-followup",
+      "mode": "baseline",
+      "seat": 1,
+      "packet": "fd65c995eb0ddaf52d88",
+      "label": "irrelevant",
+      "coverage": {
+        "plan": "no",
+        "change": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "你的用户是实体企业的一号位。",
+        "你不替任何专业席出意见。你的价值是立案、选席、质询、证据纪律、异议留痕和行动收口。"
+      ],
+      "reason": "实体企业经营决策审议主理人不直接提供SQL计划解读与索引修复；不能因内部有数智化席就认定其适用。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "database-followup",
+      "mode": "baseline",
+      "seat": 2,
+      "packet": "312e74221fc51df69397",
+      "label": "irrelevant",
+      "coverage": {
+        "plan": "no",
+        "change": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "我的唯一使命：把用户模糊的\"我要考XX\"，变成一份**可执行、可追踪、可调整**的学习计划。"
+      ],
+      "reason": "考试学习规划不处理SQL执行计划。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "database-followup",
+      "mode": "candidate",
+      "seat": 1,
+      "packet": "81f46d0cc8aaa008b79e",
+      "label": "direct",
+      "coverage": {
+        "plan": "yes",
+        "change": "yes"
+      },
+      "coverageEvidence": {
+        "plan": [
+          "用 `EXPLAIN ANALYZE` 解读执行计划"
+        ],
+        "change": [
+          "按收益/风险排序输出方案——索引、重写查询、分区、缓存、连接池调整",
+          "明确如何在非生产环境验证、如何回滚、需要监控哪些指标。"
+        ]
+      },
+      "citations": [
+        "用 `EXPLAIN ANALYZE` 解读执行计划",
+        "按收益/风险排序输出方案——索引、重写查询、分区、缓存、连接池调整",
+        "明确如何在非生产环境验证、如何回滚、需要监控哪些指标。"
+      ],
+      "reason": "原职责明确要求EXPLAIN证据、索引策略及验证前后效果。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "database-followup",
+      "mode": "candidate",
+      "seat": 2,
+      "packet": "c1c449b0094efd31389a",
+      "label": "direct",
+      "coverage": {
+        "plan": "yes",
+        "change": "yes"
+      },
+      "coverageEvidence": {
+        "plan": [
+          "EXPLAIN ANALYZE and query plan interpretation"
+        ],
+        "change": [
+          "Indexing strategies (B-tree, GiST, GIN, partial indexes)"
+        ]
+      },
+      "citations": [
+        "EXPLAIN ANALYZE and query plan interpretation",
+        "Indexing strategies (B-tree, GiST, GIN, partial indexes)",
+        "demonstrate the impact of optimizations with before/after metrics."
+      ],
+      "reason": "原职责覆盖PostgreSQL查询计划、索引策略和前后指标验证。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "exam-followup",
+      "mode": "baseline",
+      "seat": 1,
+      "packet": "6758e13fecf5e4d1d987",
+      "label": "direct",
+      "coverage": {
+        "daily": "yes",
+        "review": "yes"
+      },
+      "coverageEvidence": {
+        "daily": [
+          "长周期、高竞争考试可以提供通用规划，但没有专项资料时不冒充该考试的权威辅导专家。",
+          "生成带容量约束的今日任务或七天计划"
+        ],
+        "review": [
+          "根据打卡、错题、自测和耗时更新掌握判断"
+        ]
+      },
+      "citations": [
+        "长周期、高竞争考试可以提供通用规划，但没有专项资料时不冒充该考试的权威辅导专家。",
+        "生成带容量约束的今日任务或七天计划",
+        "根据打卡、错题、自测和耗时更新掌握判断"
+      ],
+      "reason": "这里只要求长期通用规划而非考研专项权威辅导；原角色支持容量约束计划、复习和调整。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "exam-followup",
+      "mode": "baseline",
+      "seat": 2,
+      "packet": "bdee505d62f308426bd2",
+      "label": "irrelevant",
+      "coverage": {
+        "daily": "no",
+        "review": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "A personal news advisor that filters daily headlines through an implicit user profile and explains why each story matters to the user and what they can do about it."
+      ],
+      "reason": "个性化每日新闻筛选不提供备考计划和复习调整。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "exam-followup",
+      "mode": "candidate",
+      "seat": 1,
+      "packet": "568dfbf57864a51a2c16",
+      "label": "direct",
+      "coverage": {
+        "daily": "yes",
+        "review": "yes"
+      },
+      "coverageEvidence": {
+        "daily": [
+          "长周期、高竞争考试可以提供通用规划，但没有专项资料时不冒充该考试的权威辅导专家。",
+          "生成带容量约束的今日任务或七天计划"
+        ],
+        "review": [
+          "根据打卡、错题、自测和耗时更新掌握判断"
+        ]
+      },
+      "citations": [
+        "长周期、高竞争考试可以提供通用规划，但没有专项资料时不冒充该考试的权威辅导专家。",
+        "生成带容量约束的今日任务或七天计划",
+        "根据打卡、错题、自测和耗时更新掌握判断"
+      ],
+      "reason": "这里只要求长期通用规划而非考研专项权威辅导；原角色支持容量约束计划、复习和调整。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    },
+    {
+      "case": "exam-followup",
+      "mode": "candidate",
+      "seat": 2,
+      "packet": "5caa216a28d04db78820",
+      "label": "irrelevant",
+      "coverage": {
+        "daily": "no",
+        "review": "no"
+      },
+      "coverageEvidence": {},
+      "citations": [
+        "A personal news advisor that filters daily headlines through an implicit user profile and explains why each story matters to the user and what they can do about it."
+      ],
+      "reason": "个性化每日新闻筛选不提供备考计划和复习调整。",
+      "runtime": "unknown",
+      "execution": "not-run"
+    }
+  ]
+}

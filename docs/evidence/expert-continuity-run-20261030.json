@@ -1,0 +1,1323 @@
+{
+  "schema": "hook-continuity-paired/v1",
+  "sourceRunSha256": "dad1bf76cfa72cee4f1f6d54462c2a8afbe74c7341677a59207d0ef1f97c127e",
+  "frozen": {
+    "graph": "9ba3056fe3af40e4f6d004b879bf047034faa67dcdecef356647237f10efcb91",
+    "baseline": "6c1aabb64c913d1eec3fa5cbe12b196de3c256291372996dccbb6bc4896b0fb7",
+    "candidate": "40daaf83c0c3f3bae085aff941e7d4a92e3df3e8513346946db946a1ba27c92e"
+  },
+  "rows": [
+    {
+      "id": "metric-audit",
+      "history": [
+        "修复 Skill/MCP 图路由的专家推荐，逐席核对原角色适用性，审计评价指标和测试证据。"
+      ],
+      "prompt": "我感觉你的评价指标有问题，就是你认为的正确推荐了，可能不是真正的正确推荐了？要不然你现在的什么48/68为什么还是推荐不到想要的？我感觉评价指标有问题你仔细根因分析一下，看看是不是这个问题？",
+      "candidateQuery": "修复 Skill/MCP 图路由的专家推荐，逐席核对原角色适用性，审计评价指标和测试证据。\n我感觉你的评价指标有问题，就是你认为的正确推荐了，可能不是真正的正确推荐了？要不然你现在的什么48/68为什么还是推荐不到想要的？我感觉评价指标有问题你仔细根因分析一下，看看是不是这个问题？",
+      "baseline": {
+        "startMs": 4.592249999999979,
+        "endMs": 72.508125,
+        "ms": 67.91816599999999,
+        "bytes": 7716,
+        "candidates": [
+          {
+            "name": "trap-detector",
+            "kind": "Skill"
+          },
+          {
+            "name": "career-broker",
+            "kind": "Complete expert module",
+            "moduleId": "expert:career-broker:2e2dc85f6d8748bc"
+          },
+          {
+            "name": "five-whys",
+            "kind": "Skill"
+          },
+          {
+            "name": "databrain-opinion-metrics",
+            "kind": "Skill",
+            "moduleId": "skill:databrain-opinion-metrics:e697cd6574e3b7c9"
+          },
+          {
+            "name": "layer2-research-digest",
+            "kind": "Skill",
+            "moduleId": "skill:layer2-research-digest:ab5fdb5b4c7023e8"
+          },
+          {
+            "name": "topic-evaluator",
+            "kind": "Complete expert module",
+            "moduleId": "expert:topic-evaluator:fb0a6f559714acf3"
+          },
+          {
+            "name": "listinggood",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:listinggood:c566a0568ae65a30"
+          },
+          {
+            "name": "your-service",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:your-service:9f12246928f75ad7"
+          }
+        ]
+      },
+      "candidate": {
+        "startMs": 72.53300000000002,
+        "endMs": 144.16741599999995,
+        "ms": 71.634791,
+        "bytes": 7017,
+        "candidates": [
+          {
+            "name": "tedianren",
+            "kind": "Skill",
+            "moduleId": "skill:tedianren:f32f60ce213b5412"
+          },
+          {
+            "name": "five-whys",
+            "kind": "Skill"
+          },
+          {
+            "name": "evidence-level-ranker",
+            "kind": "Skill"
+          },
+          {
+            "name": "nsfc-reviewers",
+            "kind": "Skill"
+          },
+          {
+            "name": "career-broker",
+            "kind": "Complete expert module",
+            "moduleId": "expert:career-broker:2e2dc85f6d8748bc"
+          },
+          {
+            "name": "metamorphosis-practitioner",
+            "kind": "Complete expert module",
+            "moduleId": "expert:metamorphosis-practitioner:9e6424b2b234d176"
+          },
+          {
+            "name": "recruit-mcp",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:recruit-mcp:a355f1fc5dcbaad6"
+          },
+          {
+            "name": "task_tree_skills",
+            "kind": "MCP/task_tree"
+          }
+        ]
+      },
+      "anchorOnly": {
+        "startMs": 144.18070800000004,
+        "endMs": 206.29612500000002,
+        "ms": 62.11570799999993,
+        "bytes": 6693,
+        "candidates": [
+          {
+            "name": "Skill Repair",
+            "kind": "Skill"
+          },
+          {
+            "name": "recruit-mcp",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:recruit-mcp:a355f1fc5dcbaad6"
+          },
+          {
+            "name": "scienceora",
+            "kind": "Skill",
+            "moduleId": "skill:scienceora:0ccba89f29b49c29"
+          },
+          {
+            "name": "qual-doctor",
+            "kind": "Skill"
+          },
+          {
+            "name": "evidence-citation",
+            "kind": "Skill"
+          },
+          {
+            "name": "evidence-collector",
+            "kind": "Complete expert module",
+            "moduleId": "expert:evidence-collector:1fe137d39fcca248"
+          },
+          {
+            "name": "task_tree_skills",
+            "kind": "MCP/task_tree"
+          },
+          {
+            "name": "txzhaopin",
+            "kind": "Complete expert module",
+            "moduleId": "expert:txzhaopin:4180c78a7f28ba95"
+          }
+        ]
+      }
+    },
+    {
+      "id": "incident-followup",
+      "history": [
+        "线上支付突然大面积失败，请统一指挥事故止损、值班恢复，记录影响用户与时间线，事后交付根因和整改复盘。"
+      ],
+      "prompt": "这个问题还没有恢复，请继续排查，保留处理时间线，确保最终有可验证的整改产物。",
+      "candidateQuery": "线上支付突然大面积失败，请统一指挥事故止损、值班恢复，记录影响用户与时间线，事后交付根因和整改复盘。\n这个问题还没有恢复，请继续排查，保留处理时间线，确保最终有可验证的整改产物。",
+      "baseline": {
+        "startMs": 87.613541,
+        "endMs": 138.06179100000003,
+        "ms": 50.44870900000001,
+        "bytes": 5870,
+        "candidates": [
+          {
+            "name": "update-todo-step",
+            "kind": "Skill"
+          },
+          {
+            "name": "litigation-legal",
+            "kind": "Complete expert module",
+            "moduleId": "expert:litigation-legal:a95e463b1b07d4a2"
+          },
+          {
+            "name": "code",
+            "kind": "Complete expert module",
+            "moduleId": "expert:code:a38a5046906be139"
+          },
+          {
+            "name": "eforge-recover",
+            "kind": "Skill"
+          },
+          {
+            "name": "verify-before-completion",
+            "kind": "Skill"
+          },
+          {
+            "name": "rectification-ledger",
+            "kind": "Skill"
+          },
+          {
+            "name": "task_tree_check_compact",
+            "kind": "MCP/task_tree"
+          },
+          {
+            "name": "tapd",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:tapd:f1cab11990ead304"
+          }
+        ]
+      },
+      "candidate": {
+        "startMs": 5.151207999999997,
+        "endMs": 87.59716600000002,
+        "ms": 82.44650000000001,
+        "bytes": 8410,
+        "candidates": [
+          {
+            "name": "weixinpay-feedback",
+            "kind": "Skill",
+            "moduleId": "skill:weixinpay-feedback:22ab96b6df21a845"
+          },
+          {
+            "name": "sdk-log-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:sdk-log-expert:d6ec4e9c18990bfb"
+          },
+          {
+            "name": "getnote-note",
+            "kind": "Skill",
+            "moduleId": "skill:getnote-note:ac847e1e845eb997"
+          },
+          {
+            "name": "churn-prevention",
+            "kind": "Skill"
+          },
+          {
+            "name": "weixinpay-pay",
+            "kind": "Skill",
+            "moduleId": "skill:weixinpay-pay:d61748df4170d45a"
+          },
+          {
+            "name": "incident-response-commander",
+            "kind": "Complete expert module",
+            "moduleId": "expert:incident-response-commander:4ff0a57b742f876b"
+          },
+          {
+            "name": "yiya-dental",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:yiya-dental:57d6764342bbbe37"
+          },
+          {
+            "name": "mergerinfo",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:mergerinfo:5a8a989b8f5d2eff"
+          }
+        ]
+      },
+      "anchorOnly": {
+        "startMs": 138.073875,
+        "endMs": 194.35445799999997,
+        "ms": 56.28129100000001,
+        "bytes": 8059,
+        "candidates": [
+          {
+            "name": "weixinpay-feedback",
+            "kind": "Skill",
+            "moduleId": "skill:weixinpay-feedback:22ab96b6df21a845"
+          },
+          {
+            "name": "churn-prevention",
+            "kind": "Skill"
+          },
+          {
+            "name": "incident-response-commander",
+            "kind": "Complete expert module",
+            "moduleId": "expert:incident-response-commander:4ff0a57b742f876b"
+          },
+          {
+            "name": "weixinpay-pay",
+            "kind": "Skill",
+            "moduleId": "skill:weixinpay-pay:d61748df4170d45a"
+          },
+          {
+            "name": "mibao-safety-qa",
+            "kind": "Skill",
+            "moduleId": "skill:mibao-safety-qa:f76bb607679ab556"
+          },
+          {
+            "name": "sdk-log-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:sdk-log-expert:d6ec4e9c18990bfb"
+          },
+          {
+            "name": "yiya-dental",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:yiya-dental:57d6764342bbbe37"
+          },
+          {
+            "name": "huodongxing-pro",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:huodongxing-pro:06f3f000285d3e89"
+          }
+        ]
+      }
+    },
+    {
+      "id": "security-followup",
+      "history": [
+        "多租户后台中客户A能猜编号访问客户B的账单，请分析越权、威胁模型并提供修补和攻击复现验证。"
+      ],
+      "prompt": "这个方案再检查一下，别只修这一个入口，相关攻击路径和验证证据都要覆盖。",
+      "candidateQuery": "多租户后台中客户A能猜编号访问客户B的账单，请分析越权、威胁模型并提供修补和攻击复现验证。\n这个方案再检查一下，别只修这一个入口，相关攻击路径和验证证据都要覆盖。",
+      "baseline": {
+        "startMs": 5.601540999999997,
+        "endMs": 73.26137499999999,
+        "ms": 67.66091699999998,
+        "bytes": 6207,
+        "candidates": [
+          {
+            "name": "recon-full",
+            "kind": "Skill"
+          },
+          {
+            "name": "pentest-checklist",
+            "kind": "Skill"
+          },
+          {
+            "name": "evidence-collector",
+            "kind": "Complete expert module",
+            "moduleId": "expert:evidence-collector:1fe137d39fcca248"
+          },
+          {
+            "name": "performing-directory-traversal-testing",
+            "kind": "Skill"
+          },
+          {
+            "name": "pentest-commands",
+            "kind": "Skill"
+          },
+          {
+            "name": "soe",
+            "kind": "Complete expert module",
+            "moduleId": "expert:soe:6587b54d7a1d0585"
+          },
+          {
+            "name": "task_tree_check_compact",
+            "kind": "MCP/task_tree"
+          },
+          {
+            "name": "LawyerOne",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:LawyerOne:b92e5d6a3983b213"
+          }
+        ]
+      },
+      "candidate": {
+        "startMs": 73.27216599999997,
+        "endMs": 136.152,
+        "ms": 62.880334000000005,
+        "bytes": 6979,
+        "candidates": [
+          {
+            "name": "detecting-service-account-abuse",
+            "kind": "Skill"
+          },
+          {
+            "name": "table-permission-check",
+            "kind": "Skill",
+            "moduleId": "skill:table-permission-check:ec3c296d71c8d6f8"
+          },
+          {
+            "name": "database-lateral-pivot",
+            "kind": "Skill"
+          },
+          {
+            "name": "cc-multi-tenant-safety",
+            "kind": "Skill"
+          },
+          {
+            "name": "soe",
+            "kind": "Complete expert module",
+            "moduleId": "expert:soe:6587b54d7a1d0585"
+          },
+          {
+            "name": "tianyu-account-guardian",
+            "kind": "Complete expert module",
+            "moduleId": "expert:tianyu-account-guardian:16825d5dfbac2f33"
+          },
+          {
+            "name": "awehome-loushu",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:awehome-loushu:811851a130f9f4fc"
+          },
+          {
+            "name": "sjb-mcp",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:sjb-mcp:60007767219fa4e2"
+          }
+        ]
+      },
+      "anchorOnly": {
+        "startMs": 136.16775,
+        "endMs": 199.08158299999997,
+        "ms": 62.91412500000001,
+        "bytes": 6782,
+        "candidates": [
+          {
+            "name": "detecting-service-account-abuse",
+            "kind": "Skill"
+          },
+          {
+            "name": "table-permission-check",
+            "kind": "Skill",
+            "moduleId": "skill:table-permission-check:ec3c296d71c8d6f8"
+          },
+          {
+            "name": "cc-multi-tenant-safety",
+            "kind": "Skill"
+          },
+          {
+            "name": "performing-ransomware-tabletop-exercise",
+            "kind": "Skill"
+          },
+          {
+            "name": "smb-compliance",
+            "kind": "Complete expert module",
+            "moduleId": "expert:smb-compliance:0df62562b26066b7"
+          },
+          {
+            "name": "soe",
+            "kind": "Complete expert module",
+            "moduleId": "expert:soe:6587b54d7a1d0585"
+          },
+          {
+            "name": "charge-order-query",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:charge-order-query:7ac782501acdb03a"
+          },
+          {
+            "name": "awehome-loushu",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:awehome-loushu:811851a130f9f4fc"
+          }
+        ]
+      }
+    },
+    {
+      "id": "journal-followup",
+      "history": [
+        "这篇关于城市热岛与老年健康的论文摘要，需要评估中文核心与SCI投稿，交付冲稳保选刊方案和依据。"
+      ],
+      "prompt": "这个结果还不够，请考虑主题匹配、收稿范围和投稿难度，把推荐理由核实清楚。",
+      "candidateQuery": "这篇关于城市热岛与老年健康的论文摘要，需要评估中文核心与SCI投稿，交付冲稳保选刊方案和依据。\n这个结果还不够，请考虑主题匹配、收稿范围和投稿难度，把推荐理由核实清楚。",
+      "baseline": {
+        "startMs": 75.83320800000001,
+        "endMs": 134.797666,
+        "ms": 58.964999999999975,
+        "bytes": 7055,
+        "candidates": [
+          {
+            "name": "paper-select-journal",
+            "kind": "Skill"
+          },
+          {
+            "name": "zhaopin-candidate-recommendation-report",
+            "kind": "Skill",
+            "moduleId": "skill:zhaopin-candidate-recommendation-report:694cb7bd895cc867"
+          },
+          {
+            "name": "academic-journal-selector",
+            "kind": "Complete expert module",
+            "moduleId": "expert:academic-journal-selector:0ea0f301e60ea4bd"
+          },
+          {
+            "name": "paper-relevance-filter",
+            "kind": "Skill"
+          },
+          {
+            "name": "method-research-evidence",
+            "kind": "Skill"
+          },
+          {
+            "name": "test-results-analyst",
+            "kind": "Complete expert module",
+            "moduleId": "expert:test-results-analyst:232d6d14b41339a7"
+          },
+          {
+            "name": "xiehui-fr",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:xiehui-fr:01f858e452c20681"
+          },
+          {
+            "name": "duifene-homework-grading",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:duifene-homework-grading:697f09d439b3c39b"
+          }
+        ]
+      },
+      "candidate": {
+        "startMs": 1.067707999999982,
+        "endMs": 75.81741599999998,
+        "ms": 74.75037500000002,
+        "bytes": 7014,
+        "candidates": [
+          {
+            "name": "paper-write-sci",
+            "kind": "Skill"
+          },
+          {
+            "name": "scite-database",
+            "kind": "Skill"
+          },
+          {
+            "name": "paper-feishu-digest",
+            "kind": "Skill"
+          },
+          {
+            "name": "academic-journal-selector",
+            "kind": "Complete expert module",
+            "moduleId": "expert:academic-journal-selector:0ea0f301e60ea4bd"
+          },
+          {
+            "name": "paper-select-journal",
+            "kind": "Skill"
+          },
+          {
+            "name": "xiehui-fr",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:xiehui-fr:01f858e452c20681"
+          },
+          {
+            "name": "51shebao-hr-tools",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:51shebao-hr-tools:0084a7862d2f98e9"
+          },
+          {
+            "name": "arxiv-watcher",
+            "kind": "Complete expert module",
+            "moduleId": "expert:arxiv-watcher:b897ffef34bacc62"
+          }
+        ]
+      },
+      "anchorOnly": {
+        "startMs": 134.81625000000003,
+        "endMs": 192.88491600000003,
+        "ms": 58.06929099999991,
+        "bytes": 7017,
+        "candidates": [
+          {
+            "name": "paper-write-sci",
+            "kind": "Skill"
+          },
+          {
+            "name": "基因与腹主动脉瘤SCI文章讨论撰写",
+            "kind": "Skill"
+          },
+          {
+            "name": "scite-database",
+            "kind": "Skill"
+          },
+          {
+            "name": "sci-paper-reviewer",
+            "kind": "Skill"
+          },
+          {
+            "name": "academic-journal-selector",
+            "kind": "Complete expert module",
+            "moduleId": "expert:academic-journal-selector:0ea0f301e60ea4bd"
+          },
+          {
+            "name": "51shebao-hr-tools",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:51shebao-hr-tools:0084a7862d2f98e9"
+          },
+          {
+            "name": "arxiv-watcher",
+            "kind": "Complete expert module",
+            "moduleId": "expert:arxiv-watcher:b897ffef34bacc62"
+          },
+          {
+            "name": "investoday-finance-data",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:investoday-finance-data:6260df0da7a08851"
+          }
+        ]
+      }
+    },
+    {
+      "id": "database-followup",
+      "history": [
+        "PostgreSQL订单查询很慢，使用EXPLAIN ANALYZE检查执行计划、索引和扫描行数，验证修复前后延迟。"
+      ],
+      "prompt": "这个问题继续查，请保留执行计划，不要只给通用优化建议。",
+      "candidateQuery": "PostgreSQL订单查询很慢，使用EXPLAIN ANALYZE检查执行计划、索引和扫描行数，验证修复前后延迟。\n这个问题继续查，请保留执行计划，不要只给通用优化建议。",
+      "baseline": {
+        "startMs": 196.72987499999994,
+        "endMs": 249.272,
+        "ms": 52.54245800000001,
+        "bytes": 7576,
+        "candidates": [
+          {
+            "name": "feedback",
+            "kind": "Skill",
+            "moduleId": "skill:feedback:42d1697e90b85e0f"
+          },
+          {
+            "name": "make_plan",
+            "kind": "Skill"
+          },
+          {
+            "name": "plan-md-writer",
+            "kind": "Skill"
+          },
+          {
+            "name": "implementation-planner",
+            "kind": "Skill"
+          },
+          {
+            "name": "fbsir-eight-seat-board",
+            "kind": "Complete expert module",
+            "moduleId": "expert:fbsir-eight-seat-board:b438f256168cebde"
+          },
+          {
+            "name": "xiehui-fr",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:xiehui-fr:01f858e452c20681"
+          },
+          {
+            "name": "study-planner",
+            "kind": "Complete expert module",
+            "moduleId": "expert:study-planner:4c912b3fe5199627"
+          },
+          {
+            "name": "slgj-finance-engine",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:slgj-finance-engine:b40816f028ccbd61"
+          }
+        ]
+      },
+      "candidate": {
+        "startMs": 249.28954100000004,
+        "endMs": 304.429958,
+        "ms": 55.14074999999991,
+        "bytes": 5824,
+        "candidates": [
+          {
+            "name": "postgresql",
+            "kind": "Skill"
+          },
+          {
+            "name": "database-operations",
+            "kind": "Complete expert module",
+            "moduleId": "expert:database-operations:6c69722e92d0745a"
+          },
+          {
+            "name": "sql-optimization",
+            "kind": "Skill"
+          },
+          {
+            "name": "postgresql-indexing",
+            "kind": "Skill"
+          },
+          {
+            "name": "task_tree_knowledge",
+            "kind": "MCP/task_tree"
+          },
+          {
+            "name": "database-optimization-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:database-optimization-expert:699cd70624611702"
+          },
+          {
+            "name": "gt-generate-sql-data",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:gt-generate-sql-data:5c354c80bd122c8d"
+          },
+          {
+            "name": "verify-before-completion",
+            "kind": "Skill"
+          }
+        ]
+      },
+      "anchorOnly": {
+        "startMs": 304.442916,
+        "endMs": 375.6045,
+        "ms": 71.16199999999992,
+        "bytes": 6549,
+        "candidates": [
+          {
+            "name": "postgresql",
+            "kind": "Skill"
+          },
+          {
+            "name": "tchousec-slow-sql-diagnosis",
+            "kind": "Skill",
+            "moduleId": "skill:tchousec-slow-sql-diagnosis:37a4b6cd16b2f73c"
+          },
+          {
+            "name": "postgresql-indexing",
+            "kind": "Skill"
+          },
+          {
+            "name": "database-operations",
+            "kind": "Complete expert module",
+            "moduleId": "expert:database-operations:6c69722e92d0745a"
+          },
+          {
+            "name": "task_tree_knowledge",
+            "kind": "MCP/task_tree"
+          },
+          {
+            "name": "database-optimization-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:database-optimization-expert:699cd70624611702"
+          },
+          {
+            "name": "gt-generate-sql-data",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:gt-generate-sql-data:5c354c80bd122c8d"
+          },
+          {
+            "name": "verify-before-completion",
+            "kind": "Skill"
+          }
+        ]
+      }
+    },
+    {
+      "id": "exam-followup",
+      "history": [
+        "三个月后考研，每晚两小时，数学落后、英语词汇容易忘，请制定每日可调整计划、间隔复习与每周复盘。"
+      ],
+      "prompt": "这个计划需要能在落后时自动调整，今天做什么和周末怎么复盘都要具体。",
+      "candidateQuery": "这个计划需要能在落后时自动调整，今天做什么和周末怎么复盘都要具体。",
+      "baseline": {
+        "startMs": 253.51224999999994,
+        "endMs": 305.28450000000004,
+        "ms": 51.77245800000003,
+        "bytes": 7266,
+        "candidates": [
+          {
+            "name": "mvp",
+            "kind": "Skill",
+            "moduleId": "skill:mvp:aa797f5f67745359"
+          },
+          {
+            "name": "cheat-status",
+            "kind": "Skill"
+          },
+          {
+            "name": "note-calendar",
+            "kind": "Skill"
+          },
+          {
+            "name": "schedule-plan",
+            "kind": "Skill"
+          },
+          {
+            "name": "exam-preparation-planner",
+            "kind": "Complete expert module",
+            "moduleId": "expert:exam-preparation-planner:57cfc58c078f16a0"
+          },
+          {
+            "name": "news-buddy",
+            "kind": "Complete expert module",
+            "moduleId": "expert:news-buddy:5461ff8bc9d24907"
+          },
+          {
+            "name": "task_tree_write",
+            "kind": "MCP/task_tree"
+          },
+          {
+            "name": "xuanpian-schedule",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:xuanpian-schedule:97a0a1c4aead215d"
+          }
+        ]
+      },
+      "candidate": {
+        "startMs": 197.289291,
+        "endMs": 253.49833299999995,
+        "ms": 56.20941700000003,
+        "bytes": 7266,
+        "candidates": [
+          {
+            "name": "mvp",
+            "kind": "Skill",
+            "moduleId": "skill:mvp:aa797f5f67745359"
+          },
+          {
+            "name": "cheat-status",
+            "kind": "Skill"
+          },
+          {
+            "name": "note-calendar",
+            "kind": "Skill"
+          },
+          {
+            "name": "schedule-plan",
+            "kind": "Skill"
+          },
+          {
+            "name": "exam-preparation-planner",
+            "kind": "Complete expert module",
+            "moduleId": "expert:exam-preparation-planner:57cfc58c078f16a0"
+          },
+          {
+            "name": "news-buddy",
+            "kind": "Complete expert module",
+            "moduleId": "expert:news-buddy:5461ff8bc9d24907"
+          },
+          {
+            "name": "task_tree_write",
+            "kind": "MCP/task_tree"
+          },
+          {
+            "name": "xuanpian-schedule",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:xuanpian-schedule:97a0a1c4aead215d"
+          }
+        ]
+      },
+      "anchorOnly": {
+        "startMs": 305.295458,
+        "endMs": 371.857333,
+        "ms": 66.56237499999997,
+        "bytes": 7228,
+        "candidates": [
+          {
+            "name": "study-planner",
+            "kind": "Skill",
+            "moduleId": "skill:study-planner:987d06251761ddc8"
+          },
+          {
+            "name": "study-plan",
+            "kind": "Skill",
+            "moduleId": "skill:study-plan:712cb803b4353f91"
+          },
+          {
+            "name": "vocab-craft-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:vocab-craft-expert:dc711b801468e067"
+          },
+          {
+            "name": "RET咨询阶段性目标校准协议",
+            "kind": "Skill"
+          },
+          {
+            "name": "english-exam-writing-reviewer",
+            "kind": "Skill",
+            "moduleId": "skill:english-exam-writing-reviewer:1d88a59bc4e55085"
+          },
+          {
+            "name": "exam-preparation-planner",
+            "kind": "Complete expert module",
+            "moduleId": "expert:exam-preparation-planner:57cfc58c078f16a0"
+          },
+          {
+            "name": "fenbi_mcp",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:fenbi_mcp:3cde0d3ace47e75c"
+          },
+          {
+            "name": "task_tree_check_compact",
+            "kind": "MCP/task_tree"
+          }
+        ]
+      }
+    },
+    {
+      "id": "standalone-reset",
+      "history": [
+        "分析 Skill/MCP 路由的专家推荐指标。"
+      ],
+      "prompt": "请帮我预订东京酒店。",
+      "candidateQuery": "请帮我预订东京酒店。",
+      "baseline": {
+        "startMs": 199.64154100000002,
+        "endMs": 249.82495799999998,
+        "ms": 50.183874999999944,
+        "bytes": 8621,
+        "candidates": [
+          {
+            "name": "lvshu-hotel-booking",
+            "kind": "Skill",
+            "moduleId": "skill:lvshu-hotel-booking:75ff7303b82de64e"
+          },
+          {
+            "name": "tuniu-cli",
+            "kind": "Skill",
+            "moduleId": "skill:tuniu-cli:55d48dc075537baf"
+          },
+          {
+            "name": "rollinggo-searchhotel",
+            "kind": "Skill"
+          },
+          {
+            "name": "accommodation-pick",
+            "kind": "Skill",
+            "moduleId": "skill:accommodation-pick:7700717f09997075"
+          },
+          {
+            "name": "tc-chengxin-travel-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:tc-chengxin-travel-expert:903e23991731a447"
+          },
+          {
+            "name": "tripstar-agent",
+            "kind": "Complete expert module",
+            "moduleId": "expert:tripstar-agent:9d4f7e62db6a67eb"
+          },
+          {
+            "name": "lvshu-hotel",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:lvshu-hotel:4d51a49254cb58ca"
+          },
+          {
+            "name": "tourmind-hotel-booking-token",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:tourmind-hotel-booking-token:c754545df0201927"
+          }
+        ]
+      },
+      "candidate": {
+        "startMs": 249.836791,
+        "endMs": 301.208458,
+        "ms": 51.37195899999995,
+        "bytes": 8621,
+        "candidates": [
+          {
+            "name": "lvshu-hotel-booking",
+            "kind": "Skill",
+            "moduleId": "skill:lvshu-hotel-booking:75ff7303b82de64e"
+          },
+          {
+            "name": "tuniu-cli",
+            "kind": "Skill",
+            "moduleId": "skill:tuniu-cli:55d48dc075537baf"
+          },
+          {
+            "name": "rollinggo-searchhotel",
+            "kind": "Skill"
+          },
+          {
+            "name": "accommodation-pick",
+            "kind": "Skill",
+            "moduleId": "skill:accommodation-pick:7700717f09997075"
+          },
+          {
+            "name": "tc-chengxin-travel-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:tc-chengxin-travel-expert:903e23991731a447"
+          },
+          {
+            "name": "tripstar-agent",
+            "kind": "Complete expert module",
+            "moduleId": "expert:tripstar-agent:9d4f7e62db6a67eb"
+          },
+          {
+            "name": "lvshu-hotel",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:lvshu-hotel:4d51a49254cb58ca"
+          },
+          {
+            "name": "tourmind-hotel-booking-token",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:tourmind-hotel-booking-token:c754545df0201927"
+          }
+        ]
+      },
+      "anchorOnly": {
+        "startMs": 301.22541599999994,
+        "endMs": 378.72979100000003,
+        "ms": 77.50479200000007,
+        "bytes": 6722,
+        "candidates": [
+          {
+            "name": "ligowin-mcp",
+            "kind": "Skill",
+            "moduleId": "skill:ligowin-mcp:cefcd6b2a8f9cb66"
+          },
+          {
+            "name": "referral-program",
+            "kind": "Skill"
+          },
+          {
+            "name": "recruit-mcp",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:recruit-mcp:a355f1fc5dcbaad6"
+          },
+          {
+            "name": "build-mcp-app",
+            "kind": "Skill"
+          },
+          {
+            "name": "baixiao-mcp-skill",
+            "kind": "Skill",
+            "moduleId": "skill:baixiao-mcp-skill:143abfae08c22488"
+          },
+          {
+            "name": "txzhaopin",
+            "kind": "Complete expert module",
+            "moduleId": "expert:txzhaopin:4180c78a7f28ba95"
+          },
+          {
+            "name": "tchousecdx",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:tchousecdx:d96b0308e400ab10"
+          },
+          {
+            "name": "tool-evaluation-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:tool-evaluation-expert:a5b729f3da36cb25"
+          }
+        ]
+      }
+    },
+    {
+      "id": "explicit-reset",
+      "history": [
+        "分析 Skill/MCP 路由的专家推荐指标。"
+      ],
+      "prompt": "换个话题，请检查PostgreSQL慢查询执行计划和索引。",
+      "candidateQuery": "换个话题，请检查PostgreSQL慢查询执行计划和索引。",
+      "baseline": {
+        "startMs": 261.87562499999996,
+        "endMs": 312.47075,
+        "ms": 50.59537499999999,
+        "bytes": 6174,
+        "candidates": [
+          {
+            "name": "postgresql",
+            "kind": "Skill"
+          },
+          {
+            "name": "postgresql-indexing",
+            "kind": "Skill"
+          },
+          {
+            "name": "postgresql-optimization",
+            "kind": "Skill"
+          },
+          {
+            "name": "database-operations",
+            "kind": "Complete expert module",
+            "moduleId": "expert:database-operations:6c69722e92d0745a"
+          },
+          {
+            "name": "longclaw-research",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:longclaw-research:b6ddd0e60934a39e"
+          },
+          {
+            "name": "gt-generate-sql-data",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:gt-generate-sql-data:5c354c80bd122c8d"
+          },
+          {
+            "name": "database-optimization-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:database-optimization-expert:699cd70624611702"
+          }
+        ]
+      },
+      "candidate": {
+        "startMs": 206.90787499999993,
+        "endMs": 261.86220799999995,
+        "ms": 54.954791,
+        "bytes": 6174,
+        "candidates": [
+          {
+            "name": "postgresql",
+            "kind": "Skill"
+          },
+          {
+            "name": "postgresql-indexing",
+            "kind": "Skill"
+          },
+          {
+            "name": "postgresql-optimization",
+            "kind": "Skill"
+          },
+          {
+            "name": "database-operations",
+            "kind": "Complete expert module",
+            "moduleId": "expert:database-operations:6c69722e92d0745a"
+          },
+          {
+            "name": "longclaw-research",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:longclaw-research:b6ddd0e60934a39e"
+          },
+          {
+            "name": "gt-generate-sql-data",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:gt-generate-sql-data:5c354c80bd122c8d"
+          },
+          {
+            "name": "database-optimization-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:database-optimization-expert:699cd70624611702"
+          }
+        ]
+      },
+      "anchorOnly": {
+        "startMs": 312.48604099999994,
+        "endMs": 388.88341599999995,
+        "ms": 76.39762500000006,
+        "bytes": 6722,
+        "candidates": [
+          {
+            "name": "ligowin-mcp",
+            "kind": "Skill",
+            "moduleId": "skill:ligowin-mcp:cefcd6b2a8f9cb66"
+          },
+          {
+            "name": "referral-program",
+            "kind": "Skill"
+          },
+          {
+            "name": "recruit-mcp",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:recruit-mcp:a355f1fc5dcbaad6"
+          },
+          {
+            "name": "build-mcp-app",
+            "kind": "Skill"
+          },
+          {
+            "name": "baixiao-mcp-skill",
+            "kind": "Skill",
+            "moduleId": "skill:baixiao-mcp-skill:143abfae08c22488"
+          },
+          {
+            "name": "txzhaopin",
+            "kind": "Complete expert module",
+            "moduleId": "expert:txzhaopin:4180c78a7f28ba95"
+          },
+          {
+            "name": "tchousecdx",
+            "kind": "MCP service module",
+            "moduleId": "mcp-service:tchousecdx:d96b0308e400ab10"
+          },
+          {
+            "name": "tool-evaluation-expert",
+            "kind": "Complete expert module",
+            "moduleId": "expert:tool-evaluation-expert:a5b729f3da36cb25"
+          }
+        ]
+      }
+    }
+  ],
+  "intervals": [
+    {
+      "worker": 0,
+      "case": "metric-audit",
+      "mode": "baseline",
+      "startMs": 4.592249999999979,
+      "endMs": 72.508125
+    },
+    {
+      "worker": 2,
+      "case": "security-followup",
+      "mode": "baseline",
+      "startMs": 5.601540999999997,
+      "endMs": 73.26137499999999
+    },
+    {
+      "worker": 3,
+      "case": "journal-followup",
+      "mode": "candidate",
+      "startMs": 1.067707999999982,
+      "endMs": 75.81741599999998
+    },
+    {
+      "worker": 1,
+      "case": "incident-followup",
+      "mode": "candidate",
+      "startMs": 5.151207999999997,
+      "endMs": 87.59716600000002
+    },
+    {
+      "worker": 3,
+      "case": "journal-followup",
+      "mode": "baseline",
+      "startMs": 75.83320800000001,
+      "endMs": 134.797666
+    },
+    {
+      "worker": 2,
+      "case": "security-followup",
+      "mode": "candidate",
+      "startMs": 73.27216599999997,
+      "endMs": 136.152
+    },
+    {
+      "worker": 1,
+      "case": "incident-followup",
+      "mode": "baseline",
+      "startMs": 87.613541,
+      "endMs": 138.06179100000003
+    },
+    {
+      "worker": 0,
+      "case": "metric-audit",
+      "mode": "candidate",
+      "startMs": 72.53300000000002,
+      "endMs": 144.16741599999995
+    },
+    {
+      "worker": 3,
+      "case": "journal-followup",
+      "mode": "anchorOnly",
+      "startMs": 134.81625000000003,
+      "endMs": 192.88491600000003
+    },
+    {
+      "worker": 1,
+      "case": "incident-followup",
+      "mode": "anchorOnly",
+      "startMs": 138.073875,
+      "endMs": 194.35445799999997
+    },
+    {
+      "worker": 2,
+      "case": "security-followup",
+      "mode": "anchorOnly",
+      "startMs": 136.16775,
+      "endMs": 199.08158299999997
+    },
+    {
+      "worker": 0,
+      "case": "metric-audit",
+      "mode": "anchorOnly",
+      "startMs": 144.18070800000004,
+      "endMs": 206.29612500000002
+    },
+    {
+      "worker": 3,
+      "case": "database-followup",
+      "mode": "baseline",
+      "startMs": 196.72987499999994,
+      "endMs": 249.272
+    },
+    {
+      "worker": 2,
+      "case": "standalone-reset",
+      "mode": "baseline",
+      "startMs": 199.64154100000002,
+      "endMs": 249.82495799999998
+    },
+    {
+      "worker": 1,
+      "case": "exam-followup",
+      "mode": "candidate",
+      "startMs": 197.289291,
+      "endMs": 253.49833299999995
+    },
+    {
+      "worker": 0,
+      "case": "explicit-reset",
+      "mode": "candidate",
+      "startMs": 206.90787499999993,
+      "endMs": 261.86220799999995
+    },
+    {
+      "worker": 2,
+      "case": "standalone-reset",
+      "mode": "candidate",
+      "startMs": 249.836791,
+      "endMs": 301.208458
+    },
+    {
+      "worker": 3,
+      "case": "database-followup",
+      "mode": "candidate",
+      "startMs": 249.28954100000004,
+      "endMs": 304.429958
+    },
+    {
+      "worker": 1,
+      "case": "exam-followup",
+      "mode": "baseline",
+      "startMs": 253.51224999999994,
+      "endMs": 305.28450000000004
+    },
+    {
+      "worker": 0,
+      "case": "explicit-reset",
+      "mode": "baseline",
+      "startMs": 261.87562499999996,
+      "endMs": 312.47075
+    },
+    {
+      "worker": 1,
+      "case": "exam-followup",
+      "mode": "anchorOnly",
+      "startMs": 305.295458,
+      "endMs": 371.857333
+    },
+    {
+      "worker": 3,
+      "case": "database-followup",
+      "mode": "anchorOnly",
+      "startMs": 304.442916,
+      "endMs": 375.6045
+    },
+    {
+      "worker": 2,
+      "case": "standalone-reset",
+      "mode": "anchorOnly",
+      "startMs": 301.22541599999994,
+      "endMs": 378.72979100000003
+    },
+    {
+      "worker": 0,
+      "case": "explicit-reset",
+      "mode": "anchorOnly",
+      "startMs": 312.48604099999994,
+      "endMs": 388.88341599999995
+    }
+  ],
+  "concurrency": 4,
+  "wallMs": 670.034958,
+  "productionChanged": false,
+  "limitations": [
+    "Directed development cases, not independent population accuracy.",
+    "Cached resident graph; timings include CPU scheduling and cannot establish speedup.",
+    "Candidate names are not relevance judgments; original-role review is required.",
+    "No downstream expert workflow executed. Context bytes are not model tokens."
+  ]
+}

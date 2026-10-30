@@ -1,0 +1,618 @@
+{
+  "schema": "expert-rerank-probes/v1",
+  "experiments": [
+    {
+      "experiment": "mmarco-followups",
+      "rawSha256": "3bedb956a2d5345302e3636c847ffab23d906ed0e176e5b3d6c287d93e0b4c2c",
+      "model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+      "categoryRecallDepth": 0,
+      "startupSeconds": 31.815650207994622,
+      "rows": [
+        {
+          "case": "metric-audit",
+          "candidates": 11,
+          "baseline": [
+            "career-broker",
+            "metamorphosis-practitioner"
+          ],
+          "rerankMs": 1034.5209160004742,
+          "reranked": [
+            "txzhaopin",
+            "perf-management-expert"
+          ]
+        },
+        {
+          "case": "incident-followup",
+          "candidates": 7,
+          "baseline": [
+            "sdk-log-expert",
+            "incident-response-commander"
+          ],
+          "rerankMs": 812.1400830132188,
+          "reranked": [
+            "incident-response-commander",
+            "roadshow-research-team"
+          ]
+        },
+        {
+          "case": "security-followup",
+          "candidates": 5,
+          "baseline": [
+            "soe",
+            "tianyu-account-guardian"
+          ],
+          "rerankMs": 345.71704200061504,
+          "reranked": [
+            "soe",
+            "cpq"
+          ]
+        },
+        {
+          "case": "journal-followup",
+          "candidates": 5,
+          "baseline": [
+            "academic-journal-selector",
+            "arxiv-watcher"
+          ],
+          "rerankMs": 544.0784579986939,
+          "reranked": [
+            "academic-journal-selector",
+            "paper-topic-selection"
+          ]
+        },
+        {
+          "case": "database-followup",
+          "candidates": 3,
+          "baseline": [
+            "database-operations",
+            "database-optimization-expert"
+          ],
+          "rerankMs": 327.81733400770463,
+          "reranked": [
+            "database-operations",
+            "database-optimization-expert"
+          ]
+        },
+        {
+          "case": "exam-followup",
+          "candidates": 12,
+          "baseline": [
+            "exam-preparation-planner",
+            "news-buddy"
+          ],
+          "rerankMs": 736.4917499944568,
+          "reranked": [
+            "exam-preparation-planner",
+            "ihr-conference"
+          ]
+        }
+      ],
+      "productionChanged": false,
+      "paidCalls": 0
+    },
+    {
+      "experiment": "mmarco-category50",
+      "rawSha256": "7f6ad664b72ff611d0d96f7859c5a127c6f13f953d865b39d01a63db1e9d5a12",
+      "model": "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1",
+      "categoryRecallDepth": 50,
+      "startupSeconds": 33.7599152920011,
+      "rows": [
+        {
+          "case": "metric-audit",
+          "candidates": 57,
+          "baseline": [
+            "career-broker",
+            "performance-testing-expert"
+          ],
+          "rerankMs": 4907.192833998124,
+          "reranked": [
+            "strategy-backtest-expert",
+            "long-manuscript-expert"
+          ]
+        },
+        {
+          "case": "incident-followup",
+          "candidates": 53,
+          "baseline": [
+            "sdk-log-expert",
+            "incident-response-commander"
+          ],
+          "rerankMs": 4191.766292002285,
+          "reranked": [
+            "contract-expert",
+            "tencent-rtc-expert"
+          ]
+        },
+        {
+          "case": "security-followup",
+          "candidates": 53,
+          "baseline": [
+            "soe",
+            "tianyu-account-guardian"
+          ],
+          "rerankMs": 3757.462791996659,
+          "reranked": [
+            "panshi-customer-visit-agent",
+            "tdx-stock-hunter"
+          ]
+        },
+        {
+          "case": "journal-followup",
+          "candidates": 51,
+          "baseline": [
+            "academic-journal-selector",
+            "arxiv-watcher"
+          ],
+          "rerankMs": 4281.284083001083,
+          "reranked": [
+            "academic-journal-selector",
+            "contract-expert"
+          ]
+        },
+        {
+          "case": "database-followup",
+          "candidates": 51,
+          "baseline": [
+            "database-operations",
+            "database-optimization-expert"
+          ],
+          "rerankMs": 3799.2640000011306,
+          "reranked": [
+            "database-operations",
+            "database-optimization-expert"
+          ]
+        },
+        {
+          "case": "exam-followup",
+          "candidates": 59,
+          "baseline": [
+            "exam-preparation-planner",
+            "study-planner"
+          ],
+          "rerankMs": 4164.256874995772,
+          "reranked": [
+            "exam-preparation-planner",
+            "strategy-backtest-expert"
+          ]
+        }
+      ],
+      "productionChanged": false,
+      "paidCalls": 0
+    },
+    {
+      "experiment": "qwen-followups",
+      "rawSha256": "1eaa5e83a55da3e9c251c513aa064b2662c1b4175575651e26bf58fdafa8c426",
+      "model": "Qwen/Qwen3-Reranker-0.6B",
+      "categoryRecallDepth": 0,
+      "startupSeconds": 32.301217041997006,
+      "rows": [
+        {
+          "case": "metric-audit",
+          "candidates": 11,
+          "baseline": [
+            "career-broker",
+            "metamorphosis-practitioner"
+          ],
+          "rerankMs": 2673.629000011715,
+          "reranked": [
+            "txzhaopin",
+            "tool-evaluation-expert"
+          ]
+        },
+        {
+          "case": "incident-followup",
+          "candidates": 7,
+          "baseline": [
+            "sdk-log-expert",
+            "incident-response-commander"
+          ],
+          "rerankMs": 1769.5021660038037,
+          "reranked": [
+            "incident-response-commander",
+            "sdk-log-expert"
+          ]
+        },
+        {
+          "case": "security-followup",
+          "candidates": 5,
+          "baseline": [
+            "soe",
+            "tianyu-account-guardian"
+          ],
+          "rerankMs": 961.7809169867542,
+          "reranked": [
+            "soe",
+            "evidence-collector"
+          ]
+        },
+        {
+          "case": "journal-followup",
+          "candidates": 5,
+          "baseline": [
+            "academic-journal-selector",
+            "arxiv-watcher"
+          ],
+          "rerankMs": 1568.9192919962807,
+          "reranked": [
+            "academic-journal-selector",
+            "paper-topic-selection"
+          ]
+        },
+        {
+          "case": "database-followup",
+          "candidates": 3,
+          "baseline": [
+            "database-operations",
+            "database-optimization-expert"
+          ],
+          "rerankMs": 709.9395839904901,
+          "reranked": [
+            "database-operations",
+            "database-optimization-expert"
+          ]
+        },
+        {
+          "case": "exam-followup",
+          "candidates": 12,
+          "baseline": [
+            "exam-preparation-planner",
+            "news-buddy"
+          ],
+          "rerankMs": 2161.301457992522,
+          "reranked": [
+            "exam-preparation-planner",
+            "ihr-conference"
+          ]
+        }
+      ],
+      "productionChanged": false,
+      "paidCalls": 0
+    },
+    {
+      "experiment": "qwen-category50-role",
+      "rawSha256": "dcad8e44eb123ac8e6f3ccc5aa8b67ef26bca83eefeda7c1f93078f11173b73f",
+      "model": "Qwen/Qwen3-Reranker-0.6B",
+      "categoryRecallDepth": 50,
+      "documents": "original-role",
+      "startupSeconds": 34.17156033300853,
+      "rows": [
+        {
+          "case": "metric-audit",
+          "candidates": 57,
+          "baseline": [
+            "career-broker",
+            "performance-testing-expert"
+          ],
+          "rerankMs": 26228.149416987435,
+          "reranked": [
+            "model-quality-assurance-expert",
+            "skill-smith"
+          ],
+          "sourceSha256": [
+            "18b8b038d2da7e8773a6378de9033cf12f6cd9aae94dbb266c406809f365e334",
+            "b3b0f7f6b5883dd887dd6a10ebd9d447698f65f3660dfb1e5820a6afb307c171"
+          ]
+        },
+        {
+          "case": "incident-followup",
+          "candidates": 53,
+          "baseline": [
+            "sdk-log-expert",
+            "incident-response-commander"
+          ],
+          "rerankMs": 24465.708207993885,
+          "reranked": [
+            "site-reliability-engineer",
+            "incident-response-commander"
+          ],
+          "sourceSha256": [
+            "de8f16c826b68701399a0fd644f9452c3b2832afdc37bd21f8b8370483961275",
+            "c0d524163c0a154ef1ed412a3d67279fe5b0542d9af58ec24ef10b47f22715f6"
+          ]
+        },
+        {
+          "case": "security-followup",
+          "candidates": 53,
+          "baseline": [
+            "soe",
+            "tianyu-account-guardian"
+          ],
+          "rerankMs": 24760.00516700151,
+          "reranked": [
+            "security-engineer",
+            "tencent-security-expert"
+          ],
+          "sourceSha256": [
+            "adafc050ba8bd6d0c1d5a53fd1967531f0a240e240952481bb9ccf7827036d9d",
+            "3c6251ebb78dbfd47c1476ed3df7ecdec6a8da550643ab13724bcf8097e206fe"
+          ]
+        },
+        {
+          "case": "journal-followup",
+          "candidates": 51,
+          "baseline": [
+            "academic-journal-selector",
+            "arxiv-watcher"
+          ],
+          "rerankMs": 22920.01012500259,
+          "reranked": [
+            "academic-journal-selector",
+            "empirical-research-team"
+          ],
+          "sourceSha256": [
+            "9ed4a82a13a4550c91822df81a0775036d05937c167483e3a3c7dc30a95e6b2f",
+            "858a2d46ca9ba36ea35f3551eb8cf857b83ba79d2fa3cf4a992c3e172da5dfcc"
+          ]
+        },
+        {
+          "case": "database-followup",
+          "candidates": 51,
+          "baseline": [
+            "database-operations",
+            "database-optimization-expert"
+          ],
+          "rerankMs": 23274.782207998214,
+          "reranked": [
+            "database-optimization-expert",
+            "database-operations"
+          ],
+          "sourceSha256": [
+            "f96287e950942f1d62d8229f4cdf881fc7e85bcf90448888a7bdeaf1ba3659a9",
+            "7c65c0fed75ca8ba94e63a25de37006746b27261588eadcd0fbdeba1e757bf91"
+          ]
+        },
+        {
+          "case": "exam-followup",
+          "candidates": 59,
+          "baseline": [
+            "exam-preparation-planner",
+            "study-planner"
+          ],
+          "rerankMs": 26483.26383299718,
+          "reranked": [
+            "exam-preparation-planner",
+            "study-planner"
+          ],
+          "sourceSha256": [
+            "8b24c85d3d91cb04afdb9b5f62579e22ac1a78c0fda8c9d2650b34bea50dc13b",
+            "e08e0513bae74334f0c149d0b27673933da95d4deb0f559400475c9afc6d554c"
+          ]
+        }
+      ],
+      "productionChanged": false,
+      "paidCalls": 0
+    },
+    {
+      "experiment": "qwen-role-existing-pool",
+      "rawSha256": "f2fc638d037289390e9eb6dd74d23e7d5a52e827b20e5bd47d82fc15272483c3",
+      "model": "Qwen/Qwen3-Reranker-0.6B",
+      "categoryRecallDepth": 0,
+      "documents": "original-role",
+      "startupSeconds": 29.94246174998989,
+      "rows": [
+        {
+          "case": "metric-audit",
+          "candidates": 11,
+          "baseline": [
+            "career-broker",
+            "metamorphosis-practitioner"
+          ],
+          "rerankMs": 5050.8274169988,
+          "reranked": [
+            "txzhaopin",
+            "tool-evaluation-expert"
+          ],
+          "sourceSha256": [
+            "3d9d789ddc2829aaa5ff299428f866250b2f71459797e723cf21ea5f861e2cff",
+            "9f45edf17441009462de5d117027b2a4e0e3bba41a61c415a116f169c7d5158e"
+          ]
+        },
+        {
+          "case": "incident-followup",
+          "candidates": 7,
+          "baseline": [
+            "sdk-log-expert",
+            "incident-response-commander"
+          ],
+          "rerankMs": 3429.1380409995327,
+          "reranked": [
+            "incident-response-commander",
+            "roadshow-research-team"
+          ],
+          "sourceSha256": [
+            "c0d524163c0a154ef1ed412a3d67279fe5b0542d9af58ec24ef10b47f22715f6",
+            "aa51bcf6f42c3acece50aaadd8cc32b59601782dce5ced7ff8f02d3ea8aee24b"
+          ]
+        },
+        {
+          "case": "security-followup",
+          "candidates": 5,
+          "baseline": [
+            "soe",
+            "tianyu-account-guardian"
+          ],
+          "rerankMs": 2206.51254200493,
+          "reranked": [
+            "soe",
+            "tianyu-account-guardian"
+          ],
+          "sourceSha256": [
+            "d142d79029eb180e94b865c86872ae3f14783630f4bc6f92934d71cd3674f4b5",
+            "af05793a1046a5078dd6f5b3d963d628942ef5fd353ee7faeb85ee0f0ab56fab"
+          ]
+        },
+        {
+          "case": "journal-followup",
+          "candidates": 5,
+          "baseline": [
+            "academic-journal-selector",
+            "arxiv-watcher"
+          ],
+          "rerankMs": 2207.196749994182,
+          "reranked": [
+            "academic-journal-selector",
+            "paper-topic-selection"
+          ],
+          "sourceSha256": [
+            "9ed4a82a13a4550c91822df81a0775036d05937c167483e3a3c7dc30a95e6b2f",
+            "0070481014db2c9e525d66f31258a507ac4540a38ab2800ebf71011d831001fa"
+          ]
+        },
+        {
+          "case": "database-followup",
+          "candidates": 3,
+          "baseline": [
+            "database-operations",
+            "database-optimization-expert"
+          ],
+          "rerankMs": 1327.597124996828,
+          "reranked": [
+            "database-optimization-expert",
+            "database-operations"
+          ],
+          "sourceSha256": [
+            "f96287e950942f1d62d8229f4cdf881fc7e85bcf90448888a7bdeaf1ba3659a9",
+            "7c65c0fed75ca8ba94e63a25de37006746b27261588eadcd0fbdeba1e757bf91"
+          ]
+        },
+        {
+          "case": "exam-followup",
+          "candidates": 12,
+          "baseline": [
+            "exam-preparation-planner",
+            "news-buddy"
+          ],
+          "rerankMs": 5456.310958004906,
+          "reranked": [
+            "exam-preparation-planner",
+            "study-planner"
+          ],
+          "sourceSha256": [
+            "8b24c85d3d91cb04afdb9b5f62579e22ac1a78c0fda8c9d2650b34bea50dc13b",
+            "e08e0513bae74334f0c149d0b27673933da95d4deb0f559400475c9afc6d554c"
+          ]
+        }
+      ],
+      "productionChanged": false,
+      "paidCalls": 0
+    },
+    {
+      "experiment": "qwen-category50-description",
+      "rawSha256": "7c5c2abe6354d6521d4040945c562fa8a4c20eb533b6d25c277db38d58428382",
+      "model": "Qwen/Qwen3-Reranker-0.6B",
+      "categoryRecallDepth": 50,
+      "documents": "indexed-description",
+      "startupSeconds": 31.644136083006742,
+      "rows": [
+        {
+          "case": "metric-audit",
+          "candidates": 57,
+          "baseline": [
+            "career-broker",
+            "performance-testing-expert"
+          ],
+          "rerankMs": 14597.125209009391,
+          "reranked": [
+            "txzhaopin",
+            "test-results-analyst"
+          ],
+          "sourceSha256": [
+            "6b145a5b5d5e4ffdaee4e93739b21cf17852b1da4d81492c9c1832f65dd3bc11",
+            "6c6e120f0e675454ee84a50675a1966ab268c4ed016b7f75a82e05b5ba58b4e0"
+          ]
+        },
+        {
+          "case": "incident-followup",
+          "candidates": 53,
+          "baseline": [
+            "sdk-log-expert",
+            "incident-response-commander"
+          ],
+          "rerankMs": 11554.01749999146,
+          "reranked": [
+            "incident-response-commander",
+            "sdk-log-expert"
+          ],
+          "sourceSha256": [
+            "488791d704ce4f7b5eabba4bae5948e9d2e58afa20402bcaf4ae066dca4a2d02",
+            "67da14470163f70987cf8ec7e6e6b6c8f85ecf4017f2ba70b65e53fee301d2d2"
+          ]
+        },
+        {
+          "case": "security-followup",
+          "candidates": 53,
+          "baseline": [
+            "soe",
+            "tianyu-account-guardian"
+          ],
+          "rerankMs": 11509.993582993047,
+          "reranked": [
+            "security-engineer",
+            "tencent-security-expert"
+          ],
+          "sourceSha256": [
+            "1989254619fb5289a05fb6f430addaf338341b906e5b39cdcd7cd6a90ff4f3cb",
+            "4dd191aff5692744cd72e84a5fe477a52d0bd50379d983272083daa0da62c6b7"
+          ]
+        },
+        {
+          "case": "journal-followup",
+          "candidates": 51,
+          "baseline": [
+            "academic-journal-selector",
+            "arxiv-watcher"
+          ],
+          "rerankMs": 11688.951292002457,
+          "reranked": [
+            "academic-journal-selector",
+            "paper-topic-selection"
+          ],
+          "sourceSha256": [
+            "1f601cc7afa821b2fd1fd80f73f4f3d40bba6fa73563521932d65d0a852f3bc0",
+            "2440ef95059dbac2c73cf18873646d3f84052e2988e174ac20890cec3b2c649c"
+          ]
+        },
+        {
+          "case": "database-followup",
+          "candidates": 51,
+          "baseline": [
+            "database-operations",
+            "database-optimization-expert"
+          ],
+          "rerankMs": 9729.633708004258,
+          "reranked": [
+            "database-operations",
+            "database-optimization-expert"
+          ],
+          "sourceSha256": [
+            "3ed9e6449c9cbcf364a78c4a3de4974e15898d0cdf6d5c33a74a283f54d36a73",
+            "bb0022097e0a6266c86e9cff642a7c4e38a6bc11f00625767b8cccbf2506cb4e"
+          ]
+        },
+        {
+          "case": "exam-followup",
+          "candidates": 59,
+          "baseline": [
+            "exam-preparation-planner",
+            "study-planner"
+          ],
+          "rerankMs": 12311.14158401033,
+          "reranked": [
+            "exam-preparation-planner",
+            "ihr-conference"
+          ],
+          "sourceSha256": [
+            "acdb381f0407d320b10af4e55b3f4e880d454ae3f3ea825f963daaaa125b51a7",
+            "be1116dd5ef579cc86caa363fb6a9e0de1d7e6a93f4ada63797f58cacc1549b7"
+          ]
+        }
+      ],
+      "productionChanged": false,
+      "paidCalls": 0
+    }
+  ],
+  "limitations": [
+    "Directed diagnostics only; names are not relevance judgments.",
+    "No reranker deployed; no task workflow executed."
+  ]
+}

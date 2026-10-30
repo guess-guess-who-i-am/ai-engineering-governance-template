@@ -49,7 +49,9 @@ async function route(prompt) {
   const context = JSON.parse(out).hookSpecificOutput?.additionalContext || '';
   if (context.includes('[Complete expert module;')) {
     assert.match(context, /read (?:its|the) entry (?:above )?once/);
-    assert.match(context, /Do not translate tools or introduce a host mapping/);
+    assert.match(context, /original primary role verbatim/);
+    assert.match(context, /execute its original workflow/);
+    assert.match(context, /Module: expert:retrieval-load-expert:fixture; package:/);
     assert.doesNotMatch(context, /Use Codex equivalent agent\/tool APIs/);
   }
   return [...context.matchAll(/^- (.+?) \[/gm)].map(m => m[1]);
@@ -104,9 +106,14 @@ try {
     'ci-workflow': ['ci'], 'ui-workflow': ['ui']
   }));
   await new Promise(resolve => server.listen(socketPath, resolve));
-  const results = await Promise.all(cases.map(async ([prompt, expected]) => {
-    const actual = await route(prompt);
-    return { prompt, expected, actual, pass: JSON.stringify(expected) === JSON.stringify(actual) };
+  const results = Array(cases.length);
+  let next = 0;
+  await Promise.all(Array.from({ length: 4 }, async () => {
+    while (next < cases.length) {
+      const i = next++, [prompt, expected] = cases[i];
+      const actual = await route(prompt);
+      results[i] = { prompt, expected, actual, pass: JSON.stringify(expected) === JSON.stringify(actual) };
+    }
   }));
   for (const r of results) console.log(JSON.stringify(r));
   assert.equal(received, cases.length, 'every prompt must use the shared graph worker');
