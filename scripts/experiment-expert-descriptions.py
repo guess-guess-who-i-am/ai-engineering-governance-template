@@ -23,7 +23,7 @@ def main():
     parser.add_argument('--graph', type=Path, default=Path.home()/'.codex/skill-registry/skills.graph.json')
     parser.add_argument('--sources', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--mode', choices=['primary', 'primary-intro', 'scoped-aliases', 'source-labels', 'translated', 'translated-aliases', 'translated-examples', 'native-examples', 'native-queries'], required=True)
+    parser.add_argument('--mode', choices=['primary', 'primary-intro', 'scoped-aliases', 'source-labels', 'translated', 'translated-aliases', 'translated-examples', 'native-examples', 'native-queries', 'source-generated'], required=True)
     parser.add_argument('--translations', type=Path)
     parser.add_argument('--omit-expert-id', action='store_true')
     args = parser.parse_args()
@@ -68,6 +68,12 @@ def main():
         if args.mode == 'native-queries':
             original = '\n\n'.join(dict.fromkeys(filter(None, [row['primary'], row['queries_en'], row['aliases_en']])))
             chinese = '\n\n'.join(dict.fromkeys(filter(None, [row['name']+' '+native, row['queries_zh'], row['aliases_zh'], row['primary']])))
+        if args.mode == 'source-generated':
+            translation = translations[row['id']]
+            assert translation['primarySha256'] == row['primarySha256']
+            original = tool['metadata'].get('retrieval_original_description', tool['description'])
+            chinese = '\n\n'.join(filter(None, [row['name']+' '+translation['translation'],
+                row['primary'], tool['description']]))
         descriptions[name] = (chinese, original)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     # Resolve old English texts before changing metadata.

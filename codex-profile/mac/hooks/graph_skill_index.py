@@ -730,6 +730,60 @@ def prepare_semantic_candidate_guard(engine):
     engine._codex_category_embedding_scores_context = category_scores_context
 
 
+def prepare_resource_name_evidence(engine):
+    """Use declared resource names, never transport IDs, for identity boosts.
+
+    GraphToolCall 0.46 strips Han characters before exact-name matching. An
+    all-Chinese query then becomes the empty substring of every tool ID.
+    Keep its mature Latin-name scoring, but require nonempty evidence and
+    handle literal Han names before applying the same explicit-name floor.
+    The tool graph and original expert packages retain their identities.
+    """
+    if getattr(engine, '_codex_resource_name_evidence', False):
+        return
+    aliases = {}
+    for name, tool in engine._tools.items():
+        metadata = tool.metadata or {}
+        alias = metadata.get('skill_name', metadata.get('mcp_original_name', name))
+        if not isinstance(alias, str) or not alias.strip():
+            raise ValueError(f'Resource is missing its declared name: {name}')
+        aliases[name] = alias
+    separators = re.compile(r"[\s_\-/.,;:!?()'\"`\[\]{}]+")
+
+    def boost(query, scores):
+        # Keep GraphToolCall 0.46's overlap weights and explicit-name floor,
+        # but separate readable names from the graph IDs used as score keys.
+        query_tokens = set(separators.split(query.lower())) - {''}
+        latin_query = re.sub(r'[^a-z0-9가-힣]+', '', query.lower())
+        unicode_query = re.sub(r'[\W_]+', '', query.casefold())
+        explicit = []
+        for identifier in scores:
+            alias = aliases[identifier]
+            latin_name = re.sub(r'[^a-z0-9가-힣]+', '', alias.lower())
+            han_name = bool(re.search(r'[\u3400-\u4dbf\u4e00-\u9fff]', alias))
+            if ((latin_query and len(latin_name) >= 5 and latin_name in latin_query)
+                    or (han_name and re.sub(r'[\W_]+', '', alias.casefold()) in unicode_query)):
+                explicit.append(identifier)
+                continue
+            if not latin_query:
+                continue
+            if latin_name == latin_query or latin_query in latin_name:
+                scores[identifier] *= 2.0
+                continue
+            overlap = len(query_tokens & set(separators.split(alias.lower())))
+            if overlap >= 2:
+                scores[identifier] *= 1.25 + 0.15 * (overlap - 2)
+            elif overlap == 1:
+                scores[identifier] *= 1.1
+        if explicit:
+            floor = max(scores.values()) * 1.5
+            for identifier in explicit:
+                scores[identifier] = max(scores[identifier], floor)
+
+    engine._boost_name_overlap = boost
+    engine._codex_resource_name_evidence = True
+
+
 def prepare_category_slot_retrieval(engine):
     """Select category quotas at GraphToolCall's final candidate boundary.
 
@@ -1077,6 +1131,8 @@ class _GraphWorker:
             prepare_semantic_candidate_guard(engine)
             prepare_category_slot_retrieval(self._english_graph._get_retrieval_engine())
             prepare_category_slot_retrieval(engine)
+            prepare_resource_name_evidence(english_engine)
+            prepare_resource_name_evidence(engine)
             prepare_chinese_retrieval(engine)
             prepare_service_identity_routing(english_engine)
             prepare_service_identity_routing(engine)

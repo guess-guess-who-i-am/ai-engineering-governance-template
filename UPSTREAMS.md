@@ -15,3 +15,5 @@
 许可证核验：前三个设计/Skill 仓库和 LUAS 均包含 MIT License。Kest README 声称 Apache 2.0，但调研 commit `bf73f655c1b7cabc106244605cded9e2dd326ffa` 没有可检出的根许可证文件，GitHub License API 也返回 404；在维护者补齐前只用于本地研究和工具验证，不复制或重新分发其源码。
 
 当前固定版本均与 2026-08-16 的远端默认分支一致。LUAS 从 `d3c4c76` 更新到 `6a2b2c9`，差异仅为依赖供应链脚本与 admin/web/contracts 的依赖和锁文件维护，没有新增被本模板遗漏的治理流程。
+
+GraphToolCall 检索依赖固定为 `graph-tool-call==0.46.0`（[上游](https://github.com/SonAIengine/graph-tool-call)）。名称证据修复借用其 `_boost_name_overlap` 权重与控制流程，许可证已核实为 MIT，版权与全文见 `THIRD_PARTY_NOTICES.md`；不提交完整上游镜像。

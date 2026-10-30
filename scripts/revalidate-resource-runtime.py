@@ -10,7 +10,8 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME_HELPERS = frozenset({'prepare_semantic_candidate_guard', 'prepare_sparse_bm25',
-                             'prepare_service_identity_routing', 'prepare_candidate_pool_fusion'})
+                             'prepare_service_identity_routing', 'prepare_candidate_pool_fusion',
+                             'prepare_resource_name_evidence'})
 
 
 def digest(file):

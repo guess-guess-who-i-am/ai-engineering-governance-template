@@ -15,11 +15,20 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--traces',type=Path,nargs='+',required=True)
     parser.add_argument('--report',type=Path,required=True)
+    parser.add_argument('--mode',default='fullpool')
     args=parser.parse_args()
     graph=Path.home()/'.codex/skill-registry/skills.graph.json'
     digest=hashlib.sha256(str(graph.resolve()).encode()).hexdigest()[:24]
     endpoint=f'/tmp/codex-graph-{os.getuid()}/{digest}.sock'
-    tasks=[row for p in args.traces for row in json.loads(p.read_text())['rows'] if row['mode']=='fullpool']
+    traces=[json.loads(p.read_text()) for p in args.traces]
+    graph_hash=hashlib.sha256(graph.read_bytes()).hexdigest()
+    worker=Path.home()/'.codex/hooks/graph_skill_index.py'
+    worker_hash=hashlib.sha256(worker.read_bytes()).hexdigest()
+    for trace in traces:
+        assert trace['graphSha256']==graph_hash,'Frozen trace uses a different graph'
+        assert trace['indexerSha256']==worker_hash,'Frozen trace uses a different worker'
+    tasks=[row for trace in traces for row in trace['rows'] if row['mode']==args.mode]
+    assert tasks,'No frozen predictions selected'
     data=json.loads(graph.read_text())
     canonical={n:t['metadata'].get('skill_name',t['metadata'].get('mcp_original_name',n))
                for n,t in data['tools'].items()}
@@ -53,8 +62,7 @@ def main():
         'clientPeakOverlapping':peak,'allPredictionsMatched':True,
         'medianClientMs':statistics.median((r['end']-r['start'])*1000 for r in rows)}
     args.report.write_text(json.dumps({'schema':'category-semantic-live/v1','summary':summary,'rows':rows,
-        'workerSha256':hashlib.sha256((Path.home()/'.codex/hooks/graph_skill_index.py').read_bytes()).hexdigest(),
-        'graphSha256':hashlib.sha256(graph.read_bytes()).hexdigest(),
+        'workerSha256':worker_hash,'graphSha256':graph_hash,
         'limitations':['Client overlap and multiple query PIDs verify deployed concurrency, not CPU span instrumentation.',
                       'Retrieval predictions only; no claim of executing the recommended experts.']},ensure_ascii=False,indent=2)+'\n')
     print(json.dumps(summary))

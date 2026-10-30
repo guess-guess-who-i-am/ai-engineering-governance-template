@@ -134,6 +134,8 @@ def main():
     ap.add_argument('--modes', nargs='+', default=['baseline'])
     ap.add_argument('--report', required=True, type=Path)
     args = ap.parse_args()
+    frozen_files = [args.graph, args.indexer, *args.cases]
+    frozen = {str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in frozen_files}
     import numpy as np
     from graph_tool_call.retrieval.ranking import stable_score_items
     spec = importlib.util.spec_from_file_location('expert_relevance_indexer', args.indexer)
@@ -224,8 +226,9 @@ def main():
             chosen=[row for row in rows if row['mode']==mode and row['kind']==kind]
             summary.append({'mode':mode,'kind':kind,'n':len(chosen),'hits':sum(row['rank'] is not None for row in chosen),
                             'medianMs':round(statistics.median(row['ms'] for row in chosen),3)})
-    report={'schema':'expert-relevance-trace/v1','graphSha256':hashlib.sha256(args.graph.read_bytes()).hexdigest(),
-            'indexerSha256':hashlib.sha256(args.indexer.read_bytes()).hexdigest(),'startupSeconds':startup,
+    assert all(hashlib.sha256(p.read_bytes()).hexdigest()==frozen[str(p)] for p in frozen_files), 'Experiment inputs changed during execution'
+    report={'schema':'expert-relevance-trace/v1','graphSha256':frozen[str(args.graph)],
+            'indexerSha256':frozen[str(args.indexer)],'frozenInputSha256':frozen,'startupSeconds':startup,
             'weights':engine._get_adaptive_weights(),'reranker':type(engine._reranker).__name__,
             'summary':summary,'rows':rows,'productionChanged':False,
             'limitations':['Target-name hits are diagnostic, not task success. Existing sets are development data.',
