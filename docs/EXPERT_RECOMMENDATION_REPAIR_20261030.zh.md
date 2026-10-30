@@ -83,3 +83,11 @@ node scripts/benchmark-router-continuity.mjs /path/to/old-skill-router.mjs /tmp/
 - [上一轮指标审计](EXPERT_METRIC_AUDIT_20261030.zh.md)保留ToolSandbox和MT-Bench依据及局限。
 
 尚无整体任务成功率、总token消耗或整个agent加速的可用对照；不能宣称已经比空Codex快或优于另一模型。下一关键缺口是以较低成本保留原角色领域/产物约束的召回与排序，以及独立校准后的任务产物验收。
+
+## Stop检查误判修复
+
+Stop运行库将“合法Markdown路径”误用为“任务树归属”，因此把实验目录中的专家原文当作树，同时漏掉普通文档改动的维护要求。修复位于运行库maintenance.js：根据注册表、活动树及递归SubtreeFile识别归属，保留传统subtrees目录门禁；普通Markdown仍作为实质文件要求维护。没有缩短、改写或改名原角色证据，没有改变240字符、12KiB限制或转为advisory。
+
+新回归在旧版2失败/3通过，修复后5通过，原有维护测试10通过；源码、macOS kit、插件副本均验证。原110个变更文件重放不再有问题，21份原角色快照哈希保持一致；真实Stop以stop_hook_active=false调用返回{}，实际任务树0超长行、0超预算。运行库原有未提交改动保留，Git只暂存本次差异。详见[evidence](evidence/postflight-tree-ownership-repair-20261030.json)。
+
+运行库修复本地提交：4de865aaeb5b942236f1330d6f081113b7d495ce。检查发现其远端guess-guess-who-i-am/llm-task-tree为public；遵守用户私有交付要求，未向该公开远端推送，也未更改仓库可见性。完整可审阅差异保存在本私有仓库[patch](../patches/task-tree-maintenance-ownership.patch)。
