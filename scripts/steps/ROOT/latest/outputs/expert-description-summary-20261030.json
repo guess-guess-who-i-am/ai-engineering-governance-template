@@ -111,5 +111,21 @@
   "toolEncoder": {
     "warmEncodeMedianMs": 47.43145799875492,
     "peakRssMiB": 2668.953125
+  },
+  "qualityGates": {
+    "status": "passed",
+    "passed": 15,
+    "failed": 0
+  },
+  "focusedChecks": {
+    "importAndOriginalEntryTests": 16,
+    "resourceGraphTests": 10,
+    "publisherTests": 11,
+    "workerTests": 16,
+    "scopeCompilerTests": 2,
+    "hookCategoryBudget": "passed",
+    "hookFollowupContext": "passed",
+    "treeCompact": "passed",
+    "flow": "not-applicable"
   }
 }
