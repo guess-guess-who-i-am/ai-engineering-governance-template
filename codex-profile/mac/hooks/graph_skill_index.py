@@ -619,22 +619,15 @@ def prepare_semantic_candidate_guard(engine):
         slots_context = getattr(engine, '_codex_category_slots', None)
         if not slots_context or not slots_context.get() or scoped is None or scoped[0] != query or scoped[1] is None:
             return original_embedding_scores(query, top_k, restrict)
-        import numpy as np
-
         _query, names, similarities, category_scores = scoped
-        depth = top_k * 3 if restrict is None else max(top_k * 3, len(restrict))
-        take = min(depth, len(names))
-        if take < len(names):
-            positions = np.argpartition(-similarities, take - 1)[:take].tolist()
-            positions.sort(key=lambda i: (-float(similarities[i]), names[i].casefold(), names[i]))
-        else:
-            positions = sorted(range(len(names)), key=lambda i: (-float(similarities[i]), names[i].casefold(), names[i]))
-        scores = {names[i]: float(similarities[i]) for i in positions
-                  if restrict is None or names[i] in restrict}
-        for name, score in category_scores.items():
-            if restrict is None or name in restrict:
-                scores[name] = score
-        return scores
+        # The matrix pass already scored every tool. Global top-depth BEFORE
+        # intersecting the recalled pool discards real evidence for lexical
+        # experts below that global cutoff, even when they are category leaders.
+        # Preserve each recalled candidate's cosine; output quotas are applied
+        # at _build_candidates, not at this scoring boundary. No extra model
+        # inference or larger pool is needed.
+        return {name: float(score) for name, score in zip(names, similarities)
+                if restrict is None or name in restrict}
 
     engine._compute_embedding_scores = compute_embedding_scores
 

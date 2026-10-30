@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Candidate cap must preserve global semantic hits as well as BM25 hits."""
 from concurrent.futures import ThreadPoolExecutor
+from contextvars import ContextVar
 import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
 import unittest
+import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('guard_indexer', ROOT / 'codex-profile/mac/hooks/graph_skill_index.py')
@@ -19,13 +21,18 @@ class GuardTests(unittest.TestCase):
         original = set(names[:500]) if pool is None else pool
         def candidate(query, intent, bm25_top, *, resource_scored=None):
             return None if original is False else set(original)
-        def search(query, top_k):
-            offset = 500 if query == 'one' else 550
-            return [(name, 1 - n / 1000) for n, name in enumerate(names[offset:offset + top_k])]
-        vectors = SimpleNamespace(size=len(names), encode=lambda query: query, search=search)
+        # Match the actual resident index API: one matrix pass is reused by
+        # category recall and scoring; a fake search-only index cannot test it.
+        matrix = np.asarray([[.1,.1]]*500+[[1,.5]]*50+[[.5,1]]*50,dtype=np.float32)
+        vectors = SimpleNamespace(size=len(names), _names=names, _matrix=matrix,
+            _ensure_matrix=lambda:None,
+            encode=lambda query:np.asarray([1,0] if query=='one' else [0,1],dtype=np.float32))
         prefilter = SimpleNamespace(candidate_pool=candidate, _max_pool=500,
-            _tools=dict.fromkeys(names), _embedding_index=vectors if embedding else None)
-        engine = SimpleNamespace(_get_prefilter=lambda: prefilter)
+            _tools={name:SimpleNamespace(metadata={'kind':'skill'}) for name in names},
+            _embedding_index=vectors if embedding else None)
+        engine = SimpleNamespace(_get_prefilter=lambda: prefilter,
+            _compute_embedding_scores=lambda *a,**kw:{},
+            _codex_category_slots=ContextVar('guard_test_slots',default={'expert':2,'skill':4,'mcp':2}))
         return engine, prefilter
 
     def test_global_semantic_top50_survives_lexicographic_category_cap(self):
@@ -85,6 +92,7 @@ class GuardTests(unittest.TestCase):
         engine._prefilter_enabled = True
         engine._prefilter = prefilter
         engine._embedding_index = prefilter._embedding_index
+        indexer.prepare_category_slot_retrieval(engine).set({'expert':2,'skill':4,'mcp':2})
         indexer.prepare_semantic_candidate_guard(engine)
         indexer.prepare_chinese_retrieval(engine)
         pool = engine._maybe_prefilter('one', None, {}, {})

@@ -58,7 +58,7 @@
 
 收尾检索 worker PID 540443 未变，active/running，内存约 20.50 GB；新增代理约 23 MB。仍存在 CLI/共享后台版本不同和已有实验特性警告，未为了消除提示而隐藏警告或扩大升级范围。Mac 专属界面程序和原生 node_repl 未复制为 Linux 可执行文件，不能宣称两平台所有工具二进制完全相同。
 
-新增安全证据位于服务器 /data/fqd/.codex/tmp/ 与本地 .reports/server110/：server110-ready-work-network-before.json、server110-ready-work-proxy.json、server110-direct-eight-result.json、server110-model-proxy-smoke.json、server110-model-proxy-repeat.json、server110-web-search-smoke.json、server110-proxy-timing.json、server110-proxy-recovery.json、server110-proxy-health.json、server110-proxy-backend-restart.json、server110-shared-proxy-summary.json、server110-runtime-final-proxy.json、server110-subscription-reload.json；热重载后的另一组探针另存本地 server110-proxy-timing-after-reload.json。部署和更新脚本仅在忽略的诊断目录及 110 用户私有目录，不包含订阅 token。节点字段实际落盘回执见 [本轮任务树回执](../.reports/server110/network-task-tree-receipts.md)。
+新增安全证据位于服务器 /data/fqd/.codex/tmp/ 与本地 .reports/server110/：server110-ready-work-network-before.json、server110-ready-work-proxy.json、server110-direct-eight-result.json、server110-model-proxy-smoke.json、server110-model-proxy-repeat.json、server110-web-search-smoke.json、server110-proxy-timing.json、server110-proxy-recovery.json、server110-proxy-health.json、server110-proxy-backend-restart.json、server110-shared-proxy-summary.json、server110-runtime-final-proxy.json、server110-subscription-reload.json；热重载后的另一组探针另存本地 server110-proxy-timing-after-reload.json。部署和更新脚本仅在忽略的诊断目录及 110 用户私有目录，不包含订阅 token。节点字段实际落盘回执保存在本机忽略目录 `.reports/server110/network-task-tree-receipts.md`，不随 Git 分发。
 
 参考已实际读取的 [Codex 配置说明](https://developers.openai.com/codex/config-reference) 与 [Mihomo 配置说明](https://wiki.metacubex.one/en/config/general/)。Stack Overflow 检索被人机验证拦截，未把未读帖子当依据。
 

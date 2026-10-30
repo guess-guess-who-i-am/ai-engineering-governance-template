@@ -1,0 +1,92 @@
+{
+  "schema": "expert-relevance-root-cause/v1",
+  "report": "docs/EXPERT_RELEVANCE_ROOT_CAUSE_20261030.md",
+  "graphSha256": "9db9afc99e69ae065d59beaae48ae21142872258d0df54979b7c0ea8c7deee6e",
+  "experimentCounts": {
+    "baseline": 42,
+    "ablation": 420,
+    "boundaries": 378,
+    "expert-fusion": 294,
+    "unseen": 80,
+    "expert-crossencoder": 72,
+    "expert-crossencoder-unseen": 40,
+    "e5": 38,
+    "paired-latency": 120,
+    "live": 62
+  },
+  "baselineDevelopmentExpertHits": 15,
+  "repairedDevelopmentExpertHits": 15,
+  "developmentExpertQueries": 18,
+  "baselineValidationExpertHits": 14,
+  "repairedValidationExpertHits": 16,
+  "validationExpertQueries": 20,
+  "latency": {
+    "before": {
+      "queries": 60,
+      "medianMs": 285.13270849362016,
+      "p95Ms": 599.6928583597764,
+      "uniqueTaskHits": 14
+    },
+    "after": {
+      "queries": 60,
+      "medianMs": 280.9312920071534,
+      "p95Ms": 593.707293751504,
+      "uniqueTaskHits": 16
+    }
+  },
+  "live": {
+    "requests": 62,
+    "success": 62,
+    "failures": 0,
+    "retries": 0,
+    "timeouts": 0,
+    "wallSeconds": 5.766324166994309,
+    "queryProcesses": 4,
+    "clientPeakOverlapping": 8,
+    "allPredictionsMatched": true,
+    "medianClientMs": 723.6416339874268
+  },
+  "deployment": {
+    "runtimeOnlyAstVerified": true,
+    "nonRuntimeAstSha256": "80118825bd00b69444dfa3e6b419ee875f3a64767f31b53243fdb5e56e534c81",
+    "beforeWorkerSha256": "fea838989d93ae859deac6840d88caf4f2629e006781c0ff773858ba32db56dc",
+    "afterWorkerSha256": "66cab26c5cd977624b5a03d1073b60fe514b7dc5921dcf396b3eb561df14caf1",
+    "graphSha256": "9db9afc99e69ae065d59beaae48ae21142872258d0df54979b7c0ea8c7deee6e",
+    "graphBytesUnchanged": true,
+    "oldInputsSha256": "2aa5c5e17e9070368acde7a4010260eef3cfa99a6933b58df1bbb47f206f51ee",
+    "newInputsSha256": "efc8f54766325acb8a98e5c8962b582a98bca1aa9af1654fe20e97fcba149ba3",
+    "hookPromptBytesChanged": false,
+    "productionChanged": true,
+    "retirement": "Existing worker observes atomic script replacement and drains; LaunchAgent restarts and prewarms."
+  },
+  "tests": {
+    "semanticEvidence": {
+      "beforeFailures": 3,
+      "afterPassed": 4
+    },
+    "semanticGuard": 7,
+    "poolFusion": 5,
+    "worker": 16,
+    "categoryHookPassed": true,
+    "followupPassed": true,
+    "secretBoundaryPassed": true
+  },
+  "rawReportSha256": {
+    "baseline": "2c6a0e6809b2e63e15a32d64674ea4063ba6c5251755cf59147ab0fc2bd4dd0b",
+    "ablation": "7735341a0f8734b10247da275dcba5edea04ad4553dec4a022e3da3190ba3a0f",
+    "boundaries": "3833b3fb637fbfd286206e7802e56f623f102048e61575691e32aa46211f8235",
+    "expert-fusion": "15e75c0f0dbd48368233bb71c84835f7aab687041fab04f9aadf04dbecbb6ba1",
+    "unseen": "f96699ccac5692a647491473952ee86784d42f34847d075f2d85e1a816c3d230",
+    "expert-crossencoder": "fb87703f12915fcac2d4fda0237e70905d97751fa54ae3f5972a681e5218f3a3",
+    "expert-crossencoder-unseen": "9f354bf767e75567befd78485033bddd9bb6dd233454b9ef9bc57f0f405a0b5e",
+    "e5": "26cbb2e59e4273f1e6fdcbb7aa3f5d3d63d394c1a8a62e641ebcd552757f9304",
+    "paired-latency": "d078fa869e951aefdc0d2c22fca97a39a4d23840aa6e17b8ae709562e60c8731",
+    "live": "84511d102e42e70e400ba02784f0b8643f6f277f3efeaf57a8595ae35c92a067"
+  },
+  "limitations": [
+    "Identity coverage is not task accuracy or expert execution success.",
+    "Small investigator-authored validation set; not independently annotated.",
+    "Chinese irrelevant recommendations persist; only one proven scoring boundary repaired.",
+    "No significant end-to-end acceleration or token reduction claimed."
+  ]
+}
