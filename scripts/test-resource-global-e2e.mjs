@@ -110,8 +110,8 @@ try {
         assert.equal(entry.sha256, definition.module.entry_hash, 'Installed Skill source hash mismatch');
         item.sourceHashVerified = true; item.expectedHash = definition.module.entry_hash;
       } else if (definition.kind === 'expert') {
-        const primary = entry.text.match(/^Primary role:\s*(.+)$/m)?.[1]?.trim();
-        assert.ok(primary, 'Complete expert adapter lacks Primary role');
+        const primary = entry.text.match(/^Original primary role:\s*(.+)$/m)?.[1]?.trim();
+        assert.ok(primary, 'Complete expert adapter lacks Original primary role');
         const role = await globalFile(primary);
         assert.ok(role.path.startsWith((await realpath(definition.module.package_root)) + path.sep), 'Primary role outside module package');
         const relative = path.relative(definition.module.package_root, primary).split(path.sep).join('/');
@@ -119,6 +119,8 @@ try {
         const expectedHash = record?.hashes?.[relative];
         assert.ok(expectedHash, 'No audited source role hash');
         assert.equal(role.sha256, expectedHash, 'Original expert role changed');
+        assert.ok(Buffer.from(entry.text).subarray(-Buffer.from(role.text).length).equals(Buffer.from(role.text)),
+          'One-read entry must contain the original role verbatim');
         item.primaryRole = { path: role.path, bytes: role.bytes, sha256: role.sha256, expectedHash, sourceHashVerified: true };
         item.sourceHashVerified = true;
       } else item.generatedDescriptorOnly = true;

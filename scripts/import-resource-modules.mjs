@@ -79,6 +79,34 @@ async function manifestAt(root) {
   }
   return {};
 }
+
+export async function expertRetrievalProfile(module, manifest) {
+  manifest ||= await manifestAt(module.package_root);
+  // Search hints are recall evidence, not declarations of executable scope.
+  // Keep their existing scoring input stable while correcting the capability
+  // shown to the agent. Scope is always read from the same primary selector
+  // used by the complete, verbatim execution entry.
+  const hints = strings([manifest.description, manifest.displayDescription, manifest.profession,
+    manifest.tags, manifest.defaultInitPrompt, manifest.quickPrompts]).join(' ');
+  let scope, provenance;
+  try {
+    const primary = await buildExpertEntry(module);
+    const original = await readFile(primary.originalPath, 'utf8');
+    scope = scalar(original, 'description');
+    const field = scope ? 'frontmatter.description' : 'original-role-body';
+    if (!scope) scope = original.replace(/^\uFEFF/, '').replace(/^---\s*\r?\n[\s\S]*?\r?\n---\s*/, '').trim();
+    provenance = {state:'source-grounded',primary_path:path.relative(await realpath(module.package_root),primary.originalPath),
+      primary_sha256:primary.primarySha256,field};
+  } catch (error) {
+    const blocked = blockedExpertEntry(module,error);
+    scope = `Unavailable complete expert: ${blocked.reason}. No original primary role can be loaded.`;
+    provenance = {state:'blocked',reason:blocked.reason};
+  }
+  return {description:`${module.name} ${scope}`,original_description:scope,
+    retrieval_document:`${module.name} ${hints || scope}`.slice(0,7000),
+    retrieval_original_document:hints || scope,retrieval_provenance:provenance};
+}
+
 export async function importResources({source, output, install=false, concurrency=12, auditDirectory}) {
   if (!Number.isInteger(concurrency) || concurrency<1 || concurrency>100) throw new Error('concurrency must be 1..100');
   source = await realpath(source); output = path.resolve(output);
@@ -147,6 +175,7 @@ export async function importResources({source, output, install=false, concurrenc
             ...(kind==='expert'?{forced_pass_clause:!!evidence.forcedPassClause,host_manifest_path_mismatch:!!evidence.hostManifestPathMismatch}:{})}:{})},
         dependencies:kind==='skill'?(row.host_tools||[]):[],members:members.map(member=>({path:member})),
         license:manifest.license || scalar(entryText,'license') || 'unknown',entry_hash:row.entry_hash || '',package_hash:row.package_hash};
+      if (kind === 'expert') Object.assign(module, await expertRetrievalProfile({...module,package_root:root},manifest));
       let receipt;
       if (install) {
         receipt = await copyPackage(root,folder);

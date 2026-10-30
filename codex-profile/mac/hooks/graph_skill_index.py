@@ -222,7 +222,7 @@ def load_resource_modules(catalog):
 
 
 RESOURCE_METADATA_FIELDS = ("kind", "module_id", "package_root", "availability", "dependencies",
-                            "members", "source", "license", "entry_hash", "package_hash")
+                            "members", "source", "license", "entry_hash", "package_hash", "retrieval_provenance")
 
 
 def graph_from_records(records, mcp_records=None, resource_records=None):
@@ -231,7 +231,7 @@ def graph_from_records(records, mcp_records=None, resource_records=None):
     all_records = [*records, *(resource_records or [])]
     mcp_tools = [{
         "name": record["tool_name"],
-        "description": record["description"],
+        "description": record.get("retrieval_document", record["description"]),
         "inputSchema": {"type": "object", "properties": {}, "additionalProperties": False},
         "annotations": {"readOnlyHint": True, "destructiveHint": False, "idempotentHint": True},
     } for record in all_records]
@@ -241,8 +241,10 @@ def graph_from_records(records, mcp_records=None, resource_records=None):
         if node is not None:
             node.metadata.update({"skill_name": record["name"], "skill_path": record["path"]})
             node.metadata.update({key: record[key] for key in RESOURCE_METADATA_FIELDS if key in record})
+            if record.get('kind') == 'expert':
+                node.metadata['capability_description'] = record['description']
             if 'original_description' in record:
-                node.metadata['retrieval_original_description'] = record['original_description']
+                node.metadata['retrieval_original_description'] = record.get('retrieval_original_document', record['original_description'])
             node.tags.extend(tag for tag in record["tags"] if tag not in node.tags)
         for index, category in enumerate(record["categories"]):
             label = f"{index + 1}:{category[:76]}"
@@ -462,7 +464,7 @@ def result_records(results):
         metadata = tool.metadata or {}
         output.append({
             "name": metadata.get("skill_name", metadata.get("mcp_original_name", tool.name)),
-            "description": tool.description,
+            "description": metadata['capability_description'] if metadata.get('kind') == 'expert' else tool.description,
             "path": metadata.get("skill_path", ""),
             "score": result.score,
             "confidence": str(result.confidence),

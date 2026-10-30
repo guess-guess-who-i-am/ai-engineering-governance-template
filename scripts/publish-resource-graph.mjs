@@ -131,15 +131,17 @@ export async function publishResourceGraph({ codexRoot = path.join(os.homedir(),
   if ((currentRuntime ? digest(currentRuntime) : null) !== runtimeRevalidationSha256) throw new Error('Runtime revalidation changed during validation');
   const graphPath = path.join(registry, 'skills.graph.json'), manifestPath = path.join(registry, 'skills.graph.manifest.json');
   const catalogStat = await stat(catalog);
-  const updatedManifest = { ...manifest, graphPath, resourceCatalogPath: resourceCatalog, graphInputsSha256: inputsHash };
+  const publishedResourceCatalog = path.join(registry, 'resource-modules.json');
+  const updatedManifest = { ...manifest, graphPath, resourceCatalogPath: publishedResourceCatalog, graphInputsSha256: inputsHash };
   const externalManifest = { ...updatedManifest, catalogPath: catalog, catalogLength: catalogStat.size, catalogMtimeMs: catalogStat.mtimeMs,
     graphManifestPath: manifestPath, indexerPath: path.join(codexRoot, 'hooks/graph_skill_index.py'), pythonPath: path.join(codexRoot, 'tools/graph-tool-call-venv/bin/python') };
   const indexPath = path.join(registry, 'skills-index.json'), index = JSON.parse(await readFile(indexPath, 'utf8'));
   if (!Array.isArray(index.skills)) throw new Error('Existing registry skills must be an array');
   Object.assign(index, { generatedAt: new Date().toISOString(), resourceModuleCount: ids.length, resourceModuleCounts: counts,
-    resourceCatalogPath: resourceCatalog, ownedSkillCount: manifest.ownedSkillCount, externalSkillCount: manifest.externalSkillCount,
+    resourceCatalogPath: publishedResourceCatalog, ownedSkillCount: manifest.ownedSkillCount, externalSkillCount: manifest.externalSkillCount,
     externalMissingSkillCount: checkedNumber(manifest.missingSkillCount, 'missing Skill count'), externalGraphPath: graphPath });
   const writes = new Map();
+  writes.set(publishedResourceCatalog, sourceBytes.get(resourceCatalog));
   for (const name of hookNames) writes.set(path.join(codexRoot, 'hooks', name), required(path.join('hooks', name)));
   for (const [name, bytes] of sidecars) writes.set(path.join(registry, name), bytes);
   writes.set(manifestPath, json(updatedManifest));

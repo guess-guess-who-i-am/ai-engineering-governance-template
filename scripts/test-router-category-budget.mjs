@@ -21,6 +21,7 @@ const candidates = [
   ...['skill-a', 'skill-b', 'skill-c', 'skill-d'].map((name, i) => ({ name, kind: 'skill', path: skillPath, score: .8 - i / 20 })),
   ...['mcp-a', 'mcp-b', 'mcp-c'].map((name, i) => ({ name, kind: 'mcp', mcp_server: 'fixture', score: .6 - i / 20 })),
 ].map(row => ({ ...row, description: 'fixture candidate', confidence: 'HIGH' }));
+candidates[0].description = 'Original primary scope. '.repeat(20) + 'Paid advertising accounts ONLY; not a general database search expert.';
 
 await mkdir(path.join(home, 'hooks'), { recursive: true });
 await mkdir(path.join(home, 'skill-registry'));
@@ -56,6 +57,8 @@ try {
   assert.equal(await new Promise(resolve => child.on('close', resolve)), 0, errors);
   assert.equal(errors, '');
   const context = JSON.parse(output).hookSpecificOutput.additionalContext;
+  assert.ok(context.includes('Paid advertising accounts ONLY; not a general database search expert.'),
+    'do not truncate the original expert domain boundary after character 280');
   const rows = [...context.matchAll(/^- (.+?) \[([^;]+);/gm)].map(match => ({ name: match[1], kind: match[2] }));
   assert.equal(rows.length, 8);
   assert.equal(rows.filter(row => row.kind === 'Complete expert module').length, 2);

@@ -358,7 +358,8 @@ export function renderRoutingContext(selected, codexRoot) {
   }
   lines.push('Candidates:');
   for (const item of selected) {
-    const description = String(item.skill.description || "").replace(/\s+/g, " ").trim().slice(0, 280);
+    const scope = String(item.skill.description || "").replace(/\s+/g, " ").trim();
+    const description = item.skill.kind === 'expert' ? scope : scope.slice(0, 280);
     const routeKind = item.skill.kind === "mcp" ? `MCP/${item.skill.mcpServer}` : item.skill.kind === "expert" ? "Complete expert module" : item.skill.kind === "mcp-service" ? "MCP service module" : "Skill";
     lines.push(`- ${item.skill.name} [${routeKind}; score=${item.score}; match=${item.matches.join(", ") || "description match"}]`);
     lines.push(`  ${description}`);

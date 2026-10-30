@@ -60,6 +60,27 @@ class ResourceGraphTests(unittest.TestCase):
             indexer.build(self.args(resources=False))
         self.assertTrue(self.output.is_file())
 
+    def test_expert_search_hints_never_replace_source_scope_in_worker_results(self):
+        from graph_tool_call import ToolGraph
+        source_scope = 'Paid search accounts only; analyze advertising spend and negative keywords.'
+        expert = self.modules[0]
+        expert.update(description=source_scope, original_description=source_scope,
+            retrieval_document='Universal search intent search database engineering',
+            retrieval_original_document='Universal search intent search database engineering',
+            retrieval_provenance={'state':'source-grounded','primary_path':'agents/lead.md','primary_sha256':'a'*64})
+        self.publish()
+        records = indexer.load_resource_modules(self.resources)
+        graph = indexer.graph_from_records([],resource_records=records)
+        tool = graph.tools[records[0]['tool_name']]
+        self.assertEqual(tool.description,expert['retrieval_document'])
+        self.assertEqual(indexer.english_retrieval_description(tool),expert['retrieval_original_document'])
+        self.assertEqual(tool.metadata['capability_description'],source_scope)
+        result = SimpleNamespace(tool=tool,score=1,confidence='test',keyword_score=1,graph_score=0,embedding_score=0)
+        response = indexer.result_records([result])[0]
+        self.assertEqual(response['description'],source_scope)
+        self.assertNotIn('Universal',response['description'])
+        self.assertEqual(response['retrieval_provenance']['primary_path'],'agents/lead.md')
+
     def test_build_publishes_module_counts_and_stable_input_hash(self):
         with redirect_stdout(StringIO()):
             indexer.build(self.args())

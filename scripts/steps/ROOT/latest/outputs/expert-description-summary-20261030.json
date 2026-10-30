@@ -1,0 +1,115 @@
+{
+  "schema": "expert-description-comparison/1",
+  "queriesContainTargetNames": false,
+  "representativeAccuracy": false,
+  "graphNodes": 19754,
+  "expertScopeSources": 446,
+  "blockedExperts": 1,
+  "variants": [
+    {
+      "mode": "baseline",
+      "n": 44,
+      "targetHits": 34,
+      "zhHits": 16,
+      "enHits": 18
+    },
+    {
+      "mode": "primary",
+      "n": 44,
+      "targetHits": 20,
+      "zhHits": 7,
+      "enHits": 13
+    },
+    {
+      "mode": "primary-intro",
+      "n": 44,
+      "targetHits": 26,
+      "zhHits": 10,
+      "enHits": 16
+    },
+    {
+      "mode": "scoped-aliases",
+      "n": 44,
+      "targetHits": 29,
+      "zhHits": 13,
+      "enHits": 16
+    },
+    {
+      "mode": "source-labels",
+      "n": 44,
+      "targetHits": 24,
+      "zhHits": 11,
+      "enHits": 13
+    },
+    {
+      "mode": "translated-examples",
+      "n": 44,
+      "targetHits": 31,
+      "zhHits": 11,
+      "enHits": 20
+    },
+    {
+      "mode": "translated-aliases",
+      "n": 44,
+      "targetHits": 31,
+      "zhHits": 13,
+      "enHits": 18
+    },
+    {
+      "mode": "native-examples",
+      "n": 44,
+      "targetHits": 32,
+      "zhHits": 12,
+      "enHits": 20
+    },
+    {
+      "mode": "native-queries",
+      "n": 44,
+      "targetHits": 29,
+      "zhHits": 10,
+      "enHits": 19
+    }
+  ],
+  "deployableCandidate": {
+    "descriptionScopeOnly": true,
+    "rankingImprovementClaimed": false
+  },
+  "limitations": [
+    "Investigator-written identity targets, not independent relevance judgements or task success.",
+    "No model task tokens measured."
+  ],
+  "deployed": true,
+  "live": {
+    "requests": 50,
+    "success": 50,
+    "failures": 0,
+    "timeouts": 0,
+    "retries": 0,
+    "allIdentitiesAndScoresUnchanged": true,
+    "allExpertScopesMatchOriginalRole": true,
+    "experts": 447,
+    "sourceGrounded": 446,
+    "wallSeconds": 5.261177583000972,
+    "clientPeakOverlapping": 8,
+    "queryProcesses": 4,
+    "medianClientMs": 728.4823656082153
+  },
+  "workspaceHookChecks": {
+    "requests": 6,
+    "passed": 6,
+    "entriesSourceHashVerified": 2,
+    "businessExecuted": false
+  },
+  "publishedHashes": {
+    "graphSha256": "ba3a8969fcb3be8f7a752d69c9815f98f5b5c1ffecbc321f3f7378b3eb581d84",
+    "graphInputsSha256": "a68a4eb66a0a06c5ca830b480cedb37891a213f3646a7207a5fa76a6aa7708b9",
+    "baseBuildReportSha256": "359047ea691560aa4e86f9ee0f660b7f95d88d35c9992134930eec0498fedbe4",
+    "runtimeRevalidationSha256": null,
+    "workerSha256": "bd1ccb750706fb5b1801834662afaa28d58d67cf89cb4bd0a4d58bdbed376fd4",
+    "routerSha256": "6c1aabb64c913d1eec3fa5cbe12b196de3c256291372996dccbb6bc4896b0fb7"
+  },
+  "toolEncoder": {
+    "warmEncodeMedianMs": 47.43145799875492,
+    "peakRssMiB": 2668.953125
+  }
+}

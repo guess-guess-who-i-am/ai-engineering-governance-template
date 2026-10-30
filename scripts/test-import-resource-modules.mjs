@@ -43,6 +43,26 @@ test('description scalars retain folded and literal multiline meaning', () => {
   assert.equal(scalar('---\ndescription: "Quoted text"\n---\n', 'description'), 'Quoted text');
 });
 
+test('expert retrieval scope comes from the original primary role, not marketing or repeated examples', async t => {
+  const f = await fixture(t);
+  const description = 'Analyze paid search accounts, search term reports and negative keywords to reduce wasted advertising spend.';
+  const role = `---\nname: lead\ndescription: ${description}\n---\n# Paid Media Analyst\n\nOptimize paid-search advertising accounts.\n`;
+  await put(f.expertRoot, 'agents/lead.md', role);
+  await put(f.expertRoot, '.codebuddy-plugin/plugin.json', JSON.stringify({ name: 'travel-team',
+    description: 'Universal search intent and database analysis', displayDescription: {en:'Universal search intent and database analysis'},
+    quickPrompts: ['Search all databases', 'Search all databases'], agentName: 'lead', agents: ['agents/lead.md'] }));
+  for (const install of [false, true]) {
+    const { catalog } = await importResources({ ...f, install });
+    const expert = catalog.modules.find(m => m.kind === 'expert');
+    assert.equal(expert.original_description, description);
+    assert.equal(expert.description, `travel-team ${description}`);
+    assert.equal(expert.retrieval_provenance.primary_sha256, hash(role));
+    assert.equal(expert.retrieval_provenance.primary_path, 'agents/lead.md');
+    assert.doesNotMatch(expert.description, /Universal|databases/);
+    assert.equal(await readFile(path.join(f.expertRoot, 'agents/lead.md'), 'utf8'), role);
+  }
+});
+
 test('complete expert roles, data and attached Skills survive installation without source edits', async t => {
   const f = await fixture(t);
   const { catalog, summary } = await importResources({ ...f, install: true, concurrency: 4 });

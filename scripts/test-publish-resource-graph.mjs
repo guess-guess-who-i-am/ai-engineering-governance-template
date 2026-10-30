@@ -102,6 +102,19 @@ test('check validates candidate without changing global bytes or writing report'
   await assert.rejects(access(report));
 });
 
+test('staged resource descriptions publish with the graph and retain the canonical global catalog path', async t => {
+  const f = await fixture(t);
+  const resources = JSON.parse(await readFile(f.resourceCatalog,'utf8'));
+  resources.modules[0].description='Original primary role scope, not marketing';
+  const candidate=await put(f.stage,'resource-modules.json',json(resources));
+  f.build.inputsSha256[candidate]=sha(await readFile(candidate));
+  await rehashCandidate(f,'skills.graph.manifest.json',{...f.manifest,resourceCatalogPath:candidate});
+  await publishResourceGraph(f);
+  assert.deepEqual(JSON.parse(await readFile(f.resourceCatalog,'utf8')),resources);
+  for(const file of ['skills.graph.manifest.json','external-skills-manifest.json','skills-index.json'])
+    assert.equal(JSON.parse(await readFile(path.join(f.registry,file),'utf8')).resourceCatalogPath,f.resourceCatalog);
+});
+
 test('CLI check accepts explicit roots and exits without global mutation', async t => {
   const f = await fixture(t), before = await snapshot(f.codexRoot);
   const output = execFileSync(process.execPath, [path.join(repo, 'scripts/publish-resource-graph.mjs'), '--codex-root', f.codexRoot, '--stage', f.stage, '--owned-root', f.ownedRoot, '--check'], { encoding: 'utf8' });
