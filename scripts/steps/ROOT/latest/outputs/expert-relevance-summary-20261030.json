@@ -69,7 +69,9 @@
     "worker": 16,
     "categoryHookPassed": true,
     "followupPassed": true,
-    "secretBoundaryPassed": true
+    "secretBoundaryPassed": true,
+    "globalSkillsValidated": 22,
+    "treeCompactPassed": true
   },
   "rawReportSha256": {
     "baseline": "2c6a0e6809b2e63e15a32d64674ea4063ba6c5251755cf59147ab0fc2bd4dd0b",
@@ -88,5 +90,27 @@
     "Small investigator-authored validation set; not independently annotated.",
     "Chinese irrelevant recommendations persist; only one proven scoring boundary repaired.",
     "No significant end-to-end acceleration or token reduction claimed."
-  ]
+  ],
+  "qualityGates": {
+    "status": "passed",
+    "passed": 15,
+    "testedCommit": "ba87660b53c5070e1ce7687ff3bf210ced774148",
+    "gates": [
+      "governance-structure",
+      "skill-packages",
+      "findings-contract",
+      "quality-runner-contract",
+      "design-reference-catalog",
+      "kest-flow-contract",
+      "document-integrity",
+      "release-contract",
+      "story-traceability",
+      "template-bootstrap",
+      "security-baseline",
+      "qualitative-adapter-contract",
+      "accessibility-tests",
+      "performance-regression",
+      "deployment-smoke"
+    ]
+  }
 }
