@@ -29,3 +29,10 @@
 - 证据：outputs/global-profile-audit.json、outputs/global-profile-load-{before,after,hook}.json；逐项审计、研究依据和限制见 docs/GLOBAL_PROFILE_AUDIT_20261029.md。
 
 - 最终交付检查：compact 0 违规、治理校验、22 个仓库 Skill 校验、差异空白检查通过，GitHub 仓库保持 private。
+
+## 真实专家使用频率审计
+
+- UTC 10月24–29日本机77份会话日志去重为191轮：66轮明确推荐专家；4轮确认完整原文读取，全部在专家审计/试用链路。其他工作区136轮未发现完整读取。读取不等于执行；普通任务的完整专家交付未找到可核验证据。
+- IDE诊断309次唯一skills_read未保留资源身份，真实专家使用率未知；不把日志盲区计作零使用。
+- 根因：类别排名与任务适用脱节、候选到执行未闭环、部分原包宿主工具缺失；此前远端资源缺部署，本轮未重测远端。没有修改生产配置。
+- 证据：outputs/expert-usage-audit-20261030.json；详细口径、案例和树字段旧→新回执见docs/EXPERT_USAGE_AUDIT_20261030.md。树精炼、治理及22个仓库Skill校验通过。

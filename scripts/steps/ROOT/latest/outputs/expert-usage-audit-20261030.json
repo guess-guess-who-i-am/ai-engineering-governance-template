@@ -1,0 +1,458 @@
+{
+  "schema": "expert-usage-audit/v1",
+  "windowUtc": [
+    "2026-10-24T00:00:00",
+    "2026-10-30T00:00:00"
+  ],
+  "inputs": {
+    "sessionFiles": 77,
+    "sessionBytes": 1277196209,
+    "parseFailures": 0,
+    "scope": "local persisted Codex human turns; no remote frequency claim"
+  },
+  "counts": {
+    "turns": 191,
+    "threads": 18,
+    "expertCandidateTurns": 66,
+    "attemptedReaderTurns": 8,
+    "successfulReaderTurns": 7,
+    "completeOriginalReadTurns": 4,
+    "sameTurnRecommendedOriginalReadTurns": 1,
+    "completeReadRatePercent": 2.09,
+    "recommendedToCompleteReadPercent": 1.52,
+    "distinctRecommendedExperts": 73,
+    "outsideGovernanceTurns": 136,
+    "outsideGovernanceCompleteOriginalReadTurns": 0
+  },
+  "groups": {
+    "governance": {
+      "turns": 55,
+      "threads": 2,
+      "routedTurns": 20,
+      "readTurns": 4,
+      "readRecommendedTurns": 1,
+      "readEvents": 8,
+      "uniqueReadExperts": [
+        "apm-performance-expert",
+        "code-review-expert",
+        "dev-pipeline-orchestrator",
+        "performance-testing-expert",
+        "skill-smith"
+      ]
+    },
+    "ide-development": {
+      "turns": 100,
+      "threads": 12,
+      "routedTurns": 24,
+      "readTurns": 0,
+      "readRecommendedTurns": 0,
+      "readEvents": 0,
+      "uniqueReadExperts": []
+    },
+    "other-project": {
+      "turns": 36,
+      "threads": 4,
+      "routedTurns": 22,
+      "readTurns": 0,
+      "readRecommendedTurns": 0,
+      "readEvents": 0,
+      "uniqueReadExperts": []
+    }
+  },
+  "sinceOct26": {
+    "turns": 75,
+    "threads": 9,
+    "routedTurns": 65,
+    "readTurns": 2,
+    "readRecommendedTurns": 1,
+    "readEvents": 5,
+    "uniqueReadExperts": [
+      "code-review-expert",
+      "dev-pipeline-orchestrator",
+      "performance-testing-expert",
+      "skill-smith"
+    ]
+  },
+  "reviewedCases": [
+    {
+      "threadId": "01a157a9-b947-7081-9642-53ffae8fd558",
+      "turnId": "01a170b6-8b0d-7971-b892-570cd2af08b4",
+      "at": "2026-10-25T01:39:33.845Z",
+      "group": "governance",
+      "classification": "expert-routing-audit-or-requested-trial",
+      "completeOriginals": [
+        "dev-pipeline-orchestrator"
+      ],
+      "recommendedAndCompletelyRead": [],
+      "events": [
+        {
+          "name": "dev-pipeline-orchestrator",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": true,
+          "comparison": "complete-original-text-present",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-24T19-27-15-01a157a9-b947-7081-9642-53ffae8fd558_01a16daa-3d9a-7360-baef-ad4f51731f9c.jsonl",
+          "line": 1106,
+          "itemId": "exec-72736be9-8bf4-4bb6-971c-c1128e5ff9f0"
+        },
+        {
+          "name": "gpt-researcher-team",
+          "reader": "sed",
+          "exitCode": 1,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-24T19-27-15-01a157a9-b947-7081-9642-53ffae8fd558_01a16daa-3d9a-7360-baef-ad4f51731f9c.jsonl",
+          "line": 980,
+          "itemId": "exec-7a131ff4-647b-4082-89bf-797749d9ce98"
+        },
+        {
+          "name": "performance-testing-expert",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-24T19-27-15-01a157a9-b947-7081-9642-53ffae8fd558_01a16daa-3d9a-7360-baef-ad4f51731f9c.jsonl",
+          "line": 1106,
+          "itemId": "exec-72736be9-8bf4-4bb6-971c-c1128e5ff9f0"
+        },
+        {
+          "name": "apm-performance-expert",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-24T19-27-15-01a157a9-b947-7081-9642-53ffae8fd558_01a16daa-3d9a-7360-baef-ad4f51731f9c.jsonl",
+          "line": 1106,
+          "itemId": "exec-72736be9-8bf4-4bb6-971c-c1128e5ff9f0"
+        }
+      ]
+    },
+    {
+      "threadId": "01a157a9-b947-7081-9642-53ffae8fd558",
+      "turnId": "01a171a0-42af-7782-a464-03e15a9e4ed7",
+      "at": "2026-10-25T05:54:50.707Z",
+      "group": "governance",
+      "classification": "expert-routing-audit-or-requested-trial",
+      "completeOriginals": [
+        "apm-performance-expert",
+        "dev-pipeline-orchestrator"
+      ],
+      "recommendedAndCompletelyRead": [],
+      "events": [
+        {
+          "name": "apm-performance-expert",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": true,
+          "comparison": "complete-original-text-present",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-25T10-06-11-01a157a9-b947-7081-9642-53ffae8fd558_01a170ce-ecd2-7e93-9496-c4ed2c5447ca.jsonl",
+          "line": 3017,
+          "itemId": "exec-d467b00b-8809-43ce-be13-6031b880dadc"
+        },
+        {
+          "name": "dev-pipeline-orchestrator",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": true,
+          "comparison": "complete-original-text-present",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-25T10-06-11-01a157a9-b947-7081-9642-53ffae8fd558_01a170ce-ecd2-7e93-9496-c4ed2c5447ca.jsonl",
+          "line": 3067,
+          "itemId": "exec-4b9812c2-f8ea-42ed-822c-254b31918dee"
+        },
+        {
+          "name": "performance-testing-expert",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-25T10-06-11-01a157a9-b947-7081-9642-53ffae8fd558_01a170ce-ecd2-7e93-9496-c4ed2c5447ca.jsonl",
+          "line": 3017,
+          "itemId": "exec-d467b00b-8809-43ce-be13-6031b880dadc"
+        }
+      ]
+    },
+    {
+      "threadId": "01a157a9-b947-7081-9642-53ffae8fd558",
+      "turnId": "01a171e6-2e28-7d40-848c-8d56911dec2f",
+      "at": "2026-10-25T07:11:12.973Z",
+      "group": "governance",
+      "classification": "expert-routing-audit-or-requested-trial",
+      "completeOriginals": [],
+      "recommendedAndCompletelyRead": [],
+      "events": [
+        {
+          "name": "dev-pipeline-orchestrator",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-25T10-06-11-01a157a9-b947-7081-9642-53ffae8fd558_01a170ce-ecd2-7e93-9496-c4ed2c5447ca.jsonl",
+          "line": 3693,
+          "itemId": "exec-c9610399-e22c-4afc-a1b1-fdfbdf26a0ae"
+        },
+        {
+          "name": "performance-testing-expert",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-25T10-06-11-01a157a9-b947-7081-9642-53ffae8fd558_01a170ce-ecd2-7e93-9496-c4ed2c5447ca.jsonl",
+          "line": 3693,
+          "itemId": "exec-c9610399-e22c-4afc-a1b1-fdfbdf26a0ae"
+        }
+      ]
+    },
+    {
+      "threadId": "01a157a9-b947-7081-9642-53ffae8fd558",
+      "turnId": "01a1729d-1c9d-7451-827d-5d1b27c78d8d",
+      "at": "2026-10-25T10:31:01.557Z",
+      "group": "governance",
+      "classification": "expert-routing-audit-or-requested-trial",
+      "completeOriginals": [],
+      "recommendedAndCompletelyRead": [],
+      "events": [
+        {
+          "name": "dev-pipeline-orchestrator",
+          "reader": "sed",
+          "exitCode": 1,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-25T10-06-11-01a157a9-b947-7081-9642-53ffae8fd558_01a170ce-ecd2-7e93-9496-c4ed2c5447ca.jsonl",
+          "line": 3762,
+          "itemId": "exec-626a2134-f450-49a5-a003-27edc73ad03e"
+        }
+      ]
+    },
+    {
+      "threadId": "01a157a9-b947-7081-9642-53ffae8fd558",
+      "turnId": "01a173bd-3308-7ee0-858d-a06db6e54737",
+      "at": "2026-10-25T15:45:41.678Z",
+      "group": "governance",
+      "classification": "expert-routing-audit-or-requested-trial",
+      "completeOriginals": [],
+      "recommendedAndCompletelyRead": [],
+      "events": [
+        {
+          "name": "performance-testing-expert",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-25T22-12-35-01a157a9-b947-7081-9642-53ffae8fd558_01a17367-f601-76a2-ac8a-0da1f41a0ece.jsonl",
+          "line": 1878,
+          "itemId": "exec-10bbd0c3-570d-472b-a4f4-25ccd91161dc"
+        }
+      ]
+    },
+    {
+      "threadId": "01a157a9-b947-7081-9642-53ffae8fd558",
+      "turnId": "01a1760e-f665-7df3-b1b4-8c2421d2dfdb",
+      "at": "2026-10-26T02:34:14.518Z",
+      "group": "governance",
+      "classification": "expert-routing-audit-or-requested-trial",
+      "completeOriginals": [
+        "code-review-expert",
+        "dev-pipeline-orchestrator"
+      ],
+      "recommendedAndCompletelyRead": [],
+      "events": [
+        {
+          "name": "dev-pipeline-orchestrator",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": true,
+          "comparison": "complete-original-text-present",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-25T22-12-35-01a157a9-b947-7081-9642-53ffae8fd558_01a17367-f601-76a2-ac8a-0da1f41a0ece.jsonl",
+          "line": 2906,
+          "itemId": "exec-b19443bc-28f3-4068-8cc7-179ad0f7c56a"
+        },
+        {
+          "name": "code-review-expert",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": true,
+          "comparison": "complete-original-text-present",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-25T22-12-35-01a157a9-b947-7081-9642-53ffae8fd558_01a17367-f601-76a2-ac8a-0da1f41a0ece.jsonl",
+          "line": 2906,
+          "itemId": "exec-b19443bc-28f3-4068-8cc7-179ad0f7c56a"
+        },
+        {
+          "name": "dev-pipeline-orchestrator",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-25T22-12-35-01a157a9-b947-7081-9642-53ffae8fd558_01a17367-f601-76a2-ac8a-0da1f41a0ece.jsonl",
+          "line": 3291,
+          "itemId": "exec-4fbb8f47-cd4b-405b-94a0-9510d1f86287"
+        }
+      ]
+    },
+    {
+      "threadId": "01a157a9-b947-7081-9642-53ffae8fd558",
+      "turnId": "01a176d9-7faa-7c81-a3dc-1c34df2830ca",
+      "at": "2026-10-26T06:15:27.965Z",
+      "group": "governance",
+      "classification": "expert-routing-audit-or-requested-trial",
+      "completeOriginals": [
+        "performance-testing-expert",
+        "skill-smith"
+      ],
+      "recommendedAndCompletelyRead": [
+        "skill-smith"
+      ],
+      "events": [
+        {
+          "name": "skill-smith",
+          "reader": "cat",
+          "exitCode": 0,
+          "fullReadEvidence": true,
+          "comparison": "complete-original-text-present",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-26T12-23-04-01a157a9-b947-7081-9642-53ffae8fd558_01a17672-987c-7013-811a-268a0445def0.jsonl",
+          "line": 3013,
+          "itemId": "exec-b53ac84a-ce0b-4dc1-bb90-0dc35fe58fe2"
+        },
+        {
+          "name": "performance-testing-expert",
+          "reader": "cat",
+          "exitCode": 0,
+          "fullReadEvidence": true,
+          "comparison": "complete-original-text-present",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-26T12-23-04-01a157a9-b947-7081-9642-53ffae8fd558_01a17672-987c-7013-811a-268a0445def0.jsonl",
+          "line": 3189,
+          "itemId": "exec-9b189b40-51fa-44d5-af6c-bebcce387db9"
+        },
+        {
+          "name": "performance-testing-expert",
+          "reader": "cat",
+          "exitCode": 0,
+          "fullReadEvidence": true,
+          "comparison": "complete-original-text-present",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-26T12-23-04-01a157a9-b947-7081-9642-53ffae8fd558_01a17672-987c-7013-811a-268a0445def0.jsonl",
+          "line": 3191,
+          "itemId": "exec-a29135be-4d09-4161-bb1a-e5b256cd54f9"
+        },
+        {
+          "name": "wentu",
+          "reader": "cat",
+          "exitCode": 0,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": true,
+          "file": "rollout-2026-10-26T12-23-04-01a157a9-b947-7081-9642-53ffae8fd558_01a17672-987c-7013-811a-268a0445def0.jsonl",
+          "line": 3008,
+          "itemId": "exec-5a04b673-6b48-44c8-8542-2888d9a70592"
+        }
+      ]
+    },
+    {
+      "threadId": "01a1615c-4fee-7082-8c3e-d51f55ca9d53",
+      "turnId": "01a1782f-9181-7480-9af6-df395a7e6e15",
+      "at": "2026-10-26T12:29:05.947Z",
+      "group": "ide-development",
+      "classification": "expert-integration-check",
+      "completeOriginals": [],
+      "recommendedAndCompletelyRead": [],
+      "events": [
+        {
+          "name": "a-share-analysis",
+          "reader": "sed",
+          "exitCode": 0,
+          "fullReadEvidence": false,
+          "comparison": "not-confirmed",
+          "persistenceTruncated": false,
+          "file": "rollout-2026-10-26T14-49-43-01a1615c-4fee-7082-8c3e-d51f55ca9d53_01a176f8-dd91-7160-8c35-379ad34662a7.jsonl",
+          "line": 2601,
+          "itemId": "exec-32ae5ee7-a94d-4a31-a45e-9cbe6e2ce178"
+        }
+      ]
+    }
+  ],
+  "ide": {
+    "dialogueFiles": 2294,
+    "diagnosticFiles": 319,
+    "diagnosticEvents": 25410,
+    "rangeUtc": [
+      "2026-10-23T10:15:00.326Z",
+      "2026-10-29T05:13:33.787Z"
+    ],
+    "uniqueSkillsReadCompletions": 309,
+    "completionsWithResourceIdentity": 0,
+    "expertExecutionRate": "unknown; historical tool identity unavailable"
+  },
+  "expertWorkflowExecution": {
+    "ordinaryTaskVerifiedCompletionsFound": 0,
+    "trueRate": "unknown",
+    "caution": "Complete reading is not execution; previous synthetic trials and interrupted turns are excluded."
+  },
+  "topRecommended": [
+    [
+      "xiaot",
+      7
+    ],
+    [
+      "metamorphosis-practitioner",
+      7
+    ],
+    [
+      "chuangye-manor",
+      6
+    ],
+    [
+      "ask-liuxiaopai",
+      5
+    ],
+    [
+      "nuwa",
+      4
+    ],
+    [
+      "viral-topic-master",
+      4
+    ],
+    [
+      "month-end-closer",
+      4
+    ],
+    [
+      "aihot",
+      4
+    ],
+    [
+      "gl-reconciler",
+      3
+    ],
+    [
+      "mentougou-business-guide",
+      3
+    ]
+  ],
+  "verification": {
+    "deduplicatedTurns": "pass",
+    "groupReconciliation": "pass",
+    "originalTextInSuccessfulOutput": "pass",
+    "manualReadCaseClassification": "8 turns reviewed",
+    "legacyReadDetectionCorrection": "sed can include entire short role; cat marker alone insufficient; truncated persistence remains unconfirmed",
+    "compact": "pass: 0 violations",
+    "governance": "pass",
+    "skills": "pass: 22",
+    "productionChanges": false
+  }
+}

@@ -2,7 +2,7 @@
   "schema": "flow-step/v1",
   "nodeId": "ROOT",
   "blockId": "",
-  "updatedAt": "2026-10-29T08:30:30.668781+00:00",
+  "updatedAt": "2026-10-30T02:10:50.636632+00:00",
   "title": "macOS 全局 Codex 治理配置",
   "reportZh": "report.zh.md",
   "substeps": [
@@ -70,6 +70,34 @@
         "repositorySkills": "pass: 22",
         "diffWhitespace": "pass",
         "repositoryVisibility": "private"
+      }
+    },
+    {
+      "title": "真实专家使用频率审计",
+      "inputs": [
+        {
+          "path": "codex-profile/.codex/hooks/skill-router.mjs"
+        },
+        {
+          "path": "codex-profile/mac/hooks/graph_skill_index.py"
+        },
+        {
+          "path": "scripts/audit-thread-expert-use.mjs"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "scripts/steps/ROOT/latest/outputs/expert-usage-audit-20261030.json"
+        },
+        {
+          "path": "docs/EXPERT_USAGE_AUDIT_20261030.md"
+        }
+      ],
+      "verification": {
+        "compact": "pass: 0 violations",
+        "governance": "pass",
+        "repositorySkills": "pass: 22",
+        "workflowExecutionRate": "not established; historical resource identity missing"
       }
     }
   ]
