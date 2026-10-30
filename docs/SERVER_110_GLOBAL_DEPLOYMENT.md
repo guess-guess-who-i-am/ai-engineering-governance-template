@@ -73,7 +73,7 @@
 - 正式客户端重新连接共享后台后，也收到 final_answer 为 OK 的消息；期间出现一次流读取超时后重试。测试随后被手动中断收尾，持久化 turn 状态为 interrupted（110,909 毫秒），不是完整 turn 成功证据。独立 CLI 的 completed 证据与此分开记录。
 - 第一次新接口的独立 CLI 测试仍曾 90 秒超时；未重做原 8 批次工具任务或 100 请求压测，不能借这次接口切换补称整轮高并行验收通过。
 
-新增安全证据在服务器 /data/fqd/.codex/tmp/ 和本地 .reports/server110/：server110-api-switch.json、server110-backend-restart.json、server110-model-new-api.json、server110-model-new-api-retest.json、server110-runtime-new-api.json、server110-native-new-api-summary.json。本次任务树实际落盘的逐字段回执见 [API 切换回执](../.reports/server110/api-switch-task-tree-receipts.md)。下文的 403 和“保留原后台”是首次部署时的历史记录，不代表切换后的当前状态。
+新增安全证据在服务器 /data/fqd/.codex/tmp/ 和本地 .reports/server110/：server110-api-switch.json、server110-backend-restart.json、server110-model-new-api.json、server110-model-new-api-retest.json、server110-runtime-new-api.json、server110-native-new-api-summary.json。本次任务树实际落盘的逐字段回执保存在本机忽略目录 `.reports/server110/api-switch-task-tree-receipts.md`，不随 Git 分发。下文的 403 和“保留原后台”是首次部署时的历史记录，不代表切换后的当前状态。
 
 ## 部署范围
 
@@ -158,6 +158,6 @@
 - server110-codex-ready-work.json：240 秒真实任务未完成。
 - server110-model-smoke155.json、server110-model-smoke160.json、server110-model-error-detail.json：最小模型调用与结构化 403。
 
-初次部署的任务树每次真实落盘节点/字段“旧值 → 新值”另存 [任务树回执](../.reports/server110/task-tree-receipts.md)，直接来自 task_tree_write 的 changes；API 切换回执见最新验收。任务树精炼工具和 check-tree-compact.sh 均通过；本项目没有执行流程脚本，流程状态检查为不适用。全仓 PowerShell 发布门禁没有运行，本机无 pwsh，且 Skill 指定的 scripts/verify-repository.ps1 根路径不存在；不把这些算作通过。
+初次部署的任务树每次真实落盘节点/字段“旧值 → 新值”另存本机忽略目录 `.reports/server110/task-tree-receipts.md`，不随 Git 分发，直接来自 task_tree_write 的 changes；API 切换回执见最新验收。任务树精炼工具和 check-tree-compact.sh 均通过；本项目没有执行流程脚本，流程状态检查为不适用。全仓 PowerShell 发布门禁没有运行，本机无 pwsh，且 Skill 指定的 scripts/verify-repository.ps1 根路径不存在；不把这些算作通过。
 
 本次没有提交或推送 Git，也没有执行 Windows/Linux 的跨平台发布检查。
