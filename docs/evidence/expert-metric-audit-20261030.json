@@ -1,0 +1,1249 @@
+{
+  "schema": "expert-metric-audit/v1",
+  "observations": 68,
+  "scenarios": 34,
+  "scenarioObservationCounts": {
+    "2": 34
+  },
+  "targetHitCount": 49,
+  "targetMemberHistogram": {
+    "0": 19,
+    "1": 44,
+    "2": 5
+  },
+  "byLanguage": {
+    "en": {
+      "n": 34,
+      "targetHits": 26
+    },
+    "zh": {
+      "n": 34,
+      "targetHits": 23
+    }
+  },
+  "negativeControls": {
+    "badPartnerHitCount": 49,
+    "allExpertsBlockedHitCount": 49,
+    "allRowScoresUnchanged": true
+  },
+  "rows": [
+    {
+      "set": "resource-expert-routing-challenge.json",
+      "case": "expert-research-team",
+      "language": "zh",
+      "query": "我要写一份行业技术路线报告。请让不同研究者并行查找不同来源，再由另一位核实证据和引用，审阅草稿后汇总成报告。",
+      "experts": [
+        "roadshow-research-team",
+        "gpt-researcher-team"
+      ],
+      "targetNames": [
+        "deep-researcher",
+        "gpt-researcher-team"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "resource-expert-routing-challenge.json",
+      "case": "expert-research-team",
+      "language": "en",
+      "query": "Prepare a report on an industry's technical directions. Have researchers investigate independent sources in parallel, a separate reviewer verify evidence and citations, then review and assemble the report.",
+      "experts": [
+        "gpt-researcher-team",
+        "deep-research"
+      ],
+      "targetNames": [
+        "deep-researcher",
+        "gpt-researcher-team"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "resource-expert-routing-challenge.json",
+      "case": "expert-architecture-handoffs",
+      "language": "zh",
+      "query": "为新系统制定完整架构方案，让业务、系统、安全、部署和用户故事各自形成产物并交接，最后做一致性审查。",
+      "experts": [
+        "aicoding-architecture-expert-team",
+        "software-architect"
+      ],
+      "targetNames": [
+        "aicoding-architecture-expert-team"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "resource-expert-routing-challenge.json",
+      "case": "expert-architecture-handoffs",
+      "language": "en",
+      "query": "Create a complete architecture package for a new system, with business, system, security, deployment and user-story specialists handing off artifacts and performing a final consistency review.",
+      "experts": [
+        "aicoding-architecture-expert-team",
+        "backend-architect"
+      ],
+      "targetNames": [
+        "aicoding-architecture-expert-team"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "resource-expert-routing-challenge.json",
+      "case": "expert-engineering-orchestration",
+      "language": "zh",
+      "query": "交付一个通知偏好功能：先澄清规格，拆开可并行的实现任务，先复现失败，再让不同审查者分别检查需求符合度和代码质量，最后集成验证。",
+      "experts": [
+        "senior-developer",
+        "code"
+      ],
+      "targetNames": [
+        "dev-pipeline-orchestrator"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "resource-expert-routing-challenge.json",
+      "case": "expert-engineering-orchestration",
+      "language": "en",
+      "query": "Deliver a notification-preferences feature: clarify requirements, split independent implementation work, reproduce failing tests first, use separate reviewers for specification compliance and code quality, then integrate and verify.",
+      "experts": [
+        "code",
+        "senior-developer"
+      ],
+      "targetNames": [
+        "dev-pipeline-orchestrator"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "resource-expert-routing-challenge.json",
+      "case": "expert-performance-investigation",
+      "language": "zh",
+      "query": "服务高峰期变慢。设计突发和错峰负载实验，区分CPU计算与数据库等待，保存基线，再比较调优前后的延迟、吞吐和错误。",
+      "experts": [
+        "database-operations",
+        "database-optimization-expert"
+      ],
+      "targetNames": [
+        "apm-performance-expert",
+        "performance-testing-expert"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "resource-expert-routing-challenge.json",
+      "case": "expert-performance-investigation",
+      "language": "en",
+      "query": "The service slows at peak load. Design burst and staggered-load experiments, distinguish CPU work from database waits, preserve a baseline, and compare latency, throughput and errors before and after tuning.",
+      "experts": [
+        "apm-performance-expert",
+        "database-optimization-expert"
+      ],
+      "targetNames": [
+        "apm-performance-expert",
+        "performance-testing-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "live-incident",
+      "language": "zh",
+      "query": "线上支付刚刚大量失败，请组织止损、判断影响范围、协调值班人员恢复服务，保留时间线并做事后复盘。",
+      "experts": [
+        "earnings-reviewer",
+        "month-end-closer"
+      ],
+      "targetNames": [
+        "incident-response-commander"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "live-incident",
+      "language": "en",
+      "query": "Production payments are failing widely. Coordinate incident containment, assess the impact, direct on-call recovery, preserve a timeline and run a postmortem.",
+      "experts": [
+        "incident-response-commander",
+        "studio-producer"
+      ],
+      "targetNames": [
+        "incident-response-commander"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "perf-counterfactual",
+      "language": "zh",
+      "query": "线程池改动后有人说快了，请用相同请求集做前后对照，覆盖突发与逐渐加压，报告吞吐、尾延迟和失败比例，避免只看平均数。",
+      "experts": [
+        "earnings-reviewer",
+        "equity-research"
+      ],
+      "targetNames": [
+        "apm-performance-expert",
+        "performance-testing-expert"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "perf-counterfactual",
+      "language": "en",
+      "query": "A thread-pool change is claimed to be faster. Compare before and after using identical requests, bursts and ramping load, and report throughput, tail latency and failure rate rather than means alone.",
+      "experts": [
+        "apm-performance-expert",
+        "database-optimization-expert"
+      ],
+      "targetNames": [
+        "apm-performance-expert",
+        "performance-testing-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "trace-root",
+      "language": "zh",
+      "query": "腾讯云链路追踪显示请求跨越几个服务，请结合火焰图找到耗时最集中的调用，区分计算和外部等待，再验证调优。",
+      "experts": [
+        "apm-performance-expert",
+        "migraq"
+      ],
+      "targetNames": [
+        "apm-performance-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "trace-root",
+      "language": "en",
+      "query": "Tencent Cloud traces span several services. Use distributed traces and flame graphs to locate the expensive calls, distinguish computation from external waits and validate tuning.",
+      "experts": [
+        "apm-performance-expert",
+        "tencent-rtc-expert"
+      ],
+      "targetNames": [
+        "apm-performance-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "pg-explain",
+      "language": "zh",
+      "query": "PostgreSQL的一条查询随数据增长从50毫秒变成8秒，请阅读执行计划，检查索引、连接顺序和统计信息，用同一数据比较优化结果。",
+      "experts": [
+        "database-operations",
+        "database-optimization-expert"
+      ],
+      "targetNames": [
+        "database-operations",
+        "database-optimization-expert"
+      ],
+      "targetMembers": 2,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "pg-explain",
+      "language": "en",
+      "query": "A PostgreSQL query grew from 50 milliseconds to 8 seconds as data increased. Inspect its execution plan, indexes, join order and statistics, then compare improvements on identical data.",
+      "experts": [
+        "database-operations",
+        "ai-data-copilot"
+      ],
+      "targetNames": [
+        "database-operations",
+        "database-optimization-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "threat-review",
+      "language": "zh",
+      "query": "一个多租户后台准备发布，请检查越权、会话劫持和注入，建立威胁模型，给出可复现的风险与修补验证步骤。",
+      "experts": [
+        "evidence-collector",
+        "long-manuscript-expert"
+      ],
+      "targetNames": [
+        "security-engineer",
+        "tencent-security-expert"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "threat-review",
+      "language": "en",
+      "query": "A multi-tenant admin service is about to launch. Examine authorization bypass, session hijacking and injection, build a threat model and supply reproducible risks and fix-verification steps.",
+      "experts": [
+        "multi-cloud-management-expert",
+        "tencent-security-expert"
+      ],
+      "targetNames": [
+        "security-engineer",
+        "tencent-security-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "usability-observation",
+      "language": "zh",
+      "query": "用户经常在注册第二步退出，不要凭感觉改界面，请设计可用性观察和访谈，找出行为证据，验证改版能否减少流失。",
+      "experts": [
+        "user-experience-researcher",
+        "behavioral-nudge-engine"
+      ],
+      "targetNames": [
+        "user-experience-researcher"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "usability-observation",
+      "language": "en",
+      "query": "Users frequently abandon registration at step two. Design usability observation and interviews, collect behavioral evidence and validate whether a redesign reduces abandonment.",
+      "experts": [
+        "behavioral-nudge-engine",
+        "user-experience-researcher"
+      ],
+      "targetNames": [
+        "user-experience-researcher"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "etl-recovery",
+      "language": "zh",
+      "query": "夜间订单数据同步会重复和漏行，请设计可恢复的数据流水线、幂等写入与质量检查，并明确失败后的重跑边界。",
+      "experts": [
+        "data-integration-agent",
+        "data-engineer"
+      ],
+      "targetNames": [
+        "data-engineer"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "etl-recovery",
+      "language": "en",
+      "query": "Nightly order synchronization duplicates and loses rows. Design a recoverable data pipeline, idempotent writes and quality checks, with clear retry boundaries after failures.",
+      "experts": [
+        "data-integration-agent",
+        "data-engineer"
+      ],
+      "targetNames": [
+        "data-engineer"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "api-negative-path",
+      "language": "zh",
+      "query": "为新支付接口设计正反向测试，覆盖签名错误、重复回调、过期请求和退款边界，输出可执行用例以及缺陷证据。",
+      "experts": [
+        "api-testing-expert",
+        "api-dev"
+      ],
+      "targetNames": [
+        "aladin-test-design",
+        "api-testing-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "api-negative-path",
+      "language": "en",
+      "query": "Design positive and negative tests for a new payment API, including invalid signatures, duplicate callbacks, expired requests and refund boundaries, with executable cases and defect evidence.",
+      "experts": [
+        "api-testing-expert",
+        "aladin-test-design"
+      ],
+      "targetNames": [
+        "aladin-test-design",
+        "api-testing-expert"
+      ],
+      "targetMembers": 2,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "team-evidence-report",
+      "language": "zh",
+      "query": "请把储能技术的成本与安全争议做成有来源的综述，分开搜集各路线资料，独立检查引用，再逐章审阅并交付完整报告。",
+      "experts": [
+        "humanize-ppt-team",
+        "gpt-researcher-team"
+      ],
+      "targetNames": [
+        "deep-research",
+        "deep-researcher",
+        "gpt-researcher-team"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "team-evidence-report",
+      "language": "en",
+      "query": "Produce a sourced review of cost and safety disputes in energy-storage technologies. Research each approach independently, separately verify citations, review each chapter and deliver a complete report.",
+      "experts": [
+        "gpt-researcher-team",
+        "valuation-reviewer"
+      ],
+      "targetNames": [
+        "deep-research",
+        "deep-researcher",
+        "gpt-researcher-team"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "feature-review-handoff",
+      "language": "zh",
+      "query": "实现账号注销功能前先明确验收条件，把互不依赖的改动分配出去，用失败用例驱动实现，并让不同人员审需求和代码后再合并。",
+      "experts": [
+        "aladin-test-design",
+        "dev-pipeline-orchestrator"
+      ],
+      "targetNames": [
+        "dev-pipeline-orchestrator"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-relevance-unseen-20261030.json",
+      "case": "feature-review-handoff",
+      "language": "en",
+      "query": "Before implementing account deletion, clarify acceptance criteria, assign independent changes, drive implementation with failing cases and have separate people review requirements and code before merging.",
+      "experts": [
+        "enterprise-account-strategist",
+        "code-review-expert"
+      ],
+      "targetNames": [
+        "dev-pipeline-orchestrator"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "paid-query-waste",
+      "language": "zh",
+      "query": "我们Google Ads付费搜索账户的无效点击吃掉了预算，请分析搜索词报告，分层设计否定关键词，避免广告组相互抢流量。",
+      "experts": [
+        "search-term-analyst",
+        "ppc-bidding-strategist"
+      ],
+      "targetNames": [
+        "search-term-analyst"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "paid-query-waste",
+      "language": "en",
+      "query": "Wasted clicks are consuming our Google Ads paid-search budget. Analyze search term reports, design tiered negative keywords and stop ad groups competing for traffic.",
+      "experts": [
+        "search-term-analyst",
+        "paid-media-auditor"
+      ],
+      "targetNames": [
+        "search-term-analyst"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "ncre-prep",
+      "language": "zh",
+      "query": "我下个月考全国计算机等级二级Python，现在循环和公共基础薄弱。请先诊断基础，再安排对应辅导和真题复习。",
+      "experts": [
+        "ncre-expert",
+        "exam-preparation-planner"
+      ],
+      "targetNames": [
+        "ncre-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "ncre-prep",
+      "language": "en",
+      "query": "I take the NCRE Level 2 Python exam next month and struggle with loops and common fundamentals. Diagnose my level, arrange targeted tutoring and past-exam revision.",
+      "experts": [
+        "ncre-expert",
+        "study-planner"
+      ],
+      "targetNames": [
+        "ncre-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "revision-calendar",
+      "language": "zh",
+      "query": "我还有三个月考研，每天只有晚上两小时，数学落后，英语单词总忘，请制定可调整的每日计划、复习节奏和周复盘。",
+      "experts": [
+        "exam-preparation-planner",
+        "study-planner"
+      ],
+      "targetNames": [
+        "study-planner"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "revision-calendar",
+      "language": "en",
+      "query": "My postgraduate entrance exam is in three months. I have two evening hours daily, lag in math and forget vocabulary. Create an adjustable daily plan, spaced revision and weekly reviews.",
+      "experts": [
+        "exam-preparation-planner",
+        "ket-prep-team"
+      ],
+      "targetNames": [
+        "study-planner"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "full-software-pipeline",
+      "language": "zh",
+      "query": "从零交付一个预约管理产品，请从需求规格开始，组织架构、交互、开发和测试角色交接，反复修复测试发现的问题，最后集成验收。",
+      "experts": [
+        "novel-creator",
+        "opc-team"
+      ],
+      "targetNames": [
+        "agent-orchestrator",
+        "dev-pipeline-orchestrator"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "full-software-pipeline",
+      "language": "en",
+      "query": "Deliver an appointment-management product from scratch: start with requirements, coordinate architecture, UX, development and QA handoffs, iterate on test failures and finish integrated acceptance.",
+      "experts": [
+        "opc-team",
+        "mvp-dev-expert-team"
+      ],
+      "targetNames": [
+        "agent-orchestrator",
+        "dev-pipeline-orchestrator"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "retrieval-load",
+      "language": "zh",
+      "query": "我们的工具推荐服务一百个请求错峰进来会变慢，请做负载实验，区分编码、候选生成和排序耗时，记录吞吐、尾延迟和错误率，再验证优化。",
+      "experts": [
+        "sre-expert",
+        "apm-performance-expert"
+      ],
+      "targetNames": [
+        "apm-performance-expert",
+        "performance-testing-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "retrieval-load",
+      "language": "en",
+      "query": "Our tool recommendation service slows under one hundred staggered requests. Load test it, separate encoding, candidate-generation and ranking costs, measure throughput, tail latency and errors, then validate changes.",
+      "experts": [
+        "apm-performance-expert",
+        "tool-evaluation-expert"
+      ],
+      "targetNames": [
+        "apm-performance-expert",
+        "performance-testing-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "production-database",
+      "language": "zh",
+      "query": "线上PostgreSQL订单表的连接查询越来越慢，请用EXPLAIN ANALYZE检查扫描、连接和索引，对同一数据验证改动并防止结果错误。",
+      "experts": [
+        "database-operations",
+        "database-optimization-expert"
+      ],
+      "targetNames": [
+        "database-operations",
+        "database-optimization-expert"
+      ],
+      "targetMembers": 2,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "production-database",
+      "language": "en",
+      "query": "A join against our production PostgreSQL orders table is slowing. Use EXPLAIN ANALYZE to examine scans, joins and indexes, validate changes on identical data and preserve result correctness.",
+      "experts": [
+        "database-operations",
+        "database-optimization-expert"
+      ],
+      "targetNames": [
+        "database-operations",
+        "database-optimization-expert"
+      ],
+      "targetMembers": 2,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "incident-coordination",
+      "language": "zh",
+      "query": "线上消息服务出现级联故障，请分配事故指挥与沟通职责，建立严重等级和恢复检查点，协调恢复并组织无责复盘。",
+      "experts": [
+        "incident-response-commander",
+        "ihr-conference"
+      ],
+      "targetNames": [
+        "incident-response-commander",
+        "site-reliability-engineer"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "incident-coordination",
+      "language": "en",
+      "query": "Cascading failures hit our production messaging service. Assign incident command and communication roles, establish severity and recovery checkpoints, coordinate restoration and conduct a blameless postmortem.",
+      "experts": [
+        "incident-response-commander",
+        "sre-expert"
+      ],
+      "targetNames": [
+        "incident-response-commander",
+        "site-reliability-engineer"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "research-evidence",
+      "language": "zh",
+      "query": "比较几种电池回收工艺的污染与成本，分开调研不同来源，交叉验证冲突证据并核对引用，审阅后交付完整的研究报告。",
+      "experts": [
+        "deep-research",
+        "gpt-researcher-team"
+      ],
+      "targetNames": [
+        "deep-research",
+        "deep-researcher",
+        "gpt-researcher-team"
+      ],
+      "targetMembers": 2,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-description-domain-cases.json",
+      "case": "research-evidence",
+      "language": "en",
+      "query": "Compare pollution and costs of battery-recycling processes. Research independent sources, cross-check conflicting evidence and citations, review the findings and deliver a complete research report.",
+      "experts": [
+        "finops-expert",
+        "deep-research"
+      ],
+      "targetNames": [
+        "deep-research",
+        "deep-researcher",
+        "gpt-researcher-team"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "checkout-outage",
+      "language": "zh",
+      "query": "结账突然全挂了，现在需要有人统一安排排查和恢复，把影响用户、处理经过和后续整改整理清楚。",
+      "experts": [
+        "month-end-closer",
+        "ai-meeting-notes"
+      ],
+      "targetNames": [
+        "incident-response-commander"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "checkout-outage",
+      "language": "en",
+      "query": "Checkout has just failed across the site. Coordinate the investigation and recovery, establish affected users, document the response and follow-up improvements.",
+      "experts": [
+        "yunzhi-doc-quality-expert",
+        "site-reliability-engineer"
+      ],
+      "targetNames": [
+        "incident-response-commander"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "burst-throughput",
+      "language": "zh",
+      "query": "把服务从4个处理进程改成8个之后是否真有收益？请控制数据和请求不变，模拟突发流量，比较慢请求、吞吐和出错情况。",
+      "experts": [
+        "sre-expert",
+        "ncre-expert"
+      ],
+      "targetNames": [
+        "apm-performance-expert",
+        "performance-testing-expert"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "burst-throughput",
+      "language": "en",
+      "query": "Does changing the service from four processing workers to eight actually help? Hold data and requests fixed, simulate traffic bursts and compare slow requests, throughput and errors.",
+      "experts": [
+        "rum-fullstack-team",
+        "apm-performance-expert"
+      ],
+      "targetNames": [
+        "apm-performance-expert",
+        "performance-testing-expert"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "tenant-isolation",
+      "language": "zh",
+      "query": "客户A居然能猜编号打开客户B的账单，修完后要系统查一下还有哪些类似入口，交付风险分析和验证过程。",
+      "experts": [
+        "smb-compliance",
+        "enterprise-account-strategist"
+      ],
+      "targetNames": [
+        "security-engineer",
+        "tencent-security-expert"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "tenant-isolation",
+      "language": "en",
+      "query": "Customer A can guess an identifier and open customer B's invoice. After repairing it, systematically inspect related entry points and deliver a risk analysis and verification evidence.",
+      "experts": [
+        "invoice-verify-expert",
+        "smb-compliance"
+      ],
+      "targetNames": [
+        "security-engineer",
+        "tencent-security-expert"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "replay-ingestion",
+      "language": "zh",
+      "query": "凌晨搬运业务记录的程序断电后重跑就多出重复数据，有时还丢记录；需要设计能安全重放、监控质量的整套数据处理方案。",
+      "experts": [
+        "backend-architect",
+        "database-operations"
+      ],
+      "targetNames": [
+        "data-engineer"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "replay-ingestion",
+      "language": "en",
+      "query": "After a power cut, replaying our overnight business-record ingestion duplicates some records and loses others. Design safe replay and a complete data-processing solution with quality monitoring.",
+      "experts": [
+        "data-engineer",
+        "backend-architect"
+      ],
+      "targetNames": [
+        "data-engineer"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "onboarding-research",
+      "language": "zh",
+      "query": "新用户走到绑定手机就不继续了，先别凭直觉改页面；找用户实际观察，设计研究找原因，再看新方案是否改善。",
+      "experts": [
+        "growth-hacker",
+        "user-experience-researcher"
+      ],
+      "targetNames": [
+        "user-experience-researcher"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "onboarding-research",
+      "language": "en",
+      "query": "New users stop when they reach phone linking. Before changing pages on intuition, observe real users, design research to identify causes and test whether a new design improves the experience.",
+      "experts": [
+        "user-experience-researcher",
+        "delightful-experience-designer"
+      ],
+      "targetNames": [
+        "user-experience-researcher"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "reviewed-delivery",
+      "language": "zh",
+      "query": "想增加团队邀请功能，从澄清需求到合并都帮我组织起来，能独立做的分出去，先有失败测试，再分别检查需求符合性和代码质量。",
+      "experts": [
+        "dev-pipeline-orchestrator",
+        "job-companion-team"
+      ],
+      "targetNames": [
+        "agent-orchestrator",
+        "dev-pipeline-orchestrator"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "reviewed-delivery",
+      "language": "en",
+      "query": "Organize delivery of team invitations from requirement clarification to merge. Delegate independent work, establish failing tests first, then separately review requirement compliance and code quality.",
+      "experts": [
+        "skill-smith",
+        "cloud-requirement-expert"
+      ],
+      "targetNames": [
+        "agent-orchestrator",
+        "dev-pipeline-orchestrator"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "screenreader-checkout",
+      "language": "zh",
+      "query": "盲人用户说购物流程根本操作不了，请拿读屏和纯键盘逐步检查，按WCAG给出问题、修改和复测证据。",
+      "experts": [
+        "evidence-collector",
+        "accessibility-auditor"
+      ],
+      "targetNames": [
+        "accessibility-auditor"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "screenreader-checkout",
+      "language": "en",
+      "query": "Blind users cannot complete shopping. Check the flow step by step with a screen reader and keyboard only; provide WCAG findings, repairs and retest evidence.",
+      "experts": [
+        "accessibility-auditor",
+        "computer-operations-advisor"
+      ],
+      "targetNames": [
+        "accessibility-auditor"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "journal-fit",
+      "language": "zh",
+      "query": "我有一篇关于城市热岛与老年健康的论文摘要，想同时评估中文核心和SCI投稿选择，给出冲稳保方案以及选刊依据。",
+      "experts": [
+        "academic-journal-selector",
+        "arxiv-watcher"
+      ],
+      "targetNames": [
+        "academic-journal-selector"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "journal-fit",
+      "language": "en",
+      "query": "I have an abstract on urban heat islands and older adults' health. Evaluate Chinese core journals and SCI journals in parallel, giving ambitious, realistic and safe submission options with evidence.",
+      "experts": [
+        "academic-journal-selector",
+        "thesis-writing-mentor"
+      ],
+      "targetNames": [
+        "academic-journal-selector"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "ad-query-spend",
+      "language": "zh",
+      "query": "付费广告报表里很多实际搜索词和商品无关，请找出浪费预算的词，整理否定词结构，并核验调整后高意向流量有没有增加。",
+      "experts": [
+        "paid-media-auditor",
+        "search-term-analyst"
+      ],
+      "targetNames": [
+        "search-term-analyst"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "ad-query-spend",
+      "language": "en",
+      "query": "Many actual search terms in our paid-ad reports are unrelated to the products. Identify wasted spending, organize negative keywords and verify whether changes increase high-intent traffic.",
+      "experts": [
+        "paid-media-auditor",
+        "search-term-analyst"
+      ],
+      "targetNames": [
+        "search-term-analyst"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "sales-dashboard",
+      "language": "zh",
+      "query": "把各地区销售人员提交的数据汇总为实时看板，展示区域、销售代表和商机漏斗，能让主管定位差距和机会。",
+      "experts": [
+        "sales-data-extraction-agent",
+        "sales-battle-team"
+      ],
+      "targetNames": [
+        "data-integration-agent"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "sales-dashboard",
+      "language": "en",
+      "query": "Consolidate submissions from salespeople across territories into a live dashboard showing territory, rep and pipeline summaries so managers can locate gaps and opportunities.",
+      "experts": [
+        "bidding-strategist",
+        "private-equity"
+      ],
+      "targetNames": [
+        "data-integration-agent"
+      ],
+      "targetMembers": 0,
+      "targetHit": false,
+      "syntheticBadPartnerHit": false,
+      "syntheticBlockedHit": false
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "vendor-payments",
+      "language": "zh",
+      "query": "我们每月要处理承包商账单和供应商付款，请设计自动处理流程，验证收款方，保留完整审计，并支持法币和稳定币渠道。",
+      "experts": [
+        "accounts-payable-agent",
+        "compliance-auditor"
+      ],
+      "targetNames": [
+        "accounts-payable-agent"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "vendor-payments",
+      "language": "en",
+      "query": "We process contractor invoices and vendor payments monthly. Design automated handling with payee verification, a complete audit trail and support for fiat and stablecoin rails.",
+      "experts": [
+        "accounts-payable-agent",
+        "invoice-verify-workbuddy"
+      ],
+      "targetNames": [
+        "accounts-payable-agent"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "tab-analysis",
+      "language": "zh",
+      "query": "TAB实验的结果和手工查询对不上，需要先对齐指标口径，再分群下钻，校正多重比较后判断差异是否可信。",
+      "experts": [
+        "ab-experiment-analyst",
+        "wentu"
+      ],
+      "targetNames": [
+        "ab-experiment-analyst"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    },
+    {
+      "set": "expert-ranking-heldout-20261030.json",
+      "case": "tab-analysis",
+      "language": "en",
+      "query": "Our TAB experiment results disagree with manual queries. Align metric definitions first, drill into cohorts and correct multiple comparisons before judging whether differences are credible.",
+      "experts": [
+        "ab-experiment-analyst",
+        "wentu"
+      ],
+      "targetNames": [
+        "ab-experiment-analyst"
+      ],
+      "targetMembers": 1,
+      "targetHit": true,
+      "syntheticBadPartnerHit": true,
+      "syntheticBlockedHit": true
+    }
+  ],
+  "limitations": [
+    "Name membership measures a diagnostic target hit, not expert relevance, usability or task success.",
+    "Unlisted experts are unjudged, not automatically irrelevant. No semantic precision or recall is estimated.",
+    "Counterfactuals intentionally test metric blindness; they are not actual worker outputs or observed runtime failures.",
+    "Language pairs share a scenario; these are development observations, not an independent held-out estimate."
+  ],
+  "inputs": [
+    {
+      "file": "docs/evidence/expert-ranking-20261030.json",
+      "sha256": "ac8fc5bfe17ebcece35e64e8328054ad86dc8a1c6cd23f61f56f56812c7a7f93"
+    },
+    {
+      "file": "scripts/resource-expert-routing-challenge.json",
+      "sha256": "5ef11c82091b0558b4019e40def9ae0b916171e60fa923d8f46fbd2e09474d5e"
+    },
+    {
+      "file": "scripts/expert-relevance-unseen-20261030.json",
+      "sha256": "e7885b1a5ae4e3847b235615560e52b0b47b4c44ab8d40f8d99293dfc27e7de7"
+    },
+    {
+      "file": "scripts/expert-description-domain-cases.json",
+      "sha256": "d40f062532548d52fe853755dc28882dbf5f179e54b0b4b5c6893fef54444406"
+    },
+    {
+      "file": "scripts/expert-ranking-heldout-20261030.json",
+      "sha256": "3fd6db6169b52817928b0d5922d7bf23b285faada186cb7ab3c8c5b823d6b03c"
+    }
+  ]
+}

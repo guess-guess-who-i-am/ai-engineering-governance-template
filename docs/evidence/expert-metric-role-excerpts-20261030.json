@@ -1,0 +1,100 @@
+{
+  "schema": "expert-original-role-evidence/v1",
+  "purpose": "Directed diagnostic examples; not blind labels or a population accuracy estimate.",
+  "roles": [
+    {
+      "name": "studio-producer",
+      "file": "expert/studio-producer--9d34f1e538bb305c/agents/studio-producer.md",
+      "originalSha256": "8070a65ef071ebb431e769a97e2c5831c326a61d0e323487cd0c6319963f9bcb",
+      "excerpts": [
+        {
+          "line": 14,
+          "text": "- **Role**: Executive creative strategist and portfolio orchestrator"
+        },
+        {
+          "line": 21,
+          "text": "### Lead Strategic Portfolio Management and Creative Vision"
+        }
+      ]
+    },
+    {
+      "name": "valuation-reviewer",
+      "file": "expert/valuation-reviewer--23ad6d061f074fe0/agents/valuation-reviewer.md",
+      "originalSha256": "fb7a0343f63459b2566073c4f6d7ae30b37e5004932c748759d8f65e061e1071",
+      "excerpts": [
+        {
+          "line": 3,
+          "text": "description: Ingests GP valuation packages for a fund, runs them through the valuation template, and stages LP reporting. Use for quarter-end portfolio valuation review — not for deal-time underwriting (use model-builder for that)."
+        },
+        {
+          "line": 19,
+          "text": "2. **Waterfall** — fund-level NAV, carried interest, and LP allocations."
+        }
+      ]
+    },
+    {
+      "name": "arxiv-watcher",
+      "file": "expert/arxiv-watcher--b897ffef34bacc62/agents/arxiv-watcher.md",
+      "originalSha256": "dd3ae2aa49a79c3ef718df13cb9a723bbdae5f52d8e638372e74eb8cc7336d5e",
+      "excerpts": [
+        {
+          "line": 3,
+          "text": "description: Activate when the user asks to search, summarize, or track ArXiv research papers, wants a daily digest of AI/research topics, or references an ArXiv paper by ID."
+        },
+        {
+          "line": 21,
+          "text": "1. **精准检索**：通过关键词、作者、学科分类（如 cs.AI、cs.CL）检索 ArXiv 最新论文，按提交时间倒序返回结果。"
+        }
+      ]
+    },
+    {
+      "name": "exam-preparation-planner",
+      "file": "expert/exam-preparation-planner--57cfc58c078f16a0/agents/exam-preparation-planner.md",
+      "originalSha256": "8b24c85d3d91cb04afdb9b5f62579e22ac1a78c0fda8c9d2650b34bea50dc13b",
+      "excerpts": [
+        {
+          "line": 28,
+          "text": "长周期、高竞争考试可以提供通用规划，但没有专项资料时不冒充该考试的权威辅导专家。"
+        },
+        {
+          "line": 52,
+          "text": "以下任务必须使用 `exam-preparation-playbook`："
+        }
+      ]
+    },
+    {
+      "name": "ket-prep-team",
+      "file": "expert/ket-prep-team--4f566bea53d631ad/agents/ket-prep-team-team-lead.md",
+      "originalSha256": "c9bd7a11638dca314f2d8753f1b27c5571fc6acd905c0f1e46acb1565d1546e5",
+      "excerpts": [
+        {
+          "line": 3,
+          "text": "description: Chief KET Prep Director who orchestrates the full KET preparation journey for young learners by coordinating a team of specialists covering assessment, vocabulary, grammar, listening, reading, speaking, writing, and exam tactics."
+        },
+        {
+          "line": 8,
+          "text": "  en: \"Chief KET Prep Director\""
+        },
+        {
+          "line": 15,
+          "text": "我是柯全排，KET备考总督导。我统筹一支由前剑桥英语考评部认证口语考官、资深少儿英语教研总监及一线提分名师组成的顶级备考团队，拥有超过10年的MSE（剑桥通用英语五级）教研经验，深谙CEFR A2级别核心考查要点。我的职责是理解每个孩子的备考目标与现状，协调团队专家按阶段有序推进，确保从零基础到考前冲刺的全流程顺畅落地，最终帮助孩子以Merit或Distinction的成绩斩获KET证书。"
+        }
+      ]
+    },
+    {
+      "name": "gpt-researcher-team",
+      "file": "expert/gpt-researcher-team--d1db563dc1877f46/agents/research-chief-editor.md",
+      "originalSha256": "b44dea95ea149db6e01662cd13afc7a60a01bc296d93113e315e174278f6560c",
+      "excerpts": [
+        {
+          "line": 25,
+          "text": "1. **建立团队**：任务开始时由主理人亲自创建本次任务的团队（建议命名 `research-<课题简称>`，如 `research-ai-agent-enterprise`、`research-new-energy-trend`），明确本次协作的边界与上下文。**团队创建（TeamCreate）必须且只能由主理人执行，严禁委派任何成员创建团队**"
+        },
+        {
+          "line": 41,
+          "text": "调度每位成员时，**必须**在 Agent 工具的 `name` 参数中传入该成员的 **Agent ID**（即团队成员表格/列表中对应成员的标识名），同时 `subagent_type` 参数也传入相同的 Agent ID。**禁止**省略 name 参数（否则系统会自动生成无意义名称），**禁止**在 name 中使用中文名或其他自创名称。完整列表："
+        }
+      ]
+    }
+  ]
+}
