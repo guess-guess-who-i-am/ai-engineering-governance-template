@@ -26,7 +26,7 @@
 
 70 条中 59 条的专家前两名发生变化，这不是准确率。仍有实际错配，例如数据库英文请求中混入公司查询专家；不以请求成功、返回配额或名称命中宣称推荐准确。字段清理已生效，精准专家排序仍未达标。
 
-本机与 194 服务器发布图 SHA-256 均为：`6ac5d76b0dd03ff12c0a0368ec6da0dbf78734f3247d63af5934d1db1b142de3`。两端 manifest 的 `retrievalContent` 均为 `declared-name-capability-only/v1`，引用的中英文侧车 SHA 逐项一致。
+本机与 194 服务器发布图 SHA-256 均为：`1fc027c532a90d5be0c92d5c8620277613640f62db72a6f2324296e04c264af8`。两端 manifest 的 `retrievalContent` 均为 `declared-name-capability-only/v1`，引用的中英文侧车 SHA 逐项一致。
 
 194 服务器发布验证：`codex-graph-worker.service` 为 `enabled`、`active`，`Restart=always`，4 个查询进程均参与 8 条重叠请求；中英文 `readyLanguages` 均就绪，`prefilter=true`，8 条请求全部成功。远端 125GiB 主机常驻 RSS 约 7.6GiB；当前仍保留专家排序错配和类别席位可能不足的已知限制。
 

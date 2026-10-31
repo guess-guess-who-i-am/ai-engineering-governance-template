@@ -122,4 +122,4 @@
 
 专家初始提示、快捷示例和内部ID，以及Skill分类辅助字段已退出相关性文本。19,754节点保留，70条配额核验、8条真实并发及两个工作区Hook通过；专家排序仍有错配。证据与边界见 docs/RETRIEVAL_CONTENT_CLEANUP_20261031.zh.md。
 
-本轮完成 194 服务器发布：与本机相同的图 SHA-256 为 `6ac5d76b0dd03ff12c0a0368ec6da0dbf78734f3247d63af5934d1db1b142de3`；远端 `codex-graph-worker.service` 已 `enabled`、`active`，`Restart=always`，4 个 worker 参与 8 条重叠请求并全部成功，中英文预热与 `prefilter` 检查通过。远端旧图与新 hook 不匹配导致的启动错误已通过原子替换清除。
+本轮完成 194 服务器发布：与本机相同的图 SHA-256 为 `1fc027c532a90d5be0c92d5c8620277613640f62db72a6f2324296e04c264af8`；远端 `codex-graph-worker.service` 已 `enabled`、`active`，`Restart=always`，4 个 worker 参与 8 条重叠请求并全部成功，中英文预热与 `prefilter` 检查通过。远端旧图与新 hook 不匹配导致的启动错误已通过原子替换清除。
