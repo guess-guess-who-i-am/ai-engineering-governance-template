@@ -191,6 +191,42 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(worker.query({'query': 'alpha search'})[0]['name'], 'beta')
         self.assertEqual(worker.loads, 2)
 
+    def test_last_waiter_timeout_abandons_running_query_without_caching(self):
+        worker = indexer._GraphWorker(self.graph)
+        worker.query({'query': 'warm'})
+        graph = worker._graph
+        original = graph.retrieve_with_scores
+        started = threading.Event()
+        release = threading.Event()
+        calls = []
+
+        def blocked(query, **kwargs):
+            calls.append(query)
+            started.set()
+            release.wait(timeout=5)
+            return original(query, **kwargs)
+
+        with patch.object(graph, 'retrieve_with_scores', blocked):
+            def invoke():
+                return worker.query({'query': 'abandon me',
+                                     'deadline': time.time() * 1000 + 40})
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+                futures = [pool.submit(invoke) for _ in range(8)]
+                self.assertTrue(started.wait(timeout=2))
+                for future in futures:
+                    with self.assertRaises(TimeoutError):
+                        future.result(timeout=2)
+            release.set()
+            until = time.monotonic() + 3
+            while worker._pending and time.monotonic() < until:
+                time.sleep(.01)
+            self.assertFalse(worker._pending)
+            self.assertEqual(worker.abandoned_running, 1)
+            self.assertNotIn(('abandon me', 8), worker._results)
+            worker.query({'query': 'abandon me'})
+            self.assertEqual(calls.count('abandon me'), 2)
+
     def test_crash_and_idle_restart(self):
         p = self.start()
         first = self.request()

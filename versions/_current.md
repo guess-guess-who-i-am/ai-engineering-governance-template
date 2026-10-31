@@ -6,21 +6,23 @@
 
 - Position: 120,120
 - Size: 400,520
-- Completion: 已完成
+- Completion: 进行中
 - Problem: 如何把仓库治理配置安装成 macOS 全局 Codex 行为，并让并发、Hook、路由和全部 Skill 真正可用？
 - Approach: 全局配置继续由 Finder 右键一键部署；Skill 与 MCP 统一经过 GraphToolCall。工具执行先构造依赖 DAG，同类只读调用优先融合，普通波次从2–4路开始，成功渐增，失败或超时减半；危险、限流和共享状态任务串行，20仅为硬上限。
 - Input: 仓库中的 macOS profile、用户 Codex 目录和现有非敏感配置。
 - Output: 可迁移macOS配置、全局Skill安装源、常驻worker及右键服务；codex-profile/、安装全局配置.command，第三方库由私有skills-library恢复。
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
-- Notes: 只支持 macOS；20 是硬上限，不是首波目标。全局 Skill/MCP 经过 GraphToolCall。另一台 Mac 的重启恢复尚未实测，远程 HTTP MCP 目录发现尚未接入。
-- CurrentResult: macOS 全局检索已部署4个常驻进程和轻量Hook注册表；100个不同长输入突发、错峰均100/100成功，完整Hook未命中结果缓存时P95约29.25/23.56秒，冷启动最长33.14秒。10类查询排名和返回字段与原库一致。三轮提醒长期质量及另一台Mac重启恢复仍未验证，整体目标尚未完全达成。
-- RootCauseAnalysis: 原单连接、大锁和Hook重复扫描外部全库导致排队；embedding重排绕过缓存和互斥，Metal并发会崩溃。现用4进程池、图版本缓存、在途请求合并及CPU模型缓存，并删去每轮重复外部注册表。
+- Notes: 只支持 macOS；20 是硬上限。全局 Skill/MCP 经过 GraphToolCall；跨机重启、远程 HTTP MCP 目录发现尚未实测。本机、194与110默认Terra均通过真实终端工具测试，官方目录已接入；194与110 CLI为0.166.0，110保留xhigh；桌面界面未直接验证。
+- CurrentResult: Claude 机制复用与共享查询修复均已验证：参考内核14项、IDE定向71项、GraphToolCall worker12项、缓存3项、BM25等价4项、检索等价10项通过；真实100路 burst/stagger均100/100成功。4进程池p95约8.6–10.6秒、常驻约4.4–5.6GiB；跨机恢复仍未证实，整体目标不可宣称完成。
+- RootCauseAnalysis: 首个共享查询把短请求截止时间带入进程池，造成后续长请求连带失败；同时没有等待者生命周期，所有调用者超时后计算仍继续并可能污染缓存。现以独立计算硬上限、waiter计数和abandoned结果栅栏隔离两类问题。
 - CaseStudy:
-- NextIdea: 持续监测真实长任务和完成检查的检索延迟、失败率与缓存命中，并在另一台Mac验证重启恢复和三轮提醒质量。
+  - case 1: 全部调用者超时→旧实现仍计算并缓存；新实现最后等待者取消排队任务，运行任务完成后丢弃结果。
+  - case 2: 100路压测全成功但内存4.4–5.6GiB→功能与资源边界必须分开验收。
+- NextIdea: 同步并校验全局 worker 与仓库哈希，运行完整 macOS/治理检查，再决定是否降低进程池资源并更新发布证据。
 - SelectedSkills:
 
 # GraphState
-- ChainForceNext: 
+- ChainForceNext:
 
 - Current: ROOT
 - Next: ROOT

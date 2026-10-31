@@ -4,16 +4,19 @@
 from __future__ import annotations
 
 import argparse
+import ast
 from collections import OrderedDict
-from concurrent.futures import Future, ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
 from copy import deepcopy
 import fcntl
 from functools import lru_cache
 import gc
 import hashlib
+import inspect
 import json
 import multiprocessing
+import math
 import os
 from pathlib import Path
 import re
@@ -23,8 +26,11 @@ import socketserver
 import subprocess
 import sys
 import threading
+import textwrap
 import time
 import warnings
+
+QUERY_EXECUTION_MAX_MS = 55_000
 
 # Import GraphToolCall only after the worker owns the inter-process lock.
 
@@ -232,6 +238,35 @@ def _cache_query_interpretation():
         # shared token sets to callers. Query text is retained only in RAM.
         semantic_scorer.semantic_terms = lru_cache(maxsize=65536)(
             lambda text: frozenset(original(text)))
+    _accelerate_term_matching()
+
+
+def _accelerate_term_matching():
+    """Only Korean terms need substring matching; classify immutable sets once."""
+    from graph_tool_call.retrieval import semantic_scorer
+    if hasattr(semantic_scorer._matching_terms, 'korean_cache'):
+        return
+    original = semantic_scorer._matching_terms
+    if hashlib.sha256(inspect.getsource(original).encode()).hexdigest() != 'a22287df10d4af2974d8c6270bcfc03ade932f94500b15c85f05ecb9816ef193':
+        warnings.warn('Unsupported semantic matcher revision; retaining upstream matching')
+        return
+    @lru_cache(maxsize=65536)
+    def korean_terms(terms):
+        return frozenset(term for term in terms if len(term) >= 2 and re.fullmatch(r'[가-힣]+', term))
+    def matching_terms(left, right):
+        # The old wrapper exposes frozensets, but upstream mutates the
+        # intersection on Korean partial matches. Keep the return a fresh set.
+        matches = set(left & right)
+        korean_left = korean_terms(frozenset(left)) - matches
+        if korean_left:
+            korean_right = korean_terms(frozenset(right))
+            for term in korean_left:
+                if any(term in other or other in term for other in korean_right):
+                    matches.add(term)
+        return matches
+    matching_terms.__wrapped__ = original
+    matching_terms.korean_cache = korean_terms
+    semantic_scorer._matching_terms = matching_terms
 
 
 def _prepare_keyword_index(engine):
@@ -253,6 +288,109 @@ def _prepare_keyword_index(engine):
         return {name: min(count / max(len(tokens), 1), 1.0) for name, count in counts.items()}
 
     engine._keyword_match = keyword_match
+
+
+_KEYWORD_ORIGINALS = {}
+
+
+def _specialize_query_facts(function):
+    """Hoist only pure query expressions, not tool expressions or global re.
+
+    Compile the installed function itself: no copied library implementation.
+    All candidate logic, short-circuiting and scoring remain in that function.
+    Cached facts are bounded per function and use the full, unmodified query.
+    """
+    tree = ast.parse(textwrap.dedent(inspect.getsource(function)))
+    definition = tree.body[0]
+    definition.decorator_list = []
+    expressions = []
+    class QueryFacts(ast.NodeTransformer):
+        def visit(self, node):
+            if isinstance(node, (ast.Compare, ast.BoolOp, ast.UnaryOp, ast.Call)):
+                names = {part.id for part in ast.walk(node) if isinstance(part, ast.Name)}
+                if names & {'q', 'query'} and names <= {'q', 'query', 're', 'BM25Scorer'}:
+                    # These functions contain only literal comparisons, regex
+                    # predicates and pure BM25 intent calls with this signature.
+                    expressions.append(compile(ast.Expression(node), '<query-fact>', 'eval'))
+                    return ast.copy_location(ast.Subscript(value=ast.Name(id='__facts', ctx=ast.Load()), slice=ast.Constant(len(expressions)-1), ctx=ast.Load()), node)
+            return super().visit(node)
+    definition = QueryFacts().visit(definition)
+    @lru_cache(maxsize=256)
+    def facts(query):
+        scope = {'query': query, 'q': query.lower()}
+        return tuple(eval(expression, function.__globals__, scope) for expression in expressions)
+    definition.body.insert(0, ast.parse('__facts = __query_facts(query)').body[0])
+    namespace = dict(function.__globals__, __query_facts=facts)
+    exec(compile(ast.fix_missing_locations(tree), '<specialized-keyword>', 'exec'), namespace)
+    specialized = namespace[function.__name__]
+    specialized.__wrapped__ = function
+    specialized.query_cache = facts
+    return specialized
+
+
+def _restore_keyword_interpretation():
+    """For independent equivalence tests; never used to change a live worker."""
+    from graph_tool_call.retrieval.keyword import BM25Scorer
+    for name, function in _KEYWORD_ORIGINALS.items():
+        setattr(BM25Scorer, name, staticmethod(function))
+    _KEYWORD_ORIGINALS.clear()
+
+
+def _accelerate_keyword_scoring(engine):
+    """Exact sparse BM25 and once-per-query interpretation for large catalogs."""
+    from graph_tool_call.retrieval.keyword import BM25Scorer
+    # This exact-score adapter is pinned to the tested upstream implementation.
+    # A library upgrade must pass equivalence tests before using the fast path.
+    if hashlib.sha256(inspect.getsource(BM25Scorer.score).encode()).hexdigest() != '63f083a790d7a5abbae5ce970a10c664efe956bd1ff6a81c1e9807c6c81e37c9':
+        warnings.warn('Unsupported BM25 scorer revision; retaining upstream scoring')
+        return
+    if not _KEYWORD_ORIGINALS:
+        for name in dir(BM25Scorer):
+            if name.startswith('_has_') and name.endswith('_intent'):
+                function = getattr(BM25Scorer, name)
+                _KEYWORD_ORIGINALS[name] = function
+                setattr(BM25Scorer, name, staticmethod(lru_cache(maxsize=256)(function)))
+        for name in ('_semantic_phrase_multiplier', '_route_planning_phrase_multiplier', '_korean_business_phrase_multiplier'):
+            function = getattr(BM25Scorer, name)
+            _KEYWORD_ORIGINALS[name] = function
+            setattr(BM25Scorer, name, staticmethod(_specialize_query_facts(function)))
+    scorer = engine._get_bm25()
+    if getattr(scorer, '_sparse_index_ready', False):
+        return
+    postings = {}
+    order = {name: number for number, name in enumerate(scorer._tool_tokens)}
+    for name, terms in scorer._tf_maps.items():
+        for term, frequency in terms.items():
+            postings.setdefault(term, []).append((name, frequency))
+    idfs = {term: math.log((scorer._n_docs-df+0.5)/(df+0.5)+1.0) for term, df in scorer._doc_freqs.items()}
+    def score(query, *, restrict=None):
+        raw_tokens = scorer._tokenize_fn(query)
+        if not raw_tokens:
+            return {}
+        filtered = [term for term in raw_tokens if term not in scorer._stopwords]
+        query_tokens = scorer._expand_query_tokens(filtered or raw_tokens, query)
+        scores = {}
+        # Preserve repeated query terms and each document's original floating
+        # point summation order; skip only contributions whose tf is zero.
+        for term in query_tokens:
+            for name, tf in postings.get(term, ()):
+                if restrict is not None and name not in restrict:
+                    continue
+                numerator = tf*(scorer._k1+1.0)
+                denominator = tf+scorer._k1*(1.0-scorer._b+scorer._b*scorer._doc_lens[name]/scorer._avg_dl)
+                scores[name] = scores.get(name, 0.0)+idfs[term]*numerator/denominator
+        result = {}
+        for name in sorted(scores, key=order.__getitem__):
+            value = scores[name]
+            name_len = scorer._name_token_counts.get(name, 0)
+            if name_len > 6:
+                value *= 1.0/(1.0+0.15*(name_len-6))
+            value *= scorer._name_subsequence_boost(query_tokens, name)
+            value *= scorer._semantic_phrase_boost(query, name, scorer._tools[name])
+            result[name] = value
+        return result
+    scorer.score = score
+    scorer._sparse_index_ready = True
 
 
 class _CachedEmbeddingProvider:
@@ -302,6 +440,15 @@ class _SerializedEmbeddingIndex:
         return getattr(self._index, name)
 
 
+class _SharedQuery:
+    """One computation plus the callers currently waiting for its result."""
+
+    def __init__(self, future):
+        self.future = future
+        self.waiters = 0
+        self.abandoned = False
+
+
 class _GraphWorker:
     """Keep one graph and its retrieval caches alive across Hook requests."""
 
@@ -315,8 +462,11 @@ class _GraphWorker:
         self._ready = False
         self._results = OrderedDict()
         self._pending = {}
+        self._executor = ThreadPoolExecutor(max_workers=8, thread_name_prefix="graph-query")
         self.cache_hits = 0
         self.coalesced = 0
+        self.cancelled_pending = 0
+        self.abandoned_running = 0
         self.peak_queries = 0
         self._last_request = time.monotonic()
         self.loads = 0
@@ -341,6 +491,7 @@ class _GraphWorker:
             graph.tune_for_scale()
             engine = graph._get_retrieval_engine()
             _prepare_keyword_index(engine)
+            _accelerate_keyword_scoring(engine)
             if engine._embedding_index is not None:
                 provider = engine._embedding_index._provider
                 if provider is not None and hasattr(provider, '_get_model'):
@@ -379,35 +530,60 @@ class _GraphWorker:
                 records = result_records(results)
                 self._results[key] = records
                 return deepcopy(records)
-            future = self._pending.get(key)
-            owner = future is None
-            if owner:
-                future = Future()
-                self._pending[key] = future
+            shared = self._pending.get(key)
+            if shared is None:
+                shared = _SharedQuery(self._executor.submit(
+                    self._retrieve, graph, query, top_k))
+                self._pending[key] = shared
                 self._inflight += 1
                 self.peak_queries = max(self.peak_queries, self._inflight)
+                shared.future.add_done_callback(
+                    lambda completed, key=key, shared=shared:
+                    self._finished(key, shared, completed))
             else:
                 self.coalesced += 1
-        if not owner:
-            timeout = max(0, (payload['deadline'] - time.time() * 1000) / 1000) if 'deadline' in payload else None
-            return deepcopy(future.result(timeout=timeout))
+            shared.waiters += 1
+            future = shared.future
+        timeout = max(0, (payload['deadline'] - time.time() * 1000) / 1000) if 'deadline' in payload else None
         try:
-            results = graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2)
-            records = result_records(results)
-            with self._condition:
-                self._results[key] = records
-                while len(self._results) > 128:
-                    self._results.popitem(last=False)
-            future.set_result(records)
-            return deepcopy(records)
-        except BaseException as error:
-            future.set_exception(error)
+            return deepcopy(future.result(timeout=timeout))
+        except BaseException:
+            self._release_waiter(key, shared)
             raise
         finally:
-            with self._condition:
-                self._inflight -= 1
-                self._pending.pop(key, None)
-                self._condition.notify_all()
+            if not future.cancelled() and future.done():
+                self._release_waiter(key, shared)
+
+    @staticmethod
+    def _retrieve(graph, query, top_k):
+        results = graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2)
+        return result_records(results)
+
+    def _release_waiter(self, key, shared):
+        with self._condition:
+            if shared.waiters > 0:
+                shared.waiters -= 1
+            if shared.waiters == 0 and not shared.future.done() and not shared.abandoned:
+                shared.abandoned = True
+                if shared.future.cancel():
+                    self.cancelled_pending += 1
+                else:
+                    self.abandoned_running += 1
+
+    def _finished(self, key, shared, future):
+        with self._condition:
+            if self._pending.get(key) is not shared:
+                return
+            if not future.cancelled() and future.exception() is None and not shared.abandoned:
+                self._results[key] = future.result()
+                while len(self._results) > 128:
+                    self._results.popitem(last=False)
+            self._pending.pop(key, None)
+            self._inflight -= 1
+            self._condition.notify_all()
+
+    def close(self):
+        self._executor.shutdown(wait=True, cancel_futures=True)
 
 
 class _WorkerHandler(socketserver.StreamRequestHandler):
@@ -430,7 +606,9 @@ class _WorkerHandler(socketserver.StreamRequestHandler):
                         "loads": self.server.worker.loads,
                         "metrics": {"cacheHits": self.server.worker.cache_hits,
                                     "coalesced": self.server.worker.coalesced,
-                                    "peakQueries": self.server.worker.peak_queries},
+                                    "peakQueries": self.server.worker.peak_queries,
+                                    "cancelledPending": self.server.worker.cancelled_pending,
+                                    "abandonedRunning": self.server.worker.abandoned_running},
                         "prefilter": bool(graph and graph._get_retrieval_engine()._prefilter_enabled)}
             if isinstance(self.server.worker, _ProcessGraphWorker):
                 response.update(self.server.worker._local.report)
@@ -482,13 +660,15 @@ def _initialize_query_process(graph_path):
 
 
 def _query_process(payload):
-    if payload.get('deadline', time.time() * 1000 + 1) < time.time() * 1000:
+    if payload.get('execution_deadline', time.time() * 1000 + QUERY_EXECUTION_MAX_MS) < time.time() * 1000:
         raise TimeoutError('request expired before retrieval')
     records = _process_worker.query(payload)
     return records, {'queryPid': os.getpid(), 'loads': _process_worker.loads,
                      'prefilter': bool(_process_worker._graph and _process_worker._graph._get_retrieval_engine()._prefilter_enabled),
                      'metrics': {'cacheHits': _process_worker.cache_hits,
-                     'coalesced': _process_worker.coalesced, 'peakQueries': _process_worker.peak_queries}}
+                     'coalesced': _process_worker.coalesced, 'peakQueries': _process_worker.peak_queries,
+                     'cancelledPending': _process_worker.cancelled_pending,
+                     'abandonedRunning': _process_worker.abandoned_running}}
 
 
 class _ProcessGraphWorker:
@@ -499,6 +679,7 @@ class _ProcessGraphWorker:
         self._local = threading.local()
         self._last_request = time.monotonic()
         self.loads = self.cache_hits = self.coalesced = self.peak_queries = 0
+        self.cancelled_pending = self.abandoned_running = 0
         self._path = Path(graph_path)
         self._signature = None
         self._lock = threading.RLock()
@@ -512,14 +693,26 @@ class _ProcessGraphWorker:
             mp_context=multiprocessing.get_context('spawn'),
             initializer=_initialize_query_process, initargs=(str(self._path),))
 
-    def _finished(self, key, future):
+    def _finished(self, key, shared, future):
         with self._lock:
-            if self._pending.get(key) is future:
-                self._pending.pop(key, None)
-            if not future.cancelled() and future.exception() is None and self._signature == key[0]:
+            if self._pending.get(key) is not shared:
+                return
+            if not future.cancelled() and future.exception() is None and not shared.abandoned and self._signature == key[0]:
                 self._results[key] = future.result()
                 while len(self._results) > 128:
                     self._results.popitem(last=False)
+            self._pending.pop(key, None)
+
+    def _release_waiter(self, key, shared):
+        with self._lock:
+            if shared.waiters > 0:
+                shared.waiters -= 1
+            if shared.waiters == 0 and not shared.future.done() and not shared.abandoned:
+                shared.abandoned = True
+                if shared.future.cancel():
+                    self.cancelled_pending += 1
+                else:
+                    self.abandoned_running += 1
 
     def query(self, payload):
         remaining = max(0, (payload['deadline'] - time.time() * 1000) / 1000) if 'deadline' in payload else 50
@@ -536,20 +729,36 @@ class _ProcessGraphWorker:
                 records, report = self._results[key]
                 self._local.report = report
                 return deepcopy(records)
-            future = self._pending.get(key)
-            if future is None:
+            shared = self._pending.get(key)
+            if shared is None:
                 try:
-                    future = self._pool.submit(_query_process, payload)
+                    execution_payload = dict(payload)
+                    execution_payload['execution_deadline'] = time.time() * 1000 + QUERY_EXECUTION_MAX_MS
+                    future = self._pool.submit(_query_process, execution_payload)
                 except BrokenProcessPool:
                     self._pool.shutdown(wait=False, cancel_futures=True)
                     self._pool = self._new_pool()
                     self._pending.clear()
-                    future = self._pool.submit(_query_process, payload)
-                self._pending[key] = future
+                    execution_payload = dict(payload)
+                    execution_payload['execution_deadline'] = time.time() * 1000 + QUERY_EXECUTION_MAX_MS
+                    future = self._pool.submit(_query_process, execution_payload)
+                shared = _SharedQuery(future)
+                self._pending[key] = shared
+                future.add_done_callback(
+                    lambda completed, key=key, shared=shared:
+                    self._finished(key, shared, completed))
             else:
                 self.coalesced += 1
-        future.add_done_callback(lambda completed: self._finished(key, completed))
-        records, report = future.result(timeout=remaining)
+            shared.waiters += 1
+            future = shared.future
+        try:
+            records, report = future.result(timeout=remaining)
+        except BaseException:
+            self._release_waiter(key, shared)
+            raise
+        finally:
+            if not future.cancelled() and future.done():
+                self._release_waiter(key, shared)
         self._local.report = report
         return deepcopy(records)
 
