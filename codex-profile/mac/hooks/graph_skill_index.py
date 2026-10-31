@@ -693,11 +693,15 @@ def prepare_semantic_candidate_guard(engine):
         slots = max(0, min(50, cap - len(lexical) - global_quota))
         matrix_state, semantic, category_scores = semantic_hits(index, query, quotas, slots)
         category_scores_context.set((query, *matrix_state, category_scores) if matrix_state else None)
-        if pool is None:
-            return None
         category_hits = set(category_scores)
         if not semantic and not category_hits:
             return pool
+        # Upstream None means weak CATEGORY evidence, not absent semantic
+        # evidence. We have already scored the embedding matrix above; use
+        # those actual leaders rather than scoring the entire catalog again.
+        # Keep the library's unrestricted behavior if no usable vector exists.
+        if pool is None:
+            pool = set()
         if slots == 0:
             protected = lexical | category_hits
             if protected.issubset(pool):

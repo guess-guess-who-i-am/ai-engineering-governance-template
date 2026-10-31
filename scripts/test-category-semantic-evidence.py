@@ -16,7 +16,7 @@ SPEC.loader.exec_module(INDEXER)
 
 
 class SemanticEvidenceTests(unittest.TestCase):
-    def fixture(self):
+    def fixture(self,unrestricted=False):
         names = [f'skill-{n:03}' for n in range(600)] + ['expert-first','expert-second','expert-target']
         values = np.array([.9-i*.0005 for i in range(600)]+[.4,.35,.3],dtype=np.float32)
         matrix = np.column_stack((values,-values))
@@ -24,7 +24,7 @@ class SemanticEvidenceTests(unittest.TestCase):
             _ensure_matrix=lambda:None,encode=lambda q:np.array([1,0] if q=='positive' else [0,1]))
         tools = {n:SimpleNamespace(metadata={'kind':'expert' if n.startswith('expert') else 'skill'}) for n in names}
         prefilter = SimpleNamespace(_tools=tools,_max_pool=500,_embedding_index=index,
-            candidate_pool=lambda *a,**kw:set(names[:499]+['expert-target']))
+            candidate_pool=lambda *a,**kw:None if unrestricted else set(names[:499]+['expert-target']))
         fallback = lambda q,top_k,restrict=None:{'fallback':1.0}
         engine = SimpleNamespace(_get_prefilter=lambda:prefilter,_compute_embedding_scores=fallback,
             _codex_category_slots=ContextVar('test_slots',default=None))
@@ -66,6 +66,21 @@ class SemanticEvidenceTests(unittest.TestCase):
     def test_non_category_requests_keep_the_owning_library_behavior(self):
         engine,_=self.fixture()
         self.assertEqual(engine._compute_embedding_scores('positive',8,{'expert-target'}),{'fallback':1.0})
+
+    def test_weak_category_signal_still_uses_the_semantic_pool(self):
+        engine,prefilter=self.fixture(unrestricted=True)
+        pool,scores=self.request(engine,prefilter,'positive')
+        self.assertIsNotNone(pool,'Known semantic evidence must not trigger full-corpus scoring')
+        self.assertLessEqual(len(pool),500)
+        self.assertTrue({'expert-first','expert-second','expert-target'}.issubset(pool))
+        self.assertIn('skill-000',pool)
+        self.assertEqual(set(scores),pool)
+
+    def test_absent_semantic_evidence_does_not_invent_a_pool(self):
+        engine,prefilter=self.fixture(unrestricted=True)
+        prefilter._embedding_index._matrix=None
+        pool,_=self.request(engine,prefilter,'positive')
+        self.assertIsNone(pool)
 
 
 if __name__=='__main__':unittest.main()

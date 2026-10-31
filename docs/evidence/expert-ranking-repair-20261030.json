@@ -1,0 +1,2180 @@
+{
+  "schema": "expert-ranking-repair-evidence/v1",
+  "scope": "Directed development diagnostics; no population accuracy or execution-success claim",
+  "runs": [
+    {
+      "artifact": "mlx4b-translated512.json",
+      "modelRevision": "b5d88f1fe49b50d2ac01b4692ca2d387f14f9c72",
+      "documentsSha256": "2d48f69ba7fececa603e32cfa32ce973a8e272c1625315496ecd171794f4fe86",
+      "graphSha256": null,
+      "maxLength": 512,
+      "rows": [
+        {
+          "case": "metric-audit",
+          "ms": 431.6112080050516,
+          "returned": [
+            {
+              "name": "skill-smith",
+              "score": 0.654558539390564
+            },
+            {
+              "name": "skillhub-charity-expert-team",
+              "score": 0.6496485471725464
+            },
+            {
+              "name": "rum-fullstack-team",
+              "score": 0.5985097885131836
+            },
+            {
+              "name": "test-results-analyst",
+              "score": 0.5907003879547119
+            }
+          ]
+        },
+        {
+          "case": "incident-followup",
+          "ms": 428.860166000959,
+          "returned": [
+            {
+              "name": "incident-response-commander",
+              "score": 0.5595712065696716
+            },
+            {
+              "name": "soe",
+              "score": 0.5457103252410889
+            },
+            {
+              "name": "rum-fullstack-team",
+              "score": 0.531193733215332
+            },
+            {
+              "name": "tencent-security-expert",
+              "score": 0.5181361436843872
+            }
+          ]
+        },
+        {
+          "case": "security-followup",
+          "ms": 317.10124999517575,
+          "returned": [
+            {
+              "name": "security-engineer",
+              "score": 0.619997501373291
+            },
+            {
+              "name": "soe",
+              "score": 0.607684850692749
+            },
+            {
+              "name": "tencent-security-expert",
+              "score": 0.5898986458778381
+            },
+            {
+              "name": "blockchain-security-auditor",
+              "score": 0.5594708323478699
+            }
+          ]
+        },
+        {
+          "case": "journal-followup",
+          "ms": 319.87808399571804,
+          "returned": [
+            {
+              "name": "academic-journal-selector",
+              "score": 0.7266204357147217
+            },
+            {
+              "name": "thesis-writing-mentor",
+              "score": 0.4987865686416626
+            },
+            {
+              "name": "paper-topic-selection",
+              "score": 0.47415226697921753
+            },
+            {
+              "name": "long-manuscript-expert",
+              "score": 0.4610007107257843
+            }
+          ]
+        },
+        {
+          "case": "database-followup",
+          "ms": 322.64849999774015,
+          "returned": [
+            {
+              "name": "database-operations",
+              "score": 0.6744703054428101
+            },
+            {
+              "name": "database-optimization-expert",
+              "score": 0.6474261283874512
+            },
+            {
+              "name": "data",
+              "score": 0.49088484048843384
+            },
+            {
+              "name": "apm-performance-expert",
+              "score": 0.4379504323005676
+            }
+          ]
+        },
+        {
+          "case": "exam-followup",
+          "ms": 258.9654590046848,
+          "returned": [
+            {
+              "name": "perf-management-expert",
+              "score": 0.6033114194869995
+            },
+            {
+              "name": "exam-preparation-planner",
+              "score": 0.5974618792533875
+            },
+            {
+              "name": "sprint-priority-manager",
+              "score": 0.5452070236206055
+            },
+            {
+              "name": "skill-smith",
+              "score": 0.5390693545341492
+            }
+          ]
+        },
+        {
+          "case": "standalone-reset",
+          "ms": 223.31908300111536,
+          "returned": [
+            {
+              "name": "tripstar-agent",
+              "score": 0.6292848587036133
+            },
+            {
+              "name": "tc-chengxin-travel-expert",
+              "score": 0.6004642248153687
+            },
+            {
+              "name": "lazy-travel-planner",
+              "score": 0.5410854816436768
+            },
+            {
+              "name": "xiaot",
+              "score": 0.5195859670639038
+            }
+          ]
+        },
+        {
+          "case": "explicit-reset",
+          "ms": 241.22020800132304,
+          "returned": [
+            {
+              "name": "database-optimization-expert",
+              "score": 0.7205840349197388
+            },
+            {
+              "name": "database-operations",
+              "score": 0.688986599445343
+            },
+            {
+              "name": "data",
+              "score": 0.45293161273002625
+            },
+            {
+              "name": "apm-performance-expert",
+              "score": 0.428922563791275
+            }
+          ]
+        },
+        {
+          "case": "authz-new",
+          "ms": 246.06504200346535,
+          "returned": [
+            {
+              "name": "soe",
+              "score": 0.5697143077850342
+            },
+            {
+              "name": "security-engineer",
+              "score": 0.5493489503860474
+            },
+            {
+              "name": "blockchain-security-auditor",
+              "score": 0.5419658422470093
+            },
+            {
+              "name": "tencent-security-expert",
+              "score": 0.5280268788337708
+            }
+          ]
+        },
+        {
+          "case": "incident-new",
+          "ms": 242.19199999788543,
+          "returned": [
+            {
+              "name": "incident-response-commander",
+              "score": 0.6152245998382568
+            },
+            {
+              "name": "engineering-assurance-team",
+              "score": 0.5143778324127197
+            },
+            {
+              "name": "soe",
+              "score": 0.4949326813220978
+            },
+            {
+              "name": "skillhub-charity-expert-team",
+              "score": 0.4829685091972351
+            }
+          ]
+        },
+        {
+          "case": "ranking-new",
+          "ms": 235.08837500412483,
+          "returned": [
+            {
+              "name": "model-quality-assurance-expert",
+              "score": 0.6810214519500732
+            },
+            {
+              "name": "empirical-research-team",
+              "score": 0.5866251587867737
+            },
+            {
+              "name": "ab-experiment-analyst",
+              "score": 0.522042989730835
+            },
+            {
+              "name": "ai-engineer",
+              "score": 0.5196608304977417
+            }
+          ]
+        },
+        {
+          "case": "sql-new",
+          "ms": 229.8846669946215,
+          "returned": [
+            {
+              "name": "database-optimization-expert",
+              "score": 0.6514198780059814
+            },
+            {
+              "name": "database-operations",
+              "score": 0.6176654696464539
+            },
+            {
+              "name": "apm-performance-expert",
+              "score": 0.4682004153728485
+            },
+            {
+              "name": "data",
+              "score": 0.44702351093292236
+            }
+          ]
+        },
+        {
+          "case": "journal-new",
+          "ms": 232.17841700534336,
+          "returned": [
+            {
+              "name": "academic-journal-selector",
+              "score": 0.7139115929603577
+            },
+            {
+              "name": "thesis-writing-mentor",
+              "score": 0.5242313146591187
+            },
+            {
+              "name": "long-manuscript-expert",
+              "score": 0.5010513663291931
+            },
+            {
+              "name": "empirical-research-team",
+              "score": 0.49224257469177246
+            }
+          ]
+        },
+        {
+          "case": "exam-new",
+          "ms": 228.39750000275671,
+          "returned": [
+            {
+              "name": "exam-preparation-planner",
+              "score": 0.5094054937362671
+            },
+            {
+              "name": "study-planner",
+              "score": 0.4702465236186981
+            },
+            {
+              "name": "study-fortune-compass",
+              "score": 0.461708664894104
+            },
+            {
+              "name": "perf-management-expert",
+              "score": 0.40742725133895874
+            }
+          ]
+        },
+        {
+          "case": "rtc-domain",
+          "ms": 220.64379099901998,
+          "returned": [
+            {
+              "name": "sdk-log-expert",
+              "score": 0.604991614818573
+            },
+            {
+              "name": "tencent-rtc-expert",
+              "score": 0.5980926752090454
+            },
+            {
+              "name": "rum-fullstack-team",
+              "score": 0.48787277936935425
+            },
+            {
+              "name": "apm-performance-expert",
+              "score": 0.45452141761779785
+            }
+          ]
+        },
+        {
+          "case": "security-domain",
+          "ms": 223.52329199929954,
+          "returned": [
+            {
+              "name": "soe",
+              "score": 0.6315051317214966
+            },
+            {
+              "name": "tencent-security-expert",
+              "score": 0.6223447918891907
+            },
+            {
+              "name": "andon-q-expert",
+              "score": 0.5250350832939148
+            },
+            {
+              "name": "txzhaopin",
+              "score": 0.5246050357818604
+            }
+          ]
+        },
+        {
+          "case": "hiring-domain",
+          "ms": 228.65641699900152,
+          "returned": [
+            {
+              "name": "txzhaopin",
+              "score": 0.5676515102386475
+            },
+            {
+              "name": "backend-architect",
+              "score": 0.5411835312843323
+            },
+            {
+              "name": "ihr-ai-interviewer",
+              "score": 0.5123496055603027
+            },
+            {
+              "name": "recruitment-expert",
+              "score": 0.47901004552841187
+            }
+          ]
+        },
+        {
+          "case": "paper-news",
+          "ms": 342.9664579962264,
+          "returned": [
+            {
+              "name": "arxiv-watcher",
+              "score": 0.6886146068572998
+            },
+            {
+              "name": "empirical-research-team",
+              "score": 0.629534900188446
+            },
+            {
+              "name": "aihot",
+              "score": 0.6178205013275146
+            },
+            {
+              "name": "llm-wiki",
+              "score": 0.5856044292449951
+            }
+          ]
+        },
+        {
+          "case": "qa-screenshots",
+          "ms": 230.93695800343994,
+          "returned": [
+            {
+              "name": "webapp-testing",
+              "score": 0.6408313512802124
+            },
+            {
+              "name": "ui-designer",
+              "score": 0.5831049084663391
+            },
+            {
+              "name": "evidence-collector",
+              "score": 0.5821794271469116
+            },
+            {
+              "name": "test-results-analyst",
+              "score": 0.5785877704620361
+            }
+          ]
+        },
+        {
+          "case": "db-english",
+          "ms": 222.371750001912,
+          "returned": [
+            {
+              "name": "database-operations",
+              "score": 0.660944938659668
+            },
+            {
+              "name": "database-optimization-expert",
+              "score": 0.6540883183479309
+            },
+            {
+              "name": "data",
+              "score": 0.5027773380279541
+            },
+            {
+              "name": "apm-performance-expert",
+              "score": 0.44196993112564087
+            }
+          ]
+        }
+      ],
+      "productionChanged": false
+    },
+    {
+      "artifact": "mlx4b-contrast512.json",
+      "modelRevision": "b5d88f1fe49b50d2ac01b4692ca2d387f14f9c72",
+      "documentsSha256": "2d48f69ba7fececa603e32cfa32ce973a8e272c1625315496ecd171794f4fe86",
+      "graphSha256": null,
+      "maxLength": 512,
+      "rows": [
+        {
+          "case": "application-authorization",
+          "ms": 311.20158299745526,
+          "returned": [
+            {
+              "name": "tencent-security-expert",
+              "score": 0.6188117265701294
+            },
+            {
+              "name": "soe",
+              "score": 0.6083940863609314
+            },
+            {
+              "name": "security-engineer",
+              "score": 0.5616334080696106
+            },
+            {
+              "name": "blockchain-security-auditor",
+              "score": 0.5417078137397766
+            }
+          ]
+        },
+        {
+          "case": "internal-security-policy",
+          "ms": 218.93400000408292,
+          "returned": [
+            {
+              "name": "soe",
+              "score": 0.5785444974899292
+            },
+            {
+              "name": "tencent-security-expert",
+              "score": 0.5552783012390137
+            },
+            {
+              "name": "andon-q-expert",
+              "score": 0.514938235282898
+            },
+            {
+              "name": "migraq-expert",
+              "score": 0.5008147358894348
+            }
+          ]
+        },
+        {
+          "case": "production-incident",
+          "ms": 219.45012499782024,
+          "returned": [
+            {
+              "name": "incident-response-commander",
+              "score": 0.6134828329086304
+            },
+            {
+              "name": "engineering-assurance-team",
+              "score": 0.565050482749939
+            },
+            {
+              "name": "soe",
+              "score": 0.535938024520874
+            },
+            {
+              "name": "rum-fullstack-team",
+              "score": 0.5238887071609497
+            }
+          ]
+        },
+        {
+          "case": "payment-reconciliation",
+          "ms": 218.77704100188566,
+          "returned": [
+            {
+              "name": "finance",
+              "score": 0.6077967882156372
+            },
+            {
+              "name": "gl-reconciler",
+              "score": 0.5918411016464233
+            },
+            {
+              "name": "smb-finance",
+              "score": 0.5728340744972229
+            },
+            {
+              "name": "month-end-closer",
+              "score": 0.5723153948783875
+            }
+          ]
+        },
+        {
+          "case": "model-evaluation",
+          "ms": 309.4150000033551,
+          "returned": [
+            {
+              "name": "empirical-research-team",
+              "score": 0.5324362516403198
+            },
+            {
+              "name": "ab-experiment-analyst",
+              "score": 0.5280002355575562
+            },
+            {
+              "name": "experiment-tracking-manager",
+              "score": 0.5169181823730469
+            },
+            {
+              "name": "user-experience-researcher",
+              "score": 0.49578553438186646
+            }
+          ]
+        },
+        {
+          "case": "candidate-screening",
+          "ms": 219.21233300236054,
+          "returned": [
+            {
+              "name": "txzhaopin",
+              "score": 0.61194908618927
+            },
+            {
+              "name": "ihr-ai-interviewer",
+              "score": 0.5860521793365479
+            },
+            {
+              "name": "campus-job-search-coach",
+              "score": 0.5310205221176147
+            },
+            {
+              "name": "backend-architect",
+              "score": 0.5307201147079468
+            }
+          ]
+        },
+        {
+          "case": "candidate-coaching",
+          "ms": 218.46041700337082,
+          "returned": [
+            {
+              "name": "campus-job-search-coach",
+              "score": 0.6038467884063721
+            },
+            {
+              "name": "interview-simulator",
+              "score": 0.5870033502578735
+            },
+            {
+              "name": "txzhaopin",
+              "score": 0.5726066827774048
+            },
+            {
+              "name": "frontend-developer",
+              "score": 0.5586176514625549
+            }
+          ]
+        },
+        {
+          "case": "exam-recovery",
+          "ms": 219.34699999837903,
+          "returned": [
+            {
+              "name": "exam-preparation-planner",
+              "score": 0.6276674866676331
+            },
+            {
+              "name": "study-planner",
+              "score": 0.549081563949585
+            },
+            {
+              "name": "study-fortune-compass",
+              "score": 0.531074047088623
+            },
+            {
+              "name": "perf-management-expert",
+              "score": 0.49573665857315063
+            }
+          ]
+        },
+        {
+          "case": "database-plan",
+          "ms": 220.57612499338575,
+          "returned": [
+            {
+              "name": "database-optimization-expert",
+              "score": 0.6810103058815002
+            },
+            {
+              "name": "database-operations",
+              "score": 0.6717911958694458
+            },
+            {
+              "name": "data",
+              "score": 0.46782785654067993
+            },
+            {
+              "name": "apm-performance-expert",
+              "score": 0.46128368377685547
+            }
+          ]
+        },
+        {
+          "case": "browser-evidence",
+          "ms": 219.5584159999271,
+          "returned": [
+            {
+              "name": "webapp-testing",
+              "score": 0.6135422587394714
+            },
+            {
+              "name": "evidence-collector",
+              "score": 0.5678358674049377
+            },
+            {
+              "name": "rum-fullstack-team",
+              "score": 0.5585412383079529
+            },
+            {
+              "name": "aladin-test-design",
+              "score": 0.5517637133598328
+            }
+          ]
+        },
+        {
+          "case": "journal-scope",
+          "ms": 219.18420799920568,
+          "returned": [
+            {
+              "name": "academic-journal-selector",
+              "score": 0.7336649894714355
+            },
+            {
+              "name": "thesis-writing-mentor",
+              "score": 0.5448369383811951
+            },
+            {
+              "name": "long-manuscript-expert",
+              "score": 0.5417559146881104
+            },
+            {
+              "name": "empirical-research-team",
+              "score": 0.5125271677970886
+            }
+          ]
+        },
+        {
+          "case": "paper-monitoring",
+          "ms": 219.4640830057324,
+          "returned": [
+            {
+              "name": "arxiv-watcher",
+              "score": 0.5582417249679565
+            },
+            {
+              "name": "empirical-research-team",
+              "score": 0.47074371576309204
+            },
+            {
+              "name": "aihot",
+              "score": 0.4701230525970459
+            },
+            {
+              "name": "llm-wiki",
+              "score": 0.4564141035079956
+            }
+          ]
+        }
+      ],
+      "productionChanged": false
+    },
+    {
+      "artifact": "qwen-shortscope50.json",
+      "modelRevision": "e61197ed45024b0ed8a2d74b80b4d909f1255473",
+      "documentsSha256": "2d48f69ba7fececa603e32cfa32ce973a8e272c1625315496ecd171794f4fe86",
+      "graphSha256": "a58539afdd97d6395c7075c1341c47cc211cf691873cee5b22e9bb46adfd510e",
+      "maxLength": 384,
+      "rows": [
+        {
+          "case": "metric-audit",
+          "ms": 8966.44654100237,
+          "returned": [
+            {
+              "name": "model-quality-assurance-expert",
+              "score": 1.1796875
+            },
+            {
+              "name": "tool-evaluation-expert",
+              "score": 0.46875
+            },
+            {
+              "name": "test-results-analyst",
+              "score": -1.890625
+            },
+            {
+              "name": "skill-smith",
+              "score": -2.25
+            }
+          ]
+        },
+        {
+          "case": "incident-followup",
+          "ms": 6803.14566600282,
+          "returned": [
+            {
+              "name": "incident-response-commander",
+              "score": 5.34375
+            },
+            {
+              "name": "omics-diagnosis-expert",
+              "score": -1.2578125
+            },
+            {
+              "name": "sre-expert",
+              "score": -3.8515625
+            },
+            {
+              "name": "site-reliability-engineer",
+              "score": -4.5234375
+            }
+          ]
+        },
+        {
+          "case": "security-followup",
+          "ms": 7539.849167005741,
+          "returned": [
+            {
+              "name": "security-engineer",
+              "score": 7.203125
+            },
+            {
+              "name": "compliance-auditor",
+              "score": 1.8046875
+            },
+            {
+              "name": "soe",
+              "score": -0.71875
+            },
+            {
+              "name": "tencent-security-expert",
+              "score": -3.234375
+            }
+          ]
+        },
+        {
+          "case": "journal-followup",
+          "ms": 7201.714000002539,
+          "returned": [
+            {
+              "name": "academic-journal-selector",
+              "score": 7.2421875
+            },
+            {
+              "name": "long-manuscript-expert",
+              "score": -2.5703125
+            },
+            {
+              "name": "test-results-analyst",
+              "score": -5.55078125
+            },
+            {
+              "name": "empirical-research-team",
+              "score": -5.828125
+            }
+          ]
+        },
+        {
+          "case": "database-followup",
+          "ms": 6776.498333994823,
+          "returned": [
+            {
+              "name": "database-optimization-expert",
+              "score": 6.875
+            },
+            {
+              "name": "database-operations",
+              "score": 6.3203125
+            },
+            {
+              "name": "performance-testing-expert",
+              "score": -4.265625
+            },
+            {
+              "name": "tool-evaluation-expert",
+              "score": -5.3828125
+            }
+          ]
+        },
+        {
+          "case": "exam-followup",
+          "ms": 6807.462167002086,
+          "returned": [
+            {
+              "name": "study-planner",
+              "score": 3.8125
+            },
+            {
+              "name": "exam-preparation-planner",
+              "score": -1.6875
+            },
+            {
+              "name": "worldcup-buddy",
+              "score": -2.1484375
+            },
+            {
+              "name": "sprint-priority-manager",
+              "score": -2.2890625
+            }
+          ]
+        },
+        {
+          "case": "authz-new",
+          "ms": 7021.730417000072,
+          "returned": [
+            {
+              "name": "security-engineer",
+              "score": 6.5859375
+            },
+            {
+              "name": "soe",
+              "score": 2.8984375
+            },
+            {
+              "name": "compliance-auditor",
+              "score": -1.59375
+            },
+            {
+              "name": "tencent-security-expert",
+              "score": -1.6875
+            }
+          ]
+        },
+        {
+          "case": "incident-new",
+          "ms": 6197.40191699384,
+          "returned": [
+            {
+              "name": "incident-response-commander",
+              "score": 4.96875
+            },
+            {
+              "name": "site-reliability-engineer",
+              "score": 2.0859375
+            },
+            {
+              "name": "omics-diagnosis-expert",
+              "score": -0.4375
+            },
+            {
+              "name": "sre-expert",
+              "score": -3.0078125
+            }
+          ]
+        },
+        {
+          "case": "ranking-new",
+          "ms": 6454.050833002839,
+          "returned": [
+            {
+              "name": "model-quality-assurance-expert",
+              "score": 8.921875
+            },
+            {
+              "name": "test-results-analyst",
+              "score": 2.25
+            },
+            {
+              "name": "empirical-research-team",
+              "score": 0.8515625
+            },
+            {
+              "name": "feedback-synthesis-analyst",
+              "score": -1.828125
+            }
+          ]
+        },
+        {
+          "case": "sql-new",
+          "ms": 6788.870541000506,
+          "returned": [
+            {
+              "name": "database-optimization-expert",
+              "score": 5.5078125
+            },
+            {
+              "name": "database-operations",
+              "score": 4.8359375
+            },
+            {
+              "name": "performance-testing-expert",
+              "score": -4.484375
+            },
+            {
+              "name": "tool-evaluation-expert",
+              "score": -5.234375
+            }
+          ]
+        },
+        {
+          "case": "journal-new",
+          "ms": 7246.491375000915,
+          "returned": [
+            {
+              "name": "academic-journal-selector",
+              "score": 6.5234375
+            },
+            {
+              "name": "thesis-writing-mentor",
+              "score": -2.1953125
+            },
+            {
+              "name": "long-manuscript-expert",
+              "score": -2.984375
+            },
+            {
+              "name": "empirical-research-team",
+              "score": -4.609375
+            }
+          ]
+        },
+        {
+          "case": "exam-new",
+          "ms": 6772.400333000405,
+          "returned": [
+            {
+              "name": "exam-preparation-planner",
+              "score": 5.5546875
+            },
+            {
+              "name": "study-fortune-compass",
+              "score": 1.7734375
+            },
+            {
+              "name": "study-planner",
+              "score": -0.0390625
+            },
+            {
+              "name": "vocab-craft-expert",
+              "score": -1.8125
+            }
+          ]
+        },
+        {
+          "case": "rtc-domain",
+          "ms": 6227.828333998332,
+          "returned": [
+            {
+              "name": "sdk-log-expert",
+              "score": 4.7578125
+            },
+            {
+              "name": "tencent-rtc-expert",
+              "score": 4.40625
+            },
+            {
+              "name": "omics-diagnosis-expert",
+              "score": -0.8359375
+            },
+            {
+              "name": "api-testing-expert",
+              "score": -6.83984375
+            }
+          ]
+        },
+        {
+          "case": "security-domain",
+          "ms": 6238.736874998722,
+          "returned": [
+            {
+              "name": "tencent-security-expert",
+              "score": 8.25
+            },
+            {
+              "name": "compliance-auditor",
+              "score": 3.0234375
+            },
+            {
+              "name": "yunzhi-qa-assistant",
+              "score": 1.15625
+            },
+            {
+              "name": "soe",
+              "score": 0.9375
+            }
+          ]
+        },
+        {
+          "case": "hiring-domain",
+          "ms": 6316.780542001652,
+          "returned": [
+            {
+              "name": "campus-job-search-coach",
+              "score": 0.390625
+            },
+            {
+              "name": "txzhaopin",
+              "score": -0.140625
+            },
+            {
+              "name": "ihr-ai-interviewer",
+              "score": -1.6328125
+            },
+            {
+              "name": "recruitment-expert",
+              "score": -2.171875
+            }
+          ]
+        },
+        {
+          "case": "paper-news",
+          "ms": 6871.713915999862,
+          "returned": [
+            {
+              "name": "arxiv-watcher",
+              "score": 7.2890625
+            },
+            {
+              "name": "aihot",
+              "score": 3.390625
+            },
+            {
+              "name": "empirical-research-team",
+              "score": -2.1875
+            },
+            {
+              "name": "thesis-writing-mentor",
+              "score": -3.765625
+            }
+          ]
+        },
+        {
+          "case": "qa-screenshots",
+          "ms": 6915.259416993649,
+          "returned": [
+            {
+              "name": "webapp-testing",
+              "score": 3.5234375
+            },
+            {
+              "name": "evidence-collector",
+              "score": 1.609375
+            },
+            {
+              "name": "user-experience-researcher",
+              "score": -0.0546875
+            },
+            {
+              "name": "frontend-developer",
+              "score": -0.9296875
+            }
+          ]
+        },
+        {
+          "case": "standalone-reset",
+          "ms": 9227.71324999485,
+          "returned": [
+            {
+              "name": "tripstar-agent",
+              "score": -0.34375
+            },
+            {
+              "name": "tc-chengxin-travel-expert",
+              "score": -4.0390625
+            },
+            {
+              "name": "meituan-living-assistant",
+              "score": -4.1171875
+            },
+            {
+              "name": "xiaot",
+              "score": -5.078125
+            }
+          ]
+        },
+        {
+          "case": "explicit-reset",
+          "ms": 7136.873374998686,
+          "returned": [
+            {
+              "name": "database-optimization-expert",
+              "score": 6.953125
+            },
+            {
+              "name": "database-operations",
+              "score": 5.4765625
+            },
+            {
+              "name": "data",
+              "score": -5.0234375
+            },
+            {
+              "name": "ai-data-copilot",
+              "score": -5.453125
+            }
+          ]
+        },
+        {
+          "case": "db-english",
+          "ms": 8351.774542003113,
+          "returned": [
+            {
+              "name": "database-optimization-expert",
+              "score": 5.875
+            },
+            {
+              "name": "database-operations",
+              "score": 5.859375
+            },
+            {
+              "name": "performance-testing-expert",
+              "score": -1.75
+            },
+            {
+              "name": "test-results-analyst",
+              "score": -3.796875
+            }
+          ]
+        }
+      ],
+      "productionChanged": false
+    },
+    {
+      "artifact": "gte-shortscope50.json",
+      "modelRevision": "8215cf04918ba6f7b6a62bb44238ce2953d8831c",
+      "documentsSha256": null,
+      "graphSha256": "a58539afdd97d6395c7075c1341c47cc211cf691873cee5b22e9bb46adfd510e",
+      "maxLength": 512,
+      "rows": [
+        {
+          "case": "metric-audit",
+          "ms": 2609.131167002488,
+          "returned": [
+            {
+              "name": "skill-smith",
+              "score": 0.196044921875
+            },
+            {
+              "name": "txzhaopin",
+              "score": 0.015899658203125
+            },
+            {
+              "name": "tdx-stock-diagnostician",
+              "score": -0.072509765625
+            },
+            {
+              "name": "model-quality-assurance-expert",
+              "score": -0.175048828125
+            }
+          ]
+        },
+        {
+          "case": "incident-followup",
+          "ms": 2412.774124997668,
+          "returned": [
+            {
+              "name": "sre-expert",
+              "score": -0.38037109375
+            },
+            {
+              "name": "omics-diagnosis-expert",
+              "score": -0.444580078125
+            },
+            {
+              "name": "incident-response-commander",
+              "score": -0.468994140625
+            },
+            {
+              "name": "cat-network-quality-analyst",
+              "score": -0.54931640625
+            }
+          ]
+        },
+        {
+          "case": "security-followup",
+          "ms": 2538.3291250036564,
+          "returned": [
+            {
+              "name": "threat-detection-engineer",
+              "score": -0.292236328125
+            },
+            {
+              "name": "security-engineer",
+              "score": -0.353515625
+            },
+            {
+              "name": "cpq",
+              "score": -0.55224609375
+            },
+            {
+              "name": "anti-scam-agent",
+              "score": -0.6044921875
+            }
+          ]
+        },
+        {
+          "case": "journal-followup",
+          "ms": 1993.8722910010256,
+          "returned": [
+            {
+              "name": "academic-journal-selector",
+              "score": 0.1585693359375
+            },
+            {
+              "name": "patient-education-content-review-word-assistant",
+              "score": -0.46337890625
+            },
+            {
+              "name": "long-manuscript-expert",
+              "score": -0.517578125
+            },
+            {
+              "name": "aihot",
+              "score": -0.544921875
+            }
+          ]
+        },
+        {
+          "case": "database-followup",
+          "ms": 1803.7679999979446,
+          "returned": [
+            {
+              "name": "database-operations",
+              "score": -0.041900634765625
+            },
+            {
+              "name": "database-optimization-expert",
+              "score": -0.47119140625
+            },
+            {
+              "name": "cat-network-quality-analyst",
+              "score": -0.482177734375
+            },
+            {
+              "name": "search-term-analyst",
+              "score": -0.56689453125
+            }
+          ]
+        },
+        {
+          "case": "exam-followup",
+          "ms": 1713.7844169992604,
+          "returned": [
+            {
+              "name": "study-planner",
+              "score": -0.218994140625
+            },
+            {
+              "name": "exam-preparation-planner",
+              "score": -0.51953125
+            },
+            {
+              "name": "aihot",
+              "score": -0.92724609375
+            },
+            {
+              "name": "fbsir-industry-scene-researcher",
+              "score": -1.08203125
+            }
+          ]
+        },
+        {
+          "case": "authz-new",
+          "ms": 2082.545959005074,
+          "returned": [
+            {
+              "name": "tianyu-account-guardian",
+              "score": -0.5537109375
+            },
+            {
+              "name": "malaysia-legal",
+              "score": -0.8828125
+            },
+            {
+              "name": "soe",
+              "score": -0.95166015625
+            },
+            {
+              "name": "fbsir-board-secretary-assistant",
+              "score": -1.0439453125
+            }
+          ]
+        },
+        {
+          "case": "incident-new",
+          "ms": 2096.0115839989157,
+          "returned": [
+            {
+              "name": "incident-response-commander",
+              "score": -0.71630859375
+            },
+            {
+              "name": "cat-network-quality-analyst",
+              "score": -0.8154296875
+            },
+            {
+              "name": "tianyu-account-guardian",
+              "score": -0.8154296875
+            },
+            {
+              "name": "sre-expert",
+              "score": -0.9169921875
+            }
+          ]
+        },
+        {
+          "case": "ranking-new",
+          "ms": 1278.581792001205,
+          "returned": [
+            {
+              "name": "model-quality-assurance-expert",
+              "score": -0.0953369140625
+            },
+            {
+              "name": "cat-network-quality-analyst",
+              "score": -0.66943359375
+            },
+            {
+              "name": "tool-evaluation-expert",
+              "score": -0.72021484375
+            },
+            {
+              "name": "topic-evaluator",
+              "score": -0.740234375
+            }
+          ]
+        },
+        {
+          "case": "sql-new",
+          "ms": 1564.0006249959697,
+          "returned": [
+            {
+              "name": "database-operations",
+              "score": -0.0830078125
+            },
+            {
+              "name": "cat-network-quality-analyst",
+              "score": -0.418212890625
+            },
+            {
+              "name": "sre-expert",
+              "score": -0.60107421875
+            },
+            {
+              "name": "data",
+              "score": -0.625
+            }
+          ]
+        },
+        {
+          "case": "journal-new",
+          "ms": 1517.1072079974692,
+          "returned": [
+            {
+              "name": "academic-journal-selector",
+              "score": 0.08837890625
+            },
+            {
+              "name": "viral-topic-master",
+              "score": -0.419921875
+            },
+            {
+              "name": "kdocs-knowledge-collector",
+              "score": -0.55517578125
+            },
+            {
+              "name": "patient-education-content-review-word-assistant",
+              "score": -0.564453125
+            }
+          ]
+        },
+        {
+          "case": "exam-new",
+          "ms": 1607.1474160053185,
+          "returned": [
+            {
+              "name": "liuxue-yanxue-expert",
+              "score": -0.30224609375
+            },
+            {
+              "name": "vocab-craft-expert",
+              "score": -0.43359375
+            },
+            {
+              "name": "exam-preparation-planner",
+              "score": -0.462158203125
+            },
+            {
+              "name": "study-fortune-compass",
+              "score": -0.626953125
+            }
+          ]
+        },
+        {
+          "case": "rtc-domain",
+          "ms": 1936.537124995084,
+          "returned": [
+            {
+              "name": "sdk-log-expert",
+              "score": -0.15576171875
+            },
+            {
+              "name": "omics-diagnosis-expert",
+              "score": -0.250732421875
+            },
+            {
+              "name": "tencent-rtc-expert",
+              "score": -0.33251953125
+            },
+            {
+              "name": "rum-fullstack-team",
+              "score": -0.52099609375
+            }
+          ]
+        },
+        {
+          "case": "security-domain",
+          "ms": 1812.9670420021284,
+          "returned": [
+            {
+              "name": "tencent-security-expert",
+              "score": -0.11181640625
+            },
+            {
+              "name": "tianyu-account-guardian",
+              "score": -0.1788330078125
+            },
+            {
+              "name": "yunzhi-qa-assistant",
+              "score": -0.33349609375
+            },
+            {
+              "name": "soe",
+              "score": -0.378173828125
+            }
+          ]
+        },
+        {
+          "case": "hiring-domain",
+          "ms": 1416.9340410007862,
+          "returned": [
+            {
+              "name": "txzhaopin",
+              "score": -0.344970703125
+            },
+            {
+              "name": "ihr-ai-interviewer",
+              "score": -0.50634765625
+            },
+            {
+              "name": "fbsir-industry-scene-researcher",
+              "score": -0.79150390625
+            },
+            {
+              "name": "qingflow-hr-expert",
+              "score": -0.923828125
+            }
+          ]
+        },
+        {
+          "case": "paper-news",
+          "ms": 2000.8708340028534,
+          "returned": [
+            {
+              "name": "arxiv-watcher",
+              "score": -0.043182373046875
+            },
+            {
+              "name": "viral-topic-master",
+              "score": -0.337890625
+            },
+            {
+              "name": "kdocs-knowledge-collector",
+              "score": -0.371826171875
+            },
+            {
+              "name": "aihot",
+              "score": -0.3984375
+            }
+          ]
+        },
+        {
+          "case": "qa-screenshots",
+          "ms": 1346.316791998106,
+          "returned": [
+            {
+              "name": "evidence-collector",
+              "score": -0.09039306640625
+            },
+            {
+              "name": "frontend-developer",
+              "score": -0.2880859375
+            },
+            {
+              "name": "webapp-testing",
+              "score": -0.393798828125
+            },
+            {
+              "name": "vibeknow-design-video",
+              "score": -0.414306640625
+            }
+          ]
+        },
+        {
+          "case": "standalone-reset",
+          "ms": 2776.221959000395,
+          "returned": [
+            {
+              "name": "tc-chengxin-travel-expert",
+              "score": -0.3115234375
+            },
+            {
+              "name": "tripstar-agent",
+              "score": -0.5322265625
+            },
+            {
+              "name": "meituan-living-assistant",
+              "score": -0.65087890625
+            },
+            {
+              "name": "liuxue-yanxue-expert",
+              "score": -0.95166015625
+            }
+          ]
+        },
+        {
+          "case": "explicit-reset",
+          "ms": 1623.1405409998843,
+          "returned": [
+            {
+              "name": "database-operations",
+              "score": -0.07049560546875
+            },
+            {
+              "name": "database-optimization-expert",
+              "score": -0.9052734375
+            },
+            {
+              "name": "cat-network-quality-analyst",
+              "score": -1.0458984375
+            },
+            {
+              "name": "kdocs-knowledge-collector",
+              "score": -1.09765625
+            }
+          ]
+        },
+        {
+          "case": "db-english",
+          "ms": 2582.91887499945,
+          "returned": [
+            {
+              "name": "database-operations",
+              "score": -0.044952392578125
+            },
+            {
+              "name": "database-optimization-expert",
+              "score": -0.7080078125
+            },
+            {
+              "name": "inspection-expert",
+              "score": -0.787109375
+            },
+            {
+              "name": "wentu",
+              "score": -0.80126953125
+            }
+          ]
+        }
+      ],
+      "productionChanged": false
+    },
+    {
+      "artifact": "mmarco-shortscope50.json",
+      "modelRevision": "1427fd652930e4ba29e8149678df786c240d8825",
+      "documentsSha256": null,
+      "graphSha256": "a58539afdd97d6395c7075c1341c47cc211cf691873cee5b22e9bb46adfd510e",
+      "maxLength": 512,
+      "rows": [
+        {
+          "case": "metric-audit",
+          "ms": 816.0328330050106,
+          "returned": [
+            {
+              "name": "skill-smith",
+              "score": 0.53759765625
+            },
+            {
+              "name": "txzhaopin",
+              "score": -2.111328125
+            },
+            {
+              "name": "skillhub-charity-expert-team",
+              "score": -3.458984375
+            },
+            {
+              "name": "nuwa",
+              "score": -3.466796875
+            }
+          ]
+        },
+        {
+          "case": "incident-followup",
+          "ms": 690.7568750029895,
+          "returned": [
+            {
+              "name": "uupt-delivery",
+              "score": -2.263671875
+            },
+            {
+              "name": "sdk-log-expert",
+              "score": -2.91796875
+            },
+            {
+              "name": "tencent-rtc-expert",
+              "score": -4.015625
+            },
+            {
+              "name": "accounts-payable-agent",
+              "score": -4.83203125
+            }
+          ]
+        },
+        {
+          "case": "security-followup",
+          "ms": 684.1779999958817,
+          "returned": [
+            {
+              "name": "sdk-log-expert",
+              "score": -1.669921875
+            },
+            {
+              "name": "new-share-expert",
+              "score": -2.626953125
+            },
+            {
+              "name": "uupt-delivery",
+              "score": -3.49609375
+            },
+            {
+              "name": "panshi-customer-visit-agent",
+              "score": -4.50390625
+            }
+          ]
+        },
+        {
+          "case": "journal-followup",
+          "ms": 559.8608329964918,
+          "returned": [
+            {
+              "name": "academic-journal-selector",
+              "score": -3.232421875
+            },
+            {
+              "name": "contract-expert",
+              "score": -4.27734375
+            },
+            {
+              "name": "ip-expert",
+              "score": -4.37109375
+            },
+            {
+              "name": "novel-generator",
+              "score": -4.5546875
+            }
+          ]
+        },
+        {
+          "case": "database-followup",
+          "ms": 592.0150829988415,
+          "returned": [
+            {
+              "name": "database-operations",
+              "score": 2.609375
+            },
+            {
+              "name": "yunzhi-qa-assistant",
+              "score": -4.44140625
+            },
+            {
+              "name": "database-optimization-expert",
+              "score": -4.5625
+            },
+            {
+              "name": "ai-meeting-notes",
+              "score": -4.6640625
+            }
+          ]
+        },
+        {
+          "case": "exam-followup",
+          "ms": 547.6189160035574,
+          "returned": [
+            {
+              "name": "study-planner",
+              "score": -2.33984375
+            },
+            {
+              "name": "nuwa",
+              "score": -5.48828125
+            },
+            {
+              "name": "exam-preparation-planner",
+              "score": -6.6015625
+            },
+            {
+              "name": "strategy-backtest-expert",
+              "score": -6.78125
+            }
+          ]
+        },
+        {
+          "case": "authz-new",
+          "ms": 660.4424580000341,
+          "returned": [
+            {
+              "name": "sdk-log-expert",
+              "score": -5.75
+            },
+            {
+              "name": "fbsir-super-partner",
+              "score": -5.8828125
+            },
+            {
+              "name": "kyc-screener",
+              "score": -6.01953125
+            },
+            {
+              "name": "indonesia-digital-law-expert",
+              "score": -6.1796875
+            }
+          ]
+        },
+        {
+          "case": "incident-new",
+          "ms": 641.5577910011052,
+          "returned": [
+            {
+              "name": "uupt-delivery",
+              "score": -4.4765625
+            },
+            {
+              "name": "incident-response-commander",
+              "score": -5.9140625
+            },
+            {
+              "name": "fbsir-aigc-compliance-red-team",
+              "score": -6.78515625
+            },
+            {
+              "name": "gl-reconciler",
+              "score": -6.9140625
+            }
+          ]
+        },
+        {
+          "case": "ranking-new",
+          "ms": 489.3022909964202,
+          "returned": [
+            {
+              "name": "model-quality-assurance-expert",
+              "score": -5.203125
+            },
+            {
+              "name": "a-share-analysis",
+              "score": -5.66015625
+            },
+            {
+              "name": "new-share-expert",
+              "score": -5.74609375
+            },
+            {
+              "name": "patient-education-content-review-word-assistant",
+              "score": -6.37890625
+            }
+          ]
+        },
+        {
+          "case": "sql-new",
+          "ms": 515.7904590014368,
+          "returned": [
+            {
+              "name": "database-operations",
+              "score": -1.3935546875
+            },
+            {
+              "name": "data",
+              "score": -3.43359375
+            },
+            {
+              "name": "database-optimization-expert",
+              "score": -5.18359375
+            },
+            {
+              "name": "a-share-analysis",
+              "score": -5.83203125
+            }
+          ]
+        },
+        {
+          "case": "journal-new",
+          "ms": 528.3732089956175,
+          "returned": [
+            {
+              "name": "academic-journal-selector",
+              "score": -1.6328125
+            },
+            {
+              "name": "viral-topic-master",
+              "score": -6.61328125
+            },
+            {
+              "name": "thesis-writing-mentor",
+              "score": -6.75
+            },
+            {
+              "name": "earnings-reviewer",
+              "score": -6.87890625
+            }
+          ]
+        },
+        {
+          "case": "exam-new",
+          "ms": 574.0529169997899,
+          "returned": [
+            {
+              "name": "nuwa",
+              "score": -4.75
+            },
+            {
+              "name": "exam-preparation-planner",
+              "score": -5.18359375
+            },
+            {
+              "name": "novel-generator",
+              "score": -5.78125
+            },
+            {
+              "name": "study-planner",
+              "score": -5.8046875
+            }
+          ]
+        },
+        {
+          "case": "rtc-domain",
+          "ms": 654.2161249963101,
+          "returned": [
+            {
+              "name": "sdk-log-expert",
+              "score": 6.13671875
+            },
+            {
+              "name": "tencent-rtc-expert",
+              "score": -0.0435791015625
+            },
+            {
+              "name": "api-dev",
+              "score": -4.44921875
+            },
+            {
+              "name": "rum-fullstack-team",
+              "score": -4.8203125
+            }
+          ]
+        },
+        {
+          "case": "security-domain",
+          "ms": 609.9109579954529,
+          "returned": [
+            {
+              "name": "tencent-security-expert",
+              "score": 3.15625
+            },
+            {
+              "name": "yunzhi-qa-assistant",
+              "score": -2.068359375
+            },
+            {
+              "name": "sdk-log-expert",
+              "score": -5.5546875
+            },
+            {
+              "name": "soe",
+              "score": -5.96875
+            }
+          ]
+        },
+        {
+          "case": "hiring-domain",
+          "ms": 530.390667001484,
+          "returned": [
+            {
+              "name": "interview-simulator",
+              "score": -5.078125
+            },
+            {
+              "name": "campus-job-search-coach",
+              "score": -5.1953125
+            },
+            {
+              "name": "qingflow-hr-expert",
+              "score": -5.6640625
+            },
+            {
+              "name": "eno",
+              "score": -6.0078125
+            }
+          ]
+        },
+        {
+          "case": "paper-news",
+          "ms": 629.218750000291,
+          "returned": [
+            {
+              "name": "arxiv-watcher",
+              "score": 5.01953125
+            },
+            {
+              "name": "trend-hunter",
+              "score": -4.09375
+            },
+            {
+              "name": "viral-topic-master",
+              "score": -4.375
+            },
+            {
+              "name": "academic-journal-selector",
+              "score": -4.48828125
+            }
+          ]
+        },
+        {
+          "case": "qa-screenshots",
+          "ms": 536.8087499955436,
+          "returned": [
+            {
+              "name": "nuwa",
+              "score": -3.638671875
+            },
+            {
+              "name": "webapp-testing",
+              "score": -5.22265625
+            },
+            {
+              "name": "yunzhi-doc-quality-expert",
+              "score": -5.27734375
+            },
+            {
+              "name": "aladin-test-design",
+              "score": -5.70703125
+            }
+          ]
+        },
+        {
+          "case": "standalone-reset",
+          "ms": 884.241915999155,
+          "returned": [
+            {
+              "name": "uupt-delivery",
+              "score": -2.123046875
+            },
+            {
+              "name": "meituan-living-assistant",
+              "score": -3.751953125
+            },
+            {
+              "name": "tianyu-account-guardian",
+              "score": -4.0390625
+            },
+            {
+              "name": "tc-chengxin-travel-expert",
+              "score": -4.37890625
+            }
+          ]
+        },
+        {
+          "case": "explicit-reset",
+          "ms": 541.716332998476,
+          "returned": [
+            {
+              "name": "database-operations",
+              "score": 1.541015625
+            },
+            {
+              "name": "trend-hunter",
+              "score": -2.3203125
+            },
+            {
+              "name": "database-optimization-expert",
+              "score": -3.515625
+            },
+            {
+              "name": "yunzhi-qa-assistant",
+              "score": -4.40234375
+            }
+          ]
+        },
+        {
+          "case": "db-english",
+          "ms": 615.0095830016653,
+          "returned": [
+            {
+              "name": "database-operations",
+              "score": 0.12274169921875
+            },
+            {
+              "name": "sdk-log-expert",
+              "score": -3.3359375
+            },
+            {
+              "name": "data",
+              "score": -5.00390625
+            },
+            {
+              "name": "gl-reconciler",
+              "score": -5.046875
+            }
+          ]
+        }
+      ],
+      "productionChanged": false
+    }
+  ],
+  "pool": {
+    "sameReturnedIdentityAndOrder": true,
+    "identicalAllFields": false,
+    "before": {
+      "cases": 20,
+      "measuredWarmRequests": 60,
+      "medianWarmMs": 119.67641700175591,
+      "maxPool": 19754,
+      "unrestrictedCases": [
+        "standalone-reset"
+      ],
+      "hotelWarmMedianMs": 831.1039170075674,
+      "hotelPool": 19754
+    },
+    "after": {
+      "cases": 20,
+      "measuredWarmRequests": 60,
+      "medianWarmMs": 129.08056249580113,
+      "maxPool": 500,
+      "unrestrictedCases": [],
+      "hotelWarmMedianMs": 20.296415998018347,
+      "hotelPool": 92
+    }
+  },
+  "deployment": {
+    "workerSha256": "cd8e201a2453e3a5552269011fafdc364481454df534bd531c97203579c56113",
+    "graphSha256": "b0fae889fcb470e1ee3ecb61fce63ea6d8c8b0a354f7dd969f51e0545457308b",
+    "requests": 20,
+    "clientWidth": 8,
+    "queryProcesses": 4,
+    "outsideRepositoryHookPassed": true,
+    "hookSeats": [
+      [
+        "saas-multi-tenant",
+        "Skill"
+      ],
+      [
+        "saas-msa-review",
+        "Skill"
+      ],
+      [
+        "implementing-zero-trust-for-saas-applications",
+        "Skill"
+      ],
+      [
+        "saas-auth-patterns",
+        "Skill"
+      ],
+      [
+        "car-saas",
+        "MCP service module"
+      ],
+      [
+        "sa-legal-compliance",
+        "Complete expert module"
+      ],
+      [
+        "indonesia-digital-law-expert",
+        "Complete expert module"
+      ],
+      [
+        "LawyerOne",
+        "MCP service module"
+      ]
+    ]
+  },
+  "queries": {
+    "metric-audit": "修复 Skill/MCP 图路由的专家推荐，逐席核对原角色适用性，审计评价指标和测试证据。\n我感觉你的评价指标有问题，就是你认为的正确推荐了，可能不是真正的正确推荐了？要不然你现在的什么48/68为什么还是推荐不到想要的？我感觉评价指标有问题你仔细根因分析一下，看看是不是这个问题？",
+    "incident-followup": "线上支付突然大面积失败，请统一指挥事故止损、值班恢复，记录影响用户与时间线，事后交付根因和整改复盘。\n这个问题还没有恢复，请继续排查，保留处理时间线，确保最终有可验证的整改产物。",
+    "security-followup": "多租户后台中客户A能猜编号访问客户B的账单，请分析越权、威胁模型并提供修补和攻击复现验证。\n这个方案再检查一下，别只修这一个入口，相关攻击路径和验证证据都要覆盖。",
+    "journal-followup": "这篇关于城市热岛与老年健康的论文摘要，需要评估中文核心与SCI投稿，交付冲稳保选刊方案和依据。\n这个结果还不够，请考虑主题匹配、收稿范围和投稿难度，把推荐理由核实清楚。",
+    "database-followup": "PostgreSQL订单查询很慢，使用EXPLAIN ANALYZE检查执行计划、索引和扫描行数，验证修复前后延迟。\n这个问题继续查，请保留执行计划，不要只给通用优化建议。",
+    "exam-followup": "这个计划需要能在落后时自动调整，今天做什么和周末怎么复盘都要具体。",
+    "standalone-reset": "请帮我预订东京酒店。",
+    "explicit-reset": "换个话题，请检查PostgreSQL慢查询执行计划和索引。",
+    "authz-new": "SaaS租户间出现账单横向越权，需要审查授权边界，修复接口并用攻击用例验证。",
+    "incident-new": "支付服务发布后错误率激增，需要事故指挥、止损回滚、影响范围记录和复盘整改。",
+    "ranking-new": "推荐模型离线得分很好但用户反馈很差，需要独立审计标签定义、数据泄漏、校准、排序指标及复现实验。",
+    "sql-new": "PostgreSQL关联查询出现全表扫描，需要分析EXPLAIN ANALYZE、索引与统计信息，提交前后性能对比。",
+    "journal-new": "根据环境健康论文摘要和预算筛选可投稿的SCI期刊，核对收稿范围并给出冲稳保清单。",
+    "exam-new": "还有六周考研，数学薄弱，每天只有三小时，需要每日复习、错题复盘和进度落后调整方案。",
+    "rtc-domain": "腾讯TRTC安卓SDK通话无声，需要检查设备、音频路由和SDK日志，给出可验证修复步骤。",
+    "security-domain": "公司想查询腾讯内部安全规范和既有整改流程，需要知识库依据与原文链接。",
+    "hiring-domain": "筛选后端工程师简历并设计面试题，核实技能匹配、薪资范围和到岗时间。",
+    "paper-news": "帮我追踪本周arXiv大模型论文速报，整理新论文标题、摘要和原文链接。",
+    "qa-screenshots": "测试网页界面，逐页提供截图证据，检查交互和布局，并给出发现的问题。",
+    "db-english": "Investigate a PostgreSQL query regression using EXPLAIN ANALYZE, indexes and row estimates; verify latency after the repair.",
+    "application-authorization": "我们自建的工单系统只修改工单ID就能看到其他公司的附件。请检查服务端授权、修复同类入口，并写能重现漏洞和证明修复的测试。",
+    "internal-security-policy": "我要查腾讯内部对于客户附件访问权限的安全要求和现成整改流程，请提供知识库原文依据与链接。",
+    "production-incident": "商城发版后所有用户都无法结账。请组织生产事故响应，先回滚止损，记录影响和处置时间线，再给出复盘整改。",
+    "payment-reconciliation": "本月支付渠道到账金额和总账对不上，请核对交易明细、查找差异并生成月末对账清单。",
+    "model-evaluation": "推荐系统在测试集上很漂亮，上线后却推荐错人。请核对真值定义、训练测试隔离、评价指标和校准，并复现对照实验。",
+    "candidate-screening": "我是招聘方，有十份后端候选人简历。请按岗位要求初筛，列证据、设计技术面试问题，并核实薪资和入职日期。",
+    "candidate-coaching": "我是应届求职者，请根据后端岗位帮我改简历、模拟技术面试，并分析两个offer该怎么选。",
+    "exam-recovery": "我的考研复习进度已经落后一周，每天只能学三小时，数学错题很多。请重排到考试日的每日任务和复盘方式。",
+    "database-plan": "PostgreSQL升级后订单关联查询从50毫秒变成两秒。请依据EXPLAIN ANALYZE检查行数估计、扫描和索引，验证修复效果。",
+    "browser-evidence": "请实际操作这个网站的注册、登录和结账流程，逐页截图，核对交互和页面布局，给出可复现的问题证据。",
+    "journal-scope": "我的环境健康论文准备投稿SCI，请根据摘要、收稿范围、预算和审稿周期给出冲稳保选刊方案及核实依据。",
+    "paper-monitoring": "请整理本周新发布的arXiv语言模型论文，列出标题、摘要、发布日期和原文链接，方便我持续跟踪。"
+  }
+}
