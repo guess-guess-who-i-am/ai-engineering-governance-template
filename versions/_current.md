@@ -12,14 +12,11 @@
 - Input: 仓库中的 macOS profile、用户 Codex 目录和现有非敏感配置。
 - Output: 可迁移 macOS 全局配置与一键部署；常驻 worker、全局图和 2/4/2 Hook 路由，安装说明见 codex-profile/README.zh.md。
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
-- Notes:
-  - 暂停三平台检查与Git发布，先处理110用户级Codex，不影响其他用户。
-  - 110清缓存释放17.62 GiB，已切KPOCE并刷新后台；API请求24.416秒完成，真实Codex首次90秒超时、重测11.395秒完成，模型代理和worker保留。
-  - 194为KPOCE主路由、duck备用；duck的403不回退，认证和代理不变，整机重启未实测。
-- CurrentResult: 模板分支已推送；15,472 个 Skill 源文件在私有 skills-library 固定提交中。当前本机 4,232 个专家/Skill/MCP 完整包约 1.9GB，但 Gitleaks 506 条命中，其中约309条不呈明显占位符，不能安全上传；因此“另一台电脑完整恢复”尚未可宣称。
-- RootCauseAnalysis: 生成资源包混入第三方示例、认证文档及疑似真实凭据，且 Git 无 LFS；直接把1.9GB包提交模板Git会同时触发安全风险和大文件限制。现有安装器已能按清单重建，但发布资产仍缺安全裁决。
-- CaseStudy:
-- NextIdea: 请用户选择：逐项确认并轮换命中后发布完整包，或明确允许排除命中文件发布非完整包；完成选择后再生成清单、Release资产并做另一台电脑恢复验收。
+- Notes: 本机后台刷新曾生成新侧车导致版本漂移，已按当前 manifest 重新同步194并逐项复核SHA；详细证据见 docs/RETRIEVAL_CONTENT_CLEANUP_20261031.zh.md。
+- CurrentResult: 本机与194已发布同一清理图（19,754节点，SHA 1fc027...c264af）；本机 launchd 与远端 systemd 均常驻，194 的8并发全部成功且4个worker重叠。提交 e107f68 已推送；专家排序仍有错配，不能宣称精准推荐达标。
+- RootCauseAnalysis: 类别席位仍可能把低相关专家硬塞入候选，分数未校准导致排序错配；本轮部署只验证发布一致性与并发可用性，没有改变该语义问题。
+- CaseStudy: 专家原文被误判为任务树：维护检查把合法 Markdown 路径当作树归属；修复后按注册表与子树引用识别，保留原文并继续拦截真实超预算树。
+- NextIdea: 当前保持已验证部署；后续若继续优化，再单独验证专家相关性阈值与类别校准。
 - SelectedSkills:
 
 # GraphState
