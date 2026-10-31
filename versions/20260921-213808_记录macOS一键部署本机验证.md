@@ -20,7 +20,7 @@
 - SelectedSkills:
 
 # GraphState
-- ChainForceNext:
+- ChainForceNext: 
 
 - Current: ROOT
 - Next: ROOT
