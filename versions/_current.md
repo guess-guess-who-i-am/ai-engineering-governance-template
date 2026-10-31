@@ -13,16 +13,16 @@
 - Output: 可迁移macOS配置、全局Skill安装源、常驻worker及右键服务；codex-profile/、安装全局配置.command，第三方库由私有skills-library恢复。
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
 - Notes: 只支持 macOS；20 是硬上限。全局 Skill/MCP 经过 GraphToolCall；跨机重启、远程 HTTP MCP 目录发现尚未实测。本机、194与110默认Terra均通过真实终端工具测试，官方目录已接入；194与110 CLI为0.166.0，110保留xhigh；桌面界面未直接验证。
-- CurrentResult: 两个新增按需 Skill 已全局入图，24项路由正反例、24个自有 Skill 安装回滚、16项 Worker、9项资源图及双语长文本编码通过。两个临时工作区实测完整读取与真实 IDE Hook 均成功，直接图查询均命中新 Skill；本机可用，仍待最终发布及跨机复测，未验证模型质量提升。
+- CurrentResult: 本轮两个按需 Skill 已全局入图并推送Git，原三轮 Hook 和既有方式保留。26项路由、16项 Worker、9项资源图及15项PR门禁通过，两个工作区完整读取和真实IDE Hook成功；图更新期间约29—54秒，尚未验证跨机和模型质量，不能宣称始终低延迟。
 - RootCauseAnalysis: 全局刷新器与检索 Worker 来自不同版本，旧 Worker 不接受资源目录、完整性和中文向量参数，导致新增 Skill 未入图。已合并新版图接口及原有共享查询超时保护，保留三轮 Hook 与既有路由。
 - CaseStudy:
   - case 1: 全部调用者超时→旧实现仍计算并缓存；新实现最后等待者取消排队任务，运行任务完成后丢弃结果。
   - case 2: 100路压测全成功但内存4.4–5.6GiB→功能与资源边界必须分开验收。
-- NextIdea: 核对刷新输入哈希、完成最终审阅与Git发布；跨机资源和模型质量仍需独立实测。
+- NextIdea: 在另一台Mac复测全局部署、100请求与重启恢复，并用真实任务对照评估提示机制的质量和token消耗。
 - SelectedSkills:
 
 # GraphState
-- ChainForceNext:
+- ChainForceNext: 
 
 - Current: ROOT
 - Next: ROOT
