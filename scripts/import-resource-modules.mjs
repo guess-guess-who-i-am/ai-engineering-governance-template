@@ -82,12 +82,10 @@ async function manifestAt(root) {
 
 export async function expertRetrievalProfile(module, manifest) {
   manifest ||= await manifestAt(module.package_root);
-  // Search hints are recall evidence, not declarations of executable scope.
-  // Keep their existing scoring input stable while correcting the capability
-  // shown to the agent. Scope is always read from the same primary selector
-  // used by the complete, verbatim execution entry.
-  const hints = strings([manifest.description, manifest.displayDescription, manifest.profession,
-    manifest.tags, manifest.defaultInitPrompt, manifest.quickPrompts]).join(' ');
+  // Only capability descriptions are retrieval content. Initial prompts,
+  // examples, tags and transport identifiers are execution/manifest metadata.
+  const hints = [...new Set(strings([manifest.description, manifest.displayDescription,
+    manifest.profession]).map(value=>value.trim()).filter(Boolean))].join(' ');
   let scope, provenance;
   try {
     const primary = await buildExpertEntry(module);
@@ -103,7 +101,7 @@ export async function expertRetrievalProfile(module, manifest) {
     provenance = {state:'blocked',reason:blocked.reason};
   }
   return {description:`${module.name} ${scope}`,original_description:scope,
-    retrieval_document:`${module.name} ${hints || scope}`.slice(0,7000),
+    retrieval_document:`${module.name} ${hints || scope}`,
     retrieval_original_document:hints || scope,retrieval_provenance:provenance};
 }
 
@@ -160,7 +158,7 @@ export async function importResources({source, output, install=false, concurrenc
       const entryText = originalEntry ? await readFile(originalEntry,'utf8') : '';
       if (originalEntry && row.entry_hash && sha(entryText) !== row.entry_hash) throw new Error('Source entry changed since audit');
       const evidence=kind==='skill'?skillEvidence.get(row.entry_hash):expertEvidence.get(row.name);
-      const description = kind === 'skill' ? evidence?.description || scalar(entryText,'description') : strings([manifest.description,manifest.displayDescription,manifest.profession,manifest.tags,manifest.defaultInitPrompt,manifest.quickPrompts]).join(' ');
+      const description = kind === 'skill' ? evidence?.description || scalar(entryText,'description') : '';
       const inferred = !description;
       const originalDescription = description || entryText.match(/^#\s+(.+)$/m)?.[1] || row.name;
       let declared = Array.isArray(manifest.agents) ? manifest.agents.filter(x=>typeof x==='string') : [];

@@ -50,7 +50,8 @@ test('expert retrieval scope comes from the original primary role, not marketing
   await put(f.expertRoot, 'agents/lead.md', role);
   await put(f.expertRoot, '.codebuddy-plugin/plugin.json', JSON.stringify({ name: 'travel-team',
     description: 'Universal search intent and database analysis', displayDescription: {en:'Universal search intent and database analysis'},
-    quickPrompts: ['Search all databases', 'Search all databases'], agentName: 'lead', agents: ['agents/lead.md'] }));
+    defaultInitPrompt: 'INITIAL_PROMPT_SENTINEL', tags: ['TAG_SENTINEL'],
+    quickPrompts: ['QUICK_EXAMPLE_SENTINEL', 'Search all databases'], agentName: 'lead', agents: ['agents/lead.md'] }));
   for (const install of [false, true]) {
     const { catalog } = await importResources({ ...f, install });
     const expert = catalog.modules.find(m => m.kind === 'expert');
@@ -58,6 +59,8 @@ test('expert retrieval scope comes from the original primary role, not marketing
     assert.equal(expert.description, `travel-team ${description}`);
     assert.equal(expert.retrieval_provenance.primary_sha256, hash(role));
     assert.equal(expert.retrieval_provenance.primary_path, 'agents/lead.md');
+    assert.equal(expert.retrieval_document, 'travel-team Universal search intent and database analysis');
+    assert.doesNotMatch(expert.retrieval_original_document, /SENTINEL|Search all databases/);
     assert.doesNotMatch(expert.description, /Universal|databases/);
     assert.equal(await readFile(path.join(f.expertRoot, 'agents/lead.md'), 'utf8'), role);
   }

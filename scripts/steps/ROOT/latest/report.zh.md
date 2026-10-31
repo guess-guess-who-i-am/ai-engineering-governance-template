@@ -5,9 +5,86 @@
 
 > 此区由 Stop postflight 保底生成；Agent 应在 CurrentResult 中补充结论和测量。
 
-- `.reports/codex-speed-diagnosis-20261027/capacity-tests.json`
-- `scripts/__pycache__/benchmark-graph-load.cpython-313.pyc`
-- `scripts/benchmark-graph-load.py`
+- `.reports/expert-direct-global-verification.json`
+- `.reports/expert-repair-20261030/baseline-skill-router.mjs`
+- `.reports/expert-repair-20261030/check.stderr`
+- `.reports/expert-repair-20261030/check.stdout`
+- `.reports/expert-repair-20261030/conqrr.source`
+- `.reports/expert-repair-20261030/conqrr.txt`
+- `.reports/expert-repair-20261030/continuity-live.json`
+- `.reports/expert-repair-20261030/continuity-live.stderr`
+- `.reports/expert-repair-20261030/continuity-live.stdout`
+- `.reports/expert-repair-20261030/continuity-red.stderr`
+- `.reports/expert-repair-20261030/continuity-red.stdout`
+- `.reports/expert-repair-20261030/deployment.json`
+- `.reports/expert-repair-20261030/direct-global.stderr`
+- `.reports/expert-repair-20261030/direct-global.stdout`
+- `.reports/expert-repair-20261030/dispatcher-live.json`
+- `.reports/expert-repair-20261030/judge-calibration-cases.json`
+- `.reports/expert-repair-20261030/judge-calibration-final.stderr`
+- `.reports/expert-repair-20261030/judge-calibration-final.stdout`
+- `.reports/expert-repair-20261030/judge-calibration-invalid-result.json`
+- `.reports/expert-repair-20261030/judge-calibration-result-final.json`
+- `.reports/expert-repair-20261030/judge-calibration-result.json`
+- `.reports/expert-repair-20261030/langchain-libs.source`
+- `.reports/expert-repair-20261030/langchain-meta.source`
+- `.reports/expert-repair-20261030/live-roles.json`
+- `.reports/expert-repair-20261030/mmarco-category50.json`
+- `.reports/expert-repair-20261030/mmarco-category50.stderr`
+- `.reports/expert-repair-20261030/mmarco-category50.stdout`
+- `.reports/expert-repair-20261030/mmarco-followups.json`
+- `.reports/expert-repair-20261030/mmarco-followups.stderr`
+- `.reports/expert-repair-20261030/mmarco-followups.stdout`
+- `.reports/expert-repair-20261030/mmarco-model.source`
+- `.reports/expert-repair-20261030/qwen-category50-description.json`
+- `.reports/expert-repair-20261030/qwen-category50-description.stderr`
+- `.reports/expert-repair-20261030/qwen-category50-description.stdout`
+- `.reports/expert-repair-20261030/qwen-category50-role.json`
+- `.reports/expert-repair-20261030/qwen-category50-role.stderr`
+- `.reports/expert-repair-20261030/qwen-category50-role.stdout`
+- `.reports/expert-repair-20261030/qwen-followups.json`
+- `.reports/expert-repair-20261030/qwen-followups.stderr`
+- `.reports/expert-repair-20261030/qwen-followups.stdout`
+- `.reports/expert-repair-20261030/qwen-role-existing-pool.json`
+- `.reports/expert-repair-20261030/qwen-role-existing-pool.stderr`
+- `.reports/expert-repair-20261030/qwen-role-existing-pool.stdout`
+- `.reports/expert-repair-20261030/requirement-meaning-red.stderr`
+- `.reports/expert-repair-20261030/so.source`
+- `.reports/expert-repair-20261030/sources.json`
+- `.reports/expert-repair-20261030/specificity-fixed.stderr`
+- `.reports/expert-repair-20261030/specificity-fixed.stdout`
+- `.reports/expert-repair-20261030/specificity-installed.stderr`
+- `.reports/expert-repair-20261030/specificity-installed.stdout`
+- `.reports/expert-repair-20261030/supplemental-sources.json`
+- `.reports/expert-repair-20261030/umbrela-meta.source`
+- `.reports/expert-repair-20261030/umbrela-rubric.source`
+- `.reports/expert-repair-20261030/umbrela-tree.source`
+- `.reports/expert-repair-20261030/umbrela.source`
+- `.reports/expert-repair-20261030/zeco-paper.source`
+- `.reports/expert-repair-20261030/zeco-paper.txt`
+- `.reports/expert-repair-20261030/zeco.source`
+- `.reports/quality/pr.json`
+- `.reports/site-test/.nojekyll`
+- `codex-profile/.codex/hooks/skill-router.mjs`
+- `docs/evidence/expert-applicability-review-20261030.json`
+- `docs/evidence/expert-applicability-summary-20261030.json`
+- `docs/evidence/expert-continuity-run-20261030.json`
+- `docs/evidence/expert-deployment-20261030.json`
+- `docs/evidence/expert-judge-calibration-20261030.json`
+- `docs/evidence/expert-rerank-probes-20261030.json`
+- `docs/evidence/expert-verification-wave-20261030.json`
+- `scripts/__pycache__/calibrate-expert-applicability-judge.cpython-313.pyc`
+- `scripts/__pycache__/evaluate-expert-applicability.cpython-313.pyc`
+- `scripts/__pycache__/experiment-continuity-rerank.cpython-313.pyc`
+- `scripts/__pycache__/test-expert-applicability.cpython-313.pyc`
+- `scripts/benchmark-router-continuity.mjs`
+- `scripts/calibrate-expert-applicability-judge.py`
+- `scripts/evaluate-expert-applicability.py`
+- `scripts/experiment-continuity-rerank.py`
+- `scripts/test-expert-applicability.py`
+- `scripts/test-router-context-continuity.mjs`
+- `scripts/test-router-specificity.mjs`
+- `scripts/verify-expert-direct-global.mjs`
 <!-- auto-postflight:end -->
 
 ## 提示词清理与Git交付闭环
@@ -36,3 +113,13 @@
 - IDE诊断309次唯一skills_read未保留资源身份，真实专家使用率未知；不把日志盲区计作零使用。
 - 根因：类别排名与任务适用脱节、候选到执行未闭环、部分原包宿主工具缺失；此前远端资源缺部署，本轮未重测远端。没有修改生产配置。
 - 证据：outputs/expert-usage-audit-20261030.json；详细口径、案例和树字段旧→新回执见docs/EXPERT_USAGE_AUDIT_20261030.md。树精炼、治理及22个仓库Skill校验通过。
+
+## 完整向量输入编码与全局常驻部署
+
+完整编码与全局入口已验证，精准专家排序仍未达标。详见 [实验报告](../../../../docs/EMBEDDING_TRUNCATION_REPAIR_20261031.zh.md)。16条突发请求全部成功；8条分类并发查询均保持2/4/2；两个工作区Hook候选相同。合成长查询仍有背景干扰，未将其当作推荐成功。
+
+## 检索白名单字段清理与全局常驻发布
+
+专家初始提示、快捷示例和内部ID，以及Skill分类辅助字段已退出相关性文本。19,754节点保留，70条配额核验、8条真实并发及两个工作区Hook通过；专家排序仍有错配。证据与边界见 docs/RETRIEVAL_CONTENT_CLEANUP_20261031.zh.md。
+
+本轮完成 194 服务器发布：与本机相同的图 SHA-256 为 `6ac5d76b0dd03ff12c0a0368ec6da0dbf78734f3247d63af5934d1db1b142de3`；远端 `codex-graph-worker.service` 已 `enabled`、`active`，`Restart=always`，4 个 worker 参与 8 条重叠请求并全部成功，中英文预热与 `prefilter` 检查通过。远端旧图与新 hook 不匹配导致的启动错误已通过原子替换清除。

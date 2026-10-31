@@ -20,6 +20,7 @@ import hashlib
 import json
 import multiprocessing
 from pathlib import Path
+from types import SimpleNamespace
 import re
 import secrets
 import signal
@@ -31,7 +32,61 @@ import threading
 import time
 import warnings
 
+# Also support importlib-based consumers outside this directory. Keep the
+# embedding dependency lazy so keyword-only graphs need no torch installation.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 # Import GraphToolCall only after the worker owns the inter-process lock.
+RETRIEVAL_CONTENT = 'declared-name-capability-only/v1'
+
+
+def retrieval_name(tool):
+    metadata = tool.metadata or {}
+    return metadata.get('skill_name', metadata.get('mcp_original_name', tool.name))
+
+
+def retrieval_tool_text(tool):
+    return ' '.join(part for part in (retrieval_name(tool), tool.description) if part)
+
+
+def prepare_content_retrieval(engine):
+    """Keep transport keys out of every lexical document and name heuristic."""
+    if getattr(engine, '_codex_content_retrieval', False):
+        return
+    from graph_tool_call.retrieval.keyword import BM25Scorer
+    projected = {}
+    for identifier, tool in engine._tools.items():
+        document = copy(tool)
+        document.name = retrieval_name(tool)
+        document.tags, document.parameters, document.metadata = [], [], {}
+        projected[identifier] = document
+    scorer = BM25Scorer(projected, tokenizer=engine._tokenize)
+    for identifier, tool in projected.items():
+        tokens = scorer._tokenize_fn(tool.name)
+        scorer._name_tokens[identifier] = tokens
+        scorer._name_token_counts[identifier] = len(tokens)
+    scorer._semantic_phrase_boost = lambda query, identifier, tool: BM25Scorer._semantic_phrase_multiplier(
+        query, projected[identifier].name, projected[identifier])
+    engine._bm25 = scorer
+    # Generated server/kind groups are structural, not capability descriptions.
+    # Upstream reverse-indexes neighbor IDs into these categories; an empty
+    # semantic category index prevents those hidden identifier matches. Explicit
+    # requires/precedes graph traversal and metadata-based quotas remain active.
+    engine._searcher._category_index = {}
+    phrase = type(engine)._boost_semantic_phrase_matches
+    def boost_phrases(query, scores):
+        # Let the library keep its phrase rules, with readable names as data.
+        # Process separately so duplicate public names retain distinct results.
+        for identifier in scores:
+            tool = projected[identifier]
+            view = SimpleNamespace(_tools={tool.name: tool})
+            value = {tool.name: scores[identifier]}
+            phrase(view, query, value)
+            scores[identifier] = value[tool.name]
+    engine._boost_semantic_phrase_matches = boost_phrases
+    signature = engine._tool_signature
+    engine._tool_signature = lambda identifier: signature(projected[identifier].name)
+    engine._codex_content_retrieval = True
 
 
 def chinese_tokenize(text: str) -> list[str]:
@@ -85,6 +140,8 @@ def english_retrieval_graph(graph):
     english.tune_for_scale()
     source_engine = graph._get_retrieval_engine()
     target_engine = english._get_retrieval_engine()
+    if graph.metadata.get('retrieval_content') == RETRIEVAL_CONTENT:
+        prepare_content_retrieval(target_engine)
     target_engine.set_embedding_index(source_engine._embedding_index)
     if source_engine._weights_manual:
         target_engine.set_weights(keyword=source_engine._keyword_weight, graph=source_engine._graph_weight,
@@ -144,20 +201,15 @@ def load_skills(root: Path, catalog: Path):
         tool_name = f"skill_{identifier}_{digest}"
         fields = [
             raw.get("description"), raw.get("problem_cn"), raw.get("when_cn"),
-            raw.get("c1"), raw.get("c2"), raw.get("key"), raw.get("traits_cn"), raw.get("diff_cn"),
         ]
         description = " ".join(str(value).strip() for value in fields if value)
-        categories = [str(value).strip() for value in (raw.get("c1"), raw.get("c2")) if value]
-        tags = raw.get("traits_cn", [])
-        if isinstance(tags, str):
-            tags = [tags]
         records.append({
             "name": name,
             "tool_name": tool_name,
-            "description": description[:4000],
+            "description": description,
             "path": str(target),
-            "categories": categories,
-            "tags": [str(value) for value in tags if value] if isinstance(tags, list) else [],
+            "categories": [],
+            "tags": [],
         })
     return records, missing, invalid
 
@@ -181,7 +233,7 @@ def load_owned_skills(root: Path):
             description += '\n' + translations[name]
         digest = hashlib.sha1(str(target).encode()).hexdigest()[:8]
         records.append({"name": name, "tool_name": f"skill_{re.sub(r'[^a-zA-Z0-9_-]+', '_', name).strip('_')[:60]}_{digest}",
-                        "description": description, "original_description": original_description, "path": str(target), "categories": ["global-owned"], "tags": [], "source": "owned"})
+                        "description": description, "original_description": original_description, "path": str(target), "categories": [], "tags": [], "source": "owned"})
     return records
 
 
@@ -216,7 +268,7 @@ def load_resource_modules(catalog):
         slug = re.sub(r"[^a-zA-Z0-9_-]+", "_", identifier).strip("_")[:48] or "module"
         records.append({**module, "module_id": identifier,
                         "tool_name": f"resource_{slug}_{hashlib.sha256(identifier.encode()).hexdigest()[:12]}",
-                        "tags": [], "categories": [f"resource-{module['kind']}"],
+                        "tags": [], "categories": [],
                         "dependencies": module.get("dependencies", []), "members": module.get("members", [])})
     return records
 
@@ -245,14 +297,6 @@ def graph_from_records(records, mcp_records=None, resource_records=None):
                 node.metadata['capability_description'] = record['description']
             if 'original_description' in record:
                 node.metadata['retrieval_original_description'] = record.get('retrieval_original_document', record['original_description'])
-            node.tags.extend(tag for tag in record["tags"] if tag not in node.tags)
-        for index, category in enumerate(record["categories"]):
-            label = f"{index + 1}:{category[:76]}"
-            if not label:
-                continue
-            category_name = f"skills:{label}"
-            graph.add_category(category_name)
-            graph.assign_category(record["tool_name"], category_name)
     mcp_translations_file = Path(__file__).with_name('mcp-retrieval.zh.json')
     mcp_translations = json.loads(mcp_translations_file.read_text(encoding='utf-8'))['descriptions'] if mcp_translations_file.is_file() else {}
     for record in mcp_records or []:
@@ -297,6 +341,7 @@ def graph_from_records(records, mcp_records=None, resource_records=None):
                 target = next(iter(targets))
                 if target != record["tool_name"]:
                     graph.add_relation(record["tool_name"], target, "requires", confidence="EXTRACTED", conf_score=1.0, layer=1, evidence="Explicit resource catalog dependency, exact unique identifier match")
+    graph.metadata['retrieval_content'] = RETRIEVAL_CONTENT
     return graph
 
 
@@ -317,13 +362,23 @@ def build(args):
     graph.set_tokenizer(chinese_tokenize)
     embedding = "disabled"
     if args.embedding:
+        from complete_embedding import complete_provider
+        from graph_tool_call.retrieval.embedding import EmbeddingIndex, SentenceTransformerProvider
         english = english_retrieval_graph(graph)
-        english.enable_embedding("sentence-transformers/all-MiniLM-L6-v2")
+        index = EmbeddingIndex(provider=complete_provider(
+            SentenceTransformerProvider("sentence-transformers/all-MiniLM-L6-v2")))
+        index._embeddings = dict(zip(english.tools, index._provider.encode_batch(
+            [retrieval_tool_text(tool) for tool in english.tools.values()])))
+        english._get_retrieval_engine().set_embedding_index(index)
         graph._get_retrieval_engine().set_embedding_index(english._get_retrieval_engine()._embedding_index)
         graph.tune_for_scale()
         embedding = "sentence-transformers/all-MiniLM-L6-v2"
     output.parent.mkdir(parents=True, exist_ok=True)
     metadata = {"skill_count": len(records), "catalog": str(catalog), "resource_module_count": len(resource_records)}
+    metadata['retrieval_content'] = RETRIEVAL_CONTENT
+    if args.embedding:
+        from complete_embedding import REPRESENTATION
+        metadata['embedding_representation'] = REPRESENTATION
     chinese_model = getattr(args, 'chinese_embedding', '')
     if chinese_model:
         if not args.embedding:
@@ -345,8 +400,10 @@ def build(args):
         "schemaVersion": "graph-tool-call-skills/1",
         "graphToolCallVersion": "0.46.0",
         "embedding": embedding,
+        "embeddingRepresentation": metadata.get('embedding_representation', ''),
         "chineseEmbedding": chinese_model,
         "retrievalProfile": "bilingual-cjk-language-routed/1",
+        "retrievalContent": RETRIEVAL_CONTENT,
         "generatedAt": __import__("datetime").datetime.now().astimezone().isoformat(),
         "rootPath": str(root.resolve()),
         "catalogPath": str(catalog.resolve()),
@@ -373,29 +430,33 @@ def build(args):
 def build_chinese_embedding(graph, output, model_name):
     """Content-addressed portable sidecar; publish before the graph pointer."""
     import numpy as np
+    from complete_embedding import encode_complete, REPRESENTATION
     from graph_tool_call.retrieval.embedding import SentenceTransformerProvider
     names = list(graph.tools)
-    texts = [graph.tools[n].name + ' ' + graph.tools[n].description for n in names]
-    signature = hashlib.sha256(json.dumps([model_name, names, texts], ensure_ascii=False).encode()).hexdigest()
+    texts = [retrieval_tool_text(graph.tools[n]) for n in names]
+    signature = hashlib.sha256(json.dumps([REPRESENTATION, model_name, names, texts], ensure_ascii=False).encode()).hexdigest()
     target = output.parent / f'{output.stem}.zh.{signature[:20]}.npz'
     if not target.exists():
         provider = SentenceTransformerProvider(model_name)
-        model = provider._get_model().to('cpu')
-        vectors = model.encode(texts, batch_size=64, convert_to_numpy=True, show_progress_bar=False)
+        model = provider._get_model()
+        vectors = encode_complete(model, texts)
         temporary = target.with_suffix(f'.{os.getpid()}.tmp')
         with temporary.open('wb') as stream:
             np.savez_compressed(stream, names=np.asarray(names), vectors=vectors, signature=signature)
         temporary.replace(target)
-    return {'file': target.name, 'model': model_name, 'signature': signature,
+    return {'file': target.name, 'model': model_name, 'representation': REPRESENTATION, 'signature': signature,
             'sha256': hashlib.sha256(target.read_bytes()).hexdigest()}
 
 
 def load_chinese_embedding(graph, graph_path):
     from graph_tool_call.retrieval.embedding import EmbeddingIndex, SentenceTransformerProvider
+    from complete_embedding import complete_provider, REPRESENTATION
     import numpy as np
     config = graph.metadata.get('chinese_embedding')
     if not config:
         return None
+    if config.get('representation') != REPRESENTATION:
+        raise ValueError('Chinese embedding representation is obsolete; rebuild the graph')
     relative = Path(config['file'])
     if relative.is_absolute() or len(relative.parts) != 1:
         raise ValueError('Invalid Chinese embedding sidecar path')
@@ -408,40 +469,45 @@ def load_chinese_embedding(graph, graph_path):
             raise ValueError('Chinese embedding sidecar does not match the graph')
     if vectors.shape != (len(names), 384) or not np.isfinite(vectors).all():
         raise ValueError('Invalid Chinese embedding vectors')
-    index = EmbeddingIndex(provider=SentenceTransformerProvider(config['model']))
+    index = EmbeddingIndex(provider=complete_provider(SentenceTransformerProvider(config['model'])))
     # Keep float32 array views instead of 6 million boxed Python floats.
     index._embeddings = dict(zip(names, vectors))
     return index
 
 
 def _description_cache_inputs(graph, output, model_name):
+    from complete_embedding import REPRESENTATION
     texts = list(dict.fromkeys(tool.description for tool in graph.tools.values() if tool.description))
-    signature = hashlib.sha256(json.dumps([model_name, texts], ensure_ascii=False).encode()).hexdigest()
+    signature = hashlib.sha256(json.dumps([REPRESENTATION, model_name, texts], ensure_ascii=False).encode()).hexdigest()
     return texts, signature, output.parent / f'{output.stem}.rerank.{signature[:20]}.npz'
 
 
 def build_description_embeddings(graph, output, model_name):
     """Persist description-only reranking vectors, separately from tool vectors."""
     import numpy as np
+    from complete_embedding import encode_complete, REPRESENTATION
     from graph_tool_call.retrieval.embedding import SentenceTransformerProvider
     texts, signature, target = _description_cache_inputs(graph, output, model_name)
     if not target.exists():
-        model = SentenceTransformerProvider(model_name)._get_model().to('cpu')
-        vectors = model.encode(texts, batch_size=64, convert_to_numpy=True, show_progress_bar=False)
+        model = SentenceTransformerProvider(model_name)._get_model()
+        vectors = encode_complete(model, texts)
         temporary = target.with_suffix(f'.{os.getpid()}.tmp')
         with temporary.open('wb') as stream:
             np.savez_compressed(stream, texts=np.asarray(texts), vectors=vectors, signature=signature)
         temporary.chmod(0o600)
         temporary.replace(target)
-    return {'file': target.name, 'model': model_name, 'signature': signature,
+    return {'file': target.name, 'model': model_name, 'representation': REPRESENTATION, 'signature': signature,
             'sha256': hashlib.sha256(target.read_bytes()).hexdigest()}
 
 
 def load_description_embeddings(graph, graph_path, language):
     import numpy as np
+    from complete_embedding import REPRESENTATION
     config = graph.metadata.get('description_embeddings', {}).get(language)
     if not config:
-        return {}  # Older graphs retain the bounded on-demand provider cache.
+        return {}
+    if config.get('representation') != REPRESENTATION:
+        raise ValueError('Description embedding representation is obsolete; rebuild the graph')
     texts, signature, expected = _description_cache_inputs(graph, graph_path, config['model'])
     if config['file'] != expected.name or config['signature'] != signature:
         raise ValueError('Description embedding identity/path mismatch')
@@ -510,9 +576,7 @@ def _prepare_keyword_index(engine):
     """Exact equivalent of the library fallback, indexed once per graph."""
     postings = {}
     for name, tool in engine._tools.items():
-        tokens = set(engine._tokenize(tool.name)) | set(engine._tokenize(tool.description))
-        for tag in tool.tags:
-            tokens.update(engine._tokenize(tag))
+        tokens = set(engine._tokenize(retrieval_tool_text(tool)))
         for token in tokens:
             postings.setdefault(token, []).append(name)
 
@@ -1101,16 +1165,25 @@ class _GraphWorker:
             graph.tune_for_scale()
             engine = graph._get_retrieval_engine()
             engine._tokenize = chinese_tokenize
+            if engine._embedding_index is not None and graph.metadata.get('retrieval_content') != RETRIEVAL_CONTENT:
+                raise ValueError('Retrieval content is obsolete; rebuild the graph')
+            if graph.metadata.get('retrieval_content') == RETRIEVAL_CONTENT:
+                prepare_content_retrieval(engine)
             _prepare_keyword_index(engine)
             if engine._embedding_index is not None:
+                from complete_embedding import REPRESENTATION
+                if graph.metadata.get('embedding_representation') != REPRESENTATION:
+                    raise ValueError('Tool embedding representation is obsolete; rebuild the graph')
                 provider = engine._embedding_index._provider
                 if provider is not None and hasattr(provider, '_get_model'):
+                    from complete_embedding import complete_provider
                     # Shared MPS inference crashes when independent requests
                     # overlap, even with a lock around encode. Use CPU for
                     # this small query model; graph scoring still overlaps.
                     provider._get_model().to('cpu')
                     import torch
                     torch.set_num_threads(1)
+                    complete_provider(provider)
                 if provider is not None:
                     engine._embedding_index._provider = _CachedEmbeddingProvider(provider)
                 engine.set_embedding_index(_SerializedEmbeddingIndex(engine._embedding_index))

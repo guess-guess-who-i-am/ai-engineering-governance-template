@@ -7,7 +7,7 @@ import { spawn } from "node:child_process";
 import { createReadStream, openSync, closeSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { configuredServers, discover } from './mcp-catalog.mjs';
-import { skillFiles, graphInputsHash } from './registry-inputs.mjs';
+import { skillFiles, graphInputsHash, publishMcpCatalog } from './registry-inputs.mjs';
 
 function frontmatterValue(text, key) {
   const block = text.match(/^---\s*\n([\s\S]*?)\n---/)?.[1] || "";
@@ -51,9 +51,7 @@ async function listMcpTools(codexRoot, outputPath) {
   if (failed.length) throw new Error(`MCP discovery incomplete; preserving the previous index: ${failed.join(', ')}`);
   const tools = results.flatMap(result => result.value);
   const data = { schemaVersion: "codex-mcp-tool-catalog/1", generatedAt: new Date().toISOString(), tools };
-  await mkdir(path.dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, `${JSON.stringify(data, null, 2)}\n`, { mode: 0o600 });
-  return data;
+  return publishMcpCatalog(outputPath, data);
 }
 
 async function refreshExternalIndex(home, codexRoot) {
