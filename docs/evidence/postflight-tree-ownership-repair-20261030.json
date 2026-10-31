@@ -1,0 +1,53 @@
+{
+  "schema": "postflight-tree-ownership-repair/v1",
+  "rootCause": "A safe Markdown path predicate was used as task-tree ownership. Ordinary role evidence was audited as a graph and ignored as substantive documentation work.",
+  "redTests": {
+    "passed": 3,
+    "failed": 2
+  },
+  "greenRegressionTests": 5,
+  "adjacentMaintenanceTests": 10,
+  "copiesTested": [
+    "source",
+    "macos-kit",
+    "plugin-runtime"
+  ],
+  "originalReplayedChangedFiles": 110,
+  "previousLongLineIssueCount": 62,
+  "replayedIssues": [],
+  "rawRoleSnapshots": 21,
+  "roleHashes": {
+    "academic-journal-selector.role.md": "2dde41ebe681c4587c5f7c03e697b2f6d8a62c793745ac690fd71a64f2a9b4a6",
+    "arxiv-watcher.role.md": "5d246008fb0106217907752840d1a8ab555ccc206f8efbc722cad297bf56a1b6",
+    "career-broker.role.md": "3085f16d84960db0ca609dc563366c1b9c83b883f9143b35c55d0fbb85bbd628",
+    "code.role.md": "4378881efd43242e5bfdfe6c02b8cdf5f003a24386291e4cc2606d26c5659237",
+    "database-operations.role.md": "b63d3a40ce424cece63389fa70456a8181067873241308a9650ee62beb28a89d",
+    "database-optimization-expert.role.md": "afbd1615bc638cb10c55b390850df7819bfd93fbb3f43573fbeafd09546203c3",
+    "evidence-collector.role.md": "0b233e60865a0bc9c9b536aa7658c0b9f524cfa12b60908166a6a8b599448d0d",
+    "exam-preparation-planner.role.md": "52a10daa5b876c953b0a1d72c2fe4774600e99d123b339639648a688fba93d70",
+    "fbsir-eight-seat-board.role.md": "f98e8005fa3fb9972de8d12e31a46d129a59a76bba42ea7244959712e621afa9",
+    "incident-response-commander.role.md": "606eb6fde156703996de07701e653ca67ade8152731d9d369ee085d34e0dbdda",
+    "litigation-legal.role.md": "1d467f10163102637fa570d6498dc11f079d8df7a3602536a3f985742721ec13",
+    "metamorphosis-practitioner.role.md": "456ccdb068570fbbccf4fd52b3593f5d55eac366a426b5ec8bc6d67caa4f9756",
+    "news-buddy.role.md": "7bae58fe3d6e8298fd287fbe245f63642708803d4a093670ea3802129e1c9a92",
+    "sdk-log-expert.role.md": "d054b32c11e29980bb7d64488ad31d0404efe693f1894c8e4af1d691344bf2ef",
+    "soe.role.md": "eb297691c2a22055e3896595612c891bed2e172b1fc840eced7e838b58ea031c",
+    "study-planner.role.md": "fd325c9bd1fb106d1a2a4c03d6337894dd623438c1d2fb21d82d12cac58fa235",
+    "tc-chengxin-travel-expert.role.md": "8fe2d809c9c89689172844fecf5ef09e987bd881231b34473f10a297ed56fe1b",
+    "test-results-analyst.role.md": "4a81971cf643121865af36e53cbed9b6ffdd282216d9cd285ecebd5539a5a267",
+    "tianyu-account-guardian.role.md": "ee2a5c567316375c84252e62d9a45f9a0c70c96f919c3ad38c83ec2ffcb06dcc",
+    "topic-evaluator.role.md": "ddbb3ee4c831b71ab4c730c3d9e42204e7b72b901f388976252f75e2d5edab6f",
+    "tripstar-agent.role.md": "fb355498823b54b907812c6f58a56d7526716baa287f7875537fcec897cbbbcf"
+  },
+  "rolesUnchanged": true,
+  "realStop": {
+    "exitCode": 0,
+    "stdout": "{}",
+    "stderr": ""
+  },
+  "limitsUnchanged": {
+    "maxLineChars": 240,
+    "activeTreeMaxBytes": 12288,
+    "qualityMode": "strict"
+  }
+}

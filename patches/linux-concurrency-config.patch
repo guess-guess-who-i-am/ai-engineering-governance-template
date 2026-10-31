@@ -1,0 +1,65 @@
+diff --git a/scripts/configure-lazy-capabilities-linux.mjs b/scripts/configure-lazy-capabilities-linux.mjs
+index 8f031ca..a71e3f0 100644
+--- a/scripts/configure-lazy-capabilities-linux.mjs
++++ b/scripts/configure-lazy-capabilities-linux.mjs
+@@ -145,7 +145,7 @@ async function writeProfiles(codexHome, taskTreeEntry) {
+     ? `\n[mcp_servers.task_tree]\nenabled = true\ncommand = '${process.execPath}'\nargs = ['${taskTreeEntry}']\nstartup_timeout_sec = 30\n`
+     : "";
+   const pluginSections = PLUGINS.map((plugin) => `\n[plugins."${plugin}"]\nenabled = true\n`).join("");
+-  await atomicWrite(path.join(codexHome, "full-tools.config.toml"), `[features]\nenable_mcp_apps = true\nmulti_agent = false\nplugins = true\nremote_plugin = false\n${taskTree}${pluginSections}`);
++  await atomicWrite(path.join(codexHome, "full-tools.config.toml"), `[features]\nenable_mcp_apps = true\nmulti_agent = true\nplugins = true\nremote_plugin = false\n${taskTree}${pluginSections}`);
+ }
+ 
+ async function refreshRegistry(codexHome, home) {
+@@ -199,7 +199,7 @@ async function apply(options) {
+ 
+   try {
+     let config = await readFile(configPath, "utf8");
+-    for (const [name, value] of [["enable_mcp_apps", false], ["multi_agent", false], ["plugins", false], ["remote_plugin", false]]) {
++    for (const [name, value] of [["enable_mcp_apps", false], ["multi_agent", true], ["plugins", false], ["remote_plugin", false]]) {
+       config = setFeature(config, name, value);
+     }
+     for (const plugin of new Set([...PLUGINS, ...directPluginNames(config)])) config = setPluginEnabled(config, plugin, false);
+diff --git a/scripts/repair-codex-linux-config.mjs b/scripts/repair-codex-linux-config.mjs
+index 90f7640..e1a8ef8 100644
+--- a/scripts/repair-codex-linux-config.mjs
++++ b/scripts/repair-codex-linux-config.mjs
+@@ -9,6 +9,7 @@ const KEEP_SECTIONS = [
+   /^projects\.["']\/[^"']+["']$/,
+   /^desktop$/,
+   /^features$/,
++  /^agents$/,
+   /^tui\.model_availability_nux$/,
+   /^marketplaces\.openai-bundled$/,
+   /^hooks\.state$/,
+@@ -67,7 +68,7 @@ function cleanConfig(source) {
+     "[features]",
+     "enable_mcp_apps = false",
+     "js_repl = false",
+-    "multi_agent = false"
++    "multi_agent = true"
+   ];
+   const keptSections = sections.filter((section) =>
+     KEEP_SECTIONS.some((pattern) => pattern.test(section.name))
+@@ -120,7 +121,7 @@ async function main() {
+     backupDirectory,
+     windowsPaths: remainingWindowsPaths.length,
+     mcpServers: 0,
+-    multiAgent: false
++    multiAgent: true
+   };
+   if (options.json) process.stdout.write(`${JSON.stringify(result)}\n`);
+   else console.log(result);
+diff --git a/scripts/test-repair-codex-linux-config.mjs b/scripts/test-repair-codex-linux-config.mjs
+index f72b997..a854e71 100644
+--- a/scripts/test-repair-codex-linux-config.mjs
++++ b/scripts/test-repair-codex-linux-config.mjs
+@@ -51,7 +51,7 @@ const repaired = await readFile(path.join(codexHome, "config.toml"), "utf8");
+ assert.match(repaired, /model = "gpt-5\.6-sol"/);
+ assert.match(repaired, /projects\."\/home\/test\/project"/);
+ assert.match(repaired, /enable_mcp_apps = false/);
+-assert.match(repaired, /multi_agent = false/);
++assert.match(repaired, /multi_agent = true/);
+ assert.doesNotMatch(repaired, /C:\\\\/);
+ assert.doesNotMatch(repaired, /mcp_servers/);
+ assert.match(repaired, /trusted_hash = "current"/);

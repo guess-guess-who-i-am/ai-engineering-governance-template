@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { validateJobs } from './bench-codex-ready-work.mjs';
+const job = (id, start) => 'BENCH_JOB ' + JSON.stringify({ id, start, end: start + 400, digest: createHash('sha256').update(`ready-work:${id}`).digest('hex') });
+const item = output => [{ type: 'commandExecution', exitCode: 0, output }];
+assert.equal(validateJobs(item(Array.from({ length: 8 }, (_, i) => job(i + 1, 1000)).join('\n'))).peak, 8);
+assert.equal(validateJobs(item(Array.from({ length: 8 }, (_, i) => job(i + 1, 1000 + i * 400)).join('\n'))).peak, 1);
+assert.throws(() => validateJobs(item('eight jobs ran in parallel')), /Expected/);
+assert.throws(() => validateJobs(item(Array.from({ length: 8 }, () => job(1, 1000)).join('\n'))), /distinct/);
+assert.throws(() => validateJobs(item(job(1, 1000).replace(/"digest":"[a-f0-9]+"/, '"digest":"wrong"'))), /Incorrect/);
+assert.throws(() => validateJobs([{ type: 'commandExecution', exitCode: 1, output: Array.from({ length: 8 }, (_, i) => job(i + 1, 1000)).join('\n') }]), /Expected/);
+console.log('PASS: measured overlap, serial control, identity, correctness and failed-output rejection');

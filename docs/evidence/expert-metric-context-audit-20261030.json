@@ -1,0 +1,40 @@
+{
+  "schema": "routing-context-audit/v1",
+  "entry": "routingQuery",
+  "fixture": "Synthetic one-prior-message transcript; actual follow-up text supplied by user.",
+  "previousTask": "请诊断 Skill/MCP 图路由的专家推荐，核对两席专家与真实需求是否匹配。",
+  "rows": [
+    {
+      "name": "short-followup",
+      "promptLength": 2,
+      "query": "请诊断 Skill/MCP 图路由的专家推荐，核对两席专家与真实需求是否匹配。\n继续",
+      "inheritedTask": true,
+      "unchangedPrompt": false
+    },
+    {
+      "name": "actual-followup",
+      "promptLength": 95,
+      "query": "我感觉你的评价指标有问题，就是你认为的正确推荐了，可能不是真正的正确推荐了？要不然你现在的什么48/68为什么还是推荐不到想要的？我感觉评价指标有问题你仔细根因分析一下，看看是不是这个问题？",
+      "inheritedTask": false,
+      "unchangedPrompt": true
+    },
+    {
+      "name": "long-followup",
+      "promptLength": 123,
+      "query": "我感觉你的评价指标有问题，就是你认为的正确推荐了，可能不是真正的正确推荐了？要不然你现在的什么48/68为什么还是推荐不到想要的？我感觉评价指标有问题你仔细根因分析一下，看看是不是这个问题？请逐项检查旧计分逻辑、专家原角色适用条件和任务最终产物。",
+      "inheritedTask": false,
+      "unchangedPrompt": true
+    },
+    {
+      "name": "new-topic",
+      "promptLength": 9,
+      "query": "请帮我预订东京酒店",
+      "inheritedTask": false,
+      "unchangedPrompt": true
+    }
+  ],
+  "productionChanged": false,
+  "limitations": [
+    "Tests context construction, not graph retrieval or overall long-dialogue accuracy."
+  ]
+}

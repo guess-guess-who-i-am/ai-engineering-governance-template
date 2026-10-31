@@ -1,0 +1,242 @@
+{
+  "schema": "global-profile-audit/v1",
+  "updatedAt": "2026-10-29T08:27:23.656667+00:00",
+  "deployment": {
+    "files": [
+      {
+        "source": "codex-profile/mac/hooks/graph_skill_index.py",
+        "installedEqual": true,
+        "stableEqual": true
+      },
+      {
+        "source": "codex-profile/.codex/hooks/skill-router.mjs",
+        "installedEqual": true,
+        "stableEqual": true
+      },
+      {
+        "source": "codex-profile/.codex/prompt-publisher/publish-methodology.mjs",
+        "installedEqual": true,
+        "stableEqual": true
+      },
+      {
+        "source": "codex-profile/global-skills/method-github-delivery/SKILL.md",
+        "installedEqual": true,
+        "stableEqual": true
+      },
+      {
+        "source": "scripts/deploy-global-profile.mjs",
+        "stableEqual": true
+      },
+      {
+        "source": "scripts/install-codex-profile-mac.mjs",
+        "stableEqual": true
+      },
+      {
+        "source": "scripts/install-task-tree-mcp-mac.mjs",
+        "stableEqual": true
+      }
+    ],
+    "manifest": {
+      "schemaVersion": "graph-tool-call-skills/1",
+      "graphToolCallVersion": "0.46.0",
+      "embedding": "sentence-transformers/all-MiniLM-L6-v2",
+      "chineseEmbedding": "paraphrase-multilingual-MiniLM-L12-v2",
+      "retrievalProfile": "bilingual-cjk-language-routed/1",
+      "generatedAt": "2026-10-29T16:21:33.395134+08:00",
+      "catalogSha256": "dd63f1d8b8ec26b6b6bd4ff2bdf5fd52c637964b1f7c202a746465cbebdbd54c",
+      "catalogSkillCount": 15495,
+      "skillCount": 15495,
+      "externalSkillCount": 15472,
+      "ownedSkillCount": 23,
+      "mcpToolCount": 27,
+      "resourceModuleCount": 4232,
+      "resourceModuleCounts": {
+        "expert": 447,
+        "skill": 3307,
+        "mcp-service": 478
+      },
+      "missingSkillCount": 0,
+      "invalidSkillCount": 0,
+      "catalogLength": 14100590,
+      "catalogMtimeMs": 1784795929636.5881,
+      "graphInputsSha256": "2aa5c5e17e9070368acde7a4010260eef3cfa99a6933b58df1bbb47f206f51ee"
+    },
+    "install": {
+      "schema": "global-profile-install/v1",
+      "platform": "darwin",
+      "status": "installed",
+      "resources": {
+        "processes": 4,
+        "memoryHigh": 10,
+        "memoryMax": 12,
+        "maxRequests": 128,
+        "backlog": 256
+      },
+      "ownedSkillCount": 23,
+      "externalSkillCount": 15472,
+      "mcpToolCount": 27,
+      "embedding": "sentence-transformers/all-MiniLM-L6-v2",
+      "trust": {
+        "status": "recorded",
+        "reason": "both stable dispatcher entries have persisted trust records; Codex still decides whether hashes remain current"
+      },
+      "service": "verified",
+      "taskTree": "verified",
+      "startup": "after-user-login",
+      "verificationScope": "full-installation"
+    }
+  },
+  "readCache": {
+    "cases": 10,
+    "rounds": 3,
+    "baselineMedianSumSeconds": 5.349468416006857,
+    "candidateMedianSumSeconds": 5.075437707004312,
+    "reductionPercent": 5.122578314185045,
+    "cacheEdges": "CacheInfo(hits=591, misses=77, maxsize=None, currsize=77)",
+    "cacheAttrs": "CacheInfo(hits=1269841, misses=19802, maxsize=None, currsize=19802)",
+    "limitations": [
+      "Same-process warm caches; not end-to-end agent acceleration.",
+      "No model tokens or accuracy change inferred."
+    ]
+  },
+  "contextComparison": {
+    "output": "/Library/hyf/并行ide/ai-engineering-governance-template/.reports/router-context-comparison.json",
+    "cases": 15,
+    "unchangedCandidateLists": 15,
+    "challengeTargetHits": 7,
+    "baseline": {
+      "characters": 96105,
+      "bytes": 108801,
+      "elapsedMs": 1110.846791
+    },
+    "candidate": {
+      "characters": 90915,
+      "bytes": 103611,
+      "elapsedMs": 1076.216833
+    },
+    "characterReductionPercent": 5.400343374434213,
+    "wallMs": 847.6989159999999,
+    "concurrency": 4,
+    "limitations": [
+      "Name recall is a proxy, not task correctness.",
+      "No LLM was invoked; total task tokens and expert output quality were not measured.",
+      "Character/byte reduction is not a model token count.",
+      "Resident caches and OS scheduling confound elapsed-time comparisons; no speedup claim."
+    ]
+  },
+  "load": {
+    "before": {
+      "schema": "graph-load/v1",
+      "count": 100,
+      "pattern": "stagger",
+      "graphSha256": "a68fd8a336bbd1842753d74090113f96a6d6428df7e9e1d575e9edabd5e67230",
+      "workerSha256": "c86b5c303b57349ade0d964502847507a6fe91bdb374e2871156f9ac91f68df7",
+      "transport": "socket",
+      "seed": "audit-20261029-before",
+      "warm": true,
+      "longInputs": true,
+      "uniqueQueries": true,
+      "configuredProcesses": null,
+      "success": 100,
+      "wallSeconds": 55.2091,
+      "p50Seconds": 23.658099999999997,
+      "p95Seconds": 48.7301,
+      "maxSeconds": 50.667,
+      "queryProcesses": 4,
+      "poolResidentMiB": 1146.5
+    },
+    "after": {
+      "schema": "graph-load/v1",
+      "count": 100,
+      "pattern": "stagger",
+      "graphSha256": "d684ac21de06d87e3764fffe05a1e79296db44a30751558f320606c997179212",
+      "workerSha256": "fea838989d93ae859deac6840d88caf4f2629e006781c0ff773858ba32db56dc",
+      "transport": "socket",
+      "seed": "audit-20261029-after",
+      "warm": true,
+      "longInputs": true,
+      "uniqueQueries": true,
+      "configuredProcesses": null,
+      "success": 100,
+      "wallSeconds": 46.8802,
+      "p50Seconds": 19.1438,
+      "p95Seconds": 40.2069,
+      "maxSeconds": 42.5056,
+      "queryProcesses": 4,
+      "poolResidentMiB": 1934.6
+    },
+    "hook": {
+      "schema": "graph-load/v1",
+      "count": 8,
+      "pattern": "burst",
+      "graphSha256": "d684ac21de06d87e3764fffe05a1e79296db44a30751558f320606c997179212",
+      "workerSha256": "fea838989d93ae859deac6840d88caf4f2629e006781c0ff773858ba32db56dc",
+      "transport": "hook",
+      "seed": "audit-20261029-hook",
+      "warm": true,
+      "longInputs": true,
+      "uniqueQueries": true,
+      "configuredProcesses": null,
+      "success": 8,
+      "wallSeconds": 3.7721,
+      "p50Seconds": 2.81765,
+      "p95Seconds": 3.4159,
+      "maxSeconds": 3.4166,
+      "queryProcesses": 0
+    }
+  },
+  "comparison": {
+    "sameGraph": false,
+    "wallReductionPercent": 15.086099936423524,
+    "p95ReductionPercent": 17.490626943100885,
+    "interpretation": "Observational before/after; changed graph, warm-state and OS memory pressure prevent causal attribution."
+  },
+  "realHook": {
+    "exitCode": 0,
+    "seconds": 0.5156043749993842,
+    "contextCharacters": 19219,
+    "counts": {
+      "expert": 2,
+      "skill": 4,
+      "mcp": 2
+    },
+    "candidates": [
+      "- verify-before-completion [Skill; score=15; match=GraphToolCall medium]",
+      "- expert-manager [Skill; score=14; match=GraphToolCall medium]",
+      "- wanfang-search [Skill; score=15; match=GraphToolCall medium]",
+      "- ops-troubleshooting [Skill; score=14; match=GraphToolCall medium]",
+      "- test-results-analyst [Complete expert module; score=6; match=GraphToolCall low]",
+      "- technical_research_batch [MCP/technical_research; score=5; match=GraphToolCall low]",
+      "- task_tree_check_compact [MCP/task_tree; score=5; match=GraphToolCall low]",
+      "- sre-expert [Complete expert module; score=5; match=GraphToolCall low]"
+    ],
+    "stderr": ""
+  },
+  "service": {
+    "launchdRunning": true,
+    "runAtLoad": true,
+    "keepAlive": true,
+    "startup": "after-user-login",
+    "actualRebootTested": false,
+    "stableScriptHashesEqual": true,
+    "defaultInstallCheckChanges": 0
+  },
+  "checks": {
+    "generatedArtifactDrift": "pass: 13 individually corrupted artifacts rejected; missing router repaired; readonly check; context budget",
+    "portableInstall": "pass: persisted library preserved; historical backups excluded",
+    "taskTreeRealpath": "pass: symlink repeat install; 21 tools discovered",
+    "readCache": "pass: seeded differential traversal",
+    "bm25": "pass: 7 tests including float-order counterexample",
+    "worker": "pass: 16 tests",
+    "macIntegration": "pass; interface shim is not performance evidence",
+    "governance": "pass",
+    "ownedSkills": "pass: 22 repository Skills"
+  },
+  "limitations": [
+    "No LLM token usage or task accuracy measurement.",
+    "Before/after socket load omits category_slots; the real Hook uses expert=2/skill=4/mcp=2, separately verified.",
+    "No Linux/Windows host or actual reboot test.",
+    "The local four-process resource-plan change predated this audit and remains unstaged; its RSS-based memory assumption is not proven.",
+    "No end-to-end agent acceleration claim."
+  ]
+}

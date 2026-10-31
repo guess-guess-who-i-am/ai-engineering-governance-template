@@ -1,0 +1,4 @@
+interface:
+  display_name: "任务树子树并行运行"
+  short_description: "在授权范围内并行执行任务树子树并汇总完整可审计证据"
+  default_prompt: "使用 $task-tree-subtree-run 在授权范围内运行这个任务树子树。"

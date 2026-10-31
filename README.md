@@ -1,140 +1,81 @@
 # AI Engineering Governance Template
 
-一个面向 Codex 和其他 Agent Skills 兼容工具的工程治理起点，将常驻规则、领域语义、设计上下文、按需 Skills、确定性门禁和可执行 Flow 分层组织。
+把本机这套全局 Codex 提示词、Skills、GraphToolCall 检索、Hook 和并行调度搬到其他电脑。三平台共用同一个模板源，安装过程由程序完成，不需要多个 Agent，也不需要用户输入安装代码。
 
-最后更新：2026-09-20 晚上
+更新：2026-10-25。中文检索、双语预热、并发调度及 Hook cadence 已纳入此私有部署分支。推荐根据任务内容触发，不要求用户点名 Skill 或 MCP；真实对话 Hook 信任仍需 Codex 客户端批准，未批准的 Hook 不会运行。检索边界见[任务内容自动推荐](docs/TASK_CONTENT_RECOMMENDATIONS.md)和[检索运行时实测](docs/RETRIEVAL_RUNTIME_UPGRADE.md)。
 
-## 已包含
+2026-10-24 完整模块接入：447 个专家、3,307 个 Skill 版本及 478 个 MCP 服务已安装到本机全局，并合入 19,753 节点的辅助路由图；原始专家不拆分。接入范围、已知失败和召回限制见 [完整模块记录](docs/RESOURCE_MODULES.md)。这些本地新增资源不包含在尚未更新的下载包中，不能将入图等同于全部功能已验证。
 
-- `AGENTS.md`：任务路由、权威顺序和验证预算。
-- `CONTEXT.md`：稳定术语、关系与歧义裁决。
-- `DESIGN.md`：工程工具默认视觉系统。
-- `.agents/skills/`：12 个按需加载且命名统一的专项工作流。
-- `scripts/`：治理、Skills、敏感文件和整体检查。
-- `.kest/flow/`：Markdown-native Flow 示例。
-- `requirements/user-stories/`：带稳定验收条件 ID 和证据映射的用户故事。
-- `quality/gates.json`：所有测试类别的显式启用、规划或不适用决策。
-- `TESTING.md`：功能、契约、E2E、可访问性、性能、安全、供应链和发布证据体系。
-- `UPSTREAMS.md`：第三方研究仓库与更新机制。
-- `.github/`：CI、Issue 和 PR 模板。
-- `codex-profile/`：可迁移的全局 Codex Hook、中文方法论源、英文生成物、推荐器、发布器和自建方法 Skills；不含任何登录态或密钥。
-- `qualitative/`：带正反样例校准的 LLM 定性门禁。
-- `quality/findings.json`：P0–P3 问题、稳定 fingerprint、责任人和生命周期契约。
-- `design/catalog.json`：74 条固定 commit、许可证和来源路径的设计参考。
-- `site/`：公开文档站，带静态预算、真实浏览器、键盘和 axe 证据。
-- `VERSION` / `CHANGELOG.md`：语义化版本与 GitHub Release 边界。
+2026-10-25 专家调用简化：本机已改为一次读取入口就加载完整原始主角色，不拆改原包、不做工具映射。446 个专家有明确主角色，1 个入口歧义明确受阻；加载成功不等于业务执行成功。见[使用方式和实测边界](docs/EXPERT_DIRECT_ENTRY.md)。
 
-## 快速开始
+## 最简单的安装方式
 
-```powershell
-./scripts/update-upstreams.ps1
-./scripts/check.ps1
-./scripts/invoke-quality-gates.ps1 -Profile release
-./scripts/search-design-references.ps1 -Query voice
-```
+在 GitHub 登录有权限的账号后，打开私有仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，下载 `codex/macos-global-deploy` 分支 ZIP，**先解压整个文件夹**，再打开对应文件：
 
-创建一个独立的新项目时，可让 Codex 使用 `$start-new-project` 逐项填写 brief；也可直接运行交互式向导：
+| 电脑系统 | 双击哪个文件 | 常驻服务 |
+| --- | --- | --- |
+| macOS | **安装全局配置-macOS.command**；旧的“安装全局配置.command”也可用 | 登录后由 LaunchAgent 自动启动 |
+| Windows | **安装全局配置-Windows.cmd** | 登录后由计划任务自动启动 |
+| Linux 桌面 | **安装全局配置-Linux.desktop**，选择“运行/允许启动” | systemd 用户服务；启用 linger 后开机未登录也启动 |
 
-```powershell
-./scripts/new-project.ps1
-```
+首次按系统提示授权即可，不必手输命令。已安装过：下载新版本、解压、再次双击同一入口，自动备份后更新。配置是**用户全局的**，装一次就供所有现有和未来工作区使用，不需要在每个仓库安装，也不会自动创建一堆 Agent。
 
-向导默认把项目建立在本模板的同级目录，先运行治理检查并初始化 Git；只有明确确认后才创建私有 GitHub 仓库。
+新电脑需要先通过图形安装器准备 **Codex、Git、Python 3.10+（含 pip/venv）**；没有可用的 Codex 内置 Node 时再安装 **Node.js 20+ LTS**。这不是包含操作系统和所有基础软件的离线安装包。安装器自动建立隔离 Python 环境、安装锁定的检索依赖、恢复 Skill 库并建图。缺少依赖会给出下载地址，不会假报成功。
 
-## 跨电脑复用 Codex 全局配置
+模板、15k+ 第三方 Skill 镜像和资源包均位于私有 GitHub 仓库。目标 GitHub 账号需要分别获得模板仓库与 [skills-library](https://github.com/guess-guess-who-i-am/skills-library) 的读取权限；专家/Skill/MCP 完整模块归档通过该私有资源仓库的 Release 分发。可用 GitHub Desktop 登录或安装 [GitHub CLI](https://cli.github.com/) 后按浏览器授权；不复制另一台电脑的 token、登录态或本机图索引。只获取模板 ZIP 而没有私有资源权限，不能恢复全量资源。
 
-当前完整工程保存在公开仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是受保护的 `main`。`codex-profile/` 是本机全局 Codex 配置的可迁移版本，另一台 Windows 或 Linux 电脑克隆仓库后即可安装同一套方法论路由、Hook、发布器和自建 Skills。
+完整的点击步骤、首次授权、更新与故障处理见 **[三平台傻瓜式安装说明](docs/INSTALLATION.md)**。
 
-### 仓库中具体保存了什么
+> 当前安装器在 `codex/macos-global-deploy` 分支，`main` 合并前请勿把旧版入口当作同一版本。代码通过 [PR #26](https://github.com/guess-guess-who-i-am/ai-engineering-governance-template/pull/26) 交付。原生平台的验证范围见 [安装验收记录](docs/PORTABLE_PROFILE_VERIFICATION.md)。
 
-- 全局 `AGENTS.md`：只放进入项目时需要读取一次的跨项目规则和渐进加载原则。
-- 中文唯一编辑源：`codex-profile/.codex/prompts/global-methodology-source.zh.md`，保留用户中文原文，是以后增删改方法论的唯一人工入口。
-- 英文运行文件：常驻提醒、完整方法论档案、方法论路由和映射文件；由中文源逐行翻译生成，不用润色摘要代替原文。
-- 每轮 Hook：每次用户提示重新注入英文常驻提醒和方法论路由；会话启动、恢复、清理和压缩时也会恢复这些内容。
-- 稳定 Hook dispatcher：`UserPromptSubmit` 和 `SessionStart` 各只注册一个入口，内部并发执行常驻提醒、Skill 推荐、可选 capability 推荐和索引刷新。以后增加内部路由不会移动 Hook 索引并使已有信任记录错位。
-- Skill 推荐器：先读取轻量索引，根据当前任务语义推荐最多4个候选，只在命中后读取对应完整 `SKILL.md`，不会把整个 Skill 目录塞进上下文。除本机约数百个 Skills 外，还会复用 `E:\skills\_catalog_cn.json`，把其中约1.5万个 Skills 编译为持久化行索引；不会递归预读这一万多个正文。
-- 方法论发布器：保存中文源后自动翻译、备份、生成中英文文件、更新 Skills 和索引；失败时回滚。
-- 6个自建方法 Skills：`manage-global-methodology`、`method-research-evidence`、`method-engineering-execution`、`method-evaluation-gates`、`method-github-delivery`、`method-task-tree`。
-- 63条已归类方法论：常驻21条、研究9条、工程12条、评价10条、GitHub交付1条、任务树10条；机械校验保证零重复、零遗漏。
-- 迁移工具：37个受管配置文件，以及安装、同步和安装测试脚本。`codex-profile/README.zh.md` 提供独立说明。
+## 和本机统一哪些内容
 
-### 不会上传什么
+- 全局 AGENTS 入口、中文唯一编辑源、英文运行提示、路由与发布器，同源生成；目前校验 76 条规则。
+- 22 个仓库自有 Skill 安装到用户级全局目录；第三方完整库安装到全局工具目录。自有 Skill、第三方 Skill 与已发现 MCP 工具合并到同一张 GraphToolCall 图，按目标电脑实际路径重建，不携带本机绝对路径。
+- GraphToolCall 0.46.0、sentence-transformers 6.1.0；英文查询保留 all-MiniLM-L6-v2，含中文查询使用 paraphrase-multilingual-MiniLM-L12-v2、中文分词和受约束候选池。中文说明与向量提前建好，请求时不调用翻译服务；首次安装需下载两个模型。常驻进程复用索引，Linux 使用 CPU-only PyTorch，不复制 Mac 虚拟环境。
+- 每个查询进程在服务启动及换图时完成中英文模型、BM25 和候选池的初始化，再接受正常检索；不是只发英文预热请求。检索与重排用的静态描述向量均提前构建并保存，新问题的查询向量现场计算，重复查询复用缓存。
+- 源码导航恢复 `rg` 和按需局部读取；安装器直接删除本配置曾安装的 Serena 配置块、导航 Skill、路由及专属运行文件，不保留该失败接入的备份。实验报告保留，用户自有数据和其他 MCP 配置不受影响。当前行为和证据见[双语预热与 Serena 撤回](docs/PREWARM_AND_SERENA_ROLLBACK.md)。
+- V5 调度：安全且独立的就绪任务通常一次发出 5–8 路，确定性 DAG 执行器默认 8 路；依赖、危险、共享状态及限流操作受约束。20 是 Agent 硬上限，不是每次任务必须开 20 个 Agent。
+- 固定 Hook 内容每三轮注入一次，动态 Skill 路由每轮执行；提示词改变后下一请求立即刷新，压缩与恢复时补回调度契约。
+- 按目标电脑 CPU 和内存选择 1–8 个常驻查询进程，128 个在途请求和 256 个等待连接，不在每次检索时重新加载全图。安装后执行预热与完整性检查。
+- 自动备份被覆盖的受管文件；保留原模型、provider、用户自有配置、其他 Hook 及非受管 Skills。重复安装不复制同名入口。
 
-仓库不会保存 API Key、token、cookie、`.env`、`auth.json`、GitHub 登录态、Codex 登录态、日志或机器本地备份。无论仓库公开还是私有，这些凭据都必须留在各自电脑的安全存储中。
+**不会统一或上传**：API Key、token、cookie、auth.json、Codex/GitHub 登录态、机器本地备份、模型 provider 的私密配置。每台电脑使用自己的账号和权限；不伪造 Hook 信任、不放宽企业安全策略。首次需在 Codex 内批准受管 Hook；静态工具列表变化时，可能需要新建对话或重启客户端。
 
-远程 LLM 配置允许模型名留空，由远程网关选择模型；需要时只在目标电脑或 GitHub repository secrets 中设置 `LLM_BASE_URL` 和 `LLM_API_KEY`，不要写入仓库文件。
+“和本机同源”不等于任何电脑都能达到相同耗时。194 实测已证实真实 8 路并行与 100/100 请求成功，但整体对话仍存在约 20–158 秒长尾；不能把并发配置上限当作稳定提速证明。详见 [194 提示词统一实测](docs/SERVER_194_PROMPT_UNIFICATION.md)。
 
-### 在另一台 Windows 电脑安装
+## 装好之后怎么用
 
-先安装 Git、GitHub CLI、Node.js 和 Codex，然后运行：
+直接在任意工作区打开 Codex，正常提问即可。Skills 和 MCP 的候选推荐由全局路由处理，不需要逐个启用或粘贴全文。
 
-```powershell
-gh auth login
-gh repo clone guess-guess-who-i-am/ai-engineering-governance-template
-cd ai-engineering-governance-template
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-codex-profile.ps1
-```
+Mac 首次安装还会添加“部署 Codex 全局配置”Finder 快速操作，后续可从工作区文件夹的右键菜单进入；部分 macOS 将其放在“快速操作/服务”子菜单，不能承诺在所有应用的顶层右键菜单出现。
 
-安装器会：
+更新 Skill 或 MCP 后，下一次 SessionStart 会在后台检查索引输入是否变化，保留旧图直到新图构建成功；不是每条请求都重建。新库或模型首次下载/建图需要网络和时间，初次安装速度不代表热态检索速度。
 
-1. 把目标电脑上即将覆盖的文件备份到 `~/.codex/backups/portable-profile/<时间戳>/`。
-2. 安装全局 `AGENTS.md`、Hook、中文源、英文生成物、发布器、路由配置和6个自建 Skills。
-3. 根据目标电脑的用户目录生成 `hooks.json`，不会沿用原电脑的绝对路径。
-4. 创建“编辑并发布全局 Prompt”和“编辑并发布全局方法论”两个桌面入口。
-5. 校验63条方法论的中英文对应关系并刷新 Skill 索引。
+## 可维护的工程治理模板
 
-安装完成后，在该电脑单独完成 Codex 登录并重新启动 Codex，使全局 `AGENTS.md` 和 Hook 重新加载。完整说明见 [可迁移 Codex 全局配置](codex-profile/README.zh.md)。
+本仓库也可作为下游项目的工程起点：
 
-修改过 `hooks.json` 的入口命令后，必须在 Codex 中重新批准两个 dispatcher。只看到 `user_prompt_submit:0:0` 的旧信任记录并不代表新命令已受信任；安装器不会复制或伪造 `trusted_hash`。
+- AGENTS.md：最小常驻导航、权威顺序和验证预算。
+- CONTEXT.md / DESIGN.md：领域语义与视觉系统。
+- codex-profile/global-skills：自有 Skill 的唯一版本源，不从项目目录自动发现。
+- scripts / quality / requirements：确定性门禁、用户故事、证据和问题生命周期。
+- .kest/flow / qualitative：可执行 Flow 与校准后的定性门禁。
+- UPSTREAMS.md / upstreams.lock.json：第三方来源、许可证和固定版本；完整上游镜像不放进公开模板仓库。
 
-### 在另一台 Linux 电脑安装
+创建独立产品可在 Codex 中调用 start-new-project；不会替用户擅自发布仓库。下游项目仍应补充自己的领域、设计和真实验收条件。
 
-```bash
-git clone https://github.com/guess-guess-who-i-am/ai-engineering-governance-template.git
-cd ai-engineering-governance-template
-./scripts/install-codex-profile-linux.sh
-./scripts/install-codex-profile-linux.sh --check
-```
+维护入口：[工作流](WORKFLOW.md) · [测试体系](TESTING.md) · [治理 Skill 约定](codex-profile/global-skills/README.md) · [方法论发布器](codex-profile/.codex/prompt-publisher/README.zh.md) · [GitHub 发布边界](docs/RELEASING.md)。
 
-Linux 安装器保留已有 `~/.codex/AGENTS.md` 的用户内容，生成带目标机绝对 Node 路径的 `hooks.json`，并在写入前创建 manifest 备份。安装、发布器校验或 Hook 验证任一步失败都会自动回滚。真实遇到的 PATH、PowerShell、Hook 信任、网络和并发配置错误见 [Linux 安装与故障排查](docs/CODEX_PROFILE_LINUX.md)。
+## 版本与验证
 
-若外部 Skills 不在默认的 `E:\skills`，可在该电脑设置 `CODEX_EXTERNAL_SKILL_ROOT` 和 `CODEX_EXTERNAL_SKILL_CATALOG`。生成的 `external-skills.tsv` 与 manifest 只保存在 `~/.codex/skill-registry/`，不提交第三方 Skill 正文；源目录发生变化时才重建，普通会话启动只检查目录元数据。
+三平台点击入口统一调用共享安装器；macOS、Linux、Windows 的原生路径、文件部署、发布器、Hook、进程池与服务证据分开记录，不把模拟测试说成整机安装验收。机器重启、旧对话热加载、远程 HTTP MCP 发现也分别标注边界。
 
-### 其他项目如何使用
+旧 Mac 维护命令与 Linux 窄迁移入口仍保留给维护者，**不作为新用户的默认安装方式**：
 
-安装完成后，这套用户级配置会被同一台电脑上的其他 Codex 项目共同使用；每个项目仍可通过最近的项目级 `AGENTS.md`、`CONTEXT.md`、`DESIGN.md` 和项目 Skills 增加自己的规则。
+- [旧 macOS 部署说明](docs/CODEX_PROFILE_MAC.md)
+- [194 上一阶段部署快照](docs/SERVER_194_GLOBAL_WORKER_DEPLOYMENT.md)
+- [并行设计与证据](docs/CONCURRENCY_EVIDENCE.md)
+- [Hook 注入频率实验](docs/HOOK_CONTEXT_EXPERIMENT.md)
 
-`gh auth login` 只代表该电脑上的 GitHub CLI 已登录当前账号，不代表 Agent 可以在没有任务授权时任意创建仓库。用户明确要求创建或发布项目，或项目既定工作流明确要求交付时，`method-github-delivery` 才执行 commit、push 或创建私有仓库。新项目可使用 `$start-new-project` 或 `./scripts/new-project.ps1` 创建。
-
-### 以后修改方法论并同步到 GitHub
-
-1. 使用桌面的“编辑并发布全局 Prompt”修改中文唯一源并保存。
-2. 等待发布器完成翻译、备份、生成、索引更新和完整性校验。
-3. 在本仓库运行：
-
-```powershell
-./scripts/sync-codex-profile.ps1
-./scripts/sync-codex-profile.ps1 -Check
-./scripts/test-codex-profile.ps1
-./scripts/check.ps1
-```
-
-4. 检查 diff 和秘密扫描结果，再通过 PR 合并到受保护的公开 `main`。另一台电脑之后拉取最新 `main` 并重新运行安装脚本即可更新。
-
-安装测试已经覆盖：仓库快照哈希一致、缺少源文件时拒绝发布、全新用户目录安装、旧配置备份、目标用户名路径生成、6个 Skills 安装和路由输入。完整仓库还通过秘密扫描、本地 PR 质量门禁和 GitHub CI。
-
-创建下游项目时，首先修改 `CONTEXT.md` 和 `DESIGN.md`，再用 `$establish-test-strategy` 把 `quality/gates.json` 中的 `planned` 门禁替换为真实命令。PR 检查允许尚在建设中的明确计划；发布检查会拒绝任何仍未配置的必需门禁。
-
-详细流程见 [WORKFLOW.md](WORKFLOW.md)。研究依据见 [外部工程规范与Agent技能调研.md](外部工程规范与Agent技能调研.md)。
-
-用户故事与完整测试层见 [TESTING.md](TESTING.md)。`scripts/check.ps1` 运行 PR profile；`.reports/quality/` 保存结构化结果。GitHub Actions 还提供手动 release readiness 和每周安全基线检查。
-
-公开文档站由 GitHub Pages 部署到 [项目网站](https://guess-guess-who-i-am.github.io/ai-engineering-governance-template/)。设计目录和安装边界见 [DESIGN-SOURCES.md](DESIGN-SOURCES.md)；完整 Agent Runtime 为什么应独立建仓见 [Agent 平台边界](docs/AGENT_PLATFORM_BOUNDARY.md)。
-
-定性门禁通过 OpenAI-compatible Responses API 运行。配置与本地命令见 [qualitative/README.md](qualitative/README.md)；GitHub Actions 只需要 `LLM_API_KEY`、`LLM_BASE_URL` 两个 repository secrets，模型留空并由远程网关选择。
-
-## GitHub 模式
-
-本仓库只存自有治理体系。完整第三方仓库存放在本地 `upstreams/`；若需要在 GitHub 长期跟踪上游，使用 GitHub fork。只有真正成为项目依赖时才使用 submodule 或包管理器接入。
-
-固定版本在 `upstreams.lock.json`；周任务只报告远端漂移，不自动合并上游变化。Kest 保留真实 `.flow.md` 示例和可选 CLI 接入，但因固定版本许可证文件尚未核验，不分发其二进制或源码。
+代码和文档更新通过受保护 main 的 PR 流程交付；本仓库不分发来源或许可不清晰的第三方镜像，不把凭据放入任何平台安装包。

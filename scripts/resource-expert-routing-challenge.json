@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "resource-expert-routing-challenge/1",
+  "purpose": "Frozen, name-free challenge set for checking whether task content routes to complete experts when collaboration and artifact handoffs are essential, while routing bounded tasks to Skills or MCP services.",
+  "cases": [
+    {
+      "id": "expert-research-team",
+      "split": "expert-required",
+      "zh": "我要写一份行业技术路线报告。请让不同研究者并行查找不同来源，再由另一位核实证据和引用，审阅草稿后汇总成报告。",
+      "en": "Prepare a report on an industry's technical directions. Have researchers investigate independent sources in parallel, a separate reviewer verify evidence and citations, then review and assemble the report.",
+      "targets": ["gpt-researcher-team", "deep-researcher"],
+      "capability": "多角色并行研究、独立核验与引用报告"
+    },
+    {
+      "id": "expert-architecture-handoffs",
+      "split": "expert-required",
+      "zh": "为新系统制定完整架构方案，让业务、系统、安全、部署和用户故事各自形成产物并交接，最后做一致性审查。",
+      "en": "Create a complete architecture package for a new system, with business, system, security, deployment and user-story specialists handing off artifacts and performing a final consistency review.",
+      "targets": ["aicoding-architecture-expert-team"],
+      "capability": "跨专业角色交接和完整架构产物"
+    },
+    {
+      "id": "expert-engineering-orchestration",
+      "split": "expert-required",
+      "zh": "交付一个通知偏好功能：先澄清规格，拆开可并行的实现任务，先复现失败，再让不同审查者分别检查需求符合度和代码质量，最后集成验证。",
+      "en": "Deliver a notification-preferences feature: clarify requirements, split independent implementation work, reproduce failing tests first, use separate reviewers for specification compliance and code quality, then integrate and verify.",
+      "targets": ["dev-pipeline-orchestrator"],
+      "capability": "多阶段开发编排、并行实现与双重审查"
+    },
+    {
+      "id": "expert-performance-investigation",
+      "split": "expert-required",
+      "zh": "服务高峰期变慢。设计突发和错峰负载实验，区分CPU计算与数据库等待，保存基线，再比较调优前后的延迟、吞吐和错误。",
+      "en": "The service slows at peak load. Design burst and staggered-load experiments, distinguish CPU work from database waits, preserve a baseline, and compare latency, throughput and errors before and after tuning.",
+      "targets": ["performance-testing-expert", "apm-performance-expert"],
+      "capability": "性能测试工作流、瓶颈分析和前后验证"
+    },
+    {
+      "id": "mcp-version-documentation",
+      "split": "bounded-tool",
+      "zh": "这个依赖刚升级，旧接口已经不能用了。请查当前版本的官方文档和可运行示例，只依据这个版本给出修改建议。",
+      "en": "This dependency was just upgraded and the old API no longer works. Find the official documentation and runnable examples for the current version, then recommend changes based only on that version.",
+      "targets": ["context7"],
+      "capability": "查询当前版本官方开发文档"
+    },
+    {
+      "id": "skill-editable-workbook",
+      "split": "bounded-skill",
+      "zh": "把这些收支整理成可修改的工作簿，改动明细后总额会自动重算，金额格式统一，并核对重算结果。",
+      "en": "Turn these income and expense records into an editable workbook whose totals recalculate when rows change, with consistent currency formatting and a check of the recalculated results.",
+      "targets": ["xlsx", "xlsx-author", "xlsx-manipulation", "calc-spreadsheets", "Excel Automation"],
+      "capability": "可编辑表格、公式、格式和重算验证"
+    },
+    {
+      "id": "skill-browser-flow-evidence",
+      "split": "bounded-skill",
+      "zh": "本地商城更新后，请从商品页实际走到结账，记录每一步截图，并检查控制台和页面错误。",
+      "en": "After updating the local shop, exercise the real flow from product page through checkout, save screenshots for each step, and inspect console and page errors.",
+      "targets": ["webapp-testing", "playwright", "browser-automation", "browser-use"],
+      "capability": "浏览器端到端流程和可审查证据"
+    }
+  ],
+  "limitations": [
+    "Queries contain no expert, Skill or MCP service names. Target names are diagnostic labels only.",
+    "This is a deliberately small challenge set, not a representative estimate of global retrieval accuracy.",
+    "Identity recall is only a first-pass signal; equivalent modules must be inspected for action, constraints, complete workflow and artifact coverage.",
+    "The experiment does not execute business services or estimate actual token usage."
+  ]
+}

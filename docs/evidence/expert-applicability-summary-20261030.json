@@ -1,0 +1,52 @@
+{
+  "schema": "expert-applicability-summary/v1",
+  "summary": {
+    "baseline": {
+      "tasks": 6,
+      "seats": 12,
+      "labels": {
+        "irrelevant": 9,
+        "unknown": 1,
+        "direct": 2
+      },
+      "tasksWithDirectExpert": 2,
+      "tasksWithAllCapabilitiesCovered": 2,
+      "irrelevantSeats": 9,
+      "unjudgedSeats": 1,
+      "verifiedRuntimeReadySeats": 0,
+      "verifiedTaskPasses": 0,
+      "allSeatsSemanticallyJudged": false
+    },
+    "candidate": {
+      "tasks": 6,
+      "seats": 12,
+      "labels": {
+        "irrelevant": 6,
+        "direct": 5,
+        "unknown": 1
+      },
+      "tasksWithDirectExpert": 4,
+      "tasksWithAllCapabilitiesCovered": 4,
+      "irrelevantSeats": 6,
+      "unjudgedSeats": 1,
+      "verifiedRuntimeReadySeats": 0,
+      "verifiedTaskPasses": 0,
+      "allSeatsSemanticallyJudged": false
+    }
+  },
+  "reviewer": {
+    "identity": "current primary LLM (Codex), not an independent judge",
+    "method": "Original-role scope and requirement-by-requirement review; labels are model judgments with exact source quotes. Candidate identity and mode were visible.",
+    "limitations": [
+      "Directed development scenarios; no independent blinded labeling or population accuracy claim.",
+      "Runtime prerequisites and expert artifacts were not executed; all such states remain unknown/not-run.",
+      "Semantic uncertainty is retained rather than forced into a correct/incorrect binary."
+    ]
+  },
+  "limitations": [
+    "Directed development sample, not population accuracy or independent blind evaluation.",
+    "Quoted evidence is checked mechanically; semantic truth still depends on reviewer quality.",
+    "No composite score or arbitrary pass threshold. Runtime unknown and not-run never count as success."
+  ],
+  "reviewSha256": "bc9a6607ca07f05c7ea9e248d33da52e1382f527210f8f8ba953907f3f67e26c"
+}

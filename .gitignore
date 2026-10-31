@@ -23,10 +23,12 @@ coverage/
 __pycache__/
 *.pyc
 .DS_Store
+.serena/
 Thumbs.db
 .task-tree-port
 .task-tree-ports
 .task-tree-thread
+.task-tree-threads.json
 .task-tree-runs/
 llm-task-tree/widget-report.json
 llm-task-tree/api-bridge-log.txt

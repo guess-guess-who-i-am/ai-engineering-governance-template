@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "resource-retrieval-holdout/1",
+  "frozenBeforeCandidateQueries": true,
+  "frozenAtUtc": "2026-10-24T10:06:03Z",
+  "retrievalExecuted": false,
+  "sampling": {
+    "catalog": "/Users/pku1727/.codex/skill-registry/resource-modules.json",
+    "catalogSha256": "f9d317c47f986a59d6abfaa16e0ddc1f3bda1721bc6da8d1b850ffd4616fc519",
+    "seed": "resource-unseen-2026-10-24-v1",
+    "rule": "Stratify by kind. Exclude names appearing in previous case targets OR any returned candidate in the exclusion files. For each remaining module ID compute SHA256(seed + literal backslash-zero + kind + literal backslash-zero + id), sort ascending hexadecimal digest, take first four per kind without replacement. SHA256 seeded pseudorandom ordering approximates uniform sampling; no relevance/manual replacement filter.",
+    "exclusionFiles": ["scripts/resource-retrieval-holdout.json","scripts/resource-retrieval-validation.json",".reports/resource-retrieval-candidate.json",".reports/resource-retrieval-semantic-guard.json",".reports/resource-retrieval-validation-semantic-guard.json"],
+    "excludedUniqueNames": 471,
+    "sortedExcludedNamesJsonSha256": "d3c47ebf3036b647c2f5d39278bb2b7d35fa4cb55df0dbf38c0e5ee3285c73a6",
+    "eligiblePoolSizes": {"expert":412,"skill":3165,"mcp-service":453},
+    "sampledPerKind": 4,
+    "samplingUnit": "catalog module ID, so Skill package versions are distinct units; this is not uniform over independent capabilities",
+    "handlingInsufficientDescription": "Retain sampled module and flag missing information; do not replace it to make queries easier. Service descriptors may support only coarse discovery requests, never invented tool arguments."
+  },
+  "cases": [
+    {
+      "id":"unseen-buyer-interview-coaching","kind":"expert","targets":["discovery-coach"],
+      "en":"Our salespeople jump to demos before understanding buyers. Coach them on a 30-minute customer interview that uncovers the current process, business impact and real motivation to change.",
+      "zh":"销售总是还没听懂客户就开始演示产品。请指导一场30分钟客户访谈，问清现有流程、问题的业务影响和真正的改变动机。",
+      "sourceModuleId":"expert:discovery-coach:a5a8135eb04be372",
+      "samplingKey":"0133dd3e3b2f410ff47c9c7b6e3e520dc0123c65c26c6866b877d3ac341d2ac9",
+      "evidence":{"entry":"agents/discovery-coach.md","basis":"Original role specifies SPIN, gap analysis, current/future state mapping and a 30-minute discovery call structure.","descriptionSufficiency":"sufficient"},
+      "dependencies":["Original role prose and user-supplied sales context"],
+      "freeExecutionBoundary":"Can discuss or role-play with supplied fictional context; no claim of improved sales conversion or permission to contact buyers. Actual model token cost is outside module metadata."
+    },
+    {
+      "id":"unseen-acquisition-financial-model","kind":"expert","targets":["investment-banking"],
+      "en":"Using the supplied buyer and target financials, prepare an acquisition model showing earnings-per-share accretion or dilution and sensitivity to purchase price and synergies; clearly separate assumptions from supplied facts.",
+      "zh":"根据我提供的收购方和标的财务数据，搭建并购模型，分析每股收益增厚或摊薄，以及收购价格和协同效应变化的敏感性，明确区分假设和已知数据。",
+      "sourceModuleId":"expert:investment-banking:3ca1cf91b924e677",
+      "samplingKey":"0174b615791dfcb1bfba391a721e0e9c4122b16cdc6469e628091bf6569c4d12",
+      "evidence":{"entry":"agents/investment-banking-expert.md","basis":"Role has merger model accretion/dilution, synergy analysis, scenario sensitivity and model audit within its intact 22-Skill toolbox.","descriptionSufficiency":"sufficient"},
+      "dependencies":["Original enclosed merger-model and scenario-sensitivity Skills","Supplied financial statements and assumptions","Spreadsheet/runtime tools if a workbook is requested"],
+      "freeExecutionBoundary":"Synthetic supplied financial data can be used without market APIs; do not fetch paid financial databases, execute deals or treat output as investment advice. Model correctness still needs independent numeric checks."
+    },
+    {
+      "id":"unseen-omics-failure-diagnosis","kind":"expert","targets":["omics-diagnosis-expert"],
+      "en":"A Tencent Omics workflow run has failed. Retrieve the logs for the run ID I provide, distinguish out-of-memory from disk or scheduling errors, and produce a structured diagnosis with repair suggestions without resubmitting the job.",
+      "zh":"腾讯组学工作流运行失败了。请根据我提供的运行ID读取日志，区分内存不足、磁盘和调度问题，输出结构化诊断与修复建议，不要重新提交任务。",
+      "sourceModuleId":"expert:omics-diagnosis-expert:8268d93b78ea0e59",
+      "samplingKey":"0287ca8c7c4d1404a84350a8f42b38215b5103b288215f3fc22c113e500b5ab1",
+      "evidence":{"entry":"agents/omics-diagnosis-expert.md","basis":"Role requires omics-run-diagnosis, platform log retrieval and 11 error categories; explicitly forbids proactive submission/resubmission.","descriptionSufficiency":"sufficient"},
+      "dependencies":["omics-run-diagnosis","omics-platform-cli authentication","User-supplied RunGroupId or RunId and authorized Tencent Omics access"],
+      "freeExecutionBoundary":"Live log access requires a real authorized platform account and possibly private network; cost is unverified. No login, token retrieval, paid API or job submission is authorized by this retrieval-only case. Offline logs could test diagnostic reasoning separately."
+    },
+    {
+      "id":"unseen-admissions-score-rank","kind":"expert","targets":["gaokao-advisor"],
+      "en":"For the 2025 Fujian physics-track entrance exam, look up the provincial rank corresponding to 600 points, preserve the returned year and source, and do not silently substitute another year's data or predict admission chances.",
+      "zh":"查询2025年福建物理类高考600分对应的全省位次，保留返回数据的年份与来源，不要悄悄换成年份不同的数据，也不要预测录取概率。",
+      "sourceModuleId":"expert:gaokao-advisor:25fa554b50298690",
+      "samplingKey":"0304404afbdb0b9abca2bee110eb8162015342d40392ba3fd76d75aa394d0969",
+      "evidence":{"entry":"agents/gaokao-advisor.md","basis":"Original role separates pure score-to-rank lookup from application planning, enforces data-year provenance and refuses to invent missing results.","descriptionSufficiency":"sufficient"},
+      "dependencies":["Enclosed tencent-yuanbao-gaokao-score-to-rank-lookup Skill","Structured score data API/runtime","Other role paths may require connect_cloud_service and quota"],
+      "freeExecutionBoundary":"No actual score API or cloud credential call made. Availability, authorization and free quota are not verified; missing target-year data must remain a stated gap, not estimated."
+    },
+    {
+      "id":"unseen-scheduled-task-delay","kind":"skill","targets":["us-slow-task-diagnose"],
+      "en":"A WeData scheduled job is much slower than its previous run. Break down scheduling wait, engine submission and application time, compare the previous cycle, and identify resource-queue bottlenecks while retaining the diagnostic evidence.",
+      "zh":"WeData调度任务这次比上一周期慢很多。请拆分调度等待、引擎提交和应用运行耗时，对比上一周期，定位资源队列瓶颈，并保留诊断证据。",
+      "sourceModuleId":"skill:us-slow-task-diagnose:f47dc9efe50e7044",
+      "samplingKey":"0014168386daa9153dfdb7d57d3088549448966848b6f3de3fc746f2f68312e3",
+      "evidence":{"entry":"skills/tencent-bigdata/sub-skills/US/us-slow-task-diagnose/SKILL.md","basis":"Entry explicitly decomposes scheduling/engine/application delays, collects previous-cycle logs and scans materialized log caches; preserving evidence prevents its default cleanup.","descriptionSufficiency":"sufficient"},
+      "dependencies":["Complete enclosing ab-experiment-analyst expert package","do-bigdata CLI","US/WeData credentials, project/task/date context and internal network"],
+      "freeExecutionBoundary":"Not portable generic job diagnosis; depends on Tencent internal platform. Do not call write commands or run default cache deletion. Cost/free access unknown; no live platform calls in this case."
+    },
+    {
+      "id":"unseen-erp-stock-lookup","kind":"skill","targets":["jackyun"],
+      "en":"In our JackYun ERP, look up the current stock of the item code I provide across warehouses. Return stock quantities by warehouse rather than treating shipment or transfer documents as current inventory; make no business changes.",
+      "zh":"在吉客云ERP里查询我提供的货品编码在各仓库的即时库存，按仓库列出数量，不要把发货或调拨单据当成当前库存，也不要修改业务数据。",
+      "sourceModuleId":"skill:jackyun:86739dc025c7c584",
+      "samplingKey":"001b62bb0acf1f6993db03108e6d2e5104e4a24ad4bde2fb9a906ed7cc40b64d",
+      "evidence":{"entry":"SKILL.md","basis":"Read-only ERP routing maps current stock to erp.stockquantity.get and distinguishes documents from inventory.","descriptionSufficiency":"sufficient"},
+      "dependencies":["JackYun MCP authorization","Subscription to corresponding tool","User-supplied item code and warehouse scope"],
+      "freeExecutionBoundary":"Tool subscription and account authorization required; price unknown. No credential or live business query performed. Company name is retained because the target data system matters, not to inject the module slug."
+    },
+    {
+      "id":"unseen-association-reachability","kind":"skill","targets":["xiehui-fr"],
+      "en":"Find Chinese cultural associations in Lyon that could be relevant to an exhibition. Distinguish officially registered associations from verified reachable contacts, include their pages, and do not claim a postal address means someone can be contacted.",
+      "zh":"寻找里昂适合文化展览合作的华人协会，区分官方登记记录与已认证、可联系的真人，附协会页面，不要因为有登记地址就声称能联系上。",
+      "sourceModuleId":"skill:xiehui-fr:edadd99d0a21d548",
+      "samplingKey":"003f53226adddf377955a93fc4236ccfc1f46aa0bb5c77d184cb879b0cc072d0",
+      "evidence":{"entry":"SKILL.md","basis":"RNA-based association search routes culture/friendship kinds, uses has_contact and certified fields, and requires stable page URLs.","descriptionSufficiency":"sufficient"},
+      "dependencies":["French association registry MCP connector","search_associations/get_association/get_certified_associations tool availability","Network and any service authorization"],
+      "freeExecutionBoundary":"No connector call or outreach made. Cost/authentication unknown; registry presence is not proof of contact reachability, and the agent must not claim or submit association registration."
+    },
+    {
+      "id":"unseen-engine-resource-material","kind":"skill","targets":["godot-tres-format"],
+      "en":"Create a Godot 4 text resource for a blue semi-transparent StandardMaterial3D and explain the required header and material properties so it can be loaded as a .tres file.",
+      "zh":"创建一个Godot 4文本资源，表示蓝色半透明的StandardMaterial3D材质，说明必要的文件头和材质属性，让它能作为.tres文件加载。",
+      "sourceModuleId":"skill:godot-tres-format:d04df2de018b4713",
+      "samplingKey":"004135ad01f55b221f6278bc40f2cde5a5e2f91ffd796a0073d8fea963afaa9b",
+      "evidence":{"entry":"SKILL.md","basis":"Entry provides Godot 4 format=3 headers, StandardMaterial3D albedo_color and transparency examples.","descriptionSufficiency":"sufficient"},
+      "dependencies":["Local text editing","Godot 4 runtime if actual import/load validation is performed"],
+      "freeExecutionBoundary":"No paid API needed for a synthetic resource, but Godot installation and import success are unverified. This frozen set does not actually create or load the resource."
+    },
+    {
+      "id":"unseen-course-shop-readonly","kind":"mcp-service","targets":["xiaoe-cloud-cli"],
+      "en":"Use the service connector for my Xiaoe course shop to list the courses and review the orders I specify. Keep this read-only; do not create courses, upload media or modify student records.",
+      "zh":"通过小鹅通知识店铺的服务连接器列出课程并查看我指定的订单，只做查询，不创建课程、上传素材或修改学员记录。",
+      "sourceModuleId":"mcp-service:xiaoe-cloud-cli:6768f46ea98c1352",
+      "samplingKey":"00a4b68dcf7fbf07cbf82c27da43658ef713bea7f3e185156494d2cba3120709",
+      "evidence":{"entry":"MODULE.md","basis":"Own service descriptor says query courses/students and review orders; no current tool schema was discovered.","descriptionSufficiency":"coarse discovery only; per-tool inputs and schema missing"},
+      "dependencies":["HTTP service connector","Real shop authorization","Tools/list discovery before using original schemas"],
+      "freeExecutionBoundary":"All tools undiscovered and source audit requires authorization; cost unknown. No endpoint call or shop-data access made. Only retrieval diagnosis is authorized."
+    },
+    {
+      "id":"unseen-creative-credit-check","kind":"mcp-service","targets":["kling-ai-plugin"],
+      "en":"For Kling, find the connector capability that checks my remaining credits and the status of an existing video job. Do not submit any generation or use credits.",
+      "zh":"查找可灵服务连接器里查询剩余额度和已有视频任务进度的能力，不要提交生成任务，也不要消耗额度。",
+      "sourceModuleId":"mcp-service:kling-ai-plugin:8d9b412df6d4f638",
+      "samplingKey":"0140255ae834eb1ff1dedd6bf5d06df5357ebef0dcf48b776b0100b04eabf7a7",
+      "evidence":{"entry":"MODULE.md","basis":"Descriptor expressly lists remaining-credit checks, task status and generation, allowing a non-generating discovery request.","descriptionSufficiency":"coarse discovery only; actual credit/status schemas unavailable"},
+      "dependencies":["Authorized image/video service account","Discovered original MCP tool schemas","Existing user-supplied task ID for any later status request"],
+      "freeExecutionBoundary":"Service has credit-based generation; no assumption that balance/status calls are free. Authentication, tool discovery and cost unknown; no calls made and no generation authorized."
+    },
+    {
+      "id":"unseen-legal-source-research","kind":"mcp-service","targets":["richee-mcp-server"],
+      "en":"Find a legal-service connector that can retrieve relevant statutes and similar cases for a contract dispute, then help review contract risks using returned sources rather than treating its answer as a lawyer's final opinion.",
+      "zh":"寻找能够检索合同纠纷相关法规和类似案例的法律服务连接器，再根据返回来源辅助检查合同风险，不要把结果当作律师最终意见。",
+      "sourceModuleId":"mcp-service:richee-mcp-server:cf3bff57d0cdc7e2",
+      "samplingKey":"017d2b68ca212edd5fddda8b27f780411f08e67bb26855f995f522b27a7f2833",
+      "evidence":{"entry":"MODULE.md","basis":"Descriptor states law/regulation search, similar legal cases, enterprise lookup and contract-risk review.","descriptionSufficiency":"coarse discovery only; jurisdiction, corpus currency and actual tool schemas missing"},
+      "dependencies":["Authorized legal service connector","Current discovered tools","User-supplied contract facts, jurisdiction and scope before later substantive review"],
+      "freeExecutionBoundary":"No legal-service call made. Authorization/cost unknown; jurisdiction and legal-source freshness not established. Do not upload confidential contracts or give definitive legal advice."
+    },
+    {
+      "id":"unseen-chain-store-data","kind":"mcp-service","targets":["yuanbei-hub"],
+      "en":"Find a connector for our chain-store operations data that supports comparing store sales rankings and inventory, with member-data insights if available. Do not assume access to any store until authorization is confirmed.",
+      "zh":"寻找能查询连锁门店经营数据的连接器，支持比较门店销售排名和库存，如有能力再提供会员数据洞察；授权确认前不要假设能访问门店。",
+      "sourceModuleId":"mcp-service:yuanbei-hub:b38a3fc93e67f9b2",
+      "samplingKey":"01e19e63c31ca7d309b6097ec75ad1004a4c8b11270ad47ac0e062c72c6f8ad5",
+      "evidence":{"entry":"MODULE.md","basis":"Only coarse descriptor: chain-store sales ranking, inventory, member and operations insights. No concrete tool schema or reporting dimensions available.","descriptionSufficiency":"minimal; retained sampled resource with uncertainty, not replaced"},
+      "dependencies":["Authorized chain-store service account","Actual tools/list discovery","User store/time scope and data permissions before any live query"],
+      "freeExecutionBoundary":"Cost and authentication unknown, no tools discovered, no customer/store/member data accessed. Request stays at capability discovery and cannot promise a working analytics report."
+    }
+  ],
+  "limitations": [
+    "Twelve seeded sampled catalog modules, not twelve independently verified capabilities; 24 bilingual queries are diagnostic, not a reliable benchmark or task accuracy estimate.",
+    "No retrieval was executed when authoring or freezing this set; no graph, routing code, descriptions or module prompts changed.",
+    "Cases are based on actual descriptions and selected entry sections, not all package attachments; full expert modules remain intact.",
+    "Four sampled MCP descriptors lack discovered tool schemas and require authorization with unknown price. This missing information is retained explicitly, not repaired by swapping easier samples.",
+    "Targets are source identity labels for existing script compatibility, not claims that equivalent alternatives are incorrect. No target names should enter retrieval scoring.",
+    "Natural necessary platform/product names may remain in queries; full module slugs are not copied into query text. No credentials, personal records or real IDs are included.",
+    "No live account, paid model/API, service call, actual job, trading transaction or other external action is authorized or tested by creating these cases."
+  ]
+}

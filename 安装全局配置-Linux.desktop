@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=安装 Codex 全局配置
+Comment=安装全局提示词、Skills、图检索和常驻服务
+Exec=/bin/sh -c 'exec "$(dirname "$1")/scripts/launch-global-profile.sh"' codex-global-install %k
+Icon=system-software-install
+Terminal=true
+Categories=Development;

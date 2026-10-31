@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-10-28T14:57:55.213363+00:00",
+  "implementationCommit": "c2a886bbe8508b50965bbe14103510881f4f63a8",
+  "checks": [
+    {
+      "command": [
+        "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node",
+        "scripts/test-router-context-budget.mjs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.041,
+      "stdout": "PASS concise routing guidance; 8 candidates, original entries, availability and specific failures preserved\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node",
+        "codex-profile/.codex/prompt-publisher/test-methodology-publisher.mjs"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.045,
+      "stdout": "PASS: methodology publisher source parsing, route counts, duplicate rejection, and unknown-route rejection.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationSeconds": 0.016,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "priorVerified": {
+    "methodologyRules": 76,
+    "ownedSkills": 22,
+    "macOSInstallEndToEnd": "passed in preceding implementation turn"
+  },
+  "limitations": [
+    "本机全局配置尚未重新部署",
+    "未声称端到端性能提升"
+  ]
+}

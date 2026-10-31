@@ -61,6 +61,27 @@ try {
             throw "Generated project is missing $relativePath"
         }
     }
+    if (Test-Path -LiteralPath (Join-Path $destination '.agents')) {
+        throw 'Generated projects must use global Skills and must not contain a project .agents directory.'
+    }
+    $generatedAgents = Get-Content -LiteralPath (Join-Path $destination 'AGENTS.md') -Raw
+    if ($generatedAgents.Contains('.agents/skills')) {
+        throw 'Generated AGENTS.md still routes to project-local Skills.'
+    }
+    $generatedPackage = Get-Content -LiteralPath (Join-Path $destination 'package.json') -Raw | ConvertFrom-Json -Depth 20
+    if ($generatedPackage.scripts.PSObject.Properties.Name -match 'codex-profile') {
+        throw 'Generated project retained global Codex profile deployment scripts.'
+    }
+    if (Test-Path -LiteralPath (Join-Path $destination 'scripts/install-task-tree-mcp-mac.mjs')) {
+        throw 'Generated project retained the global task-tree MCP installer.'
+    }
+    $generatedWorkflow = Get-Content -LiteralPath (Join-Path $destination '.github/workflows/governance.yml') -Raw
+    if ($generatedWorkflow -match 'portable-profile|codex-profile') {
+        throw 'Generated project retained the template global-profile CI job.'
+    }
+    if ($generatedWorkflow -notmatch 'runs-on:\s*macos-15') {
+        throw 'Generated project governance CI is not configured for macOS.'
+    }
 
     $config = Get-Content -LiteralPath (Join-Path $destination 'quality/gates.json') -Raw | ConvertFrom-Json -Depth 20
     if ($config.projectKind -ne 'web') { throw 'Generated quality manifest did not retain the project type.' }

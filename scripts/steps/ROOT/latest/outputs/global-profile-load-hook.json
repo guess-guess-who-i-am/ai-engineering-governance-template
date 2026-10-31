@@ -1,0 +1,85 @@
+{
+  "schema": "graph-load/v1",
+  "count": 8,
+  "pattern": "burst",
+  "graphSha256": "d684ac21de06d87e3764fffe05a1e79296db44a30751558f320606c997179212",
+  "workerSha256": "fea838989d93ae859deac6840d88caf4f2629e006781c0ff773858ba32db56dc",
+  "transport": "hook",
+  "seed": "audit-20261029-hook",
+  "warm": true,
+  "longInputs": true,
+  "uniqueQueries": true,
+  "configuredProcesses": null,
+  "success": 8,
+  "wallSeconds": 3.7721,
+  "p50Seconds": 2.81765,
+  "p95Seconds": 3.4159,
+  "maxSeconds": 3.4166,
+  "rows": [
+    {
+      "number": 0,
+      "arrivalSeconds": 0,
+      "seconds": 3.4166,
+      "ok": true,
+      "error": "",
+      "contextBytes": 19928
+    },
+    {
+      "number": 1,
+      "arrivalSeconds": 0,
+      "seconds": 3.4159,
+      "ok": true,
+      "error": "",
+      "contextBytes": 18989
+    },
+    {
+      "number": 2,
+      "arrivalSeconds": 0,
+      "seconds": 2.5336,
+      "ok": true,
+      "error": "",
+      "contextBytes": 19766
+    },
+    {
+      "number": 3,
+      "arrivalSeconds": 0,
+      "seconds": 2.4896,
+      "ok": true,
+      "error": "",
+      "contextBytes": 19276
+    },
+    {
+      "number": 4,
+      "arrivalSeconds": 0,
+      "seconds": 3.1017,
+      "ok": true,
+      "error": "",
+      "contextBytes": 20005
+    },
+    {
+      "number": 5,
+      "arrivalSeconds": 0,
+      "seconds": 2.3685,
+      "ok": true,
+      "error": "",
+      "contextBytes": 20212
+    },
+    {
+      "number": 6,
+      "arrivalSeconds": 0,
+      "seconds": 2.3633,
+      "ok": true,
+      "error": "",
+      "contextBytes": 19529
+    },
+    {
+      "number": 7,
+      "arrivalSeconds": 0,
+      "seconds": 3.1345,
+      "ok": true,
+      "error": "",
+      "contextBytes": 19267
+    }
+  ],
+  "queryProcesses": 0
+}

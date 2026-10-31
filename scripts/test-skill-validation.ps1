@@ -8,7 +8,7 @@ $validator = Join-Path $Root 'scripts/validate-skills.ps1'
 & $validator -Root $Root | Out-Null
 
 $fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) ("skill-validation-" + [guid]::NewGuid().ToString('N'))
-$fixtureSkills = Join-Path $fixtureRoot '.agents/skills'
+$fixtureSkills = Join-Path $fixtureRoot 'codex-profile/global-skills'
 $fixtureScripts = Join-Path $fixtureRoot 'scripts'
 New-Item -ItemType Directory -Path $fixtureSkills, $fixtureScripts -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $Root 'scripts/validate-skill.ps1') -Destination $fixtureScripts
