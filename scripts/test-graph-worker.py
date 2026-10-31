@@ -173,7 +173,7 @@ class WorkerTests(unittest.TestCase):
     def test_repeated_queries_coalesce_and_reload_invalidates_cache(self):
         worker = indexer._GraphWorker(self.graph)
         worker.query({'query': 'warm'})
-        graph = worker._graph
+        graph = worker._english_graph
         original = graph.retrieve_with_scores
         calls = []
         def slow(query, **kwargs):
@@ -194,7 +194,7 @@ class WorkerTests(unittest.TestCase):
     def test_last_waiter_timeout_abandons_running_query_without_caching(self):
         worker = indexer._GraphWorker(self.graph)
         worker.query({'query': 'warm'})
-        graph = worker._graph
+        graph = worker._english_graph
         original = graph.retrieve_with_scores
         started = threading.Event()
         release = threading.Event()
@@ -223,9 +223,94 @@ class WorkerTests(unittest.TestCase):
                 time.sleep(.01)
             self.assertFalse(worker._pending)
             self.assertEqual(worker.abandoned_running, 1)
-            self.assertNotIn(('abandon me', 8), worker._results)
+            self.assertNotIn(('abandon me', 8, None), worker._results)
             worker.query({'query': 'abandon me'})
             self.assertEqual(calls.count('abandon me'), 2)
+
+    def test_retry_does_not_join_abandoned_running_computation(self):
+        worker = indexer._GraphWorker(self.graph)
+        worker.query({'query':'warm'})
+        graph = worker._english_graph
+        original = graph.retrieve_with_scores
+        started, release = threading.Event(), threading.Event()
+        calls = []
+        def first_blocks(query, **kwargs):
+            calls.append(query)
+            if len(calls) == 1:
+                started.set()
+                release.wait(timeout=5)
+            return original(query, **kwargs)
+        try:
+            with patch.object(graph, 'retrieve_with_scores', first_blocks):
+                with concurrent.futures.ThreadPoolExecutor(max_workers=1) as callers:
+                    timed = callers.submit(worker.query, {'query':'alpha retry same query', 'deadline':time.time()*1000+50})
+                    self.assertTrue(started.wait(timeout=2))
+                    with self.assertRaises(TimeoutError): timed.result(timeout=2)
+                    retried = worker.query({'query':'alpha retry same query', 'deadline':time.time()*1000+1500})
+                    self.assertTrue(retried)
+                    self.assertEqual(len(calls),2)
+                    release.set()
+                until = time.monotonic()+2
+                while worker._inflight and time.monotonic()<until: time.sleep(.005)
+                self.assertEqual(worker._inflight,0)
+                self.assertFalse(worker._pending)
+                self.assertEqual(worker.query({'query':'alpha retry same query'}),retried)
+        finally:
+            release.set()
+            worker.close()
+
+    def test_process_callers_keep_independent_deadlines(self):
+        class Pool:
+            def __init__(self):
+                self.calls = []
+                self.future = concurrent.futures.Future()
+                self.future.set_running_or_notify_cancel()
+            def submit(self, fn, payload):
+                self.calls.append(payload)
+                return self.future
+        pool = Pool()
+        with patch.object(indexer._ProcessGraphWorker, '_new_pool', return_value=pool):
+            worker = indexer._ProcessGraphWorker(self.graph)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as callers:
+            short = callers.submit(worker.query, {'query':'shared deadline', 'deadline':time.time()*1000+80})
+            until = time.monotonic()+2
+            while not pool.calls and time.monotonic()<until:
+                time.sleep(.002)
+            long = callers.submit(worker.query, {'query':'shared deadline', 'deadline':time.time()*1000+2000})
+            with self.assertRaises(TimeoutError):
+                short.result(timeout=2)
+            pool.future.set_result(([{'name':'shared-success'}], {'queryPid':123}))
+            self.assertEqual(long.result(timeout=2)[0]['name'], 'shared-success')
+        self.assertEqual(len(pool.calls),1)
+        self.assertGreater(pool.calls[0]['execution_deadline'], time.time()*1000+50000)
+        self.assertEqual(worker.coalesced,1)
+        self.assertEqual(next(iter(worker._results.values()))[0][0]['name'],'shared-success')
+
+    def test_process_last_waiter_cancels_queued_future(self):
+        class Pool:
+            def __init__(self): self.future = concurrent.futures.Future()
+            def submit(self, *_): return self.future
+        pool = Pool()
+        with patch.object(indexer._ProcessGraphWorker, '_new_pool', return_value=pool):
+            worker = indexer._ProcessGraphWorker(self.graph)
+        with self.assertRaises(TimeoutError):
+            worker.query({'query':'queued', 'deadline':time.time()*1000+10})
+        self.assertTrue(pool.future.cancelled())
+        self.assertEqual(worker.cancelled_pending,1)
+        self.assertFalse(worker._pending)
+        self.assertFalse(worker._results)
+
+    def test_process_computation_drops_first_caller_deadline(self):
+        from types import SimpleNamespace
+        seen = []
+        fake = SimpleNamespace(query=lambda payload: seen.append(payload) or [], loads=1,
+            _ready_languages=set(), _english_graph=SimpleNamespace(_get_retrieval_engine=lambda: SimpleNamespace(_embedding_index=None)),
+            _graph=SimpleNamespace(_get_retrieval_engine=lambda: SimpleNamespace(_embedding_index=None, _prefilter_enabled=True)),
+            cache_hits=0, coalesced=0, peak_queries=0)
+        with patch.object(indexer, '_process_worker', fake):
+            indexer._query_process({'query':'shared', 'deadline':0,
+                'execution_deadline':time.time()*1000+55000})
+        self.assertGreater(seen[0]['deadline'],time.time()*1000+50000)
 
     def test_crash_and_idle_restart(self):
         p = self.start()
@@ -247,7 +332,7 @@ class WorkerTests(unittest.TestCase):
         graph.save(self.graph)
         worker = indexer._GraphWorker(self.graph)
         loaded = worker._load_if_stale()
-        engine = loaded._get_retrieval_engine()
+        engine = worker._english_graph._get_retrieval_engine()
         self.assertTrue(engine._prefilter_enabled)
         pools = []
         original = engine._maybe_prefilter

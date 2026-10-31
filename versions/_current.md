@@ -13,12 +13,12 @@
 - Output: 可迁移macOS配置、全局Skill安装源、常驻worker及右键服务；codex-profile/、安装全局配置.command，第三方库由私有skills-library恢复。
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
 - Notes: 只支持 macOS；20 是硬上限。全局 Skill/MCP 经过 GraphToolCall；跨机重启、远程 HTTP MCP 目录发现尚未实测。本机、194与110默认Terra均通过真实终端工具测试，官方目录已接入；194与110 CLI为0.166.0，110保留xhigh；桌面界面未直接验证。
-- CurrentResult: Claude 机制复用与共享查询修复均已验证：参考内核14项、IDE定向71项、GraphToolCall worker12项、缓存3项、BM25等价4项、检索等价10项通过；真实100路 burst/stagger均100/100成功。4进程池p95约8.6–10.6秒、常驻约4.4–5.6GiB；跨机恢复仍未证实，整体目标不可宣称完成。
-- RootCauseAnalysis: 首个共享查询把短请求截止时间带入进程池，造成后续长请求连带失败；同时没有等待者生命周期，所有调用者超时后计算仍继续并可能污染缓存。现以独立计算硬上限、waiter计数和abandoned结果栅栏隔离两类问题。
+- CurrentResult: 两个新增按需 Skill 已全局入图，24项路由正反例、24个自有 Skill 安装回滚、16项 Worker、9项资源图及双语长文本编码通过。两个临时工作区实测完整读取与真实 IDE Hook 均成功，直接图查询均命中新 Skill；本机可用，仍待最终发布及跨机复测，未验证模型质量提升。
+- RootCauseAnalysis: 全局刷新器与检索 Worker 来自不同版本，旧 Worker 不接受资源目录、完整性和中文向量参数，导致新增 Skill 未入图。已合并新版图接口及原有共享查询超时保护，保留三轮 Hook 与既有路由。
 - CaseStudy:
   - case 1: 全部调用者超时→旧实现仍计算并缓存；新实现最后等待者取消排队任务，运行任务完成后丢弃结果。
   - case 2: 100路压测全成功但内存4.4–5.6GiB→功能与资源边界必须分开验收。
-- NextIdea: 同步并校验全局 worker 与仓库哈希，运行完整 macOS/治理检查，再决定是否降低进程池资源并更新发布证据。
+- NextIdea: 核对刷新输入哈希、完成最终审阅与Git发布；跨机资源和模型质量仍需独立实测。
 - SelectedSkills:
 
 # GraphState

@@ -152,7 +152,8 @@ elif "retrieve" in args:
     "evolve-contracts", "fix-regression-with-tdd", "model-project-domain",
     "review-governance-framework", "review-project-diff", "start-new-project",
     "systematic-debugging", "verify-before-completion", "write-pr-description",
-    "task-tree-chain-run", "task-tree-core-state", "task-tree-grill", "task-tree-subtree-run"
+    "task-tree-chain-run", "task-tree-core-state", "task-tree-grill", "task-tree-subtree-run",
+    "skill-supply-chain-review", "desktop-task-workflow"
   ];
   for (const name of expectedSkills) {
     const skill = await readFile(path.join(home, ".agents", "skills", name, "SKILL.md"), "utf8");
@@ -215,6 +216,7 @@ for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse
   const contextPayload = JSON.parse(context.stdout);
   const contextText = String(contextPayload.hookSpecificOutput.additionalContext);
   assert(context.status === 0 && contextText.startsWith("[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4]") && contextText.includes("Start ordinary read-only waves at 2-4") && contextText.includes("halve it after failures"), "adaptive scheduling contract is absent, not first, or weakened");
+  assert(!contextText.includes("# Desktop Task Workflow") && !contextText.includes("# Skill Supply-Chain Review"), "fixed Hook must not inject specialized Skill bodies");
   const routeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Please push this release to GitHub", cwd: REPOSITORY_ROOT })}\n`;
   const routed = run(dispatcher, [], { ...envArgs, input: routeInput });
   assert(routed.status === 0 && routed.stdout.includes("method-github-delivery"), `GitHub methodology route did not match: ${routed.stderr || routed.stdout}`);
@@ -226,6 +228,10 @@ for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse
   const taskTreeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "帮我精简任务树的核心状态", cwd: REPOSITORY_ROOT })}\n`;
   const taskTree = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: taskTreeInput });
   assert(taskTree.status === 0 && taskTree.stdout.includes("task-tree-core-state"), `task-tree core-state route did not match: ${taskTree.stderr || taskTree.stdout}`);
+  const supplyChain = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "请审查这个第三方 MCP 插件的供应链风险", cwd: REPOSITORY_ROOT })}\n` });
+  assert(supplyChain.status === 0 && supplyChain.stdout.includes("skill-supply-chain-review"), `supply-chain review route did not match: ${supplyChain.stderr || supplyChain.stdout}`);
+  const simpleFileQuestion = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "这个文件有几行", cwd: REPOSITORY_ROOT })}\n` });
+  assert(simpleFileQuestion.status === 0 && !simpleFileQuestion.stdout.includes("desktop-task-workflow"), "simple factual file question received desktop workflow Skill");
   const workerMarker = path.join(root, "graph-worker-marker.txt");
   const workerEnv = { CODEX_GRAPH_TOOL_PYTHON: graphToolPython, CODEX_GRAPH_TOOL_WORKER_MARKER: workerMarker, CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS: "2" };
   const externalRoute = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, extraEnv: workerEnv, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Help implement Astro islands hydration patterns", cwd: REPOSITORY_ROOT })}\n` });
@@ -426,7 +432,7 @@ await writeFile(configPath, config);
     console.log(`PASS: full catalog fixture indexed ${fullManifest.skillCount}/${fullManifest.catalogSkillCount} Skills; total index bytes=${Buffer.byteLength(fullIndex)}; example route=resolving-merge-conflicts`);
   }
 
-  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 22 owned Skills, global-only registry, system and task-tree routing, merge, manifest backup, credential isolation, 76-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
+  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 24 owned Skills, global-only registry, system/task-tree/supply-chain routing, merge, manifest backup, credential isolation, 76-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
 } finally {
   await rm(root, { recursive: true, force: true });
 }

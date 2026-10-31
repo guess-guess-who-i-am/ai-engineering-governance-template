@@ -1,0 +1,4 @@
+interface:
+  display_name: "桌面产物工作流"
+  short_description: "协调桌面多步骤文件任务，按需加载技能并验证真实产物及交付链接"
+  default_prompt: "使用 $desktop-task-workflow 完成这个桌面文件任务并验证交付产物。"

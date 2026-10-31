@@ -9,12 +9,12 @@
 - 每个事件只注册一个稳定 dispatcher。dispatcher 内部并发运行常驻提醒、Skill 路由、可选 capability 路由和索引刷新，避免新增 Hook 导致索引位置变化、原信任记录失效；
 - 中文唯一编辑源、英文生成物、63条规则映射与完整性校验；
 - 自动翻译和原子发布器；
-- `method-*` 五个方法 Skill、`manage-global-methodology`、12个治理 Skill 和4个任务树 Skill，共22个全局 Skill；
+- `method-*` 五个方法 Skill、`manage-global-methodology`、12个治理 Skill、4个任务树 Skill，以及供应链审查和桌面产物工作流，共24个全局 Skill；
 - Skill 路由别名；部署时从仓库旁的私有 Skill 镜像复制约 15,472 条目录到用户级工具目录，并用 GraphToolCall 0.46.0 建立本机工具关系图索引。完整第三方库不进入本仓库，避免把混合许可的第三方内容发布到公开模板仓库。
 
 所有调用都经过全局 GraphToolCall 路由。默认从仓库旁的私有镜像 `../skills` 部署到 `~/.codex/tools/skills`；没有该目录时复用已安装的全局库，否则自动恢复固定版本的私有Git镜像，也可通过 `CODEX_EXTERNAL_SKILL_ROOT` 指定已有目录。会话启动时把 `_catalog_cn.json` 转成 Skill 节点，并读取 `config.toml` 中命令行stdio MCP server 的 `tools/list`，统一写入 `~/.codex/skill-registry/skills.graph.json`。用户提示通过 GraphToolCall 检索，命中 Skill 后才读取原始 `SKILL.md`，命中 MCP 后显示其 server/tool 调用入口。没有可靠元数据时不伪造 producer-consumer 边。完整第三方Skill正文保存在私有Git镜像，机器路径相关的生成索引在各电脑重建。
 
-图中的仓库自有 22 个 Skill 与第三方 Skill 一样部署到用户级全局目录；它们不写入具体项目，也不使用当前电脑的固定绝对路径。换电脑时安装器会先复制全局 Skill，再按新电脑的实际路径重建图。
+图中的仓库自有 24 个 Skill 与第三方 Skill 一样部署到用户级全局目录；它们不写入具体项目，也不使用当前电脑的固定绝对路径。换电脑时安装器会先复制全局 Skill，再按新电脑的实际路径重建图。
 
 macOS 检索使用共享 Unix socket 入口和4个常驻检索进程，同一用户的不同工作区复用服务。支持128个在途连接、256个等待连接；100请求突发与错峰已实测全部成功。每个检索进程保留图、BM25、候选池、关键词倒排索引和CPU embedding模型；图按版本更新缓存。入口合并相同在途查询，缓存128个完整结果；模型缓存4096条查询/说明向量，缓存均只驻留内存，图更新后失效。每次加载图后调用 `tune_for_scale()`，通常召回150–500候选，信号不足时可全库评分。轻量Hook注册表只保留系统、插件和治理入口，外部库通过图检索，避免每请求再扫描或解析15k+库。客户端预算55秒；请求超时不会退出共享服务，子进程崩溃后后续请求重建进程池。代码更新后旧服务退出；电脑重启后首次Hook拉起，冷启动仍有加载开销。默认持续驻留；`CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS` 可设置空闲退出秒数，0表示不退出。16 GiB本机4进程稳定驻留约4.25 GiB，100个不同长输入完整Hook的未命中缓存批次P95约23.56–29.25秒，命中缓存批次约7.39秒；这些是本机样本，不是延迟保证。详见[实测报告](../docs/GRAPH_WORKER_VALIDATION.md)。
 
@@ -36,7 +36,7 @@ macOS 检索使用共享 Unix socket 入口和4个常驻检索进程，同一用
 
 下载本仓库的 `codex/macos-global-deploy` 分支，双击根目录的 **安装全局配置.command**。首次安装后会提供持久的 Finder 右键“快速操作 → 部署 Codex 全局配置”。无需手输部署命令；首次下载15k+库、Python依赖与embedding模型需要联网。先在目标电脑登录 Codex，并通过 `gh auth login` 与 `gh auth setup-git` 授权读取私有 Skill 库，或提供已有的库副本。
 
-部署优先复用已有库；没有库时自动从私有Git仓库 `guess-guess-who-i-am/skills-library` 拉取 `portable-dependencies.json` 固定的commit，并校验目录SHA-256。访问失败会明确终止完整部署，不会默默只安装22个Skill。
+部署优先复用已有库；没有库时自动从私有Git仓库 `guess-guess-who-i-am/skills-library` 拉取 `portable-dependencies.json` 固定的commit，并校验目录SHA-256。访问失败会明确终止完整部署，不会默默只安装24个Skill。
 
 ```bash
 ./scripts/deploy-codex-profile-mac.sh
@@ -63,6 +63,6 @@ macOS 安装器优先使用 Codex 自带 Node.js 的绝对路径，不依赖非�
 
 ## 跨电脑复原范围
 
-可复原的内容包括22个自有Skill、私有库的15,472条目录记录（其中15,471个可读取正文）、方法论源与运行文件、全局Hook与路由、常驻worker和候选池、并发调度器、task_tree MCP安装器及右键服务。全部安装在目标用户目录，不写入工作区。库新增内容先提交私有库，再更新固定版本及目录摘要；本机已安装的库会优先保留，不自动覆盖用户自定义内容。
+可复原的内容包括24个自有Skill、私有库的15,472条目录记录（其中15,471个可读取正文）、方法论源与运行文件、全局Hook与路由、常驻worker和候选池、并发调度器、task_tree MCP安装器及右键服务。全部安装在目标用户目录，不写入工作区。库新增内容先提交私有库，再更新固定版本及目录摘要；本机已安装的库会优先保留，不自动覆盖用户自定义内容。
 
 图中约248MB的本机绝对路径、socket、venv和模型缓存不提交；安装器在目标机固定依赖版本、下载模型并按实际Skill/MCP路径重建图。这是可复建配置，不是复制运行进程。Codex自带的computer-use/cua_repl等机器专属MCP由目标机的产品运行时提供，不复制旧机命令路径或授权。自建task_tree由部署重新注册；额外MCP需在目标机注册，其stdio工具由索引发现，HTTP发现仍未覆盖。

@@ -6,7 +6,7 @@
 
 前提：目标机已安装 Git 和 Codex，并已下载本仓库的 `codex/macos-global-deploy` 分支。双击仓库根目录 `安装全局配置.command` 即可启动安装，不需要输入部署命令。脚本优先使用 Codex 自带 Node.js，找不到时才使用 `PATH` 中的 Node.js。
 
-完整Skill库保存在独立私有仓库 `guess-guess-who-i-am/skills-library`。目标机没有库时部署自动拉取固定commit并校验目录摘要；先通过 `gh auth login` 和 `gh auth setup-git` 完成该电脑的授权，或带入已有库。没有权限时明确失败，不会把22个自有Skill的部分安装说成完整复原。首次构图会下载embedding模型并为新电脑重写路径；不会复制旧机图中的绝对路径。
+完整Skill库保存在独立私有仓库 `guess-guess-who-i-am/skills-library`。目标机没有库时部署自动拉取固定commit并校验目录摘要；先通过 `gh auth login` 和 `gh auth setup-git` 完成该电脑的授权，或带入已有库。没有权限时明确失败，不会把24个自有Skill的部分安装说成完整复原。首次构图会下载embedding模型并为新电脑重写路径；不会复制旧机图中的绝对路径。
 
 ```bash
 cd ai-engineering-governance-template
@@ -43,7 +43,7 @@ cd ai-engineering-governance-template
 ## 已遇到的错误和正确处理
 
 1. **SSH 非交互环境找不到 Node**：登录 shell 能运行 `node`，Hook 或 SSH 命令却失败。原因是非交互 `PATH` 不含 `~/.local/bin`。安装器把 `process.execPath` 和 Hook 路径都写成绝对路径。
-2. **把项目 Skill 当作运行时来源**：仓库版本源位于不会被 Codex 自动发现的 `codex-profile/global-skills`；macOS 全局安装器把22个 Skill 复制到 `~/.agents/skills`，注册表只扫描用户级和插件根。
+2. **把项目 Skill 当作运行时来源**：仓库版本源位于不会被 Codex 自动发现的 `codex-profile/global-skills`；macOS 全局安装器把24个 Skill 复制到 `~/.agents/skills`，注册表只扫描用户级和插件根。
 3. **把旧 Windows 发布脚本带入 macOS profile**：旧快照包含 PowerShell 和 VBS 入口。当前 profile 只分发 Node 与 POSIX shell 入口，方法论发布使用安装时固定的 Node 运行时。
 4. **Git clone 留下空目录或残缺仓库**：先运行 `git status` 和 `git rev-parse --verify HEAD`。失败时删除的只能是已确认的残缺克隆目录，再重新 clone；不要覆盖一个含用户文件的目录。
 5. **GitHub 443 超时**：先确认 DNS、代理和 `curl -I https://github.com`。若另一台已授权机器能访问，可用 `git bundle create` 生成可校验 bundle，经 SSH 传输后 `git fetch <bundle>`；这只是网络回退，不替代最终远端同步。
@@ -56,3 +56,18 @@ cd ai-engineering-governance-template
 ## 凭据边界
 
 每台电脑都要分别执行 Codex 登录和 `gh auth login`。GitHub CLI 登录只赋予该电脑上的 CLI 身份，不意味着 Agent 可以在没有用户任务授权时自行创建仓库或推送。远程 LLM 只在机器环境或 GitHub Secrets 中配置 `LLM_BASE_URL` 与 `LLM_API_KEY`，模型名可以留空，不写入本仓库。
+
+
+## Claude 桌面工作流融合与真实消费者检查
+
+新增 `desktop-task-workflow`、`skill-supply-chain-review` 仍安装到用户级 `~/.agents/skills`，各工作区共享；Skill 正文没有加入固定三轮 Hook。机制来源、适配和排除项见 [Claude 机制对照](CLAUDE_MECHANISM_REUSE_20261031.zh.md)。
+
+仅更新检索 Worker 时，`scripts/deploy-graph-worker.mjs` 会同时备份并部署 `complete_embedding.py` 和主 Worker，不能单独复制 Python 入口到版本不同的全局安装。已有较新全局配置时，不要用旧快照整体覆盖；先对照刷新器接受的 CLI 参数。
+
+拥有并行 IDE 源码时，可通过下面的显式消费者检查验证任意两个临时工作区都读到全局完整 Skill，且实际 UserPromptSubmit Hook 正常路由：
+
+```bash
+node scripts/test-desktop-global-integration.mjs --ide-runtime /path/to/ide/server/agent-runtime.js --output .reports/desktop-global-consumer.json
+```
+
+它不调用模型、不读取认证信息、不修改业务任务树；记录的是真实读取/Hook结果、来源数量和内容哈希，不能证明模型准确率提升。

@@ -40,6 +40,8 @@
   "task-tree-subtree-run": ["运行子树", "执行子任务树", "并行任务树", "subtree run", "task tree subtree"],
   "manage-global-methodology": ["编辑方法论", "修改方法论", "新增方法论", "删除方法论", "移动方法论", "发布方法论", "全局方法论", "编辑全局prompt", "methodology editor", "methodology publisher"],
   "tool-call-batching": ["并发", "高并发", "并发调用", "工具调用", "工具往返", "批量工具", "执行慢", "运行慢", "Promise.all", "tool batching", "parallel tool calls"],
+  "skill-supply-chain-review": ["供应链审查", "供应链风险", "插件审查", "插件供应链", "MCP审查", "技能安全审查", "审查第三方技能", "supply chain review", "plugin security review", "MCP security"],
+  "desktop-task-workflow": ["桌面文件任务", "创建报告", "创建演示文稿", "创建表格", "交付产物", "desktop artifact", "desktop task", "file deliverable", "修改报告", "编辑报告", "整理报告", "修改演示文稿", "制作演示文稿", "修改表格", "制作表格", "edit report", "revise report", "update report", "prepare report", "create report", "edit spreadsheet", "create spreadsheet", "create presentation"],
   "pdf": ["\u8bfb\u53d6 PDF", "PDF", "pdf"],
   "docx": ["Word \u6587\u6863", "docx", "word document"]
 }

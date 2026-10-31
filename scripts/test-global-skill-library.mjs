@@ -55,7 +55,7 @@ try {
   await writeFile(path.join(profile, "codex-profile", "portable-dependencies.json"), JSON.stringify(lock));
   await assert.rejects(ensureSkillLibrary({ ...options, home: missingHome }), /Git operation failed/);
   assert.deepEqual(await readdir(path.join(missingHome, ".codex", "tools")), []);
-  console.log("PASS: clean-machine pinned Git restore, SHA-256 verification, offline reuse/check, explicit missing source, failure cleanup, paths with spaces; no partial 22-Skill deployment.");
+  console.log("PASS: clean-machine pinned Git restore, SHA-256 verification, offline reuse/check, explicit missing source, failure cleanup, paths with spaces; no partial 24-Skill deployment.");
 } finally {
   await rm(temporary, { recursive: true, force: true });
 }
