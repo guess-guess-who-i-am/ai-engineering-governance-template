@@ -1,7 +1,7 @@
 # Skill 目录
 
 Skills 是按需加载的专项工作流，不是常驻规则集合。
-本目录是24个自有 Skill 的唯一版本源。macOS 部署器把它们安装到 `~/.agents/skills`；下游项目不复制本目录，运行时注册表也不扫描项目 Skill。
+本目录是25个自有 Skill 的唯一版本源。macOS 部署器把它们安装到 `~/.agents/skills`；下游项目不复制本目录，运行时注册表也不扫描项目 Skill。
 
 | Skill | 任务 |
 |---|---|
@@ -28,6 +28,7 @@ Skills 是按需加载的专项工作流，不是常驻规则集合。
 | `task-tree-grill` | 通过逐项澄清建立或修复任务图 |
 | `task-tree-subtree-run` | 在授权范围内并行执行任务子树 |
 | `skill-supply-chain-review` | 审查第三方 Skill、插件与 MCP 的供应链风险 |
+| `parallel-web-research` | 互补批量检索 GitHub、Stack Overflow、论文和免费网页 |
 | `desktop-task-workflow` | 协调桌面文件产物、按需 Skill 和真实消费者验证 |
 
 ## 编写规则

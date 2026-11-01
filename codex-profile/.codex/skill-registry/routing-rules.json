@@ -1,47 +1,579 @@
 {
-  "_stopTokens": ["\u5e2e\u6211", "\u8bf7\u5e2e", "\u4e00\u4e2a", "\u8fd9\u4e2a", "\u6211\u7684", "\u60f3\u8981", "\u73b0\u5728", "\u9700\u8981", "\u53ef\u4ee5", "\u6709\u5173", "\u8fdb\u884c", "\u5982\u4f55", "\u5e2e\u5fd9"],
-  "start-new-project": ["\u65b0\u9879\u76ee", "\u65b0\u5efa\u9879\u76ee", "\u65b0\u7684\u9879\u76ee", "\u521d\u59cb\u5316\u9879\u76ee", "\u521b\u5efa\u9879\u76ee", "create project", "new project", "scaffold"],
-  "clarify-before-build": ["\u9700\u6c42\u6f84\u6e05", "\u5148\u95ee\u95ee\u9898", "\u9700\u6c42\u4e0d\u6e05", "clarify", "requirements"],
-  "diagnosing-bugs": ["\u8c03\u8bd5", "\u62a5\u9519", "\u6839\u56e0", "\u6545\u969c", "debug", "bug", "error", "regression"],
-  "diagnose": ["\u8bca\u65ad", "\u5b9a\u4f4d\u95ee\u9898", "\u5931\u8d25\u539f\u56e0", "\u6545\u969c", "debug", "diagnose"],
-  "root-cause-analysis": ["根因分析", "为什么失败", "第一处分歧", "实验效果不好", "结果异常", "反复失败", "跑不通", "root cause", "why failed", "unexpected failure"],
-  "systematic-debugging": ["调试", "报错", "根因", "根因分析", "故障", "诊断", "定位问题", "失败原因", "第一处分歧", "首次偏离", "为什么失败", "结果异常", "反复失败", "跑不通", "debug", "bug", "error", "diagnose", "root cause", "why failed", "unexpected failure"],
-  "verify-before-completion": ["验证", "测试", "验收", "完成前", "宣称完成", "足够证据", "完成证据", "是否完成", "verify", "completion", "evidence"],
-  "tdd": ["\u6d4b\u8bd5\u9a71\u52a8", "\u5355\u5143\u6d4b\u8bd5", "\u56de\u5f52\u6d4b\u8bd5", "coverage", "test", "tdd"],
-  "fix-regression-with-tdd": ["测试驱动", "单元测试", "回归测试", "已确认回归", "先写失败测试", "coverage", "test", "tdd", "regression"],
-  "skill-creator": ["\u521b\u5efa skill", "\u7f16\u5199 skill", "\u4fee\u6539 skill", "skill \u63cf\u8ff0", "skill creator"],
-  "write-a-skill": ["\u521b\u5efa skill", "\u7f16\u5199 skill", "\u4fee\u6539 skill", "write a skill"],
-  "skill-installer": ["\u5b89\u88c5 skill", "install skill", "skill \u4ed3\u5e93"],
-  "find-skills": ["\u641c\u7d22 skill", "\u67e5\u627e skill", "\u53d1\u73b0 skill", "find skill", "search skill"],
-  "openai-docs": ["OpenAI \u6587\u6863", "Codex API", "Responses API", "OpenAI API"],
-  "literature-review": ["\u6587\u732e\u7efc\u8ff0", "\u7cfb\u7edf\u7efc\u8ff0", "literature review", "survey paper"],
-  "paper-lookup": ["\u67e5\u8bba\u6587", "\u67e5\u6587\u732e", "\u8bba\u6587\u68c0\u7d22", "paper lookup", "\u6587\u732e\u641c\u7d22"],
-  "research": ["\u79d1\u7814", "\u7814\u7a76\u65b9\u6848", "research design", "\u79d1\u7814\u95ee\u9898"],
-  "scientific-writing": ["\u8bba\u6587\u5199\u4f5c", "\u5b66\u672f\u5199\u4f5c", "scientific writing", "manuscript"],
-  "frontend-design": ["\u524d\u7aef\u754c\u9762", "\u7f51\u9875\u8bbe\u8ba1", "UI", "frontend", "web app"],
-  "webapp-testing": ["\u7f51\u9875\u6d4b\u8bd5", "\u6d4f\u89c8\u5668\u6d4b\u8bd5", "Playwright", "webapp testing"],
-  "code-review": ["\u4ee3\u7801\u5ba1\u67e5", "\u4ee3\u7801 review", "code review", "review changes"],
-  "review-project-diff": ["代码审查", "审查 diff", "审查当前分支", "审查提交", "审查 PR", "行为缺陷", "code review", "review changes", "review diff"],
-  "build-designed-interface": ["前端界面", "网页设计", "界面重构", "设计系统", "可访问性", "响应式", "UI", "frontend", "web app", "designed interface"],
-  "establish-test-strategy": ["测试策略", "测试体系", "测试分类", "测试覆盖", "端到端测试", "供应链测试", "CI", "test strategy", "test system", "quality layers"],
-  "evolve-contracts": ["接口变更", "契约变更", "API 变更", "事件格式", "schema 变更", "CLI 格式", "生产者消费者", "contract change", "API evolution", "schema evolution"],
-  "model-project-domain": ["领域建模", "业务术语", "状态转换", "领域边界", "归属冲突", "domain model", "business language", "state transition"],
-  "review-governance-framework": ["治理框架审查", "治理体系审查", "路由完整性", "token 成本", "规则重复", "governance review", "governance framework", "routing audit"],
-  "write-pr-description": ["PR 描述", "pull request 描述", "更新 PR 正文", "发布说明", "PR description", "pull request description"],
-  "method-research-evidence": ["论文", "文献", "科研", "研究设计", "科学依据", "baseline", "benchmark", "paper", "literature review", "research evidence"],
-  "method-engineering-execution": ["代码修改", "工程问题", "架构", "依赖", "安装", "实现", "集成", "复现", "调试", "architecture", "implementation", "engineering"],
-  "method-evaluation-gates": ["验收门", "阈值", "评价标准", "评估指标", "验证策略", "品味", "意图", "大模型门禁", "acceptance gate", "threshold", "qualitative evaluation"],
-  "github-delivery": ["GitHub", "\u63d0\u4ea4\u4ee3\u7801", "\u63a8\u9001\u4ed3\u5e93", "pull request", "commit and push"],
-  "method-github-delivery": ["GitHub", "提交代码", "推送仓库", "创建仓库", "私有仓库", "pull request", "commit", "push"],
-  "method-task-tree": ["任务树", "任务图", "task-tree", "task tree", "GraphState", "task_tree_focus"],
-  "task-tree-chain-run": ["运行任务链", "自动推进任务树", "链式执行", "chain run", "task tree chain", "task_tree_chain"],
-  "task-tree-core-state": ["精简任务树", "清理任务图", "任务树过长", "核心状态", "compact task tree", "task tree core state"],
-  "task-tree-grill": ["创建任务树", "重建任务图", "拆分任务节点", "澄清任务图", "task tree grill", "build task tree"],
-  "task-tree-subtree-run": ["运行子树", "执行子任务树", "并行任务树", "subtree run", "task tree subtree"],
-  "manage-global-methodology": ["编辑方法论", "修改方法论", "新增方法论", "删除方法论", "移动方法论", "发布方法论", "全局方法论", "编辑全局prompt", "methodology editor", "methodology publisher"],
-  "tool-call-batching": ["并发", "高并发", "并发调用", "工具调用", "工具往返", "批量工具", "执行慢", "运行慢", "Promise.all", "tool batching", "parallel tool calls"],
-  "skill-supply-chain-review": ["供应链审查", "供应链风险", "插件审查", "插件供应链", "MCP审查", "技能安全审查", "审查第三方技能", "supply chain review", "plugin security review", "MCP security"],
-  "desktop-task-workflow": ["桌面文件任务", "创建报告", "创建演示文稿", "创建表格", "交付产物", "desktop artifact", "desktop task", "file deliverable", "修改报告", "编辑报告", "整理报告", "修改演示文稿", "制作演示文稿", "修改表格", "制作表格", "edit report", "revise report", "update report", "prepare report", "create report", "edit spreadsheet", "create spreadsheet", "create presentation"],
-  "pdf": ["\u8bfb\u53d6 PDF", "PDF", "pdf"],
-  "docx": ["Word \u6587\u6863", "docx", "word document"]
+  "_capabilityRoutes": {
+    "pdf": {
+      "subjects": [
+        "PDF",
+        ".pdf"
+      ],
+      "actions": [
+        "read",
+        "create",
+        "generate",
+        "extract",
+        "render",
+        "convert",
+        "split",
+        "merge",
+        "inspect",
+        "读取",
+        "生成",
+        "提取",
+        "拆分",
+        "合并",
+        "渲染",
+        "导出"
+      ],
+      "objects": [
+        "file",
+        "files",
+        "document",
+        "documents",
+        "pages",
+        "page",
+        "statements",
+        "tables",
+        "文件",
+        "文档",
+        "页",
+        "表格",
+        "账单",
+        "报表"
+      ],
+      "exclude": [
+        "implement",
+        "library",
+        "API",
+        "specification",
+        "代码",
+        "开发库",
+        "实现",
+        "接口",
+        "规范"
+      ]
+    },
+    "skill-supply-chain-review": {
+      "subjects": [
+        "Skill",
+        "技能",
+        "插件",
+        "MCP",
+        "plugin"
+      ],
+      "actions": [
+        "审查",
+        "检查",
+        "review",
+        "audit"
+      ],
+      "objects": [
+        "风险",
+        "安全",
+        "供应链",
+        "security",
+        "supply chain"
+      ],
+      "exclude": [
+        "不要",
+        "不用",
+        "解释",
+        "explain"
+      ]
+    },
+    "desktop-task-workflow": {
+      "subjects": [
+        "报告",
+        "演示文稿",
+        "表格",
+        "文件",
+        "report",
+        "presentation",
+        "spreadsheet",
+        "artifact"
+      ],
+      "actions": [
+        "创建",
+        "制作",
+        "修改",
+        "交付",
+        "create",
+        "prepare",
+        "produce",
+        "deliver"
+      ],
+      "objects": [
+        "报告",
+        "演示文稿",
+        "表格",
+        "文件",
+        "report",
+        "presentation",
+        "spreadsheet",
+        "artifact"
+      ],
+      "exclude": [
+        "不要",
+        "不用",
+        "解释",
+        "explain"
+      ]
+    }
+  },
+  "_stopTokens": [
+    "帮我",
+    "请帮",
+    "一个",
+    "这个",
+    "我的",
+    "想要",
+    "现在",
+    "需要",
+    "可以",
+    "有关",
+    "进行",
+    "如何",
+    "帮忙"
+  ],
+  "start-new-project": [
+    "新项目",
+    "新建项目",
+    "新的项目",
+    "初始化项目",
+    "创建项目",
+    "create project",
+    "new project",
+    "scaffold"
+  ],
+  "clarify-before-build": [
+    "需求澄清",
+    "先问问题",
+    "需求不清",
+    "clarify",
+    "requirements"
+  ],
+  "diagnosing-bugs": [
+    "调试",
+    "报错",
+    "根因",
+    "故障",
+    "debug",
+    "bug",
+    "error",
+    "regression"
+  ],
+  "diagnose": [
+    "诊断",
+    "定位问题",
+    "失败原因",
+    "故障",
+    "debug",
+    "diagnose"
+  ],
+  "root-cause-analysis": [
+    "根因分析",
+    "为什么失败",
+    "第一处分歧",
+    "实验效果不好",
+    "结果异常",
+    "反复失败",
+    "跑不通",
+    "root cause",
+    "why failed",
+    "unexpected failure"
+  ],
+  "systematic-debugging": [
+    "调试",
+    "报错",
+    "根因",
+    "根因分析",
+    "故障",
+    "诊断",
+    "定位问题",
+    "失败原因",
+    "第一处分歧",
+    "首次偏离",
+    "为什么失败",
+    "结果异常",
+    "反复失败",
+    "跑不通",
+    "debug",
+    "bug",
+    "error",
+    "diagnose",
+    "root cause",
+    "why failed",
+    "unexpected failure"
+  ],
+  "verify-before-completion": [
+    "验证",
+    "测试",
+    "验收",
+    "完成前",
+    "宣称完成",
+    "足够证据",
+    "完成证据",
+    "是否完成",
+    "verify",
+    "completion",
+    "evidence"
+  ],
+  "tdd": [
+    "测试驱动",
+    "单元测试",
+    "回归测试",
+    "coverage",
+    "test",
+    "tdd"
+  ],
+  "fix-regression-with-tdd": [
+    "测试驱动",
+    "单元测试",
+    "回归测试",
+    "已确认回归",
+    "先写失败测试",
+    "coverage",
+    "test",
+    "tdd",
+    "regression"
+  ],
+  "skill-creator": [
+    "创建 skill",
+    "编写 skill",
+    "修改 skill",
+    "skill 描述",
+    "skill creator"
+  ],
+  "write-a-skill": [
+    "创建 skill",
+    "编写 skill",
+    "修改 skill",
+    "write a skill"
+  ],
+  "skill-installer": [
+    "安装 skill",
+    "install skill",
+    "skill 仓库"
+  ],
+  "find-skills": [
+    "搜索 skill",
+    "查找 skill",
+    "发现 skill",
+    "find skill",
+    "search skill"
+  ],
+  "openai-docs": [
+    "OpenAI 文档",
+    "Codex API",
+    "Responses API",
+    "OpenAI API"
+  ],
+  "literature-review": [
+    "文献综述",
+    "系统综述",
+    "literature review",
+    "survey paper"
+  ],
+  "paper-lookup": [
+    "查论文",
+    "查文献",
+    "论文检索",
+    "paper lookup",
+    "文献搜索"
+  ],
+  "research": [
+    "科研",
+    "研究方案",
+    "research design",
+    "科研问题"
+  ],
+  "scientific-writing": [
+    "论文写作",
+    "学术写作",
+    "scientific writing",
+    "manuscript"
+  ],
+  "frontend-design": [
+    "前端界面",
+    "网页设计",
+    "UI",
+    "frontend",
+    "web app"
+  ],
+  "webapp-testing": [
+    "网页测试",
+    "浏览器测试",
+    "Playwright",
+    "webapp testing"
+  ],
+  "code-review": [
+    "代码审查",
+    "代码 review",
+    "code review",
+    "review changes"
+  ],
+  "review-project-diff": [
+    "代码审查",
+    "审查 diff",
+    "审查当前分支",
+    "审查提交",
+    "审查 PR",
+    "行为缺陷",
+    "code review",
+    "review changes",
+    "review diff"
+  ],
+  "build-designed-interface": [
+    "前端界面",
+    "网页设计",
+    "界面重构",
+    "设计系统",
+    "可访问性",
+    "响应式",
+    "UI",
+    "frontend",
+    "web app",
+    "designed interface"
+  ],
+  "establish-test-strategy": [
+    "测试策略",
+    "测试体系",
+    "测试分类",
+    "测试覆盖",
+    "端到端测试",
+    "供应链测试",
+    "CI",
+    "test strategy",
+    "test system",
+    "quality layers"
+  ],
+  "evolve-contracts": [
+    "接口变更",
+    "契约变更",
+    "API 变更",
+    "事件格式",
+    "schema 变更",
+    "CLI 格式",
+    "生产者消费者",
+    "contract change",
+    "API evolution",
+    "schema evolution"
+  ],
+  "model-project-domain": [
+    "领域建模",
+    "业务术语",
+    "状态转换",
+    "领域边界",
+    "归属冲突",
+    "domain model",
+    "business language",
+    "state transition"
+  ],
+  "review-governance-framework": [
+    "治理框架审查",
+    "治理体系审查",
+    "路由完整性",
+    "token 成本",
+    "规则重复",
+    "governance review",
+    "governance framework",
+    "routing audit"
+  ],
+  "write-pr-description": [
+    "PR 描述",
+    "pull request 描述",
+    "更新 PR 正文",
+    "发布说明",
+    "PR description",
+    "pull request description"
+  ],
+  "method-research-evidence": [
+    "论文",
+    "文献",
+    "科研",
+    "研究设计",
+    "科学依据",
+    "baseline",
+    "benchmark",
+    "paper",
+    "literature review",
+    "research evidence"
+  ],
+  "method-engineering-execution": [
+    "代码修改",
+    "工程问题",
+    "架构",
+    "依赖",
+    "安装",
+    "实现",
+    "集成",
+    "复现",
+    "调试",
+    "architecture",
+    "implementation",
+    "engineering"
+  ],
+  "method-evaluation-gates": [
+    "验收门",
+    "阈值",
+    "评价标准",
+    "评估指标",
+    "验证策略",
+    "品味",
+    "意图",
+    "大模型门禁",
+    "acceptance gate",
+    "threshold",
+    "qualitative evaluation"
+  ],
+  "github-delivery": [
+    "GitHub",
+    "提交代码",
+    "推送仓库",
+    "pull request",
+    "commit and push"
+  ],
+  "method-github-delivery": [
+    "GitHub",
+    "提交代码",
+    "推送仓库",
+    "创建仓库",
+    "私有仓库",
+    "pull request",
+    "commit",
+    "push"
+  ],
+  "method-task-tree": [
+    "任务树",
+    "任务图",
+    "task-tree",
+    "task tree",
+    "GraphState",
+    "task_tree_focus"
+  ],
+  "task-tree-chain-run": [
+    "运行任务链",
+    "自动推进任务树",
+    "链式执行",
+    "chain run",
+    "task tree chain",
+    "task_tree_chain"
+  ],
+  "task-tree-core-state": [
+    "精简任务树",
+    "清理任务图",
+    "任务树过长",
+    "核心状态",
+    "compact task tree",
+    "task tree core state"
+  ],
+  "task-tree-grill": [
+    "创建任务树",
+    "重建任务图",
+    "拆分任务节点",
+    "澄清任务图",
+    "task tree grill",
+    "build task tree"
+  ],
+  "task-tree-subtree-run": [
+    "运行子树",
+    "执行子任务树",
+    "并行任务树",
+    "subtree run",
+    "task tree subtree"
+  ],
+  "manage-global-methodology": [
+    "编辑方法论",
+    "修改方法论",
+    "新增方法论",
+    "删除方法论",
+    "移动方法论",
+    "发布方法论",
+    "全局方法论",
+    "编辑全局prompt",
+    "methodology editor",
+    "methodology publisher"
+  ],
+  "tool-call-batching": [
+    "并发",
+    "高并发",
+    "并发调用",
+    "工具调用",
+    "工具往返",
+    "批量工具",
+    "执行慢",
+    "运行慢",
+    "Promise.all",
+    "tool batching",
+    "parallel tool calls"
+  ],
+  "pdf": [
+    "读取 PDF",
+    "PDF",
+    "pdf"
+  ],
+  "docx": [
+    "Word 文档",
+    "docx",
+    "word document"
+  ],
+  "technical_research_batch": [
+    "API-only",
+    "仅技术API"
+  ],
+  "complementary_search_batch": [
+    "Stack Overflow",
+    "StackOverflow",
+    "高star",
+    "高 star",
+    "CCF-A",
+    "CCF A",
+    "查仓库",
+    "成熟库",
+    "论文检索",
+    "技术资料",
+    "互补搜索",
+    "technical research"
+  ],
+  "parallel-web-research": [
+    "并行搜索",
+    "联网研究",
+    "搜索资料",
+    "查论文"
+  ],
+  "desktop-task-workflow": [
+    "桌面文件任务",
+    "创建报告",
+    "创建演示文稿",
+    "创建表格",
+    "交付产物",
+    "desktop artifact",
+    "desktop task",
+    "file deliverable",
+    "修改报告",
+    "编辑报告",
+    "整理报告",
+    "修改演示文稿",
+    "制作演示文稿",
+    "修改表格",
+    "制作表格",
+    "edit report",
+    "revise report",
+    "update report",
+    "prepare report",
+    "create report",
+    "edit spreadsheet",
+    "create spreadsheet",
+    "create presentation"
+  ],
+  "skill-supply-chain-review": [
+    "供应链审查",
+    "供应链风险",
+    "插件审查",
+    "插件供应链",
+    "MCP审查",
+    "技能安全审查",
+    "审查第三方技能",
+    "supply chain review",
+    "plugin security review",
+    "MCP security"
+  ]
 }

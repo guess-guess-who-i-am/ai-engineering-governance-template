@@ -1,0 +1,164 @@
+{
+  "date": "2026-11-01",
+  "source": "Mac current global profile",
+  "target": "194 Linux user global profile",
+  "published": {
+    "status": "published",
+    "graphSha256": "215ed6964044554a8599202768ae84804a50525da91245511faed92ecf613273",
+    "graphInputsSha256": "a1d3da43404701a38f6ec22ecfb45ae905203be3f74253d10a08490e30c554de",
+    "baseBuildReportSha256": "26e63520720dcaeac9174d1d500f4a74c9621ab0e39613f392c523fdd1b82f28",
+    "runtimeRevalidationSha256": null,
+    "workerSha256": "689eba7f6d80f1cf73f717a3ce77b40199d53bd28a4b04ec4eb9221301b90069",
+    "routerSha256": "7b6e2072daadb274116e5202147f8ec4e391a8335ae9f7de6734a3bcc5cd4544",
+    "runtimeOnlyAstVerified": false,
+    "verificationScope": "Current artifact integrity and coverage; task evaluation evidence is separate",
+    "resourceModuleCount": 4232,
+    "resourceModuleCounts": {
+      "expert": 447,
+      "skill": 3307,
+      "mcp-service": 478
+    },
+    "ownedSkillCount": 25,
+    "externalSkillCount": 15472,
+    "mcpToolCount": 23,
+    "writes": 15,
+    "productionChanged": true
+  },
+  "build": {
+    "schemaVersion": "exact-text-vector-reuse/1",
+    "sourceSha256": "0fa304186d4129897790adbb6a042d0e6b1874dd139027a08971f1d538d8590d",
+    "graphSha256": "215ed6964044554a8599202768ae84804a50525da91245511faed92ecf613273",
+    "seconds": 153.3,
+    "encoding": [
+      {
+        "model": "sentence-transformers/all-MiniLM-L6-v2",
+        "documents": 19752,
+        "newUniqueTexts": 3,
+        "seconds": 4.21
+      },
+      {
+        "model": "paraphrase-multilingual-MiniLM-L12-v2",
+        "documents": 19752,
+        "newUniqueTexts": 3,
+        "seconds": 2.4853
+      },
+      {
+        "model": "sentence-transformers/all-MiniLM-L6-v2",
+        "documents": 19412,
+        "newUniqueTexts": 3,
+        "seconds": 0.2534
+      },
+      {
+        "model": "paraphrase-multilingual-MiniLM-L12-v2",
+        "documents": 19457,
+        "newUniqueTexts": 4,
+        "seconds": 2.4938
+      }
+    ],
+    "localIndexerUsed": true,
+    "sourceGraphUnchanged": true
+  },
+  "integrity": {
+    "passed": true,
+    "rows": [
+      {
+        "channel": "tool-en",
+        "shared": 19474,
+        "new": 3,
+        "mismatches": 0
+      },
+      {
+        "channel": "tool-zh",
+        "shared": 19495,
+        "new": 4,
+        "mismatches": 0
+      },
+      {
+        "channel": "desc-en",
+        "shared": 19409,
+        "new": 3,
+        "mismatches": 0
+      },
+      {
+        "channel": "desc-zh",
+        "shared": 19453,
+        "new": 4,
+        "mismatches": 0
+      },
+      {
+        "channel": "fresh-en",
+        "samples": 4,
+        "maxAbsoluteError": 1.2665987014770508e-07
+      },
+      {
+        "channel": "fresh-zh",
+        "samples": 4,
+        "maxAbsoluteError": 0.0
+      }
+    ]
+  },
+  "ideConsumers": {
+    "paths": 18,
+    "passed": 18,
+    "workspaces": 36,
+    "modelWorkflowExecuted": false
+  },
+  "concurrency": {
+    "status": "PASS",
+    "newSkillsRetrievedThroughGraph": true,
+    "retries": 0,
+    "modelQualityMeasured": false
+  },
+  "waves": [
+    {
+      "name": "burst",
+      "requests": 100,
+      "successes": 100,
+      "peakOverlappingRequests": 43,
+      "p50Ms": 13.7,
+      "p95Ms": 21.6,
+      "maxMs": 22.9
+    },
+    {
+      "name": "staggered",
+      "requests": 100,
+      "successes": 100,
+      "peakOverlappingRequests": 19,
+      "p50Ms": 6.8,
+      "p95Ms": 12.0,
+      "maxMs": 14.8
+    },
+    {
+      "name": "distinct-burst",
+      "requests": 100,
+      "successes": 100,
+      "peakOverlappingRequests": 100,
+      "p50Ms": 4578.7,
+      "p95Ms": 8759.7,
+      "maxMs": 9265.4
+    }
+  ],
+  "globalE2E": {
+    "passed": true,
+    "routes": 6,
+    "anonymousContext7TaskPassed": true
+  },
+  "limitations": [
+    "One original expert has no unambiguous lead",
+    "Mac node_repl binary unavailable on Linux: four tools excluded from runnable catalog",
+    "Service cold start tested; full machine reboot and every existing GUI memory snapshot not tested",
+    "Imported MCP descriptors are not blanket proof of service execution or authorization"
+  ],
+  "sharedBroker": {
+    "passed": true,
+    "entry": "expert:dev-pipeline-orchestrator:2e0997ee6c39c8ae",
+    "bytes": 12771,
+    "sha256": "85836f493177959e1ed9dde58bbce50ea1189829130136ce9d12269e87cec8af",
+    "fullSourceMatched": true
+  },
+  "macInstaller": {
+    "passed": true,
+    "ownedSkills": 25,
+    "scope": "isolated homes, arbitrary workspace service runner, MCP handshake, idempotence and rollback; no GUI click or reboot"
+  }
+}

@@ -5,26 +5,25 @@ import path from "node:path";
 
 const home = os.homedir();
 const codexRoot = process.env.CODEX_HOME || path.join(home, ".codex");
-const prompts = path.join(codexRoot, "prompts");
-const targets = {
-  alwaysOn: path.join(prompts, "global-attention-anchor.en.md"),
-  "method-research-evidence": path.join(home, ".agents", "skills", "method-research-evidence", "SKILL.md"),
-  "method-engineering-execution": path.join(home, ".agents", "skills", "method-engineering-execution", "SKILL.md"),
-  "method-evaluation-gates": path.join(home, ".agents", "skills", "method-evaluation-gates", "SKILL.md"),
-  "method-github-delivery": path.join(home, ".agents", "skills", "method-github-delivery", "SKILL.md"),
-  "method-task-tree": path.join(home, ".agents", "skills", "method-task-tree", "SKILL.md")
-};
 
 function lines(text) { return text.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n").split("\n"); }
 function rules(text) { return lines(text).filter((line) => line.startsWith("- ")); }
 
 try {
+  const args = process.argv.slice(2);
+  if (args.length && (args.length !== 2 || args[0] !== "--config")) throw new Error("Usage: validate-methodology-routing.mjs [--config path]");
+  const configFile = path.resolve(args[1] || path.join(codexRoot, "prompt-publisher", "methodology-targets.json"));
+  const config = JSON.parse(await readFile(configFile, "utf8"));
+  const resolve = file => path.resolve(path.dirname(configFile), file);
+  const outputs = Object.fromEntries(Object.entries(config.outputs).map(([key, file]) => [key, resolve(file)]));
+  const targets = { alwaysOn: outputs.anchorEnglish,
+    ...Object.fromEntries(config.routes.filter(route => route.skillFile).map(route => [route.id, resolve(route.skillFile)])) };
   const [sourceText, chineseText, chineseAnchorText, reviewText, mapText, ...targetTexts] = await Promise.all([
-    readFile(path.join(prompts, "global-every-turn.en.md"), "utf8"),
-    readFile(path.join(prompts, "global-every-turn.zh.md"), "utf8"),
-    readFile(path.join(prompts, "global-attention-anchor.zh.md"), "utf8"),
-    readFile(path.join(prompts, "global-methodology-routing-review.zh.md"), "utf8"),
-    readFile(path.join(prompts, "global-methodology-map.json"), "utf8"),
+    readFile(outputs.fullEnglish, "utf8"),
+    readFile(outputs.fullChinese, "utf8"),
+    readFile(outputs.anchorChinese, "utf8"),
+    readFile(outputs.chineseReview, "utf8"),
+    readFile(outputs.map, "utf8"),
     ...Object.values(targets).map((file) => readFile(file, "utf8"))
   ]);
   const sourceRules = rules(sourceText);

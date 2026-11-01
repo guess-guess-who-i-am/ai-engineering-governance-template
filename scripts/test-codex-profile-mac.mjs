@@ -77,7 +77,7 @@ try {
 import json, os, pathlib, socket, sys, time
 args = sys.argv[1:]
 if "-c" in args:
-    raise SystemExit(0)
+    os.execv(sys.executable, [sys.executable, *args])
 def value(name):
     return args[args.index(name) + 1]
 if "build" in args:
@@ -153,7 +153,7 @@ elif "retrieve" in args:
     "review-governance-framework", "review-project-diff", "start-new-project",
     "systematic-debugging", "verify-before-completion", "write-pr-description",
     "task-tree-chain-run", "task-tree-core-state", "task-tree-grill", "task-tree-subtree-run",
-    "skill-supply-chain-review", "desktop-task-workflow"
+    "skill-supply-chain-review", "desktop-task-workflow", "parallel-web-research"
   ];
   for (const name of expectedSkills) {
     const skill = await readFile(path.join(home, ".agents", "skills", name, "SKILL.md"), "utf8");
@@ -187,8 +187,10 @@ elif "retrieve" in args:
   const mcpVersion = path.join(root, "mcp-refresh-description.txt");
   await writeFile(mcpVersion, "version one");
   await writeFile(mcpFixture, `import { readFileSync } from 'node:fs';
-let raw = ''; for await (const chunk of process.stdin) raw += chunk;
-for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse)) {
+import { createInterface } from 'node:readline';
+for await (const line of createInterface({ input: process.stdin })) {
+ const request = JSON.parse(line);
+ if (!request.id) continue;
  const result = request.method === 'tools/list' ? { tools: [{name:'fixture-tool',description:readFileSync(process.argv[2],'utf8'),inputSchema:{type:'object'}}] } : {protocolVersion:'2025-06-18',capabilities:{}};
  process.stdout.write(JSON.stringify({jsonrpc:'2.0',id:request.id,result})+'\\n');
 }
@@ -277,10 +279,10 @@ for (const request of raw.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse
   const taskTreeRuntime = path.join(root, "task-tree-runtime");
   await mkdir(path.join(taskTreeRuntime, "scripts"), { recursive: true });
   await writeFile(path.join(taskTreeRuntime, "scripts", "mcp-server.mjs"), `#!/usr/bin/env node
-let input = "";
-for await (const chunk of process.stdin) input += chunk.toString();
-const requests = input.trim().split(/\\r?\\n/).filter(Boolean).map(JSON.parse);
-for (const request of requests) {
+import { createInterface } from 'node:readline';
+for await (const line of createInterface({ input: process.stdin })) {
+  const request = JSON.parse(line);
+  if (!request.id) continue;
   const result = request.method === "tools/list"
     ? { tools: [{ name: "task_tree_focus" }, { name: "task_tree_write" }] }
     : { protocolVersion: "2025-06-18", capabilities: {} };
@@ -432,7 +434,7 @@ await writeFile(configPath, config);
     console.log(`PASS: full catalog fixture indexed ${fullManifest.skillCount}/${fullManifest.catalogSkillCount} Skills; total index bytes=${Buffer.byteLength(fullIndex)}; example route=resolving-merge-conflicts`);
   }
 
-  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 24 owned Skills, global-only registry, system/task-tree/supply-chain routing, merge, manifest backup, credential isolation, 76-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
+  console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 25 owned Skills, global-only registry, system/task-tree/supply-chain routing, merge, manifest backup, credential isolation, 76-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
 } finally {
   await rm(root, { recursive: true, force: true });
 }
