@@ -3,7 +3,7 @@
 // No model request, credentials, project edits or third-party prompt export.
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { mkdtemp, readFile, rm, mkdir, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, mkdir, writeFile, realpath } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -20,6 +20,10 @@ const names = ['desktop-task-workflow', 'skill-supply-chain-review'];
 const manifest = JSON.parse(await readFile(path.join(codexHome, 'skill-registry/skills.graph.manifest.json')));
 assert.equal(manifest.missingSkillCount, 0);
 assert.equal(manifest.invalidSkillCount, 0);
+assert.equal(await realpath(manifest.graphPath),
+  await realpath(path.join(codexHome, 'skill-registry/skills.graph.json')),
+  'Graph manifest must identify this host, not the source computer');
+await realpath(manifest.rootPath);
 const root = await mkdtemp(path.join(os.tmpdir(), 'desktop-global-consumer-'));
 try {
   const rows = await Promise.all([0, 1].map(async index => {
