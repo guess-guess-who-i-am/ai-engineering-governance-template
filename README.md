@@ -119,6 +119,8 @@ Finder 右键 Quick Action 已纳入 macOS 安装测试，覆盖服务安装、�
 
 194当前全量资源同步、专家读取、Linux平台边界及并发实测见 [194全局资源部署](docs/GLOBAL_RESOURCES_194_20261101.zh.md)。
 
+IDE与当前本机Codex的指令、入口元数据预算、全局资源、V5 Hook及独立比对证据见 [配置一致性验收](docs/IDE_CODEX_PARITY_20261104.zh.md)。
+
 实际IDE消费者、100请求、194部署故障和回退边界见 [Mac与194部署验收](docs/MAC_194_DEPLOYMENT_20261101.zh.md)。安装门禁不替代真实模型质量或整机重启验证。
 
 创建下游项目时，首先修改 `CONTEXT.md` 和 `DESIGN.md`，再用 `$establish-test-strategy` 把 `quality/gates.json` 中的 `planned` 门禁替换为真实命令。PR 检查允许尚在建设中的明确计划；发布检查会拒绝任何仍未配置的必需门禁。

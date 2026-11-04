@@ -79,8 +79,8 @@ function defaultHandlers(eventName, codexRoot) {
       : [];
 
   const external = eventName === "UserPromptSubmit"
-    ? process.env.CODEX_CAPABILITY_HOOK || (process.platform === "win32" ? "E:\\能力归纳概括\\capability-router\\hooks\\capability-router.ps1" : "")
-    : process.env.CODEX_CAPABILITY_REFRESH_HOOK || (process.platform === "win32" ? "E:\\能力归纳概括\\capability-router\\hooks\\refresh-capability-registry.ps1" : "");
+    ? process.env.CODEX_CAPABILITY_HOOK
+    : process.env.CODEX_CAPABILITY_REFRESH_HOOK;
   if (external) handlers.push({ file: external, timeoutMs: eventName === "UserPromptSubmit" ? 12000 : 30000 });
   return handlers.filter((handler) => existsSync(handler.file));
 }

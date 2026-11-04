@@ -73,4 +73,16 @@ for (let turn = 1; turn <= 4; turn += 1) {
   assert.ok(context.includes(`ROUTE:${turn}`), `dynamic route missing on turn ${turn}`);
   assert.equal(fixed(context), turn === 1 || turn === 4);
 }
-console.log('PASS: cadence 1/4, retry, session isolation, no-ID fallback, compact and resume reset.');
+// A newly published policy must take effect immediately in an existing session,
+// even when its next ordinary cadence slot would otherwise suppress reminders.
+assert.equal(fixed(invoke({ session: 'policy-update', turn: '1' })), true);
+assert.equal(fixed(invoke({ session: 'policy-update', turn: '2' })), false);
+await writeFile(path.join(codexHome, 'prompts/global-methodology-router.en.md'), 'FIXED_ROUTER_UPDATED');
+assert.equal(fixed(invoke({ session: 'policy-update', turn: '3' })), true, 'changed policy must reinject immediately');
+assert.equal(fixed(invoke({ session: 'policy-update', turn: '3' })), true, 'retry preserves the reinjection receipt');
+assert.equal(fixed(invoke({ session: 'policy-update', turn: '4' })), false);
+for (const source of ['compact', 'resume']) {
+  const restored = invoke({ event: 'SessionStart', source, session: `restore-${source}` });
+  assert.ok(restored.includes('[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5]'), `${source} must restore the current scheduling contract`);
+}
+console.log('PASS: cadence 1/4, retry, session isolation, no-ID fallback, policy updates, compact and resume restore V5.');

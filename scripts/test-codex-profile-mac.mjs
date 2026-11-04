@@ -217,7 +217,7 @@ for await (const line of createInterface({ input: process.stdin })) {
   const context = run(dispatcher, [], { ...envArgs, input: contextInput });
   const contextPayload = JSON.parse(context.stdout);
   const contextText = String(contextPayload.hookSpecificOutput.additionalContext);
-  assert(context.status === 0 && contextText.startsWith("[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4]") && contextText.includes("Start ordinary read-only waves at 2-4") && contextText.includes("halve it after failures"), "adaptive scheduling contract is absent, not first, or weakened");
+  assert(context.status === 0 && contextText.startsWith("[ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5]") && contextText.includes("normally 5-8 operations") && contextText.includes("halve it after failures"), "adaptive scheduling contract is absent, not first, or weakened");
   assert(!contextText.includes("# Desktop Task Workflow") && !contextText.includes("# Skill Supply-Chain Review"), "fixed Hook must not inject specialized Skill bodies");
   const routeInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Please push this release to GitHub", cwd: REPOSITORY_ROOT })}\n`;
   const routed = run(dispatcher, [], { ...envArgs, input: routeInput });

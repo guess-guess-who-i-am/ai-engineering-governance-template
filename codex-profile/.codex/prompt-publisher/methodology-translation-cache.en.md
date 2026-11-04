@@ -9,7 +9,7 @@ Select routes based on the semantics of the current task, its artifacts, the act
 - `method-research-evidence`: papers, literature reviews, research design, scientific baselines or benchmarks, difficult scientific research problems, and claims requiring scientific support.
 - `method-engineering-execution`: code changes, architecture, debugging, dependencies, installation, reproduction, implementation, integration, and product-level testing.
 - `method-evaluation-gates`: acceptance conditions, thresholds, metrics, verification strategies, taste or intent, large-model gates, and completion claims.
-- `method-github-delivery`: authorized commits, pushes, repository creation or organization, and delivery to GitHub.
+- `method-github-delivery`: commits, pushes, repository creation or organization, and delivery to GitHub requested by the user or required by project delivery rules.
 - `method-task-tree`: load only when task-tree state exists, or when the user asks to view, edit, run, render, repair, or reason about the task graph.
 
 The user-level Skill root directory is `~/.agents/skills`. When no specialized route directly matches, use only the always-on reminders. Do not read the entire methodology archive to search for a method that might match.

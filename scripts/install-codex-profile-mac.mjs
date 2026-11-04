@@ -424,7 +424,7 @@ async function verifyInstallation(home, codexHome, operations) {
   catch { throw new Error(`Methodology publisher returned invalid JSON: ${publisher.stdout.trim()}`); }
   const hookInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const context = await run(process.execPath, [path.join(codexHome, "hooks", "hook-dispatch.mjs")], { env, input: hookInput, timeoutMs: 300000 });
-  if (context.code !== 0 || !context.stdout.includes("ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V4")) throw new Error("Hook dispatcher did not emit the adaptive scheduling contract");
+  if (context.code !== 0 || !context.stdout.includes("ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5")) throw new Error("Hook dispatcher did not emit the adaptive scheduling contract");
   return { validation: publication.validation, trust: await inspectHookTrust(codexHome) };
 }
 
