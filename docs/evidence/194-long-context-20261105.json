@@ -1,0 +1,444 @@
+{
+  "date": "2026-11-05",
+  "profile": {
+    "sessions": [
+      {
+        "schema": "codex-session-performance/1",
+        "rows": 2229,
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "effort": "high",
+            "turnContexts": 11
+          }
+        ],
+        "completedToolWrappers": 257,
+        "unmatchedToolCalls": 0,
+        "promiseBatchSyntaxCalls": 6,
+        "multiExecWithoutPromiseBatchSyntax": 79,
+        "toolOutputBytes": {
+          "count": 257,
+          "p50": 4586,
+          "p95": 43300
+        },
+        "commandCallIntervals": 256,
+        "peakOverlappingCommandCalls": 4,
+        "compactionSeconds": [
+          135.328,
+          193.959,
+          55.141,
+          146.767
+        ],
+        "contextBins": [
+          {
+            "inputTokensMin": 0,
+            "inputTokensMaxExclusive": 100000,
+            "calls": 61,
+            "interToolGapSeconds": {
+              "count": 58,
+              "p50": 20.23,
+              "p95": 85.025
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 58,
+              "p50": 20.23,
+              "p95": 85.025
+            },
+            "toolWrapperSeconds": {
+              "count": 61,
+              "p50": 2.595,
+              "p95": 9.634
+            },
+            "medianCachedInputRatio": 0.9593
+          },
+          {
+            "inputTokensMin": 100000,
+            "inputTokensMaxExclusive": 180000,
+            "calls": 96,
+            "interToolGapSeconds": {
+              "count": 94,
+              "p50": 36.405,
+              "p95": 91.158
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 94,
+              "p50": 36.405,
+              "p95": 91.158
+            },
+            "toolWrapperSeconds": {
+              "count": 96,
+              "p50": 2.589,
+              "p95": 6.852
+            },
+            "medianCachedInputRatio": 0.9921
+          },
+          {
+            "inputTokensMin": 180000,
+            "inputTokensMaxExclusive": 260000,
+            "calls": 95,
+            "interToolGapSeconds": {
+              "count": 94,
+              "p50": 32.044,
+              "p95": 85.017
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 94,
+              "p50": 32.044,
+              "p95": 85.017
+            },
+            "toolWrapperSeconds": {
+              "count": 95,
+              "p50": 2.774,
+              "p95": 7.726
+            },
+            "medianCachedInputRatio": 0.9947
+          },
+          {
+            "inputTokensMin": 260000,
+            "inputTokensMaxExclusive": null,
+            "calls": 0,
+            "interToolGapSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "toolWrapperSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "medianCachedInputRatio": null
+          }
+        ],
+        "limitations": [
+          "Observational bins do not establish context length as a sole cause",
+          "Inter-tool gaps include model generation, host overhead and unclassified waits",
+          "Promise syntax is a batching indicator, not proof of safe independent work or execution overlap",
+          "Command intervals describe tool calls; yielded background processes can outlive them",
+          "No prompts, commands, tool outputs, reasoning or credentials are emitted"
+        ],
+        "snapshotSha256": "0b87d4c659efac0339cfc07eee6b6874f07117bb274bf9cb9527c292759d5152",
+        "snapshotBytes": 28679796,
+        "invalidLines": 0
+      },
+      {
+        "schema": "codex-session-performance/1",
+        "rows": 2440,
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "effort": "high",
+            "turnContexts": 6
+          }
+        ],
+        "completedToolWrappers": 303,
+        "unmatchedToolCalls": 0,
+        "promiseBatchSyntaxCalls": 4,
+        "multiExecWithoutPromiseBatchSyntax": 24,
+        "toolOutputBytes": {
+          "count": 303,
+          "p50": 1743,
+          "p95": 20849
+        },
+        "commandCallIntervals": 185,
+        "peakOverlappingCommandCalls": 5,
+        "compactionSeconds": [
+          139.016,
+          119.009,
+          151.676
+        ],
+        "contextBins": [
+          {
+            "inputTokensMin": 0,
+            "inputTokensMaxExclusive": 100000,
+            "calls": 50,
+            "interToolGapSeconds": {
+              "count": 50,
+              "p50": 16.115,
+              "p95": 34.543
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 50,
+              "p50": 16.115,
+              "p95": 34.543
+            },
+            "toolWrapperSeconds": {
+              "count": 50,
+              "p50": 5.026,
+              "p95": 7.286
+            },
+            "medianCachedInputRatio": 0.9698
+          },
+          {
+            "inputTokensMin": 100000,
+            "inputTokensMaxExclusive": 180000,
+            "calls": 137,
+            "interToolGapSeconds": {
+              "count": 135,
+              "p50": 24.388,
+              "p95": 75.4
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 135,
+              "p50": 24.388,
+              "p95": 75.4
+            },
+            "toolWrapperSeconds": {
+              "count": 137,
+              "p50": 5.252,
+              "p95": 30.026
+            },
+            "medianCachedInputRatio": 0.9958
+          },
+          {
+            "inputTokensMin": 180000,
+            "inputTokensMaxExclusive": 260000,
+            "calls": 112,
+            "interToolGapSeconds": {
+              "count": 112,
+              "p50": 32.183,
+              "p95": 106.542
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 112,
+              "p50": 32.183,
+              "p95": 106.542
+            },
+            "toolWrapperSeconds": {
+              "count": 112,
+              "p50": 5.219,
+              "p95": 30.021
+            },
+            "medianCachedInputRatio": 0.9965
+          },
+          {
+            "inputTokensMin": 260000,
+            "inputTokensMaxExclusive": null,
+            "calls": 0,
+            "interToolGapSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "toolWrapperSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "medianCachedInputRatio": null
+          }
+        ],
+        "limitations": [
+          "Observational bins do not establish context length as a sole cause",
+          "Inter-tool gaps include model generation, host overhead and unclassified waits",
+          "Promise syntax is a batching indicator, not proof of safe independent work or execution overlap",
+          "Command intervals describe tool calls; yielded background processes can outlive them",
+          "No prompts, commands, tool outputs, reasoning or credentials are emitted"
+        ],
+        "snapshotSha256": "1e6f68ff3fcbb93411a6669d964d7758f864135cf71c70af97515faaf818cff4",
+        "snapshotBytes": 15652786,
+        "invalidLines": 0
+      },
+      {
+        "schema": "codex-session-performance/1",
+        "rows": 184,
+        "models": [
+          {
+            "model": "gpt-6.1-sol",
+            "effort": "high",
+            "turnContexts": 1
+          }
+        ],
+        "completedToolWrappers": 21,
+        "unmatchedToolCalls": 0,
+        "promiseBatchSyntaxCalls": 0,
+        "multiExecWithoutPromiseBatchSyntax": 11,
+        "toolOutputBytes": {
+          "count": 21,
+          "p50": 3348,
+          "p95": 50778
+        },
+        "commandCallIntervals": 23,
+        "peakOverlappingCommandCalls": 4,
+        "compactionSeconds": [],
+        "contextBins": [
+          {
+            "inputTokensMin": 0,
+            "inputTokensMaxExclusive": 100000,
+            "calls": 0,
+            "interToolGapSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "toolWrapperSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "medianCachedInputRatio": null
+          },
+          {
+            "inputTokensMin": 100000,
+            "inputTokensMaxExclusive": 180000,
+            "calls": 16,
+            "interToolGapSeconds": {
+              "count": 16,
+              "p50": 21.79,
+              "p95": 44.382
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 16,
+              "p50": 21.79,
+              "p95": 44.382
+            },
+            "toolWrapperSeconds": {
+              "count": 16,
+              "p50": 1.39,
+              "p95": 5.212
+            },
+            "medianCachedInputRatio": 0.9789
+          },
+          {
+            "inputTokensMin": 180000,
+            "inputTokensMaxExclusive": 260000,
+            "calls": 4,
+            "interToolGapSeconds": {
+              "count": 4,
+              "p50": 33.159,
+              "p95": 62.35
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 4,
+              "p50": 33.159,
+              "p95": 62.35
+            },
+            "toolWrapperSeconds": {
+              "count": 4,
+              "p50": 8.176,
+              "p95": 14.262
+            },
+            "medianCachedInputRatio": 0.9936
+          },
+          {
+            "inputTokensMin": 260000,
+            "inputTokensMaxExclusive": null,
+            "calls": 0,
+            "interToolGapSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "gapExcludingCompactionSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "toolWrapperSeconds": {
+              "count": 0,
+              "p50": null,
+              "p95": null
+            },
+            "medianCachedInputRatio": null
+          }
+        ],
+        "limitations": [
+          "Observational bins do not establish context length as a sole cause",
+          "Inter-tool gaps include model generation, host overhead and unclassified waits",
+          "Promise syntax is a batching indicator, not proof of safe independent work or execution overlap",
+          "Command intervals describe tool calls; yielded background processes can outlive them",
+          "No prompts, commands, tool outputs, reasoning or credentials are emitted"
+        ],
+        "snapshotSha256": "2f3a9fb1d0809bde05e91a56432a1c9e9eeab07a0c9c9649f2338e7f162b01ca",
+        "snapshotBytes": 937577,
+        "invalidLines": 0
+      }
+    ]
+  },
+  "hookProbe": {
+    "seconds": 0.57,
+    "exitCode": 0,
+    "contextCharacters": 19588,
+    "stderrBytes": 0
+  },
+  "contextExperiment": {
+    "model": "gpt-6.1-sol",
+    "effort": "high",
+    "concurrency": 2,
+    "productionModified": false,
+    "hooksDisabledInProbe": true,
+    "arms": [
+      {
+        "arm": "baseline",
+        "limit": 240000,
+        "exitCode": 0,
+        "timedOut": false,
+        "seconds": 80.227,
+        "correct": true,
+        "completedProbes": 6,
+        "peakProbeOverlap": 6,
+        "eventTypes": {
+          "item.completed": 11,
+          "turn.started": 1,
+          "turn.completed": 1,
+          "thread.started": 1,
+          "item.started": 8
+        },
+        "errors": [],
+        "usageExcludedReason": "Fork exec reports inherited cumulative usage, not isolated request token costs"
+      },
+      {
+        "arm": "early",
+        "limit": 120000,
+        "exitCode": 0,
+        "timedOut": false,
+        "seconds": 158.015,
+        "correct": true,
+        "completedProbes": 6,
+        "peakProbeOverlap": 6,
+        "eventTypes": {
+          "item.completed": 11,
+          "turn.started": 1,
+          "turn.completed": 1,
+          "thread.started": 1,
+          "item.started": 9
+        },
+        "errors": [],
+        "usageExcludedReason": "Fork exec reports inherited cumulative usage, not isolated request token costs"
+      },
+      {
+        "arm": "fresh",
+        "limit": 240000,
+        "exitCode": 0,
+        "timedOut": false,
+        "seconds": 63.295,
+        "correct": true,
+        "completedProbes": 6,
+        "peakProbeOverlap": 6
+      }
+    ],
+    "limitations": [
+      "Single trial per arm; no statistically supported speed ratio",
+      "Forks share source session ID but the source remained active; not an immutable replay",
+      "A 240000 experimental threshold is not a claim about the production default",
+      "CLI tool surface differs from Desktop functions.exec",
+      "No provider-side prefill/queue timing; observed gaps are not pure model computation"
+    ]
+  },
+  "deployment": "No production performance configuration or running project modified"
+}

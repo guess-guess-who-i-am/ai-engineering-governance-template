@@ -140,3 +140,5 @@ IDE与当前本机Codex的指令、入口元数据预算、全局资源、V5 Hoo
 固定版本在 `upstreams.lock.json`；周任务只报告远端漂移，不自动合并上游变化。Kest 保留真实 `.flow.md` 示例和可选 CLI 接入，但因固定版本许可证文件尚未核验，不分发其二进制或源码。
 
 194 同版运行时、项目重启及专家/新 Skill 验收见 [194 配置对齐](docs/IDE_194_PARITY_20261105.zh.md)。
+
+194 长聊天的模型等待、压缩与工具重叠实测见 [长上下文性能诊断](docs/194_LONG_CONTEXT_PERFORMANCE_20261105.zh.md)；只读分析器为 `scripts/profile-codex-session.py`。
