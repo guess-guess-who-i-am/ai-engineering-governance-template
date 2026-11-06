@@ -39,7 +39,7 @@ async function fixture(t) {
   const mcp = { tools: [{ tool_name: 'native-tool', name: 'search', server: 'fixture', description: 'native search' }] };
   inputFiles.push(await put(registry, 'mcp-tools.json', json(mcp)));
   for (let i = 0; i < 3; i++) inputFiles.push(await put(ownedRoot, `owned-${i}/SKILL.md`, `---\nname: owned-${i}\ndescription: Test ${i}\n---\n`));
-  const hookNames = ['registry-inputs.mjs', 'graph_skill_index.py', 'artifact_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json', 'skill-router.mjs'];
+  const hookNames = ['registry-inputs.mjs', 'graph_skill_index.py', 'artifact_relations.py', 'semantic_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json', 'skill-router.mjs'];
   for (const name of hookNames) {
     const bytes = name === 'registry-inputs.mjs' ? await readFile(path.join(repo, 'codex-profile/mac/hooks', name)) : Buffer.from(name.endsWith('.json') ? '{}\n' : '# fixture-hook-' + name + '\n');
     inputFiles.push(await put(temp, 'source-hooks/' + name, bytes));
@@ -233,5 +233,23 @@ test('mid-publish failure restores prior bytes and removes newly created files f
     } }), /injected publish failure/);
     assert(count > 1); assert.deepEqual(await snapshot(f.codexRoot), before);
     await assert.rejects(access(path.join(f.codexRoot, 'backups')));
+  }
+});
+
+test('semantic registry must be verified, hash-bound and cover all current nodes', async t => {
+  for (const flaw of ['missing', 'unverified', 'hash', 'stale']) {
+    const f = await fixture(t);
+    const relations = { schemaVersion: 'source-grounded-semantic-relations/v1', verification: { complete: flaw !== 'unverified' }, nodes: {}, edges: [] };
+    const bytes = Buffer.from(json(relations));
+    if (flaw !== 'missing') {
+      const file = await put(f.stage, 'hooks/semantic-relations.json', bytes);
+      f.build.publishFiles[file] = sha(bytes);
+    }
+    f.graph.metadata.semantic_relations = { registrySha256: flaw === 'hash' ? '0'.repeat(64) : sha(bytes),
+      processed: 9, unmatched: flaw === 'stale' ? 1 : 0, state: flaw === 'stale' ? 'needs-rebuild' : 'ready' };
+    await rehashCandidate(f, 'skills.graph.json', f.graph);
+    const before = await snapshot(f.codexRoot);
+    await assert.rejects(publishResourceGraph(f), /Semantic|semantic-relations/);
+    assert.deepEqual(await snapshot(f.codexRoot), before);
   }
 });

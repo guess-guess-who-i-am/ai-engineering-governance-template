@@ -27,9 +27,12 @@ function stableJson(value) {
 
 export async function graphInputsHash(ownedRoot, mcpTools, resourceCatalog) {
   const hash = createHash('sha256');
-  for (const name of ['graph_skill_index.py', 'artifact_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json']) {
+  for (const name of ['graph_skill_index.py', 'artifact_relations.py', 'semantic_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json']) {
     hash.update(await readFile(path.join(path.dirname(fileURLToPath(import.meta.url)), name)));
   }
+  const semantic = path.join(path.dirname(fileURLToPath(import.meta.url)), 'semantic-relations.json');
+  try { hash.update(await readFile(semantic)); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
   for (const file of await skillFiles(ownedRoot)) {
     hash.update(path.relative(ownedRoot, file)); hash.update('\0');
     hash.update(await readFile(file)); hash.update('\0');

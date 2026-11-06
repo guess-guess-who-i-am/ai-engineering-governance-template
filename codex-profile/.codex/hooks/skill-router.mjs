@@ -197,6 +197,9 @@ function selectCategoryBudget(items) {
       if (first.skill.path === item.skill.path && !first.skill.artifactLinks && item.skill.artifactLinks) {
         first.skill = { ...first.skill, artifactLinks: item.skill.artifactLinks };
       }
+      if (first.skill.path === item.skill.path && !first.skill.semanticLinks && item.skill.semanticLinks) {
+        first.skill = { ...first.skill, semanticLinks: item.skill.semanticLinks };
+      }
       return false;
     }
     seen.set(key, item);
@@ -362,6 +365,7 @@ async function graphCandidates(graphPath, query, pythonPath, indexerPath) {
       dependencies: item.dependencies,
       memberCount: Array.isArray(item.members) ? item.members.length : 0,
       artifactLinks: item.artifact_links,
+      semanticLinks: item.semantic_links,
       resourceSource: item.source
     }, score: Math.round(Number(item.score || 0) * 1000), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] }));
 
@@ -416,6 +420,14 @@ export function renderRoutingContext(selected, codexRoot) {
       const entry = link.kind === 'mcp'
         ? `MCP ${clean(link.mcp_server)}/${clean(link.name)}` : `${clean(link.name)}; Read: ${clean(link.path)}`;
       lines.push(`  Artifact handoff (inferred; consider only if selecting this entry): ${relation} ${entry}; artifact=${clean(link.artifact)}`);
+    }
+    for (const link of item.skill.semanticLinks || []) {
+      const clean = value => String(value || '').replace(/\s+/g, ' ').trim();
+      const relation = link.relation === 'similar_to' ? 'similar alternative'
+        : link.relation === 'precedes' ? (link.direction === 'downstream' ? 'possible next step' : 'possible prior step') : 'complementary workflow';
+      const entry = link.kind === 'mcp' ? `MCP ${clean(link.mcp_server)}/${clean(link.name)}`
+        : `${clean(link.name)}; Read: ${clean(link.path)}`;
+      lines.push(`  Semantic relation (inferred; conditional, no execution authorization): ${relation}: ${entry}; reason=${clean(link.evidence.reason)}`);
     }
     if (item.skill.moduleId) {
       lines.push(`  Module: ${item.skill.moduleId}; package: ${item.skill.packageRoot}; members: ${item.skill.memberCount}; availability: ${JSON.stringify(item.skill.availability)}`);

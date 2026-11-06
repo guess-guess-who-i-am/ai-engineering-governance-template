@@ -119,7 +119,15 @@ export async function publishResourceGraph({ codexRoot = path.join(os.homedir(),
     if (path.dirname(relative) !== 'hooks' || !/^[a-zA-Z0-9._-]+\.(?:mjs|py|json)$/.test(name)) throw new Error('Unexpected staged hook');
     return name;
   });
-  for (const name of ['registry-inputs.mjs', 'graph_skill_index.py', 'artifact_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json']) if (!hookNames.includes(name)) throw new Error('Missing staged hook: ' + name);
+  for (const name of ['registry-inputs.mjs', 'graph_skill_index.py', 'artifact_relations.py', 'semantic_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json']) if (!hookNames.includes(name)) throw new Error('Missing staged hook: ' + name);
+  const semantic = graph.metadata.semantic_relations;
+  if (semantic?.registrySha256) {
+    const bytes = required(path.join('hooks', 'semantic-relations.json'));
+    const relations = JSON.parse(bytes);
+    if (digest(bytes) !== semantic.registrySha256 || relations.verification?.complete !== true) throw new Error('Semantic relation registry checksum or verification mismatch');
+    checkedNumber(semantic.processed, 'semantic processed'); checkedNumber(semantic.unmatched, 'semantic unmatched');
+    if (semantic.processed + semantic.unmatched !== Object.keys(graph.tools).length || semantic.state !== (semantic.unmatched ? 'needs-rebuild' : 'ready')) throw new Error('Semantic relation coverage inconsistent');
+  }
   const allowed = new Set(['skills.graph.json', 'skills.graph.manifest.json', ...sidecars.keys(), ...hookNames.map(name => path.join('hooks', name))]);
   sameSet(new Set(staged.keys()), allowed, 'Publication file allowlist');
   const hashModule = await import(pathToFileURL(path.join(stage, 'hooks/registry-inputs.mjs')).href + '?sha=' + digest(required('hooks/registry-inputs.mjs')));

@@ -349,6 +349,8 @@ def graph_from_records(records, mcp_records=None, resource_records=None):
                     graph.add_relation(record["tool_name"], target, "requires", confidence="EXTRACTED", conf_score=1.0, layer=1, evidence="Explicit resource catalog dependency, exact unique identifier match")
     from artifact_relations import enrich_artifact_relations
     enrich_artifact_relations(graph)
+    from semantic_relations import apply_semantic_relations
+    graph.metadata['semantic_relations'] = apply_semantic_relations(graph)
     graph.metadata['retrieval_content'] = RETRIEVAL_CONTENT
     return graph
 
@@ -385,6 +387,7 @@ def build(args):
     metadata = {"skill_count": len(records), "catalog": str(catalog), "resource_module_count": len(resource_records)}
     metadata['artifact_relations'] = graph.metadata['artifact_relations']
     metadata['artifact_relation_sources'] = graph.metadata['artifact_relation_sources']
+    metadata['semantic_relations'] = graph.metadata['semantic_relations']
     if getattr(args, 'require_complete', False) and metadata['artifact_relations']['readErrors']:
         raise ValueError('Artifact declaration files could not be read; keeping the previous graph')
     metadata['retrieval_content'] = RETRIEVAL_CONTENT
@@ -427,6 +430,7 @@ def build(args):
         "mcpToolCount": len(mcp_records),
         "resourceModuleCount": len(resource_records),
         "artifactRelations": graph.metadata.get("artifact_relations", {}),
+        "semanticRelations": graph.metadata.get("semantic_relations", {}),
         "resourceModuleCounts": {kind: sum(record["kind"] == kind for record in resource_records) for kind in ("expert", "skill", "mcp-service")},
         "resourceCatalogPath": str(Path(resource_catalog).resolve()) if resource_catalog else "",
         "missingSkillCount": missing,
@@ -557,6 +561,8 @@ def result_records(results, graph=None):
     if graph is not None:
         from artifact_relations import attach_artifact_links
         attach_artifact_links(output, [result.tool.name for result in results], graph)
+        from semantic_relations import attach_semantic_links
+        attach_semantic_links(output, [result.tool.name for result in results], graph)
     return output
 
 

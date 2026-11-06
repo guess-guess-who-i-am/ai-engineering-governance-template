@@ -37,9 +37,11 @@ def main():
     if digest(a.source_graph) != a.source_sha256:
         raise ValueError('Source graph checksum mismatch')
     hooks = a.hooks.resolve() if a.hooks else a.codex_root / 'hooks'
-    hook_names = ['graph_skill_index.py', 'artifact_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json',
+    hook_names = ['graph_skill_index.py', 'artifact_relations.py', 'semantic_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json',
                   'mcp-retrieval.zh.json', 'registry-inputs.mjs', 'refresh-skill-registry.mjs',
                   'skill-router.mjs']
+    if (hooks / 'semantic-relations.json').exists():
+        hook_names.append('semantic-relations.json')
     # Pin executable bytes before importing them, rather than after loading the
     # large source cache. A concurrent installer must invalidate this candidate.
     imported_sources = {str(hooks / name): digest(hooks / name) for name in hook_names}
