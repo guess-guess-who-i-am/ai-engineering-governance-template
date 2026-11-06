@@ -34,3 +34,5 @@
 可复用只读分析器：`python3 scripts/profile-codex-session.py <session.jsonl> --output <report.json>`。它输出上下文分组、工具间隔、包装调用耗时、压缩时间和重叠；不输出对话、命令、工具正文或认证信息。支持正在追加的日志，并显式记录无效行和未完成调用。三个回归用例覆盖隐私、列表型输出、用户等待、压缩时间扣除、重叠边界及半行日志。
 
 原始数字见[脱敏验收JSON](evidence/194-long-context-20261105.json)。官方0.166.0源码确认[配置项](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/core/config.schema.json)区分完整上下文计费阈值与压缩后前缀之外的增长；[压缩实现](https://github.com/openai/codex/blob/rust-v0.166.0/codex-rs/core/src/compact.rs)也表明压缩会保留部分用户消息，并非把所有历史清空。Stack Overflow相关讨论未提供可移植的延迟保证，没有用其问题标题替代实测。
+
+后续请求级证据、流读取修复及失败路由切换的回滚记录见[路由修复报告](194_CODEX_ROUTER_STREAMING_20261105.zh.md)。原文的“尚缺上游时序”已由该报告部分补齐；长业务任务整体提速仍未得到证明。
