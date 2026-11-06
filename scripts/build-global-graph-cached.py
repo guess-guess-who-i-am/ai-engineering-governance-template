@@ -29,14 +29,15 @@ def main():
     p.add_argument('--source-sha256', required=True)
     p.add_argument('--codex-root', type=Path, default=Path.home() / '.codex')
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--hooks', type=Path, help='Candidate hook sources, separate from production')
     p.add_argument('--report', type=Path, required=True)
     a = p.parse_args()
     if a.output.name != 'skills.graph.json' or a.output.parent == a.codex_root / 'skill-registry':
         p.error('Output must be skills.graph.json in a separate candidate directory')
     if digest(a.source_graph) != a.source_sha256:
         raise ValueError('Source graph checksum mismatch')
-    hooks = a.codex_root / 'hooks'
-    hook_names = ['graph_skill_index.py', 'complete_embedding.py', 'skill-retrieval.zh.json',
+    hooks = a.hooks.resolve() if a.hooks else a.codex_root / 'hooks'
+    hook_names = ['graph_skill_index.py', 'artifact_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json',
                   'mcp-retrieval.zh.json', 'registry-inputs.mjs', 'refresh-skill-registry.mjs',
                   'skill-router.mjs']
     # Pin executable bytes before importing them, rather than after loading the
@@ -155,6 +156,12 @@ def main():
     if before != {str(file): digest(file) for file in inputs}:
         raise ValueError('Inputs changed during build; refusing publication receipt')
     built = json.loads(a.output.read_text())
+    # Source declarations are graph inputs even though retrieval never reads
+    # package bodies. Refuse publication if any changed after extraction.
+    relation_sources = built['metadata'].get('artifact_relation_sources', {})
+    if any(digest(file) != expected for file, expected in relation_sources.items()):
+        raise ValueError('Artifact declaration source changed during build')
+    before.update(relation_sources)
     files = [a.output, a.output.with_suffix('.manifest.json'), *stage_hooks.iterdir()]
     files += [a.output.parent / built['metadata']['chinese_embedding']['file']]
     files += [a.output.parent / x['file'] for x in built['metadata']['description_embeddings'].values()]

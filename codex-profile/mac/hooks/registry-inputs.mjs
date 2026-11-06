@@ -27,7 +27,7 @@ function stableJson(value) {
 
 export async function graphInputsHash(ownedRoot, mcpTools, resourceCatalog) {
   const hash = createHash('sha256');
-  for (const name of ['graph_skill_index.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json']) {
+  for (const name of ['graph_skill_index.py', 'artifact_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json']) {
     hash.update(await readFile(path.join(path.dirname(fileURLToPath(import.meta.url)), name)));
   }
   for (const file of await skillFiles(ownedRoot)) {

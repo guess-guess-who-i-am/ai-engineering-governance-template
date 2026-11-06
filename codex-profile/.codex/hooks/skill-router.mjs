@@ -186,12 +186,20 @@ function routeCategory(item) {
 function selectCategoryBudget(items) {
   // Diversify only the already-ranked result set. This does not expand graph
   // retrieval or manufacture a missing category; absent candidates stay absent.
-  const seen = new Set();
+  const seen = new Map();
   const unique = items.filter(item => {
     const key = item.skill.moduleId ? `module:${item.skill.moduleId}` : routeCategory(item) === 'mcp'
       ? `mcp:${item.skill.mcpServer || ''}/${item.skill.name}` : `skill:${item.skill.name}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
+    if (seen.has(key)) {
+      const first = seen.get(key);
+      // An explicit lexical match can precede the same graph entry. Preserve
+      // its ranking while retaining the graph's source-grounded handoff data.
+      if (first.skill.path === item.skill.path && !first.skill.artifactLinks && item.skill.artifactLinks) {
+        first.skill = { ...first.skill, artifactLinks: item.skill.artifactLinks };
+      }
+      return false;
+    }
+    seen.set(key, item);
     return true;
   });
   const selected = new Set();
@@ -353,6 +361,7 @@ async function graphCandidates(graphPath, query, pythonPath, indexerPath) {
       availability: item.availability,
       dependencies: item.dependencies,
       memberCount: Array.isArray(item.members) ? item.members.length : 0,
+      artifactLinks: item.artifact_links,
       resourceSource: item.source
     }, score: Math.round(Number(item.score || 0) * 1000), matches: [`GraphToolCall ${item.confidence || "retrieval"}`] }));
 
@@ -401,6 +410,13 @@ export function renderRoutingContext(selected, codexRoot) {
     lines.push(item.skill.kind === "mcp"
       ? `  Call through indexed MCP server: ${item.skill.mcpServer}/${item.skill.name}`
       : `  Read: ${item.skill.path}`);
+    for (const link of item.skill.artifactLinks || []) {
+      const clean = value => String(value || '').replace(/\s+/g, ' ').trim();
+      const relation = link.direction === 'downstream' ? 'produces for' : 'consumes from';
+      const entry = link.kind === 'mcp'
+        ? `MCP ${clean(link.mcp_server)}/${clean(link.name)}` : `${clean(link.name)}; Read: ${clean(link.path)}`;
+      lines.push(`  Artifact handoff (inferred; consider only if selecting this entry): ${relation} ${entry}; artifact=${clean(link.artifact)}`);
+    }
     if (item.skill.moduleId) {
       lines.push(`  Module: ${item.skill.moduleId}; package: ${item.skill.packageRoot}; members: ${item.skill.memberCount}; availability: ${JSON.stringify(item.skill.availability)}`);
       if (item.skill.availability?.state === "known-helper-failure") lines.push("  Known helper failure: read the audit's specific failing helper and input before using this module.");

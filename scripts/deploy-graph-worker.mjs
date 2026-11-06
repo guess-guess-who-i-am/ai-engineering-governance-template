@@ -7,7 +7,7 @@ const root=path.resolve(import.meta.dirname,'..');
 const hash=data=>createHash('sha256').update(data).digest('hex');
 const files=[];
 // Publish the dependency first so a restarting service never sees a missing import.
-for(const name of ['complete_embedding.py','graph_skill_index.py']){
+for(const name of ['artifact_relations.py','complete_embedding.py','graph_skill_index.py']){
  const source=path.join(root,'codex-profile/mac/hooks',name);
  const destination=path.join(os.homedir(),'.codex/hooks',name);
  const content=await readFile(source);

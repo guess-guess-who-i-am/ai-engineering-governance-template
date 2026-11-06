@@ -56,10 +56,15 @@ export async function publishResourceGraph({ codexRoot = path.join(os.homedir(),
     effective = runtime; runtimeRevalidationSha256 = digest(runtimeBytes);
   }
   const sourceBytes = new Map();
-  await Promise.all(Object.entries(effective.inputsSha256).map(async ([file, expected]) => {
-    const target = path.resolve(file), bytes = await readFile(target);
-    if (digest(bytes) !== expected) throw new Error('Source input changed since build: ' + target);
-    sourceBytes.set(target, bytes);
+  const sourceEntries = Object.entries(effective.inputsSha256);
+  let sourceCursor = 0;
+  await Promise.all(Array.from({length: Math.min(8, sourceEntries.length)}, async () => {
+    while (sourceCursor < sourceEntries.length) {
+      const [file, expected] = sourceEntries[sourceCursor++];
+      const target = path.resolve(file), bytes = await readFile(target);
+      if (digest(bytes) !== expected) throw new Error('Source input changed since build: ' + target);
+      sourceBytes.set(target, bytes);
+    }
   }));
   const staged = new Map();
   await Promise.all(Object.entries(effective.publishFiles).map(async ([file, expected]) => {
@@ -114,7 +119,7 @@ export async function publishResourceGraph({ codexRoot = path.join(os.homedir(),
     if (path.dirname(relative) !== 'hooks' || !/^[a-zA-Z0-9._-]+\.(?:mjs|py|json)$/.test(name)) throw new Error('Unexpected staged hook');
     return name;
   });
-  for (const name of ['registry-inputs.mjs', 'graph_skill_index.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json']) if (!hookNames.includes(name)) throw new Error('Missing staged hook: ' + name);
+  for (const name of ['registry-inputs.mjs', 'graph_skill_index.py', 'artifact_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json']) if (!hookNames.includes(name)) throw new Error('Missing staged hook: ' + name);
   const allowed = new Set(['skills.graph.json', 'skills.graph.manifest.json', ...sidecars.keys(), ...hookNames.map(name => path.join('hooks', name))]);
   sameSet(new Set(staged.keys()), allowed, 'Publication file allowlist');
   const hashModule = await import(pathToFileURL(path.join(stage, 'hooks/registry-inputs.mjs')).href + '?sha=' + digest(required('hooks/registry-inputs.mjs')));

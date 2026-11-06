@@ -316,6 +316,7 @@ def graph_from_records(records, mcp_records=None, resource_records=None):
             "name": tool_name,
             "description": description,
             "inputSchema": record.get("inputSchema", {"type": "object"}),
+            **({"outputSchema": record["outputSchema"]} if record.get("outputSchema") else {}),
             "annotations": record.get("annotations", {})
         }], server_name=record.get("server", "global-mcp"), detect_dependencies=False)
         node = graph.tools.get(tool_name)
@@ -346,6 +347,8 @@ def graph_from_records(records, mcp_records=None, resource_records=None):
                 target = next(iter(targets))
                 if target != record["tool_name"]:
                     graph.add_relation(record["tool_name"], target, "requires", confidence="EXTRACTED", conf_score=1.0, layer=1, evidence="Explicit resource catalog dependency, exact unique identifier match")
+    from artifact_relations import enrich_artifact_relations
+    enrich_artifact_relations(graph)
     graph.metadata['retrieval_content'] = RETRIEVAL_CONTENT
     return graph
 
@@ -380,6 +383,10 @@ def build(args):
         embedding = "sentence-transformers/all-MiniLM-L6-v2"
     output.parent.mkdir(parents=True, exist_ok=True)
     metadata = {"skill_count": len(records), "catalog": str(catalog), "resource_module_count": len(resource_records)}
+    metadata['artifact_relations'] = graph.metadata['artifact_relations']
+    metadata['artifact_relation_sources'] = graph.metadata['artifact_relation_sources']
+    if getattr(args, 'require_complete', False) and metadata['artifact_relations']['readErrors']:
+        raise ValueError('Artifact declaration files could not be read; keeping the previous graph')
     metadata['retrieval_content'] = RETRIEVAL_CONTENT
     if args.embedding:
         from complete_embedding import REPRESENTATION
@@ -419,6 +426,7 @@ def build(args):
         "ownedSkillCount": len(owned_records),
         "mcpToolCount": len(mcp_records),
         "resourceModuleCount": len(resource_records),
+        "artifactRelations": graph.metadata.get("artifact_relations", {}),
         "resourceModuleCounts": {kind: sum(record["kind"] == kind for record in resource_records) for kind in ("expert", "skill", "mcp-service")},
         "resourceCatalogPath": str(Path(resource_catalog).resolve()) if resource_catalog else "",
         "missingSkillCount": missing,
@@ -528,7 +536,7 @@ def load_description_embeddings(graph, graph_path, language):
     return dict(zip(texts, vectors))
 
 
-def result_records(results):
+def result_records(results, graph=None):
     output = []
     for result in results:
         tool = result.tool
@@ -546,6 +554,9 @@ def result_records(results):
             "mcp_server": metadata.get("mcp_server", ""),
             **{key: metadata[key] for key in RESOURCE_METADATA_FIELDS if key in metadata},
         })
+    if graph is not None:
+        from artifact_relations import attach_artifact_links
+        attach_artifact_links(output, [result.tool.name for result in results], graph)
     return output
 
 
@@ -1385,7 +1396,7 @@ class _GraphWorker:
         semantic_token = semantic_context.set(None)
         token = engine._codex_category_slots.set(category_slots)
         try:
-            return result_records(graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2))
+            return result_records(graph.retrieve_with_scores(query, top_k=top_k, max_graph_depth=2), graph)
         finally:
             engine._codex_category_slots.reset(token)
             semantic_context.reset(semantic_token)

@@ -39,7 +39,7 @@ async function fixture(t) {
   const mcp = { tools: [{ tool_name: 'native-tool', name: 'search', server: 'fixture', description: 'native search' }] };
   inputFiles.push(await put(registry, 'mcp-tools.json', json(mcp)));
   for (let i = 0; i < 3; i++) inputFiles.push(await put(ownedRoot, `owned-${i}/SKILL.md`, `---\nname: owned-${i}\ndescription: Test ${i}\n---\n`));
-  const hookNames = ['registry-inputs.mjs', 'graph_skill_index.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json', 'skill-router.mjs'];
+  const hookNames = ['registry-inputs.mjs', 'graph_skill_index.py', 'artifact_relations.py', 'complete_embedding.py', 'skill-retrieval.zh.json', 'mcp-retrieval.zh.json', 'skill-router.mjs'];
   for (const name of hookNames) {
     const bytes = name === 'registry-inputs.mjs' ? await readFile(path.join(repo, 'codex-profile/mac/hooks', name)) : Buffer.from(name.endsWith('.json') ? '{}\n' : '# fixture-hook-' + name + '\n');
     inputFiles.push(await put(temp, 'source-hooks/' + name, bytes));
