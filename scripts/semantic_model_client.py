@@ -33,7 +33,7 @@ class ModelHTTPError(RuntimeError):
 class ModelStreamError(RuntimeError):
     def __init__(self,kind,code):
         super().__init__('Configured model stream failed: '+str(kind)+' code='+str(code))
-        self.retryable=code in ('server_error','rate_limit_exceeded','timeout','overloaded')
+        self.retryable=code in ('server_error','rate_limit_exceeded','timeout','overloaded','upstream_http2_stream_error')
 
 
 def configuration():

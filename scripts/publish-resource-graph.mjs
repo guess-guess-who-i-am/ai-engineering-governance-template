@@ -124,7 +124,7 @@ export async function publishResourceGraph({ codexRoot = path.join(os.homedir(),
   if (semantic?.registrySha256) {
     const bytes = required(path.join('hooks', 'semantic-relations.json'));
     const relations = JSON.parse(bytes);
-    if (digest(bytes) !== semantic.registrySha256 || relations.verification?.complete !== true) throw new Error('Semantic relation registry checksum or verification mismatch');
+    if (digest(bytes) !== semantic.registrySha256 || relations.verification?.complete !== true || relations.verification?.citationAuditComplete !== true) throw new Error('Semantic relation registry checksum or verification mismatch');
     checkedNumber(semantic.processed, 'semantic processed'); checkedNumber(semantic.unmatched, 'semantic unmatched');
     if (semantic.processed + semantic.unmatched !== Object.keys(graph.tools).length || semantic.state !== (semantic.unmatched ? 'needs-rebuild' : 'ready')) throw new Error('Semantic relation coverage inconsistent');
   }

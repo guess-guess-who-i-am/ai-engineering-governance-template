@@ -121,6 +121,10 @@ elif "retrieve" in args:
 
   const install = run(INSTALLER, ["--home", home, "--json"], { home, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: skillFixture, CODEX_EXTERNAL_SKILL_CATALOG: skillCatalog, CODEX_GRAPH_TOOL_PYTHON: graphToolPython } });
   assert(install.status === 0, `clean install failed: ${install.stderr || install.stdout}`);
+  const semanticSource = await readFile(path.join(REPOSITORY_ROOT, "codex-profile/mac/hooks/semantic-relations.json"));
+  const installedSemantic = await readFile(path.join(home, ".codex/hooks/semantic-relations.json"));
+  assert(installedSemantic.equals(semanticSource), "global install omitted or modified the portable relation registry");
+  assert(JSON.parse(installedSemantic).verification.citationAuditComplete === true, "installed relations have not passed citation verification");
   const result = JSON.parse(install.stdout);
   assert(result.status === "installed" && result.changedFiles > 0, "installer did not report a real installation");
   assert((await readFile(path.join(home, ".codex", "skill-registry", "external-library-config.json"), "utf8")).includes(skillFixture), "installer did not configure the external global Skill library");

@@ -237,9 +237,9 @@ test('mid-publish failure restores prior bytes and removes newly created files f
 });
 
 test('semantic registry must be verified, hash-bound and cover all current nodes', async t => {
-  for (const flaw of ['missing', 'unverified', 'hash', 'stale']) {
+  for (const flaw of ['missing', 'unverified', 'citation', 'hash', 'stale']) {
     const f = await fixture(t);
-    const relations = { schemaVersion: 'source-grounded-semantic-relations/v1', verification: { complete: flaw !== 'unverified' }, nodes: {}, edges: [] };
+    const relations = { schemaVersion: 'source-grounded-semantic-relations/v1', verification: { complete: flaw !== 'unverified', citationAuditComplete: flaw !== 'citation' }, nodes: {}, edges: [] };
     const bytes = Buffer.from(json(relations));
     if (flaw !== 'missing') {
       const file = await put(f.stage, 'hooks/semantic-relations.json', bytes);

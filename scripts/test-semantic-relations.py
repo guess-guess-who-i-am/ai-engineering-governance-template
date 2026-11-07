@@ -24,6 +24,8 @@ spec=importlib.util.spec_from_file_location('semantic_indexer',ROOT/'codex-profi
 indexer=importlib.util.module_from_spec(spec);spec.loader.exec_module(indexer)
 spec=importlib.util.spec_from_file_location('semantic_client',ROOT/'scripts/semantic_model_client.py')
 client=importlib.util.module_from_spec(spec);spec.loader.exec_module(client)
+spec=importlib.util.spec_from_file_location('citation_audit',ROOT/'scripts/audit-semantic-citations.py')
+citation_audit=importlib.util.module_from_spec(spec);spec.loader.exec_module(citation_audit)
 
 
 class SemanticTests(unittest.TestCase):
@@ -52,6 +54,9 @@ class SemanticTests(unittest.TestCase):
             self.assertEqual(str(requests[0].url),'https://fixture.invalid/v1/responses')
             with self.assertRaisesRegex(RuntimeError,'without completion'):run([])
             with self.assertRaisesRegex(RuntimeError,'stream failed'):run([{'type':'response.incomplete'}])
+            with self.assertRaises(client.ModelStreamError) as caught:
+                run([{'type':'error','code':'upstream_http2_stream_error'}])
+            self.assertTrue(caught.exception.retryable)
             with self.assertRaises(client.ModelHTTPError) as caught:run([],429)
             self.assertTrue(caught.exception.retryable)
             with self.assertRaises(client.ModelHTTPError) as caught:run([],401)
@@ -199,7 +204,7 @@ class SemanticTests(unittest.TestCase):
         keys={name:semantic.identity(tool.metadata,semantic.tool_source(tool)[1]) for name,tool in graph.tools.items()}
         nodes={keys[name]:{'state':'declared-io','contract':semantic.declarations(semantic.tool_source(tool)[0].decode())}
                for name,tool in graph.tools.items()}
-        document={'schemaVersion':semantic.REVISION,'verification':{'complete':True},'nodes':nodes,'edges':[{'source':keys['invoice-parse'],
+        document={'schemaVersion':semantic.REVISION,'verification':{'complete':True,'citationAuditComplete':True},'coverage':{},'limitations':[],'nodes':nodes,'edges':[{'source':keys['invoice-parse'],
             'target':keys['billing-audit'],'relation':'precedes','sourceQuote':'Invoice rows in CSV.',
             'targetQuote':'Invoice rows in CSV.','reason':'Possible CSV handoff; compatibility unverified.'}]}
         registry=root/'registry.json';registry.write_text(json.dumps(document));return graph,registry,document
@@ -263,6 +268,27 @@ class SemanticTests(unittest.TestCase):
             registry.write_text(json.dumps(document))
             with self.assertRaisesRegex(ValueError,'complete blind verification'):
                 semantic.apply_semantic_relations(graph,registry)
+
+    def test_two_pass_registry_without_citation_audit_cannot_publish(self):
+        with tempfile.TemporaryDirectory() as d:
+            graph,registry,document=self.make_graph(Path(d))
+            document['verification'].pop('citationAuditComplete',None)
+            registry.write_text(json.dumps(document))
+            with self.assertRaisesRegex(ValueError,'citation'):
+                semantic.apply_semantic_relations(graph,registry)
+
+    def test_citation_audit_hides_names_and_removes_unsupported_edge(self):
+        with tempfile.TemporaryDirectory() as d:
+            _,_,document=self.make_graph(Path(d))
+            records,pairs=citation_audit.quoted_inputs(document)
+            self.assertTrue(all(row['name']=='quoted passage' for row in records))
+            self.assertTrue(all(pair['proposal']=='hidden' for pair in pairs))
+            result=citation_audit.finalize(document,[{'id':'0','relation':'none'}])
+            self.assertEqual(result['edges'],[])
+            self.assertEqual(result['coverage']['relatedNodes'],0)
+            self.assertEqual(result['verification']['citationRejected'],1)
+            with self.assertRaisesRegex(ValueError,'incomplete'):
+                citation_audit.finalize(document,[])
 
     def test_existing_requires_not_overwritten(self):
         with tempfile.TemporaryDirectory() as d:

@@ -19,7 +19,8 @@ indexer=importlib.util.module_from_spec(spec);spec.loader.exec_module(indexer)
 def main():
     p=argparse.ArgumentParser();p.add_argument('--graph',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True);p.add_argument('--baseline',type=Path)
-    a=p.parse_args();cases=json.loads((ROOT/'scripts/resource-retrieval-holdout.json').read_text())['cases']
+    p.add_argument('--cases',type=Path,default=ROOT/'scripts/resource-retrieval-holdout.json')
+    a=p.parse_args();cases=json.loads(a.cases.read_text())['cases']
     worker=indexer._GraphWorker(a.graph);start=time.monotonic();worker._load_if_stale();loaded=time.monotonic()-start
     rows=[]
     for case in cases:
@@ -43,12 +44,12 @@ def main():
     worker.close();report={'schemaVersion':'semantic-retrieval-eval/1','graph':str(a.graph),
         'loadSeconds':round(loaded,3),'rows':rows,'primaryHits':sum(r['primaryHit'] for r in rows),
         'assistedHits':sum(r['assistedHit'] for r in rows),'cachedQueryWave':wave,
-        'limitations':['28 pre-existing diagnostic holdouts; cannot estimate all task success.',
+        'limitations':[f'{len(rows)} diagnostic queries; cannot estimate all task success.',
                        'Assisted hit includes conditional hints, not automatic execution.',
                        'One load/query pass; cached wave is not a cold 100-query throughput benchmark.']}
     if a.baseline:
         baseline=json.loads(a.baseline.read_text())
-        if [(r['id'],r['language'],r['query']) for r in baseline['rows']]!=[(r['id'],r['language'],r['query']) for r in rows]:
+        if [(r['id'],r['language'],r['query'],r['targets']) for r in baseline['rows']]!=[(r['id'],r['language'],r['query'],r['targets']) for r in rows]:
             raise ValueError('Baseline queries differ')
         report['regressions']=[{'id':b['id'],'language':b['language']} for b,c in zip(baseline['rows'],rows) if b['primaryHit'] and not c['primaryHit']]
         report['improvements']=[{'id':b['id'],'language':b['language']} for b,c in zip(baseline['rows'],rows) if not b['primaryHit'] and c['primaryHit']]

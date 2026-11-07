@@ -93,6 +93,8 @@ def apply_semantic_relations(graph, file=None):
         raise ValueError('Invalid semantic relationship registry')
     if document.get('verification',{}).get('complete') is not True:
         raise ValueError('Semantic relationships require complete blind verification')
+    if document['verification'].get('citationAuditComplete') is not True:
+        raise ValueError('Semantic relationships require complete citation verification')
     names, raw_sources = {}, {}
     matched, stale = 0, []
     for name, tool in graph.tools.items():
