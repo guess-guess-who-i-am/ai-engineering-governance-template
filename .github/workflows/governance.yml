@@ -28,6 +28,11 @@ jobs:
           cache: npm
       - name: Test macOS global Codex profile
         run: ./scripts/test-codex-profile-mac.sh
+      - name: Test conversational routing and IDE patch contract
+        run: |
+          node --test scripts/test-routing-context.mjs
+          node scripts/test-desktop-skill-routing.mjs
+          python3 scripts/test-patch-ide-routing-context.py
       - name: Test pinned Skill library restore on a clean home
         run: node scripts/test-global-skill-library.mjs
       - name: Test real GraphToolCall worker and candidate pool

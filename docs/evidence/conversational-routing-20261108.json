@@ -1,0 +1,2362 @@
+{
+  "schemaVersion": "conversational-routing-evidence/1",
+  "date": "2026-11-08",
+  "retrieval": {
+    "schemaVersion": "routing-context-eval/1",
+    "queries": 28,
+    "beforeHits": 0,
+    "afterHits": 23,
+    "standaloneHits": 23,
+    "standaloneRegressions": [],
+    "baselineStandaloneHits": 23,
+    "regressions": [],
+    "rows": [
+      {
+        "id": "research-evidence",
+        "language": "zh",
+        "targets": [
+          "gpt-researcher-team"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 64,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "gpt-researcher-team",
+            "evidence-citation",
+            "company-research",
+            "report-composer",
+            "company-research-assistant",
+            "a-share-analysis",
+            "task_tree_write",
+            "task_tree_knowledge"
+          ],
+          "ms": 87,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "gpt-researcher-team",
+            "evidence-citation",
+            "company-research",
+            "report-composer",
+            "company-research-assistant",
+            "a-share-analysis",
+            "task_tree_write",
+            "task_tree_knowledge"
+          ],
+          "ms": 229,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "gpt-researcher-team",
+            "evidence-citation",
+            "company-research",
+            "report-composer",
+            "company-research-assistant",
+            "a-share-analysis",
+            "task_tree_write",
+            "task_tree_knowledge"
+          ],
+          "ms": 104,
+          "hit": true
+        },
+        "wave": 0
+      },
+      {
+        "id": "research-evidence",
+        "language": "en",
+        "targets": [
+          "gpt-researcher-team"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 83,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "desktop-task-workflow",
+            "research",
+            "investigate",
+            "research",
+            "technical_research",
+            "gpt-researcher-team",
+            "empirical-research-team",
+            "technical_research_batch"
+          ],
+          "ms": 93,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "desktop-task-workflow",
+            "research",
+            "investigate",
+            "research",
+            "technical_research",
+            "gpt-researcher-team",
+            "empirical-research-team",
+            "technical_research_batch"
+          ],
+          "ms": 148,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "desktop-task-workflow",
+            "research",
+            "investigate",
+            "research",
+            "technical_research",
+            "gpt-researcher-team",
+            "empirical-research-team",
+            "technical_research_batch"
+          ],
+          "ms": 174,
+          "hit": true
+        },
+        "wave": 0
+      },
+      {
+        "id": "architecture-handoff",
+        "language": "zh",
+        "targets": [
+          "aicoding-architecture-expert-team"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 73,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "aicoding-architecture-expert-team",
+            "workflow-coordinator",
+            "engineering-assurance-team",
+            "data-analysis-engine",
+            "1k-group-think",
+            "engineering-playbook",
+            "ssvSkillHub",
+            "aidd-saas"
+          ],
+          "ms": 89,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "aicoding-architecture-expert-team",
+            "workflow-coordinator",
+            "engineering-assurance-team",
+            "data-analysis-engine",
+            "1k-group-think",
+            "engineering-playbook",
+            "ssvSkillHub",
+            "aidd-saas"
+          ],
+          "ms": 154,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "aicoding-architecture-expert-team",
+            "workflow-coordinator",
+            "engineering-assurance-team",
+            "data-analysis-engine",
+            "1k-group-think",
+            "engineering-playbook",
+            "ssvSkillHub",
+            "aidd-saas"
+          ],
+          "ms": 169,
+          "hit": true
+        },
+        "wave": 0
+      },
+      {
+        "id": "architecture-handoff",
+        "language": "en",
+        "targets": [
+          "aicoding-architecture-expert-team"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 78,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "architecture",
+            "geopandas-coordinate-projections",
+            "multi-agent-patterns",
+            "security-engineer",
+            "aicoding-architecture-expert-team",
+            "oma-architecture",
+            "tcum-mcp-hub",
+            "dop-platform-mcp"
+          ],
+          "ms": 86,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "architecture",
+            "geopandas-coordinate-projections",
+            "multi-agent-patterns",
+            "security-engineer",
+            "aicoding-architecture-expert-team",
+            "oma-architecture",
+            "tcum-mcp-hub",
+            "dop-platform-mcp"
+          ],
+          "ms": 122,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "architecture",
+            "geopandas-coordinate-projections",
+            "multi-agent-patterns",
+            "security-engineer",
+            "aicoding-architecture-expert-team",
+            "oma-architecture",
+            "tcum-mcp-hub",
+            "dop-platform-mcp"
+          ],
+          "ms": 118,
+          "hit": true
+        },
+        "wave": 0
+      },
+      {
+        "id": "latency-load",
+        "language": "zh",
+        "targets": [
+          "performance-testing-expert",
+          "apm-performance-expert"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 90,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "fastapi-patterns",
+            "api-onboarding",
+            "apm-performance-expert",
+            "implementing-api-rate-limiting-and-throttling",
+            "performing-api-rate-limiting-bypass",
+            "api-testing-expert",
+            "task_tree_api",
+            "task_tree_write"
+          ],
+          "ms": 100,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "fastapi-patterns",
+            "api-onboarding",
+            "apm-performance-expert",
+            "implementing-api-rate-limiting-and-throttling",
+            "performing-api-rate-limiting-bypass",
+            "api-testing-expert",
+            "task_tree_api",
+            "task_tree_write"
+          ],
+          "ms": 78,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "fastapi-patterns",
+            "api-onboarding",
+            "apm-performance-expert",
+            "implementing-api-rate-limiting-and-throttling",
+            "performing-api-rate-limiting-bypass",
+            "api-testing-expert",
+            "task_tree_api",
+            "task_tree_write"
+          ],
+          "ms": 96,
+          "hit": true
+        },
+        "wave": 1
+      },
+      {
+        "id": "latency-load",
+        "language": "en",
+        "targets": [
+          "performance-testing-expert",
+          "apm-performance-expert"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 164,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "experiment",
+            "k6-load-testing",
+            "multi-agent-performance-profiling",
+            "surge-experiment",
+            "apm-performance-expert",
+            "ab-experiment-analyst",
+            "technical_research_batch",
+            "complementary_search_batch"
+          ],
+          "ms": 98,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "experiment",
+            "k6-load-testing",
+            "multi-agent-performance-profiling",
+            "surge-experiment",
+            "apm-performance-expert",
+            "ab-experiment-analyst",
+            "technical_research_batch",
+            "complementary_search_batch"
+          ],
+          "ms": 66,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "experiment",
+            "k6-load-testing",
+            "multi-agent-performance-profiling",
+            "surge-experiment",
+            "apm-performance-expert",
+            "ab-experiment-analyst",
+            "technical_research_batch",
+            "complementary_search_batch"
+          ],
+          "ms": 79,
+          "hit": true
+        },
+        "wave": 1
+      },
+      {
+        "id": "requirements-tests",
+        "language": "zh",
+        "targets": [
+          "aladin-test-design"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 89,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "test-design",
+            "audio-transcribe",
+            "establish-test-strategy",
+            "testbuddy-skill",
+            "cloud-requirement-expert",
+            "aladin-test-design",
+            "zerone",
+            "testbuddy_tools"
+          ],
+          "ms": 102,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "test-design",
+            "audio-transcribe",
+            "establish-test-strategy",
+            "testbuddy-skill",
+            "cloud-requirement-expert",
+            "aladin-test-design",
+            "zerone",
+            "testbuddy_tools"
+          ],
+          "ms": 75,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "test-design",
+            "audio-transcribe",
+            "establish-test-strategy",
+            "testbuddy-skill",
+            "cloud-requirement-expert",
+            "aladin-test-design",
+            "zerone",
+            "testbuddy_tools"
+          ],
+          "ms": 82,
+          "hit": true
+        },
+        "wave": 1
+      },
+      {
+        "id": "requirements-tests",
+        "language": "en",
+        "targets": [
+          "aladin-test-design"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 181,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "test-design",
+            "traceability-matrix",
+            "discovery-questions",
+            "test-cases",
+            "aladin-test-design",
+            "legal-compliance-reviewer",
+            "tcum-mcp-hub",
+            "requirement-assistant"
+          ],
+          "ms": 86,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "test-design",
+            "traceability-matrix",
+            "discovery-questions",
+            "test-cases",
+            "aladin-test-design",
+            "legal-compliance-reviewer",
+            "tcum-mcp-hub",
+            "requirement-assistant"
+          ],
+          "ms": 65,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "test-design",
+            "traceability-matrix",
+            "discovery-questions",
+            "test-cases",
+            "aladin-test-design",
+            "legal-compliance-reviewer",
+            "tcum-mcp-hub",
+            "requirement-assistant"
+          ],
+          "ms": 79,
+          "hit": true
+        },
+        "wave": 1
+      },
+      {
+        "id": "parallel-feature-delivery",
+        "language": "zh",
+        "targets": [
+          "dev-pipeline-orchestrator"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 60,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "auth-code-tester",
+            "fix-regression-with-tdd",
+            "tdd",
+            "test-detect",
+            "dev-pipeline-orchestrator",
+            "code",
+            "task_tree_models",
+            "task_tree_registry"
+          ],
+          "ms": 73,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "auth-code-tester",
+            "fix-regression-with-tdd",
+            "tdd",
+            "test-detect",
+            "dev-pipeline-orchestrator",
+            "code",
+            "task_tree_models",
+            "task_tree_registry"
+          ],
+          "ms": 101,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "auth-code-tester",
+            "fix-regression-with-tdd",
+            "tdd",
+            "test-detect",
+            "dev-pipeline-orchestrator",
+            "code",
+            "task_tree_models",
+            "task_tree_registry"
+          ],
+          "ms": 94,
+          "hit": true
+        },
+        "wave": 2
+      },
+      {
+        "id": "parallel-feature-delivery",
+        "language": "en",
+        "targets": [
+          "dev-pipeline-orchestrator"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 70,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "code",
+            "deliver-edge-cases",
+            "parallel-dev-cycle",
+            "bio-read-qc-fastp-workflow",
+            "clarify",
+            "dev-pipeline-orchestrator",
+            "weixinpay",
+            "eplus-mcp"
+          ],
+          "ms": 71,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "code",
+            "deliver-edge-cases",
+            "parallel-dev-cycle",
+            "bio-read-qc-fastp-workflow",
+            "clarify",
+            "dev-pipeline-orchestrator",
+            "weixinpay",
+            "eplus-mcp"
+          ],
+          "ms": 84,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "code",
+            "deliver-edge-cases",
+            "parallel-dev-cycle",
+            "bio-read-qc-fastp-workflow",
+            "clarify",
+            "dev-pipeline-orchestrator",
+            "weixinpay",
+            "eplus-mcp"
+          ],
+          "ms": 100,
+          "hit": true
+        },
+        "wave": 2
+      },
+      {
+        "id": "paper-language",
+        "language": "zh",
+        "targets": [
+          "academic-translation"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 64,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "ml-paper-writing",
+            "academic-translation",
+            "nsfc-abstract",
+            "dissertation-polisher-zh",
+            "ai-humanizer",
+            "kdocs-pdf-toolbox",
+            "duifene-homework-grading",
+            "paper-retrieval"
+          ],
+          "ms": 63,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "ml-paper-writing",
+            "academic-translation",
+            "nsfc-abstract",
+            "dissertation-polisher-zh",
+            "ai-humanizer",
+            "kdocs-pdf-toolbox",
+            "duifene-homework-grading",
+            "paper-retrieval"
+          ],
+          "ms": 91,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "ml-paper-writing",
+            "academic-translation",
+            "nsfc-abstract",
+            "dissertation-polisher-zh",
+            "ai-humanizer",
+            "kdocs-pdf-toolbox",
+            "duifene-homework-grading",
+            "paper-retrieval"
+          ],
+          "ms": 94,
+          "hit": true
+        },
+        "wave": 2
+      },
+      {
+        "id": "paper-language",
+        "language": "en",
+        "targets": [
+          "academic-translation"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 69,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "polish",
+            "paper-polish-workflow",
+            "paper-polish",
+            "explain-paper",
+            "english-writing-coach",
+            "paper-retrieval",
+            "note-class-representative",
+            "complementary_search_batch"
+          ],
+          "ms": 70,
+          "hit": false
+        },
+        "standalone": {
+          "names": [
+            "polish",
+            "paper-polish-workflow",
+            "paper-polish",
+            "explain-paper",
+            "english-writing-coach",
+            "paper-retrieval",
+            "note-class-representative",
+            "complementary_search_batch"
+          ],
+          "ms": 79,
+          "hit": false
+        },
+        "baselineStandalone": {
+          "names": [
+            "polish",
+            "paper-polish-workflow",
+            "paper-polish",
+            "explain-paper",
+            "english-writing-coach",
+            "paper-retrieval",
+            "note-class-representative",
+            "complementary_search_batch"
+          ],
+          "ms": 102,
+          "hit": false
+        },
+        "wave": 2
+      },
+      {
+        "id": "browser-functional",
+        "language": "zh",
+        "targets": [
+          "webapp-testing"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 61,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "browser-use",
+            "WeData-Platform",
+            "news-fact-checker",
+            "webapp-testing",
+            "chrome",
+            "task_tree_render",
+            "hsk-devops-expert",
+            "webapp-testing"
+          ],
+          "ms": 70,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "browser-use",
+            "WeData-Platform",
+            "news-fact-checker",
+            "webapp-testing",
+            "chrome",
+            "task_tree_render",
+            "hsk-devops-expert",
+            "webapp-testing"
+          ],
+          "ms": 64,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "browser-use",
+            "WeData-Platform",
+            "news-fact-checker",
+            "webapp-testing",
+            "chrome",
+            "task_tree_render",
+            "hsk-devops-expert",
+            "webapp-testing"
+          ],
+          "ms": 68,
+          "hit": true
+        },
+        "wave": 3
+      },
+      {
+        "id": "browser-functional",
+        "language": "en",
+        "targets": [
+          "webapp-testing"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 74,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "login-flow",
+            "browser",
+            "screenshots",
+            "browser",
+            "console-operation",
+            "webapp-testing",
+            "sdk-log-expert",
+            "cloudbase"
+          ],
+          "ms": 65,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "login-flow",
+            "browser",
+            "screenshots",
+            "browser",
+            "console-operation",
+            "webapp-testing",
+            "sdk-log-expert",
+            "cloudbase"
+          ],
+          "ms": 62,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "login-flow",
+            "browser",
+            "screenshots",
+            "browser",
+            "console-operation",
+            "webapp-testing",
+            "sdk-log-expert",
+            "cloudbase"
+          ],
+          "ms": 65,
+          "hit": true
+        },
+        "wave": 3
+      },
+      {
+        "id": "document-extract",
+        "language": "zh",
+        "targets": [
+          "pdf",
+          "pdf-extraction",
+          "pdf-toolbox"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 69,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "pdf",
+            "kdocs-pdf-toolbox",
+            "pdf-to-markdown",
+            "pdf-toolbox",
+            "document-processing",
+            "document-skills",
+            "ofdh-doc-convert",
+            "contractkit-template"
+          ],
+          "ms": 61,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "pdf",
+            "kdocs-pdf-toolbox",
+            "pdf-to-markdown",
+            "pdf-toolbox",
+            "document-processing",
+            "document-skills",
+            "ofdh-doc-convert",
+            "contractkit-template"
+          ],
+          "ms": 59,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "pdf",
+            "kdocs-pdf-toolbox",
+            "pdf-to-markdown",
+            "pdf-toolbox",
+            "document-processing",
+            "document-skills",
+            "ofdh-doc-convert",
+            "contractkit-template"
+          ],
+          "ms": 67,
+          "hit": true
+        },
+        "wave": 3
+      },
+      {
+        "id": "document-extract",
+        "language": "en",
+        "targets": [
+          "pdf",
+          "pdf-extraction",
+          "pdf-toolbox"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 77,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "pdf",
+            "oma-pdf",
+            "pdf-extract-experimental-materials",
+            "pdf-extract",
+            "kdocs-pdf-toolbox",
+            "ofdh-doc-convert",
+            "document-skills",
+            "contractkit-template"
+          ],
+          "ms": 74,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "pdf",
+            "oma-pdf",
+            "pdf-extract-experimental-materials",
+            "pdf-extract",
+            "kdocs-pdf-toolbox",
+            "ofdh-doc-convert",
+            "document-skills",
+            "contractkit-template"
+          ],
+          "ms": 63,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "pdf",
+            "oma-pdf",
+            "pdf-extract-experimental-materials",
+            "pdf-extract",
+            "kdocs-pdf-toolbox",
+            "ofdh-doc-convert",
+            "document-skills",
+            "contractkit-template"
+          ],
+          "ms": 60,
+          "hit": true
+        },
+        "wave": 3
+      },
+      {
+        "id": "spreadsheet-formulas",
+        "language": "zh",
+        "targets": [
+          "xlsx",
+          "xlsx-author",
+          "xlsx-manipulation"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 57,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "Excel字典字段时间区间正数值平均值计算",
+            "Excel Automation",
+            "large-excel-analysis-and-formatting",
+            "workbuddy-sheetagent",
+            "model-builder",
+            "task_tree_subtree",
+            "document-skills",
+            "slgj-finance-engine"
+          ],
+          "ms": 59,
+          "hit": false
+        },
+        "standalone": {
+          "names": [
+            "Excel字典字段时间区间正数值平均值计算",
+            "Excel Automation",
+            "large-excel-analysis-and-formatting",
+            "workbuddy-sheetagent",
+            "model-builder",
+            "task_tree_subtree",
+            "document-skills",
+            "slgj-finance-engine"
+          ],
+          "ms": 56,
+          "hit": false
+        },
+        "baselineStandalone": {
+          "names": [
+            "Excel字典字段时间区间正数值平均值计算",
+            "Excel Automation",
+            "large-excel-analysis-and-formatting",
+            "workbuddy-sheetagent",
+            "model-builder",
+            "task_tree_subtree",
+            "document-skills",
+            "slgj-finance-engine"
+          ],
+          "ms": 56,
+          "hit": false
+        },
+        "wave": 4
+      },
+      {
+        "id": "spreadsheet-formulas",
+        "language": "en",
+        "targets": [
+          "xlsx",
+          "xlsx-author",
+          "xlsx-manipulation"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 62,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "spreadsheet-ops",
+            "large-excel-analysis-and-formatting",
+            "excel-statistical-formulas",
+            "data-analysis",
+            "xlsx",
+            "tapnow",
+            "model-builder",
+            "jiushuyun"
+          ],
+          "ms": 64,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "spreadsheet-ops",
+            "large-excel-analysis-and-formatting",
+            "excel-statistical-formulas",
+            "data-analysis",
+            "xlsx",
+            "tapnow",
+            "model-builder",
+            "jiushuyun"
+          ],
+          "ms": 66,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "spreadsheet-ops",
+            "large-excel-analysis-and-formatting",
+            "excel-statistical-formulas",
+            "data-analysis",
+            "xlsx",
+            "tapnow",
+            "model-builder",
+            "jiushuyun"
+          ],
+          "ms": 64,
+          "hit": true
+        },
+        "wave": 4
+      },
+      {
+        "id": "trip-budget-feasibility",
+        "language": "zh",
+        "targets": [
+          "budget-balance"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 57,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "budget-balance",
+            "travel-plan",
+            "tripstar-agent",
+            "travel-booking",
+            "travel-query",
+            "tc-chengxin-travel-expert",
+            "huilianyi",
+            "tourmind-hotel-booking-token"
+          ],
+          "ms": 59,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "budget-balance",
+            "travel-plan",
+            "tripstar-agent",
+            "travel-booking",
+            "travel-query",
+            "tc-chengxin-travel-expert",
+            "huilianyi",
+            "tourmind-hotel-booking-token"
+          ],
+          "ms": 58,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "budget-balance",
+            "travel-plan",
+            "tripstar-agent",
+            "travel-booking",
+            "travel-query",
+            "tc-chengxin-travel-expert",
+            "huilianyi",
+            "tourmind-hotel-booking-token"
+          ],
+          "ms": 56,
+          "hit": true
+        },
+        "wave": 4
+      },
+      {
+        "id": "trip-budget-feasibility",
+        "language": "en",
+        "targets": [
+          "budget-balance"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 63,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "travel-itinerary-data",
+            "cwicr-value-engineering",
+            "travel-planning",
+            "lazy-travel-planner",
+            "fenbeitong",
+            "ziru-business-travel",
+            "itinerary-planner",
+            "tc-chengxin-travel-expert"
+          ],
+          "ms": 63,
+          "hit": false
+        },
+        "standalone": {
+          "names": [
+            "travel-itinerary-data",
+            "cwicr-value-engineering",
+            "travel-planning",
+            "lazy-travel-planner",
+            "fenbeitong",
+            "ziru-business-travel",
+            "itinerary-planner",
+            "tc-chengxin-travel-expert"
+          ],
+          "ms": 68,
+          "hit": false
+        },
+        "baselineStandalone": {
+          "names": [
+            "travel-itinerary-data",
+            "cwicr-value-engineering",
+            "travel-planning",
+            "lazy-travel-planner",
+            "fenbeitong",
+            "ziru-business-travel",
+            "itinerary-planner",
+            "tc-chengxin-travel-expert"
+          ],
+          "ms": 64,
+          "hit": false
+        },
+        "wave": 4
+      },
+      {
+        "id": "live-library-docs",
+        "language": "zh",
+        "targets": [
+          "context7"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 55,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "emr-query-skill",
+            "gitlab-docs",
+            "wecomcli-doc",
+            "context7",
+            "grep_app",
+            "wecomcli-doc",
+            "api-dev",
+            "superpowers-zh"
+          ],
+          "ms": 56,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "emr-query-skill",
+            "gitlab-docs",
+            "wecomcli-doc",
+            "context7",
+            "grep_app",
+            "wecomcli-doc",
+            "api-dev",
+            "superpowers-zh"
+          ],
+          "ms": 59,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "emr-query-skill",
+            "gitlab-docs",
+            "wecomcli-doc",
+            "context7",
+            "grep_app",
+            "wecomcli-doc",
+            "api-dev",
+            "superpowers-zh"
+          ],
+          "ms": 59,
+          "hit": true
+        },
+        "wave": 5
+      },
+      {
+        "id": "live-library-docs",
+        "language": "en",
+        "targets": [
+          "context7"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 62,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "context7-mcp-skill",
+            "code-documentation-doc-generate",
+            "grep_app",
+            "c4-code",
+            "api-documentation-generator",
+            "context7",
+            "code-review-expert",
+            "code"
+          ],
+          "ms": 60,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "context7-mcp-skill",
+            "code-documentation-doc-generate",
+            "grep_app",
+            "c4-code",
+            "api-documentation-generator",
+            "context7",
+            "code-review-expert",
+            "code"
+          ],
+          "ms": 63,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "context7-mcp-skill",
+            "code-documentation-doc-generate",
+            "grep_app",
+            "c4-code",
+            "api-documentation-generator",
+            "context7",
+            "code-review-expert",
+            "code"
+          ],
+          "ms": 62,
+          "hit": true
+        },
+        "wave": 5
+      },
+      {
+        "id": "repository-collaboration",
+        "language": "zh",
+        "targets": [
+          "github"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 54,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "github",
+            "github",
+            "github-issue",
+            "github",
+            "github",
+            "grep_app",
+            "hsk-devops-expert",
+            "git-workflow-expert"
+          ],
+          "ms": 63,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "github",
+            "github",
+            "github-issue",
+            "github",
+            "github",
+            "grep_app",
+            "hsk-devops-expert",
+            "git-workflow-expert"
+          ],
+          "ms": 66,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "github",
+            "github",
+            "github-issue",
+            "github",
+            "github",
+            "grep_app",
+            "hsk-devops-expert",
+            "git-workflow-expert"
+          ],
+          "ms": 63,
+          "hit": true
+        },
+        "wave": 5
+      },
+      {
+        "id": "repository-collaboration",
+        "language": "en",
+        "targets": [
+          "github"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 60,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "github",
+            "github-workflow",
+            "pr-authoring",
+            "github",
+            "github",
+            "andon-q-expert",
+            "technical_research_batch",
+            "ab-experiment-analyst"
+          ],
+          "ms": 63,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "github",
+            "github-workflow",
+            "pr-authoring",
+            "github",
+            "github",
+            "andon-q-expert",
+            "technical_research_batch",
+            "ab-experiment-analyst"
+          ],
+          "ms": 60,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "github",
+            "github-workflow",
+            "pr-authoring",
+            "github",
+            "github",
+            "andon-q-expert",
+            "technical_research_batch",
+            "ab-experiment-analyst"
+          ],
+          "ms": 61,
+          "hit": true
+        },
+        "wave": 5
+      },
+      {
+        "id": "workspace-notes",
+        "language": "zh",
+        "targets": [
+          "notion"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 56,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "notion",
+            "notion-research-documentation",
+            "notion-knowledge-capture",
+            "notion-automation",
+            "vibe-notionbot",
+            "orientfutures_mobile_knowledge_base",
+            "fin-research-expert",
+            "personal-knowledge-architect"
+          ],
+          "ms": 63,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "notion",
+            "notion-research-documentation",
+            "notion-knowledge-capture",
+            "notion-automation",
+            "vibe-notionbot",
+            "orientfutures_mobile_knowledge_base",
+            "fin-research-expert",
+            "personal-knowledge-architect"
+          ],
+          "ms": 57,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "notion",
+            "notion-research-documentation",
+            "notion-knowledge-capture",
+            "notion-automation",
+            "vibe-notionbot",
+            "orientfutures_mobile_knowledge_base",
+            "fin-research-expert",
+            "personal-knowledge-architect"
+          ],
+          "ms": 55,
+          "hit": true
+        },
+        "wave": 6
+      },
+      {
+        "id": "workspace-notes",
+        "language": "en",
+        "targets": [
+          "notion"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 64,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "notion",
+            "workspace",
+            "notion",
+            "edgeone-pages",
+            "notion-research-documentation",
+            "workspace-builder",
+            "research-documentation",
+            "hr-digital-expert"
+          ],
+          "ms": 66,
+          "hit": true
+        },
+        "standalone": {
+          "names": [
+            "notion",
+            "workspace",
+            "notion",
+            "edgeone-pages",
+            "notion-research-documentation",
+            "workspace-builder",
+            "research-documentation",
+            "hr-digital-expert"
+          ],
+          "ms": 63,
+          "hit": true
+        },
+        "baselineStandalone": {
+          "names": [
+            "notion",
+            "workspace",
+            "notion",
+            "edgeone-pages",
+            "notion-research-documentation",
+            "workspace-builder",
+            "research-documentation",
+            "hr-digital-expert"
+          ],
+          "ms": 64,
+          "hit": true
+        },
+        "wave": 6
+      },
+      {
+        "id": "employee-social-insurance",
+        "language": "zh",
+        "targets": [
+          "51shebao-hr-tools"
+        ],
+        "before": {
+          "names": [
+            "aike-dashboard",
+            "lhb-analyzer",
+            "worldcup-api",
+            "tencent-musician-skills",
+            "task_tree_render",
+            "ad-creative-strategist",
+            "content-monetization-team",
+            "bugly"
+          ],
+          "ms": 55,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "beisen-service-portal",
+            "ihr-insurance",
+            "ihr-payroll",
+            "beisen-data-query",
+            "hr-operations-team",
+            "malaysia-hr-admin",
+            "archive-hospital-mcp",
+            "h3yun-connector"
+          ],
+          "ms": 57,
+          "hit": false
+        },
+        "standalone": {
+          "names": [
+            "beisen-service-portal",
+            "ihr-insurance",
+            "ihr-payroll",
+            "beisen-data-query",
+            "hr-operations-team",
+            "malaysia-hr-admin",
+            "archive-hospital-mcp",
+            "h3yun-connector"
+          ],
+          "ms": 57,
+          "hit": false
+        },
+        "baselineStandalone": {
+          "names": [
+            "beisen-service-portal",
+            "ihr-insurance",
+            "ihr-payroll",
+            "beisen-data-query",
+            "hr-operations-team",
+            "malaysia-hr-admin",
+            "archive-hospital-mcp",
+            "h3yun-connector"
+          ],
+          "ms": 58,
+          "hit": false
+        },
+        "wave": 6
+      },
+      {
+        "id": "employee-social-insurance",
+        "language": "en",
+        "targets": [
+          "51shebao-hr-tools"
+        ],
+        "before": {
+          "names": [
+            "now-reading-page",
+            "better-auth-best-practices",
+            "claudini",
+            "improve-article",
+            "fbsir-super-partner",
+            "behavioral-nudge-engine",
+            "awehome-newmedia",
+            "qince"
+          ],
+          "ms": 63,
+          "hit": false
+        },
+        "after": {
+          "names": [
+            "south-africa-hr-admin",
+            "erhao-hr",
+            "hr_data_service_v1",
+            "hr-operations-team",
+            "employee-handbook",
+            "hr-pro",
+            "erhao-hr-employee",
+            "hr-pro-v2"
+          ],
+          "ms": 64,
+          "hit": false
+        },
+        "standalone": {
+          "names": [
+            "south-africa-hr-admin",
+            "erhao-hr",
+            "hr_data_service_v1",
+            "hr-operations-team",
+            "employee-handbook",
+            "hr-pro",
+            "erhao-hr-employee",
+            "hr-pro-v2"
+          ],
+          "ms": 64,
+          "hit": false
+        },
+        "baselineStandalone": {
+          "names": [
+            "south-africa-hr-admin",
+            "erhao-hr",
+            "hr_data_service_v1",
+            "hr-operations-team",
+            "employee-handbook",
+            "hr-pro",
+            "erhao-hr-employee",
+            "hr-pro-v2"
+          ],
+          "ms": 65,
+          "hit": false
+        },
+        "wave": 6
+      }
+    ],
+    "limits": [
+      "Diagnostic followups derived from existing task labels, not a new independent business benchmark.",
+      "One history task per case; multi-turn mechanisms and isolation require separate tests.",
+      "No business workflow or model answer quality measured."
+    ]
+  },
+  "liveRouting": {
+    "mac": {
+      "passed": true,
+      "requests": 100,
+      "targetHits": 75,
+      "standaloneEquivalent": 100,
+      "maxActive": 8,
+      "retries": 0,
+      "timeouts": 0,
+      "skipped": 0,
+      "p50Ms": 114,
+      "p95Ms": 168,
+      "maxMs": 225,
+      "limits": [
+        "100 requests at width 8, not 100 simultaneous processes.",
+        "Known relevant tasks test context transport and routing isolation; not general semantic accuracy."
+      ]
+    },
+    "194": {
+      "passed": true,
+      "requests": 100,
+      "targetHits": 75,
+      "standaloneEquivalent": 100,
+      "maxActive": 8,
+      "retries": 0,
+      "timeouts": 0,
+      "skipped": 0,
+      "p50Ms": 112,
+      "p95Ms": 135,
+      "maxMs": 150,
+      "limits": [
+        "100 requests at width 8, not 100 simultaneous processes.",
+        "Known relevant tasks test context transport and routing isolation; not general semantic accuracy."
+      ]
+    }
+  },
+  "ide": {
+    "mac": {
+      "passed": true,
+      "scope": "Real IDE turn owner and Hook ordering, controlled model transport; no business-model-quality claim",
+      "runner": "/Library/hyf/并行ide/llm-task-tree-macos/llm-task-tree-kit/server/deepseek-run.js",
+      "rows": [
+        {
+          "mode": "supplied",
+          "liveHooks": true,
+          "routedNames": [
+            "postgresql",
+            "index",
+            "postgresql-indexing",
+            "lsp-index-engineer",
+            "complementary_search_batch",
+            "database-operations",
+            "technical_research_batch",
+            "start-new-project"
+          ],
+          "order": [
+            "SessionStart",
+            "UserPromptSubmit",
+            "Stop"
+          ],
+          "modelRequests": 1,
+          "query": "Investigate PostgreSQL index construction and lock waits.\nOption two uses CREATE INDEX CONCURRENTLY.\nHow about the second option?",
+          "contextBytes": 365,
+          "passed": true
+        },
+        {
+          "mode": "resumed",
+          "liveHooks": true,
+          "routedNames": [
+            "postgresql",
+            "index",
+            "postgresql-indexing",
+            "lsp-index-engineer",
+            "complementary_search_batch",
+            "database-operations",
+            "technical_research_batch",
+            "start-new-project"
+          ],
+          "order": [
+            "context",
+            "dialogue",
+            "UserPromptSubmit",
+            "Stop"
+          ],
+          "modelRequests": 1,
+          "query": "Investigate PostgreSQL index construction and lock waits.\nOption two uses CREATE INDEX CONCURRENTLY.\nHow about the second option?",
+          "contextBytes": 335,
+          "passed": true
+        },
+        {
+          "mode": "forked",
+          "liveHooks": true,
+          "routedNames": [
+            "postgresql",
+            "index",
+            "postgresql-indexing",
+            "lsp-index-engineer",
+            "complementary_search_batch",
+            "database-operations",
+            "technical_research_batch",
+            "start-new-project"
+          ],
+          "order": [
+            "context",
+            "dialogue",
+            "SessionStart",
+            "UserPromptSubmit",
+            "Stop"
+          ],
+          "modelRequests": 1,
+          "query": "Investigate PostgreSQL index construction and lock waits.\nOption two uses CREATE INDEX CONCURRENTLY.\nHow about the second option?",
+          "contextBytes": 363,
+          "passed": true
+        }
+      ]
+    },
+    "194": {
+      "passed": true,
+      "scope": "Real IDE turn owner and Hook ordering, controlled model transport; no business-model-quality claim",
+      "runner": "/home/hyf/.codex/tools/llm-task-tree-kit/server/deepseek-run.js",
+      "rows": [
+        {
+          "mode": "supplied",
+          "liveHooks": true,
+          "routedNames": [
+            "postgresql",
+            "index",
+            "postgresql-indexing",
+            "lsp-index-engineer",
+            "complementary_search_batch",
+            "database-operations",
+            "technical_research_batch",
+            "start-new-project"
+          ],
+          "order": [
+            "SessionStart",
+            "UserPromptSubmit",
+            "Stop"
+          ],
+          "modelRequests": 1,
+          "query": "Investigate PostgreSQL index construction and lock waits.\nOption two uses CREATE INDEX CONCURRENTLY.\nHow about the second option?",
+          "contextBytes": 321,
+          "passed": true
+        },
+        {
+          "mode": "resumed",
+          "liveHooks": true,
+          "routedNames": [
+            "postgresql",
+            "index",
+            "postgresql-indexing",
+            "lsp-index-engineer",
+            "complementary_search_batch",
+            "database-operations",
+            "technical_research_batch",
+            "start-new-project"
+          ],
+          "order": [
+            "context",
+            "dialogue",
+            "UserPromptSubmit",
+            "Stop"
+          ],
+          "modelRequests": 1,
+          "query": "Investigate PostgreSQL index construction and lock waits.\nOption two uses CREATE INDEX CONCURRENTLY.\nHow about the second option?",
+          "contextBytes": 291,
+          "passed": true
+        },
+        {
+          "mode": "forked",
+          "liveHooks": true,
+          "routedNames": [
+            "postgresql",
+            "index",
+            "postgresql-indexing",
+            "lsp-index-engineer",
+            "complementary_search_batch",
+            "database-operations",
+            "technical_research_batch",
+            "start-new-project"
+          ],
+          "order": [
+            "context",
+            "dialogue",
+            "SessionStart",
+            "UserPromptSubmit",
+            "Stop"
+          ],
+          "modelRequests": 1,
+          "query": "Investigate PostgreSQL index construction and lock waits.\nOption two uses CREATE INDEX CONCURRENTLY.\nHow about the second option?",
+          "contextBytes": 319,
+          "passed": true
+        }
+      ]
+    },
+    "194ActualProjectRuntime": {
+      "passed": true,
+      "scope": "Real IDE turn owner and Hook ordering, controlled model transport; no business-model-quality claim",
+      "runner": "/home/hyf/.local/share/task-tree-remote/runtimes/daa43f728f4e6c0c8da2de7d/server/deepseek-run.js",
+      "rows": [
+        {
+          "mode": "supplied",
+          "liveHooks": true,
+          "routedNames": [
+            "postgresql",
+            "index",
+            "postgresql-indexing",
+            "lsp-index-engineer",
+            "complementary_search_batch",
+            "database-operations",
+            "technical_research_batch",
+            "start-new-project"
+          ],
+          "order": [
+            "SessionStart",
+            "UserPromptSubmit",
+            "Stop"
+          ],
+          "modelRequests": 1,
+          "query": "Investigate PostgreSQL index construction and lock waits.\nOption two uses CREATE INDEX CONCURRENTLY.\nHow about the second option?",
+          "contextBytes": 321,
+          "passed": true
+        },
+        {
+          "mode": "resumed",
+          "liveHooks": true,
+          "routedNames": [
+            "postgresql",
+            "index",
+            "postgresql-indexing",
+            "lsp-index-engineer",
+            "complementary_search_batch",
+            "database-operations",
+            "technical_research_batch",
+            "start-new-project"
+          ],
+          "order": [
+            "context",
+            "dialogue",
+            "UserPromptSubmit",
+            "Stop"
+          ],
+          "modelRequests": 1,
+          "query": "Investigate PostgreSQL index construction and lock waits.\nOption two uses CREATE INDEX CONCURRENTLY.\nHow about the second option?",
+          "contextBytes": 291,
+          "passed": true
+        },
+        {
+          "mode": "forked",
+          "liveHooks": true,
+          "routedNames": [
+            "postgresql",
+            "index",
+            "postgresql-indexing",
+            "lsp-index-engineer",
+            "complementary_search_batch",
+            "database-operations",
+            "technical_research_batch",
+            "start-new-project"
+          ],
+          "order": [
+            "context",
+            "dialogue",
+            "SessionStart",
+            "UserPromptSubmit",
+            "Stop"
+          ],
+          "modelRequests": 1,
+          "query": "Investigate PostgreSQL index construction and lock waits.\nOption two uses CREATE INDEX CONCURRENTLY.\nHow about the second option?",
+          "contextBytes": 319,
+          "passed": true
+        }
+      ]
+    }
+  },
+  "tests": {
+    "context": {
+      "passed": 45,
+      "failed": 0
+    },
+    "idePatcher": {
+      "passed": 6,
+      "failed": 0
+    },
+    "semanticRelations": {
+      "passed": 21,
+      "failed": 0
+    },
+    "artifactRelations": {
+      "passed": 12,
+      "failed": 0
+    },
+    "desktopRouting": {
+      "passed": 26,
+      "failed": 0
+    },
+    "installer": "passed; includes install, idempotence, dispatcher, credential isolation, check and rollback",
+    "prQuality": {
+      "passed": 15,
+      "failed": 0,
+      "scope": "HEAD archive with delivery files applied, initialized as isolated Git repository; unrelated 56 historical deletions in real worktree preserved",
+      "reportSha256": "1c62a1d2a7fe6f96dbedc25b67247ebb7164f731459471a441f4b8313c2b382f"
+    }
+  },
+  "modelRewritePilot": {
+    "cases": 4,
+    "seconds": [
+      39.25388503074646,
+      33.185548067092896,
+      34.626736879348755,
+      33.433456897735596
+    ],
+    "enabledByDefault": false,
+    "limitation": "Not a model quality benchmark; one incorrect needs_context flag"
+  },
+  "sources": [
+    {
+      "id": "conqrr",
+      "url": "https://aclanthology.org/2022.emnlp-main.679/",
+      "finalUrl": "https://aclanthology.org/2022.emnlp-main.679/",
+      "status": 200,
+      "seconds": 2.327,
+      "bytes": 43599,
+      "sha256": "9d10c9dbf089fb26ca16b0b15a0211c63e5bd135dbe1ad09a36c1dcc8464999d"
+    },
+    {
+      "id": "quretec",
+      "url": "https://arxiv.org/html/2005.11723",
+      "finalUrl": "https://arxiv.org/html/2005.11723",
+      "status": 200,
+      "seconds": 2.057,
+      "bytes": 270723,
+      "sha256": "68feddd31715c01662e6eabeffb9f45c077fe42f9b97b8b535543e31c55a86b6"
+    },
+    {
+      "id": "multiquery",
+      "url": "https://arxiv.org/html/2406.18960",
+      "finalUrl": "https://arxiv.org/html/2406.18960",
+      "status": 200,
+      "seconds": 1.839,
+      "bytes": 138993,
+      "sha256": "706d4f8c9449916cf084d835ba2f8207a165478043ee0823b5d7de1517db0bcf"
+    },
+    {
+      "id": "langchain",
+      "url": "https://raw.githubusercontent.com/langchain-ai/langchain/master/libs/langchain-classic/langchain_classic/chains/history_aware_retriever.py",
+      "finalUrl": "https://raw.githubusercontent.com/langchain-ai/langchain/master/libs/langchain-classic/langchain_classic/chains/history_aware_retriever.py",
+      "status": 404,
+      "seconds": 2.06,
+      "bytes": 14,
+      "sha256": "d5558cd419c8d46bdc958064cb97f963d1ea793866414c025906ec15033512ed"
+    },
+    {
+      "id": "qrecc",
+      "url": "https://raw.githubusercontent.com/apple-aiml-research/ml-qrecc/main/README.md",
+      "finalUrl": "https://raw.githubusercontent.com/apple-aiml-research/ml-qrecc/main/README.md",
+      "status": 200,
+      "seconds": 1.533,
+      "bytes": 4434,
+      "sha256": "51f71c778ad02f21992f48bd89297b2a643d21b1fe403d3bf959d452cbd6a358"
+    },
+    {
+      "id": "stackoverflow",
+      "url": "https://api.stackexchange.com/2.3/questions/76561073/answers?site=stackoverflow&filter=withbody",
+      "finalUrl": "https://api.stackexchange.com/2.3/questions/76561073/answers?site=stackoverflow&filter=withbody",
+      "status": 200,
+      "seconds": 1.421,
+      "bytes": 4821,
+      "sha256": "720c275352282bc296df4250bb4666460f322b3b226ad93f09fe942adad1dd43"
+    },
+    {
+      "id": "codex-hooks",
+      "url": "https://developers.openai.com/codex/hooks/",
+      "finalUrl": "https://learn.chatgpt.com/docs/hooks",
+      "status": 200,
+      "seconds": 2.907,
+      "bytes": 541095,
+      "sha256": "1c86bf69bb98c84f88b31b1929fcb7572d291fb1d31105366e713cb32584349e"
+    },
+    {
+      "id": "langchain-success",
+      "url": "https://raw.githubusercontent.com/langchain-ai/langchain/v0.2/libs/langchain/langchain/chains/history_aware_retriever.py",
+      "status": 200,
+      "sha256": "6bddaf97196ad0f68eb9b73f6f88e3fd6c068af9384f28b5c7348129a4cec788"
+    }
+  ],
+  "deployment": {
+    "macProjects": [
+      {
+        "root": "/Users/pku1727/.codex/worktrees/2d89/ai-engineering-governance-template",
+        "port": 5439,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Library/hyf/并行ide/llm-task-tree-macos",
+        "port": 5518,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Users/pku1727/Desktop/任务清单",
+        "port": 5475,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Users/pku1727/Desktop/终身记忆",
+        "port": 5542,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Users/pku1727/Desktop/怎么宣传",
+        "port": 5380,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Users/pku1727/Desktop/提取内容",
+        "port": 5799,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Users/pku1727/Desktop/claude",
+        "port": 5867,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Users/pku1727/Desktop/破解workbuddy",
+        "port": 5453,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Library/hyf/并行ide",
+        "port": 5393,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Users/pku1727/Desktop/修改手机与电脑",
+        "port": 5367,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Users/pku1727/Desktop/所接触的人的建模",
+        "port": 5505,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Users/pku1727/Desktop/导出微信程序",
+        "port": 5922,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      },
+      {
+        "root": "/Users/pku1727/Desktop/建模世界",
+        "port": 5866,
+        "runtimeRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "desiredRevision": "33125f0043bab4200b5de38d99e7a166d6450e3e586b6171683cf02734433545",
+        "updatePending": false
+      }
+    ],
+    "194Projects": [
+      {
+        "root": "/home/hyf/memes",
+        "hostname": "yyd-SYS-7049GP-TRT",
+        "port": 37643,
+        "pid": 1375123,
+        "revision": "parity-20261105",
+        "reused": false,
+        "runtimeRevision": "bcdb0c5f85ef915a2f607ff4145f38c049349ca7811e36a5d0851b671643a6a3",
+        "desiredRuntimeRevision": "bcdb0c5f85ef915a2f607ff4145f38c049349ca7811e36a5d0851b671643a6a3",
+        "desiredRevision": "parity-20261105",
+        "updatePending": false
+      },
+      {
+        "root": "/home/hyf/platform1_new",
+        "hostname": "yyd-SYS-7049GP-TRT",
+        "port": 36085,
+        "pid": 1375182,
+        "revision": "daa43f728f4e6c0c8da2de7d",
+        "reused": false,
+        "runtimeRevision": "ea1126b9ffd37f67b24c8ead74c806fd76de6dbb952eb797de08f9b94a441945",
+        "desiredRuntimeRevision": "ea1126b9ffd37f67b24c8ead74c806fd76de6dbb952eb797de08f9b94a441945",
+        "desiredRevision": "daa43f728f4e6c0c8da2de7d",
+        "updatePending": false
+      },
+      {
+        "root": "/data/hyf/ctms",
+        "hostname": "yyd-SYS-7049GP-TRT",
+        "port": 36411,
+        "pid": 1375309,
+        "revision": "daa43f728f4e6c0c8da2de7d",
+        "reused": false,
+        "runtimeRevision": "ea1126b9ffd37f67b24c8ead74c806fd76de6dbb952eb797de08f9b94a441945",
+        "desiredRuntimeRevision": "ea1126b9ffd37f67b24c8ead74c806fd76de6dbb952eb797de08f9b94a441945",
+        "desiredRevision": "daa43f728f4e6c0c8da2de7d",
+        "updatePending": false
+      }
+    ],
+    "globalFiles": {
+      "codex-profile/.codex/hooks/routing-context.mjs": "18b4f870af956ae4fa916150817404cf350961da7715ac2eb8302e2798c66e86",
+      "codex-profile/.codex/hooks/skill-router.mjs": "3b67b9a80a56f3831146cd9ef4bd439f8a9d302b2837457f66b3fc16b4aa2885"
+    }
+  },
+  "limitations": [
+    "Small derived diagnostic set; not a business benchmark or a universal 82% accuracy claim.",
+    "Remaining 5/28 failures also occur for standalone tasks; spreadsheet target hits in mixed live workload remain 75/100.",
+    "Live runs use warm repeated task queries and max width 8, not 100 concurrent processes.",
+    "IDE uses real executable, Hook and graph with controlled model HTTP responses; model answer quality not measured.",
+    "Bounded lexical context selection is not general natural-language coreference.",
+    "Transcript format is host-dependent; task anchor outside 8MiB tail cannot be recovered.",
+    "Machine-only evidence retains red/green logs and deployment backups; no credentials or user dialogue submitted."
+  ],
+  "verificationEnvironmentCorrections": [
+    "System Node unavailable: used installed absolute Node path.",
+    "Graph tests require CODEX_TEST_NODE; rerun passed.",
+    "Archive-only validation lacked Git metadata; initialized isolated repository, all 15 gates passed.",
+    "Skill mentions scripts/verify-repository.ps1 which is absent; used repository-owned scripts/check.ps1 with executable gate definitions.",
+    "194 installed psutil exposes Process.connections, not net_connections; service enumeration corrected without changing application."
+  ]
+}

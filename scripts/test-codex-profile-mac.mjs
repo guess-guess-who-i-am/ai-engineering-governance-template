@@ -125,6 +125,7 @@ elif "retrieve" in args:
   const installedSemantic = await readFile(path.join(home, ".codex/hooks/semantic-relations.json"));
   assert(installedSemantic.equals(semanticSource), "global install omitted or modified the portable relation registry");
   assert(JSON.parse(installedSemantic).verification.citationAuditComplete === true, "installed relations have not passed citation verification");
+  assert((await readFile(path.join(home, ".codex/hooks/routing-context.mjs"))).equals(await readFile(path.join(REPOSITORY_ROOT, "codex-profile/.codex/hooks/routing-context.mjs"))), "global context resolver missing or changed");
   const result = JSON.parse(install.stdout);
   assert(result.status === "installed" && result.changedFiles > 0, "installer did not report a real installation");
   assert((await readFile(path.join(home, ".codex", "skill-registry", "external-library-config.json"), "utf8")).includes(skillFixture), "installer did not configure the external global Skill library");

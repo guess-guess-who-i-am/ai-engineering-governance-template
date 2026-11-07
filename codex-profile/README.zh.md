@@ -12,6 +12,8 @@
 - `method-*` 五个方法 Skill、`manage-global-methodology`、12个治理 Skill、4个任务树 Skill，以及供应链审查和桌面产物工作流，共25个全局 Skill；
 - Skill 路由别名；部署时从仓库旁的私有 Skill 镜像复制约 15,472 条目录到用户级工具目录，并用 GraphToolCall 0.46.0 建立本机工具关系图索引。完整第三方库不进入本仓库，避免把混合许可的第三方内容发布到公开模板仓库。
 
+短追问由全局 `routing-context.mjs` 先解析本会话的任务与必要助手方案，再进入同一张图；不会扫描其他聊天或在线调用改写模型。安装器和右键部署源均带此依赖。独立IDE运行时需在Hook前传历史；补丁、验证和回退见[短追问检索说明](../docs/CONVERSATIONAL_ROUTING.zh.md)。
+
 所有调用都经过全局 GraphToolCall 路由。默认从仓库旁的私有镜像 `../skills` 部署到 `~/.codex/tools/skills`；没有该目录时复用已安装的全局库，否则自动恢复固定版本的私有Git镜像，也可通过 `CODEX_EXTERNAL_SKILL_ROOT` 指定已有目录。会话启动时把 `_catalog_cn.json` 转成 Skill 节点，并读取 `config.toml` 中命令行stdio MCP server 的 `tools/list`，统一写入 `~/.codex/skill-registry/skills.graph.json`。用户提示通过 GraphToolCall 检索，命中 Skill 后才读取原始 `SKILL.md`，命中 MCP 后显示其 server/tool 调用入口。没有可靠元数据时不伪造 producer-consumer 边。完整第三方Skill正文保存在私有Git镜像，机器路径相关的生成索引在各电脑重建。
 
 图中的仓库自有 25 个 Skill 与第三方 Skill 一样部署到用户级全局目录；它们不写入具体项目，也不使用当前电脑的固定绝对路径。换电脑时安装器会先复制全局 Skill，再按新电脑的实际路径重建图。

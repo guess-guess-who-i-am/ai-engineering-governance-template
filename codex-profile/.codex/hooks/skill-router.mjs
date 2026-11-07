@@ -2,94 +2,14 @@
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, realpathSync } from "node:fs";
-import { readFile, mkdir, lstat, open } from "node:fs/promises";
+import { readFile, mkdir, lstat } from "node:fs/promises";
 import { createConnection } from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from 'node:url';
 
-function isFollowup(prompt) {
-  // Sticky tokenization avoids catastrophic backtracking on near-miss input.
-  const token = /好的?|可以|行|那么|那|就|请|嗯|是的|对|都|也|再|先|直接|帮我|把|按照|照|按|这个|这些|那个|那些|上述|上面|前面|继续|还是|仍然|执行|修改|改|做|修|统一|部署|测试|验证|完成|一下|吧|啊|呢|了|的|办|开始|用|方案|推荐|\s|[，。！!,.?？:：]/uy;
-  let offset = 0;
-  while (offset < prompt.length) {
-    token.lastIndex = offset;
-    const match = token.exec(prompt);
-    if (!match) break;
-    offset = token.lastIndex;
-  }
-  return offset === prompt.length ||
-    /^(?:yes|ok(?:ay)?|please|then|go ahead|continue|do (?:it|that)|proceed)(?:[\s,.!]+(?:please|then|with (?:it|that)|as discussed|continue|do (?:it|that)|proceed))*[\s,.!]*$/i.test(prompt);
-}
-
-function needsTaskContext(prompt) {
-  if (isFollowup(prompt)) return true;
-  // Quoted referents and a locally supplied problem are self-contained data.
-  const active = prompt.replace(/```[\s\S]*?```|`[^`]*`|“[^”]*”|「[^」]*」|"[^"\n]*"/gu, ' ');
-  if (/^(?:换个话题|另一个(?:独立)?(?:问题|任务)|新任务|与(?:前面|上面|之前)无关|new topic\b|unrelated (?:question|task)\b)/i.test(active)) return false;
-  if (/(?:这个|以下|如下)(?:问题|需求|任务|结果|方案|方法)[：:]\s*\S|(?:this|following) (?:problem|task|question|result|method)\s*:\s*\S/i.test(active)) return false;
-  return /(?:这|那)(?:个|些|种)(?:问题|方案|方法|实现|结果|配置|指标|评价|推荐|部分|功能|改动)|(?:上次|刚才|前面|上述|先前)(?:的|提到|说|做|实现|推荐)|你(?:的|认为的)(?:评价|推荐|实现|结果|指标)|(?:那就|那么)(?:赶紧|继续|帮我|请|先|直接|把|尽快|\s)*(?:修好|修改|修复|改好|继续)|\b(?:this|that|these|those) (?:problem|issue|result|method|approach|implementation|configuration|recommendation)s?\b|\b(?:earlier|previous) (?:method|result|approach|recommendation)s?\b/i.test(active);
-}
-
-// A referential reply is not a standalone search query. Read only a bounded
-// tail of the transcript supplied by Codex, never persist prompts or scan all
-// sessions. History is retrieval data, not authority to revive old actions.
-export async function routingQuery(input, prompt) {
-  const reply = prompt.match(/^<send_user_message_question_reply>\s*([\s\S]*?)\s*<\/send_user_message_question_reply>\s*$/);
-  if (reply) {
-    const answers = JSON.parse(reply[1]);
-    if (!Array.isArray(answers)) throw new Error('Question reply must be an array');
-    // The question supplies the missing referent; IDs and transport keys do not.
-    const resolved = answers.map(answer => [answer.question, answer.answer]
-      .filter(value => typeof value === 'string').join('\n')).filter(Boolean).join('\n');
-    if (!resolved) return '';
-    prompt = resolved;
-  }
-  const currentPrompt = prompt;
-  if (!needsTaskContext(prompt)) return prompt;
-  if (!input.transcript_path) return isFollowup(prompt) ? '' : prompt;
-  const file = await open(input.transcript_path, 'r');
-  let text;
-  try {
-    const info = await file.stat();
-    if (!info.isFile()) throw new Error('Routing transcript is not a regular file');
-    const size = Math.min(info.size, 1024 * 1024), offset = info.size - size;
-    const buffer = Buffer.alloc(size);
-    const { bytesRead } = await file.read(buffer, 0, size, offset);
-    text = buffer.subarray(0, bytesRead).toString('utf8');
-    if (offset) text = text.slice(text.indexOf('\n') + 1);
-  } finally { await file.close(); }
-  const prior = [];
-  for (const line of text.split('\n')) {
-    if (!line.trim()) continue;
-    let record;
-    try { record = JSON.parse(line); } catch { continue; } // tail can end mid-record
-    const message = record.type === 'response_item' ? record.payload : undefined;
-    if (message?.type !== 'message' || message.role !== 'user') continue;
-    const value = (message.content || []).filter(c => c.type === 'input_text').map(c => c.text || '').join('\n').trim();
-    if (!value || value === prompt || isFollowup(value) || value.startsWith('<') || value.startsWith('# AGENTS.md')) continue;
-    // Do not copy obvious credentials from conversation history into retrieval.
-    if (/\b(?:sk-[a-z0-9_-]{12,}|(?:api[_-]?key|token|password|authorization)\s*[:=])|[?&](?:token|key)=/i.test(value)) continue;
-    prior.push(value);
-  }
-  if (!prior.length) return isFollowup(prompt) ? '' : prompt;
-  // Follow the referent chain to its last self-contained user task. The latest
-  // standalone request is the topic boundary; earlier projects cannot leak in.
-  let anchor = prior.length - 1;
-  while (anchor > 0 && needsTaskContext(prior[anchor])) anchor--;
-  const task = prior[anchor];
-  const updates = prior.slice(anchor + 1);
-  // Preserve the existing 1600-character history budget, keeping the task
-  // anchor and most recent constraints. Never truncate the current request.
-  const retained = [];
-  let remaining = Math.max(0, 1600 - Math.min(task.length, 1200));
-  for (const value of updates.reverse()) {
-    if (value.length + 1 > remaining) continue;
-    retained.unshift(value); remaining -= value.length + 1;
-  }
-  return [task.slice(0, retained.length ? 1600 - retained.join('\n').length - 1 : 1600),
-    ...retained, currentPrompt].join('\n');
-}
+export { routingQuery } from './routing-context.mjs';
+import { routingQuery } from './routing-context.mjs';
 
 async function readInput() {
   let raw = "";
@@ -438,7 +358,7 @@ export function renderRoutingContext(selected, codexRoot) {
   return lines.join('\n');
 }
 
-if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) try {
+if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) try {
   const input = await readInput();
   const prompt = String(input.prompt || input.user_prompt || input.message || input.text || "").trim();
   if (input.hook_event_name !== "UserPromptSubmit" || !prompt) {
@@ -481,7 +401,7 @@ if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.me
   // aliases are fallback evidence only: they must not consume task slots by
   // masquerading as explicit invocations. No type/name-specific rank bonuses.
   const explicit = [...scored, ...graphScored].filter(item => requestedSkill(prompt, item.skill.name));
-  const direct = scored.filter(item => capabilityMatch(prompt,
+  const direct = scored.filter(item => capabilityMatch(retrievalQuery,
     ruleDocument._capabilityRoutes?.[String(item.skill.name).toLocaleLowerCase()]))
     .map(item => ({ ...item, matches: ['capability subject + action + object'] }));
   const minimum = Math.max(6, Math.floor((scored[0]?.score || 0) * 0.55));

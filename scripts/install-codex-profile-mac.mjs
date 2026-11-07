@@ -245,13 +245,13 @@ async function buildOperations(home) {
     mode: 0o700,
     source: dispatcherSource
   });
-  const routerSource = path.join(PROFILE_ROOT, ".codex", "hooks", "skill-router.mjs");
-  operations.set(path.join(codexHome, "hooks", "skill-router.mjs"), {
-    destination: path.join(codexHome, "hooks", "skill-router.mjs"),
-    content: await readFile(routerSource),
-    mode: 0o700,
-    source: routerSource
-  });
+  for (const name of ["routing-context.mjs", "skill-router.mjs"]) {
+    const source = path.join(PROFILE_ROOT, ".codex", "hooks", name);
+    operations.set(path.join(codexHome, "hooks", name), {
+      destination: path.join(codexHome, "hooks", name),
+      content: await readFile(source), mode: 0o700, source
+    });
+  }
   for (const name of GLOBAL_SKILLS) {
     await addTree(path.join(SKILLS_ROOT, name), path.join(agentsHome, "skills", name));
   }
