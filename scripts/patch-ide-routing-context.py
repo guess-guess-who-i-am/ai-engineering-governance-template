@@ -22,11 +22,9 @@ def patch(source):
       const routingContext = createRoutingContext({sessionId:threadId,cwd,prompt:String(prompt||''),
         messages:Array.isArray(dialogueContext) && dialogueContext.length ? dialogueContext : archivedInput});
 """
-    source=source.replace(ANCHOR,LOAD+extra+ANCHOR,1)
-    start="source: 'startup',\n        ...(executionMode"
-    replacement="source: 'startup',\n        routing_context: routingContext,\n        ...(executionMode"
-    if source.count(start)!=1:raise ValueError('Expected lifecycle source anchor')
-    source=source.replace(start,replacement,1)
+    # The lifecycle object itself owns this field. Its unrelated following
+    # properties vary between real deployments and must not select the patch.
+    source=source.replace(ANCHOR,LOAD+extra+ANCHOR+"\n        routing_context: routingContext,",1)
     source="import {createRoutingContext} from './skill-routing-context.mjs';\n"+source
     return source,True
 

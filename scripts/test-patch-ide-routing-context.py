@@ -4,6 +4,9 @@ from unittest.mock import patch
 spec=importlib.util.spec_from_file_location('patcher',pathlib.Path(__file__).with_name('patch-ide-routing-context.py'));p=importlib.util.module_from_spec(spec);spec.loader.exec_module(p)
 class PatchTests(unittest.TestCase):
  def source(self):return 'OWNER_USER_CHANGE\n'+p.ANCHOR+"\n        ...(executionMode ? {} : {}) };\n"+p.LOAD+'      conversation.push(...archivedInput.map(normalizeChatMessage));\n'
+ def test_does_not_depend_on_unrelated_execution_mode_property(self):
+  source=self.source().replace('...(executionMode ? {} : {})','...(environment?.TASK_TREE_CONTEXT_NODE_ID ? {} : {})')
+  out,changed=p.patch(source);self.assertTrue(changed);self.assertIn('routing_context: routingContext',out);self.assertLess(out.index(p.LOAD),out.index(p.ANCHOR))
  def test_requires_known_owner(self):
   for source in ['',self.source()+p.LOAD,self.source().replace(p.ANCHOR,'unknown')]:
    with self.assertRaisesRegex(ValueError,'anchor|Expected'):p.patch(source)

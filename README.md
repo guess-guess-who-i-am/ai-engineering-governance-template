@@ -119,7 +119,7 @@ cd ai-engineering-governance-template
 
 Finder 右键 Quick Action 已纳入 macOS 安装测试，覆盖服务安装、文件夹输入类型、任意工作区部署、重复部署幂等和服务检查。
 
-194当前全量资源同步、专家读取、Linux平台边界及并发实测见 [194全局资源部署](docs/GLOBAL_RESOURCES_194_20261101.zh.md)。
+194最新全量资源、94个有效IDE入口统一、三轮Hook、真实模型/MCP与100路不同查询验收见 [194完整部署](docs/COMPLETE_194_DEPLOYMENT_20261108.zh.md)。此前资源同步与Linux平台边界见 [194全局资源部署](docs/GLOBAL_RESOURCES_194_20261101.zh.md)。
 
 IDE与当前本机Codex的指令、入口元数据预算、全局资源、V5 Hook及独立比对证据见 [配置一致性验收](docs/IDE_CODEX_PARITY_20261104.zh.md)。
 

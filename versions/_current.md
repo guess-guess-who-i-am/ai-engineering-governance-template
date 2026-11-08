@@ -10,15 +10,15 @@
 - Problem: 如何把仓库治理配置安装成 macOS 全局 Codex 行为，并让并发、Hook、路由和全部 Skill 真正可用？
 - Approach: IDE与Codex共用用户级配置、Skill正文、专家原包及GraphToolCall常驻服务；默认入口元数据和项目指令按Codex有效配置发现。独立就绪操作通常成批5–8路，危险或共享写入串行，失败回压；20仅为硬上限。
 - Input: 仓库中的 macOS profile、用户 Codex 目录和现有非敏感配置。
-- Output: 可迁移macOS配置、全局Skill安装源、常驻worker及右键服务；codex-profile/、安装全局配置.command，第三方库由私有skills-library恢复。
+- Output: 194全量部署、逐入口版本、资源读取、模型调用及并发验收；docs/COMPLETE_194_DEPLOYMENT_20261108.zh.md；docs/evidence/complete-194-deployment-20261108.json
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
 - Notes: 只支持 macOS；20 是硬上限。全局 Skill/MCP 经过 GraphToolCall；跨机重启、远程 HTTP MCP 目录发现尚未实测。本机、194与110默认Terra均通过真实终端工具测试，官方目录已接入；194与110 CLI为0.166.0，110保留xhigh；桌面界面未直接验证。
-- CurrentResult: 短追问28例目标命中0/28→23/28，与完整任务一致且无退化；45项解析、两机各100次错峰路由及3种IDE入口通过。Mac13个项目、194三个主项目已更新核对，隔离交付副本15项PR门禁通过；剩余5例为完整任务本身的推荐缺口。
-- RootCauseAnalysis: 历史解析漏判短追问且丢失助手方案，IDE又在Hook之后才加载历史；能力路由仍检查未解析短句。三处信息边界现已修复，图本身无需重建。
+- CurrentResult: 194全局资源与Mac校验零差异，94个有效IDE入口同版且保留原端口；4232模块、39原生Skill、Hook、真实MCP与模型读写通过，300次图请求全成功。部署验收与15项仓库门禁通过；不同查询P95仍约8.28秒，非全部专家业务验证。
+- RootCauseAnalysis: 漏部署来自仅更新主项目及磁盘、旧进程未重载；旧补丁还依赖无关字段，备份运行时缺模块。现统一有效入口并核验版本；77份注册表仅由原生规范化函数补加运行类型，正文与AGENTS未变。
 - CaseStudy:
   - case 1: 全部调用者超时→旧实现仍计算并缓存；新实现最后等待者取消排队任务，运行任务完成后丢弃结果。
   - case 2: 100路压测全成功但内存4.4–5.6GiB→功能与资源边界必须分开验收。
-- NextIdea: 针对完整任务仍未命中的5例，区分候选召回、排序和相关性标签原因，建立独立评测后再改推荐。
+- NextIdea: 新增Skill或MCP时走全局安装及持锁刷新，复验图、Hook和实际IDE入口。
 - SelectedSkills:
 
 # GraphState

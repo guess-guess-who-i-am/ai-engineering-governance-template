@@ -1,0 +1,324 @@
+{
+  "schema": "complete-194-deployment/1",
+  "generatedAt": "2026-11-08T01:01:37.975316+00:00",
+  "sourceBase": "593bc2352bcab6f180110bc374165f7bc65d76e5",
+  "sourceChanges": [
+    "scripts/patch-ide-routing-context.py",
+    "scripts/test-patch-ide-routing-context.py"
+  ],
+  "sourceReleaseNote": "Base archive plus the explicitly listed patcher fix; not a byte-identical base release. Final commit gets a separate immutable archive.",
+  "resources": {
+    "externalSkills": 15472,
+    "ownedGraphSkills": 25,
+    "graphSkills": 15497,
+    "resourceModules": 4232,
+    "experts": 447,
+    "resourceSkills": 3307,
+    "mcpDescriptors": 478,
+    "liveMcpTools": 23,
+    "graphNodes": 19752,
+    "checksums": {
+      "externalSkillsDiffLines": 0,
+      "resourcePackagesDiffLines": 0,
+      "ownedSkillsDiffLines": 0,
+      "rsyncExitCodes": [
+        0,
+        0,
+        0
+      ],
+      "exclusions": [
+        ".git",
+        ".DS_Store",
+        "._*",
+        ".env*",
+        "__pycache__",
+        "*.pyc"
+      ]
+    },
+    "allResourceReads": {
+      "passed": true,
+      "resourceCounts": {
+        "expert": 447,
+        "skill": 3307,
+        "mcp-service": 478
+      },
+      "totalReads": 4232,
+      "nativeSkillReads": 39,
+      "experts": {
+        "registered": 447,
+        "state": "registered",
+        "executionVerified": false
+      },
+      "errors": [],
+      "workflowExecuted": false
+    }
+  },
+  "services": {
+    "passed": true,
+    "inventoried": 149,
+    "existingProjects": 92,
+    "verifiedEndpoints": 94,
+    "directReplacements": 93,
+    "systemdReplacements": 1,
+    "originalPortsPreserved": true,
+    "missingProjectsRetained": 55,
+    "runtimeRevision": "9e0585dd8d81fa4a0f3cada0508f0a304c431a7183072533fd6c66ba69b78019",
+    "projectConfigsUpdated": 87,
+    "remoteMarkersUpdated": 3,
+    "treeAndAgentsContentChanges": 0,
+    "registryNormalizations": 77,
+    "registryNormalization": "Each original Git blob matches the predeployment hash; actual JSON equals owning normalizeTreeRegistry(original), only runtimeKind=parallel-run is added.",
+    "unexpectedChanges": [],
+    "systemd": {
+      "graph": "active, enabled",
+      "search": "active, enabled",
+      "linger": true,
+      "fullMachineRebootTested": false
+    },
+    "projectConfigsVerified": 88,
+    "finalHttp": {
+      "passed": true,
+      "endpoints": 94,
+      "concurrency": 8,
+      "memoryAvailableGiB": 47.9,
+      "activeRuns": 0
+    }
+  },
+  "hooks": {
+    "trustedEnabled": true,
+    "count": 2,
+    "workspaceRows": [
+      {
+        "workspace": 0,
+        "started": 1794099156146,
+        "ended": 1794099166219,
+        "nativeMetadataMatched": 39,
+        "agents": {
+          "enabled": true,
+          "configuredLimit": 20,
+          "hostLimit": 20
+        },
+        "cadence": [
+          true,
+          false,
+          false,
+          true
+        ]
+      },
+      {
+        "workspace": 1,
+        "started": 1794099156147,
+        "ended": 1794099166273,
+        "nativeMetadataMatched": 39,
+        "agents": {
+          "enabled": true,
+          "configuredLimit": 20,
+          "hostLimit": 20
+        },
+        "cadence": [
+          true,
+          false,
+          false,
+          true
+        ]
+      }
+    ],
+    "everyTurnRoutes": true
+  },
+  "graphConcurrency": {
+    "status": "PASS",
+    "warmupRequests": 8,
+    "waves": [
+      {
+        "name": "burst",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 62,
+        "p50Ms": 28.7,
+        "p95Ms": 46.7,
+        "maxMs": 48.6
+      },
+      {
+        "name": "staggered",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 18,
+        "p50Ms": 6.6,
+        "p95Ms": 13.0,
+        "maxMs": 15.0
+      },
+      {
+        "name": "distinct-burst",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 100,
+        "p50Ms": 4329.4,
+        "p95Ms": 8281.1,
+        "maxMs": 8938.1
+      }
+    ],
+    "retries": 0,
+    "modelQualityMeasured": false
+  },
+  "mcp": {
+    "context7Passed": true,
+    "researchSuccessful": 2,
+    "researchFailed": 0,
+    "httpRequests": 2,
+    "peakHttpRequests": 2,
+    "retrievalMs": 907.699796,
+    "providers": [
+      "github",
+      "stackoverflow"
+    ]
+  },
+  "model": {
+    "status": "completed",
+    "name": "gpt-6.1-sol",
+    "tools": 6,
+    "resourceNames": [
+      "dev-pipeline-orchestrator",
+      "documents:documents"
+    ],
+    "proofWrittenAndRead": true,
+    "allExpertBusinessWorkflowsTested": false
+  },
+  "scopeLimits": [
+    "55 missing project roots were not recreated or cleaned; their historical processes remain outside valid workspace deployment.",
+    "478 MCP descriptors do not mean 478 configured authorized services.",
+    "Mac desktop APIs, arm64 binaries and account permissions were not copied.",
+    "Checksum/readability verification is not business-quality verification for every expert or Skill.",
+    "100 distinct graph requests succeeded, but p95 is about 8.28 seconds, unlike cached repeats."
+  ],
+  "negativeEvidence": [
+    "Patcher initially rejected an unrelated executionMode difference; a failing regression test precedes the fix (7 tests pass).",
+    "The newly copied old backup lacked provider-circuit.js. It was never activated and was removed; all valid services use the verified canonical runtime.",
+    "Dry-run initially assumed an absolute server.js argv; /proc identity inspection showed relative argv, and the check now resolves cwd before matching. No service was changed by the failed dry-run.",
+    "The systemd-owned global search was restarted by its owning unit to avoid a competing direct process; the generic helper retained a stale-PID failure, superseded by 94 live endpoint revision checks.",
+    "The first conservative file-equality gate rejected 77 registry normalizations; all 77 were audited against original hashes and the owning function. The initial failed report is retained."
+  ],
+  "evidenceDirectory194": "~/.codex/cache/deploy-194-complete-20261108",
+  "artifacts": [
+    {
+      "name": "service-final.json",
+      "sha256": "a353285fb3c9d7851e73c9ac5ea56178b071e357445731f76aa0997f00dc4b6e"
+    },
+    {
+      "name": "service-final-initial.json",
+      "sha256": "3a33c399f81a1f3593e401faa6e972adc5771af317ed7108af23fc7798728393"
+    },
+    {
+      "name": "registry-normalization-audit.json",
+      "sha256": "5b9f8ccf2ed0d8b22c6e01cae654b615f92a74fc918045b9dc13ffb4d9b0ab6a"
+    },
+    {
+      "name": "graph-concurrency.json",
+      "sha256": "452f6167a9dfa0f07ec5f7612c01236af0ec6f213e44fd7c2b6809d6fe0f331f"
+    },
+    {
+      "name": "all-resource-reads.json",
+      "sha256": "e917859908c99eed2fca91e10b4959f27c44cd84c280684a7f2135200aa587b5"
+    },
+    {
+      "name": "ide-parity.json",
+      "sha256": "03fc6e729c2c9ad06ddb3dc2da1f7dd12788503afd9ef5f30728f3f7c57a510d"
+    },
+    {
+      "name": "model-smoke.json",
+      "sha256": "2152141ef9bc774ca767e07b301c78b8ca529cec6104663c531b3458f3ee1c0a"
+    },
+    {
+      "name": "global-e2e.json",
+      "sha256": "73d29cdc6cee03f65f0d73ca1d2ffc634db725b992580ce9e50eb0252d2408dc"
+    },
+    {
+      "name": "research-mcp.json",
+      "sha256": "401e90137620dc1db34e52265bfae7c88be62a9880822ac6ad0daa80ac340286"
+    },
+    {
+      "name": "all-runtime-tests.json",
+      "sha256": "482d9d60e45f0290dd7ed41bba29507370b46e00a90b91804ad310c6a67b1b9c"
+    },
+    {
+      "name": "runtime-deployment.json",
+      "sha256": "ac1a64659751f83d3be48f495547034a3b272937399197a022250245afe2a0f2"
+    },
+    {
+      "name": "http-final.json",
+      "sha256": "f4237ff8fc53318f840554badd9fca3222060e14b628a1e1ce39533b6d5613f1"
+    }
+  ],
+  "repositoryVerification": {
+    "profile": "pr",
+    "status": "passed",
+    "gateCount": 15,
+    "gateResults": [
+      {
+        "id": "governance-structure",
+        "status": "passed"
+      },
+      {
+        "id": "skill-packages",
+        "status": "passed"
+      },
+      {
+        "id": "findings-contract",
+        "status": "passed"
+      },
+      {
+        "id": "quality-runner-contract",
+        "status": "passed"
+      },
+      {
+        "id": "design-reference-catalog",
+        "status": "passed"
+      },
+      {
+        "id": "kest-flow-contract",
+        "status": "passed"
+      },
+      {
+        "id": "document-integrity",
+        "status": "passed"
+      },
+      {
+        "id": "release-contract",
+        "status": "passed"
+      },
+      {
+        "id": "story-traceability",
+        "status": "passed"
+      },
+      {
+        "id": "template-bootstrap",
+        "status": "passed"
+      },
+      {
+        "id": "security-baseline",
+        "status": "passed"
+      },
+      {
+        "id": "qualitative-adapter-contract",
+        "status": "passed"
+      },
+      {
+        "id": "accessibility-tests",
+        "status": "passed"
+      },
+      {
+        "id": "performance-regression",
+        "status": "passed"
+      },
+      {
+        "id": "deployment-smoke",
+        "status": "passed"
+      }
+    ],
+    "environment": "Isolated Git snapshot including scoped changes, preserving 56 unrelated working-tree deletions in the real checkout.",
+    "patchTests": 7,
+    "routingContextTests": 45,
+    "focusedTestsPassed": true,
+    "compactGate": "Passed via actual shared Kit using TASK_TREE_KIT_DIR; default wrapper points to an absent sibling checkout.",
+    "qualityReportSha256": "81dd8fb0ca2b3427aab91d5b0a1fca6b939862c1d3dc714d6dc1acfb074e5f39"
+  }
+}
