@@ -38,7 +38,7 @@ jobs:
       - name: Test real GraphToolCall worker and candidate pool
         run: |
           python3 -m venv .tools/graph-worker-tests
-          .tools/graph-worker-tests/bin/python -m pip install 'graph-tool-call==0.46.0' 'httpx==0.28.1'
+          .tools/graph-worker-tests/bin/python -m pip install 'graph-tool-call[embedding]==0.46.0' 'sentence-transformers==6.1.0' 'httpx==0.28.1'
           .tools/graph-worker-tests/bin/python scripts/test-graph-worker.py
           .tools/graph-worker-tests/bin/python scripts/test-artifact-relations.py
           .tools/graph-worker-tests/bin/python scripts/test-semantic-relations.py
