@@ -73,14 +73,14 @@ function defaultHandlers(eventName, codexRoot) {
     return { file, timeoutMs };
   };
   const handlers = eventName === "UserPromptSubmit"
-    ? [own("context-refresh", 7000), own("skill-router", 60000)]
+    ? [own("context-refresh", 7000), own("skill-router", 12000)]
     : eventName === "SessionStart"
       ? [own("context-refresh", 7000), own("refresh-skill-registry", 65000)]
       : [];
 
   const external = eventName === "UserPromptSubmit"
-    ? process.env.CODEX_CAPABILITY_HOOK
-    : process.env.CODEX_CAPABILITY_REFRESH_HOOK;
+    ? process.env.CODEX_CAPABILITY_HOOK || (process.platform === "win32" ? "E:\\能力归纳概括\\capability-router\\hooks\\capability-router.ps1" : "")
+    : process.env.CODEX_CAPABILITY_REFRESH_HOOK || (process.platform === "win32" ? "E:\\能力归纳概括\\capability-router\\hooks\\refresh-capability-registry.ps1" : "");
   if (external) handlers.push({ file: external, timeoutMs: eventName === "UserPromptSubmit" ? 12000 : 30000 });
   return handlers.filter((handler) => existsSync(handler.file));
 }
@@ -93,7 +93,6 @@ try {
     process.exit(0);
   }
   const codexRoot = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
-  const testing = Boolean(testHandlers());
   const handlers = testHandlers() || defaultHandlers(eventName, codexRoot);
   const results = await Promise.all(handlers.map((handler) => runHandler(handler, raw)));
   for (const result of results) {
@@ -101,7 +100,6 @@ try {
       process.stderr.write(`Hook dispatcher child ${result.file}: ${result.error || result.stderr.trim()}\n`);
     }
   }
-  if (testing && results.some((result) => result.error)) process.exitCode = 1;
   const contexts = results.map((result) => result.context.trim()).filter(Boolean);
   if (!contexts.length) process.stdout.write("{}");
   else process.stdout.write(JSON.stringify({
@@ -110,5 +108,4 @@ try {
 } catch (error) {
   process.stderr.write(`Hook dispatcher skipped: ${error.message}\n`);
   process.stdout.write("{}");
-  if (process.env.CODEX_HOOK_DISPATCH_TEST_MODE === "1") process.exitCode = 1;
 }

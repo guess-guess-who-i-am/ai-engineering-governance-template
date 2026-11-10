@@ -2,23 +2,21 @@
 
 > 这个文件是大模型和前端共同维护的任务图。每个项目一棵独立的树。
 
-## ROOT - macOS 全局 Codex 治理配置
+## ROOT - <填写你的项目目标>
 
 - Position: 120,120
 - Size: 400,520
-- Completion: 进行中
-- Problem: 如何把仓库治理配置安装成 macOS 全局 Codex 行为，并让并发、Hook、路由和全部 Skill 真正可用？
-- Approach: IDE与Codex共用用户级配置、Skill正文、专家原包及GraphToolCall常驻服务；默认入口元数据和项目指令按Codex有效配置发现。独立就绪操作通常成批5–8路，危险或共享写入串行，失败回压；20仅为硬上限。
-- Input: 仓库中的 macOS profile、用户 Codex 目录和现有非敏感配置。
-- Output: 194全量部署、逐入口版本、资源读取、模型调用及并发验收；docs/COMPLETE_194_DEPLOYMENT_20261108.zh.md；docs/evidence/complete-194-deployment-20261108.json
-- Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。
-- Notes: 只支持 macOS；20 是硬上限。全局 Skill/MCP 经过 GraphToolCall；跨机重启、远程 HTTP MCP 目录发现尚未实测。本机、194与110默认Terra均通过真实终端工具测试，官方目录已接入；194与110 CLI为0.166.0，110保留xhigh；桌面界面未直接验证。
-- CurrentResult: 194全局资源与Mac校验零差异，94个有效IDE入口同版且保留原端口；4232模块、39原生Skill、Hook、真实MCP与模型读写通过，300次图请求全成功。部署验收与15项仓库门禁通过；不同查询P95仍约8.28秒，非全部专家业务验证。
-- RootCauseAnalysis: 默认README旧是因为已部署分支未合并main。干净CI缺少NumPy及完整向量依赖，而正式安装器已包含；现CI与正式依赖声明一致，49项Python和14项Node回归通过。
+- Completion: 已完成
+- Problem: 如何让用户通过 Codex 逐项填写项目资料，并一键生成独立私有 GitHub 项目？
+- Approach: 先生成简短项目 brief，再用确定性脚本复制最小治理骨架、初始化 Git，并可选创建私有 GitHub 仓库；模型只负责澄清，不直接处理密钥。
+- Input: 当前治理模板、GitHub CLI 登录状态、用户的项目想法。
+- Output: 可执行的新项目向导、项目 brief、私有仓库初始化结果。
+- Metrics: 向导可重复运行；缺少必填信息时停止；新目录可通过基础检查；GitHub 创建失败不丢失本地项目。
+- Notes: 第一次使用时，请让 Agent 拆成 3-7 个节点；节点不写代码、原始数据或复杂英文术语。
+- CurrentResult: 完整工程仍已在私有 main；根 README 现已补齐配置组成、55条归类、6个自建方法 Skills、凭据边界、跨电脑安装、其他项目继承和后续同步流程。文件计数、方法论解析、文档、治理与秘密扫描均通过，“完整说明写入 README”目标已达到。
+- RootCauseAnalysis: 生成器必须从已提交模板导出，才能隔离母仓库未提交内容；定性 LLM 门禁默认排除，避免缺少新仓库 Secrets 时首推失败。
 - CaseStudy:
-  - case 1: 全部调用者超时→旧实现仍计算并缓存；新实现最后等待者取消排队任务，运行任务完成后丢弃结果。
-  - case 2: 100路压测全成功但内存4.4–5.6GiB→功能与资源边界必须分开验收。
-- NextIdea: 通过PR第28号的干净环境CI后，将全局路由分支完整合并main并核对README。
+- NextIdea: 在另一台 Windows 电脑克隆私有仓库并运行安装脚本，再分别登录 GitHub 与 Codex。
 - SelectedSkills:
 
 # GraphState
