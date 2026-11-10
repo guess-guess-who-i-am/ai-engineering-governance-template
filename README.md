@@ -44,7 +44,7 @@
 
 ## 跨电脑复用 Codex 全局配置
 
-当前完整工程保存在公开仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是 `main`。`codex-profile/` 是本机 macOS 全局 Codex 配置的可迁移版本；安装后 Skill 只从用户级目录加载，不从项目目录加载。
+当前完整工程保存在公开仓库 `guess-guess-who-i-am/ai-engineering-governance-template`，默认分支是受保护的 `main`。`codex-profile/` 是本机 macOS 全局 Codex 配置的可迁移版本；安装后 Skill 只从用户级目录加载，不从项目目录加载。
 
 ### 仓库中具体保存了什么
 
@@ -70,7 +70,7 @@
 
 ### 在 macOS 安装
 
-完整macOS配置、全局路由与部署说明现已合并到默认 `main` 分支。下载后双击仓库根目录 **安装全局配置.command**，安装成功后即可使用持久的Finder右键部署入口；不用手输脚本。缺少15k+Skill库时会自动从独立私有仓库拉取固定版本，需先在新电脑授权GitHub读取该库。图索引会按目标机实际路径重建，常驻worker与候选池随后由Hook启动。完整迁移范围与凭据边界见 `codex-profile/README.zh.md`。
+当前完整macOS版本位于 `codex/macos-global-deploy` 分支。下载后双击仓库根目录 **安装全局配置.command**，安装成功后即可使用持久的Finder右键部署入口；不用手输脚本。缺少15k+Skill库时会自动从独立私有仓库拉取固定版本，需先在新电脑授权GitHub读取该库。图索引会按目标机实际路径重建，常驻worker与候选池随后由Hook启动。完整迁移范围与凭据边界见 `codex-profile/README.zh.md`。
 
 先安装 Git、GitHub CLI、Codex，并确保 Codex 自带 Node.js 可用，然后运行：
 
@@ -113,7 +113,7 @@ cd ai-engineering-governance-template
 ./scripts/test-codex-profile-mac.sh
 ```
 
-4. 检查 diff 和秘密扫描结果，再通过 PR 合并到公开 `main`。另一台电脑之后拉取最新 `main` 并重新运行安装脚本即可更新。
+4. 检查 diff 和秘密扫描结果，再通过 PR 合并到受保护的公开 `main`。另一台电脑之后拉取最新 `main` 并重新运行安装脚本即可更新。
 
 安装测试覆盖：一键部署、全新用户目录安装、旧配置备份、非敏感配置合并、macOS Node 路径生成、25个全局 Skills 安装、全局-only 注册表、系统/任务树路由输入、自适应调度契约、Hook 重叠执行和失败回滚。独立调度器测试覆盖 DAG 顺序、4路真实重叠、失败/超时回压、危险任务串行和20路硬上限；完整仓库门禁由 macOS GitHub Actions 执行。
 
