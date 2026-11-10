@@ -36,7 +36,7 @@ macOS 检索使用共享 Unix socket 入口和4个常驻检索进程，同一用
 
 ## 在 macOS 安装
 
-下载本仓库的 `codex/macos-global-deploy` 分支，双击根目录的 **安装全局配置.command**。首次安装后会提供持久的 Finder 右键“快速操作 → 部署 Codex 全局配置”。无需手输部署命令；首次下载15k+库、Python依赖与embedding模型需要联网。先在目标电脑登录 Codex，并通过 `gh auth login` 与 `gh auth setup-git` 授权读取私有 Skill 库，或提供已有的库副本。
+下载本仓库的默认 `main` 分支，双击根目录的 **安装全局配置.command**。首次安装后会提供持久的 Finder 右键“快速操作 → 部署 Codex 全局配置”。无需手输部署命令；首次下载15k+库、Python依赖与embedding模型需要联网。先在目标电脑登录 Codex，并通过 `gh auth login` 与 `gh auth setup-git` 授权读取私有 Skill 库，或提供已有的库副本。
 
 部署优先复用已有库；没有库时自动从私有Git仓库 `guess-guess-who-i-am/skills-library` 拉取 `portable-dependencies.json` 固定的commit，并校验目录SHA-256。访问失败会明确终止完整部署，不会默默只安装25个Skill。
 
