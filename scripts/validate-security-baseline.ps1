@@ -5,5 +5,6 @@ param(
 
 $ErrorActionPreference = 'Stop'
 & (Join-Path $Root 'scripts/scan-secrets.ps1') -Root $Root
+& (Join-Path $Root 'scripts/test-secret-scanner.ps1') -Root $Root
 & (Join-Path $Root 'scripts/validate-workflows.ps1') -Root $Root
 Write-Output 'Security baseline passed.'

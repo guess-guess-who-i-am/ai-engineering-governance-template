@@ -1,0 +1,277 @@
+{
+  "schemaVersion": "artifact-relations-evidence/1",
+  "scope": "Conditional complementary recommendation, not general task success or format compatibility",
+  "ab": {
+    "baselinePartnerHits": 2,
+    "candidatePartnerHits": 2,
+    "baselineAssistedHits": 2,
+    "candidateAssistedHits": 6,
+    "holdoutRegressions": [],
+    "limitations": [
+      "Targeted queries name the producer; measures complementary recommendation, not general task completion.",
+      "One pass per condition; no latency confidence interval or broad accuracy claim."
+    ]
+  },
+  "targetedCases": [
+    {
+      "id": "concept-to-strategy",
+      "query": "edge-concept-synthesizer",
+      "target": "edge-strategy-designer",
+      "partnerRank": 5,
+      "primaryFound": true,
+      "linkedPartners": [
+        "edge-strategy-designer"
+      ],
+      "assistedHit": true
+    },
+    {
+      "id": "schema-to-appendix",
+      "query": "table-schema",
+      "target": "appendix-table-writer",
+      "partnerRank": null,
+      "primaryFound": true,
+      "linkedPartners": [
+        "outline-builder",
+        "appendix-table-writer"
+      ],
+      "assistedHit": true
+    },
+    {
+      "id": "outline-to-evidence",
+      "query": "outline-builder",
+      "target": "claim-evidence-matrix",
+      "partnerRank": null,
+      "primaryFound": true,
+      "linkedPartners": [
+        "citation-diversifier",
+        "claim-evidence-matrix",
+        "table-schema"
+      ],
+      "assistedHit": true
+    },
+    {
+      "id": "modules-to-slides",
+      "query": "module-planner",
+      "target": "beamer-scaffold",
+      "partnerRank": null,
+      "primaryFound": true,
+      "linkedPartners": [
+        "beamer-scaffold"
+      ],
+      "assistedHit": true
+    },
+    {
+      "id": "finance-to-explanation",
+      "query": "finance-core-analysis",
+      "target": "finance-beginner-explainer",
+      "partnerRank": 8,
+      "primaryFound": true,
+      "linkedPartners": [
+        "finance-beginner-explainer"
+      ],
+      "assistedHit": true
+    },
+    {
+      "id": "control-to-qa",
+      "query": "create-control-manifest",
+      "target": "qa-plan",
+      "partnerRank": null,
+      "primaryFound": true,
+      "linkedPartners": [
+        "qa-plan"
+      ],
+      "assistedHit": true
+    }
+  ],
+  "holdout": {
+    "queries": 28,
+    "before": 21,
+    "after": 21
+  },
+  "intentReview": {
+    "cases": 11,
+    "possibleHandoffsAccepted": 9,
+    "knownGood": "pass",
+    "knownBad": "fail",
+    "protocol": "Shuffled source excerpts; no expected labels; require quotes from both declarations; no tools."
+  },
+  "deployments": {
+    "mac": {
+      "graphSha256": "607cdb354078b886a96da7df07fc493fc9f5326862516691ba723f173524824e",
+      "workerSha256": "bab077794116db6655ad308ce51db4df07b0d7e9bbb250f1303c5fd22d9c5019",
+      "routerSha256": "1ef81080eacbb6d20d51cff0dae04a79466a023d76a77d566368a36c719f7ce8",
+      "published": true,
+      "hookWave": {
+        "members": [
+          "edge-concept-synthesizer",
+          "table-schema",
+          "outline-builder",
+          "module-planner",
+          "finance-core-analysis",
+          "create-control-manifest"
+        ],
+        "width": 6,
+        "allOverlapped": true,
+        "successful": 6,
+        "retries": 0,
+        "timeouts": 0,
+        "skippedConsumers": [],
+        "observations": [
+          {
+            "producer": "edge-concept-synthesizer",
+            "target": "edge-strategy-designer",
+            "seconds": 0.396,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 96793.622962208,
+            "end": 96794.019127916
+          },
+          {
+            "producer": "table-schema",
+            "target": "appendix-table-writer",
+            "seconds": 0.449,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 96793.623087458,
+            "end": 96794.071835
+          },
+          {
+            "producer": "outline-builder",
+            "target": "claim-evidence-matrix",
+            "seconds": 0.38,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 96793.623203333,
+            "end": 96794.003214916
+          },
+          {
+            "producer": "module-planner",
+            "target": "beamer-scaffold",
+            "seconds": 0.386,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 96793.623314125,
+            "end": 96794.009610041
+          },
+          {
+            "producer": "finance-core-analysis",
+            "target": "finance-beginner-explainer",
+            "seconds": 0.485,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 96793.627601083,
+            "end": 96794.112446
+          },
+          {
+            "producer": "create-control-manifest",
+            "target": "qa-plan",
+            "seconds": 0.375,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 96793.628120125,
+            "end": 96794.003344625
+          }
+        ]
+      }
+    },
+    "194": {
+      "graphSha256": "a4fec036e1fc5576db47055e4fadb39a0f7fb9c50b2a131525ee28f42950b58b",
+      "workerSha256": "bab077794116db6655ad308ce51db4df07b0d7e9bbb250f1303c5fd22d9c5019",
+      "routerSha256": "1ef81080eacbb6d20d51cff0dae04a79466a023d76a77d566368a36c719f7ce8",
+      "published": true,
+      "hookWave": {
+        "members": [
+          "edge-concept-synthesizer",
+          "table-schema",
+          "outline-builder",
+          "module-planner",
+          "finance-core-analysis",
+          "create-control-manifest"
+        ],
+        "width": 6,
+        "allOverlapped": true,
+        "successful": 6,
+        "retries": 0,
+        "timeouts": 0,
+        "skippedConsumers": [],
+        "observations": [
+          {
+            "producer": "edge-concept-synthesizer",
+            "target": "edge-strategy-designer",
+            "seconds": 0.843,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 1555533.913702077,
+            "end": 1555534.756277388
+          },
+          {
+            "producer": "table-schema",
+            "target": "appendix-table-writer",
+            "seconds": 0.393,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 1555533.914392775,
+            "end": 1555534.307719841
+          },
+          {
+            "producer": "outline-builder",
+            "target": "claim-evidence-matrix",
+            "seconds": 0.446,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 1555533.915488091,
+            "end": 1555534.361317638
+          },
+          {
+            "producer": "module-planner",
+            "target": "beamer-scaffold",
+            "seconds": 0.51,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 1555533.915944234,
+            "end": 1555534.42592785
+          },
+          {
+            "producer": "finance-core-analysis",
+            "target": "finance-beginner-explainer",
+            "seconds": 0.551,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 1555533.916689481,
+            "end": 1555534.467236231
+          },
+          {
+            "producer": "create-control-manifest",
+            "target": "qa-plan",
+            "seconds": 0.722,
+            "exitCode": 0,
+            "primaryFound": true,
+            "handoffFound": true,
+            "start": 1555533.917152206,
+            "end": 1555534.639158771
+          }
+        ]
+      }
+    }
+  },
+  "checks": {
+    "artifactRelations": 12,
+    "socketWorker": 16,
+    "resourceWorker": 9,
+    "publication": 11,
+    "portableResources": 2,
+    "repositoryPrGates": 15,
+    "macInstaller": "passed"
+  }
+}

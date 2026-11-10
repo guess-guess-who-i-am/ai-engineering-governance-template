@@ -5,9 +5,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $patterns = @(
-    'gh[pousr]_[A-Za-z0-9]{20,}',
-    'sk-[A-Za-z0-9_-]{20,}',
-    'AKIA[0-9A-Z]{16}',
+    '(?<![A-Za-z0-9_-])gh[pousr]_[A-Za-z0-9]{20,}',
+    '(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_-]{20,}',
+    '(?<![A-Za-z0-9_-])AKIA[0-9A-Z]{16}',
     '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----'
 )
 

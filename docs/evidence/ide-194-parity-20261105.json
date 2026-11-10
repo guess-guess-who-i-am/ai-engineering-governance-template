@@ -1,0 +1,420 @@
+{
+  "date": "2026-11-05",
+  "scope": "194 Linux deployment and actual IDE resource consumers",
+  "services": {
+    "passed": true,
+    "revision": "3b1797e5623d5e2a1fafddeadb4399b2b5005f9784b3c94d2da4c0af8a1a98d4",
+    "rows": [
+      {
+        "root": "/home/hyf/memes",
+        "port": 37643,
+        "pid": 2350299,
+        "runtimeRevision": "3b1797e5623d5e2a1fafddeadb4399b2b5005f9784b3c94d2da4c0af8a1a98d4"
+      },
+      {
+        "root": "/home/hyf/platform1_new",
+        "port": 36085,
+        "pid": 2350366,
+        "runtimeRevision": "3b1797e5623d5e2a1fafddeadb4399b2b5005f9784b3c94d2da4c0af8a1a98d4"
+      },
+      {
+        "root": "/data/hyf/ctms",
+        "port": 36411,
+        "pid": 2350632,
+        "runtimeRevision": "3b1797e5623d5e2a1fafddeadb4399b2b5005f9784b3c94d2da4c0af8a1a98d4"
+      }
+    ]
+  },
+  "consumer": {
+    "passed": true,
+    "modelWorkflowExecuted": false,
+    "waveWidth": 2,
+    "retries": 0,
+    "timeouts": 0,
+    "skipped": 0,
+    "runtime": "/home/hyf/.codex/tools/llm-task-tree-kit/server/agent-runtime.js",
+    "sourceHashes": {
+      "agent-runtime.js": "227ea8e6368a4050e0ed97842542e029098f64bf31b738548161367b966b8b4a",
+      "codex-resource-parity.js": "f06f87e2b8469bbcbe81be214fef428cc3fba9df625d3b82c56a1531086a9af9",
+      "global-execution-profile.js": "851c98aebf798e383825bcd7bee2c8530bf2e61a9430620e1f6d14ed085d12f9",
+      "external-skill-catalog.js": "19ef9da9346becfd10c2eb38d3a884ecf9c8341b910cb0d89c89a5f2d5723e20",
+      "global-mcp.js": "22fbabdde1224dc678e391111dee0fe8354cfd336fc12fd7c3f3f6f3915300e1"
+    },
+    "graph": {
+      "skills": 15497,
+      "resources": 4232,
+      "mcpTools": 23
+    },
+    "rows": [
+      {
+        "workspace": 0,
+        "started": 1793856764839,
+        "ended": 1793856774306,
+        "nativeMetadataMatched": 37,
+        "configSha256": "0c933536b2d154f119059872eb7e041c48364dd441a891a453171852f82d1519",
+        "instructionSources": [
+          "/home/hyf/.codex/AGENTS.md"
+        ],
+        "hookSources": [
+          "/home/hyf/.codex/hooks.json"
+        ],
+        "skillCatalog": {
+          "source": "codex-app-server-skills/list",
+          "total": 37,
+          "included": 37,
+          "omitted": 0,
+          "truncatedDescriptions": 36,
+          "mode": "characters",
+          "limit": 8000,
+          "used": 8000,
+          "errors": []
+        },
+        "agents": {
+          "enabled": true,
+          "configuredLimit": 20,
+          "hostLimit": 20
+        },
+        "experts": 447,
+        "cadence": [
+          true,
+          false,
+          false,
+          true
+        ]
+      },
+      {
+        "workspace": 1,
+        "started": 1793856764840,
+        "ended": 1793856774205,
+        "nativeMetadataMatched": 37,
+        "configSha256": "0c933536b2d154f119059872eb7e041c48364dd441a891a453171852f82d1519",
+        "instructionSources": [
+          "/home/hyf/.codex/AGENTS.md"
+        ],
+        "hookSources": [
+          "/home/hyf/.codex/hooks.json"
+        ],
+        "skillCatalog": {
+          "source": "codex-app-server-skills/list",
+          "total": 37,
+          "included": 37,
+          "omitted": 0,
+          "truncatedDescriptions": 36,
+          "mode": "characters",
+          "limit": 8000,
+          "used": 8000,
+          "errors": []
+        },
+        "agents": {
+          "enabled": true,
+          "configuredLimit": 20,
+          "hostLimit": 20
+        },
+        "experts": 447,
+        "cadence": [
+          true,
+          false,
+          false,
+          true
+        ]
+      }
+    ]
+  },
+  "resourceReads": {
+    "passed": true,
+    "resourceCounts": {
+      "expert": 447,
+      "skill": 3307,
+      "mcp-service": 478
+    },
+    "totalReads": 4232,
+    "nativeSkillReads": 37,
+    "experts": {
+      "registered": 447,
+      "state": "registered",
+      "executionVerified": false
+    },
+    "errors": [],
+    "workflowExecuted": false
+  },
+  "graphLoad": {
+    "status": "PASS",
+    "newSkillsRetrievedThroughGraph": true,
+    "warmup": [
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      },
+      {
+        "ok": true
+      }
+    ],
+    "waves": [
+      {
+        "name": "burst",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 52,
+        "p50Ms": 19.8,
+        "p95Ms": 29.2,
+        "maxMs": 30.1
+      },
+      {
+        "name": "staggered",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 19,
+        "p50Ms": 6.5,
+        "p95Ms": 13.7,
+        "maxMs": 14.9
+      }
+    ],
+    "retries": 0,
+    "modelQualityMeasured": false
+  },
+  "vectorReuse": {
+    "schemaVersion": "exact-text-vector-reuse/1",
+    "sourceSha256": "215ed6964044554a8599202768ae84804a50525da91245511faed92ecf613273",
+    "graphSha256": "2eef12c6d49639dc1e3179bec6e2f8dfabfbba8912d7cd8c16d6394fb429074d",
+    "seconds": 146.346,
+    "encoding": [
+      {
+        "model": "sentence-transformers/all-MiniLM-L6-v2",
+        "documents": 19752,
+        "newUniqueTexts": 1,
+        "seconds": 3.9365
+      },
+      {
+        "model": "paraphrase-multilingual-MiniLM-L12-v2",
+        "documents": 19752,
+        "newUniqueTexts": 1,
+        "seconds": 2.057
+      },
+      {
+        "model": "sentence-transformers/all-MiniLM-L6-v2",
+        "documents": 19412,
+        "newUniqueTexts": 1,
+        "seconds": 0.1433
+      },
+      {
+        "model": "paraphrase-multilingual-MiniLM-L12-v2",
+        "documents": 19457,
+        "newUniqueTexts": 1,
+        "seconds": 2.836
+      }
+    ],
+    "localIndexerUsed": true,
+    "sourceGraphUnchanged": true
+  },
+  "hookTrust": {
+    "data": [
+      {
+        "cwd": "/tmp",
+        "hooks": [
+          {
+            "key": "/home/hyf/.codex/hooks.json:session_start:0:0",
+            "eventName": "sessionStart",
+            "handlerType": "command",
+            "command": "'/home/hyf/.local/bin/node' '/home/hyf/.codex/hooks/hook-dispatch.mjs'",
+            "async": false,
+            "matcher": "^(startup|resume|clear|compact)$",
+            "timeoutSec": 70,
+            "statusMessage": "Restoring reminders and refreshing indexes in parallel",
+            "additionalContextLimit": 15000,
+            "sourcePath": "/home/hyf/.codex/hooks.json",
+            "source": "user",
+            "pluginId": null,
+            "environmentId": null,
+            "displayOrder": 0,
+            "enabled": true,
+            "isManaged": false,
+            "currentHash": "sha256:6179e2a666871cc7270834d78bae19f8ffe54711351eb1ec5bca78d374931598",
+            "trustStatus": "trusted"
+          },
+          {
+            "key": "/home/hyf/.codex/hooks.json:user_prompt_submit:0:0",
+            "eventName": "userPromptSubmit",
+            "handlerType": "command",
+            "command": "'/home/hyf/.local/bin/node' '/home/hyf/.codex/hooks/hook-dispatch.mjs'",
+            "async": false,
+            "matcher": null,
+            "timeoutSec": 60,
+            "statusMessage": "Loading reminders and routing in parallel",
+            "additionalContextLimit": 18000,
+            "sourcePath": "/home/hyf/.codex/hooks.json",
+            "source": "user",
+            "pluginId": null,
+            "environmentId": null,
+            "displayOrder": 1,
+            "enabled": true,
+            "isManaged": false,
+            "currentHash": "sha256:7f42219c4c72e51d49bfa172c983448ef67e2c3efaa1648f1c1b0d9f83d3f588",
+            "trustStatus": "trusted"
+          }
+        ],
+        "warnings": [],
+        "errors": []
+      }
+    ]
+  },
+  "regressions": {
+    "core": {
+      "passed": 20,
+      "tests": 20,
+      "skipped": 0
+    },
+    "capacityAndToolWaves": {
+      "passed": 15,
+      "tests": 15
+    }
+  },
+  "modelSmoke": {
+    "status": "completed",
+    "model": "gpt-6.1-sol",
+    "toolCount": 5,
+    "tools": [
+      {
+        "round": 1,
+        "toolCallId": "call_a076fc1e65d6469d843de9970bbf811c",
+        "toolName": "skills_list",
+        "startedAt": "2026-11-05T05:16:59.850Z",
+        "preHookMs": 6,
+        "executeMs": 672,
+        "postHookMs": 3,
+        "durationMs": 682,
+        "imageSource": "skills_list",
+        "imageInputs": 0,
+        "endedAt": "2026-11-05T05:17:00.532Z"
+      },
+      {
+        "round": 2,
+        "toolCallId": "call_fa68a3e026d541d1a0baa978cc5ca647",
+        "toolName": "skills_list",
+        "startedAt": "2026-11-05T05:17:06.704Z",
+        "preHookMs": 3,
+        "executeMs": 174,
+        "postHookMs": 2,
+        "durationMs": 179,
+        "imageSource": "skills_list",
+        "imageInputs": 0,
+        "endedAt": "2026-11-05T05:17:06.883Z"
+      },
+      {
+        "round": 3,
+        "toolCallId": "call_a9a2c887ad0a4f309a5f9f31ae7957e1",
+        "toolName": "skills_read",
+        "startedAt": "2026-11-05T05:17:12.659Z",
+        "preHookMs": 2,
+        "executeMs": 7,
+        "postHookMs": 3,
+        "durationMs": 13,
+        "imageSource": "skills_read",
+        "imageInputs": 0,
+        "endedAt": "2026-11-05T05:17:12.672Z"
+      },
+      {
+        "round": 3,
+        "toolCallId": "call_124bc5bdecfe4ba8b0605ee7d66bb300",
+        "toolName": "skills_read",
+        "startedAt": "2026-11-05T05:17:12.660Z",
+        "preHookMs": 4,
+        "executeMs": 5,
+        "postHookMs": 5,
+        "durationMs": 14,
+        "imageSource": "skills_read",
+        "imageInputs": 0,
+        "endedAt": "2026-11-05T05:17:12.674Z"
+      },
+      {
+        "round": 4,
+        "toolCallId": "call_8913c229de98461086797a45dc7ff908",
+        "toolName": "exec_command",
+        "startedAt": "2026-11-05T05:17:25.670Z",
+        "preHookMs": 1,
+        "executeMs": 46,
+        "postHookMs": 2,
+        "durationMs": 49,
+        "imageSource": "exec_command",
+        "imageInputs": 0,
+        "endedAt": "2026-11-05T05:17:25.719Z"
+      }
+    ],
+    "proof": {
+      "resources": [
+        {
+          "name": "dev-pipeline-orchestrator",
+          "quote": "你像导演而非演员：判断当前处在流水线的哪一环，把合适的上下文交给合适的执行者，再用客观证据确认它真的做完了。"
+        },
+        {
+          "name": "documents:documents",
+          "quote": "DOCX text extraction (or reading XML) will miss layout defects: clipping, overlap, missing glyphs, broken tables, spacing drift, and header/footer issues."
+        }
+      ]
+    },
+    "totalMs": 51380,
+    "businessExpertWorkflowExecuted": false
+  },
+  "context7": {
+    "passed": true,
+    "mode": "anonymous-readonly-live",
+    "errors": []
+  },
+  "researchMcp": {
+    "status": "ok",
+    "successfulOperations": 2,
+    "operations": [
+      {
+        "source": "github",
+        "status": "ok",
+        "httpStatus": 200,
+        "returnedCount": 1
+      },
+      {
+        "source": "crossref",
+        "status": "ok",
+        "httpStatus": 200,
+        "returnedCount": 3
+      }
+    ]
+  },
+  "librarySync": {
+    "externalDifferenceOnly": "3 Finder .DS_Store files",
+    "resourcePackageDifferences": 0
+  },
+  "limitations": [
+    "No blanket execution/authorization claim for 478 MCP service descriptors",
+    "No complete business workflow for every expert",
+    "Mac native node_repl and desktop APIs require platform host",
+    "No whole-machine reboot test"
+  ],
+  "commonSettings": {
+    "codexModel": "gpt-6.1-terra",
+    "reasoningEffort": "high",
+    "ideModel": "gpt-6.1-sol",
+    "agentLimit": 20,
+    "allowLoginShell": true,
+    "webSearch": "live",
+    "platformDifferences": [
+      "Linux explicitly enables plugin discovery",
+      "Existing Linux execution authorization retained",
+      "No Mac-native node_repl or desktop private APIs"
+    ]
+  }
+}

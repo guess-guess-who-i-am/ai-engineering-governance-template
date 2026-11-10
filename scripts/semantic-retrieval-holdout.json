@@ -1,0 +1,19 @@
+{
+  "schemaVersion":"semantic-retrieval-holdout/1",
+  "frozenBeforeFinalCandidateQueries":true,
+  "cases":[
+    {"id":"clinical-cleaning","targets":["clinical-data-cleaner"],"en":"Clean clinical trial records and standardize them to SDTM for regulatory submission, handling missing and abnormal laboratory values.","zh":"清理临床试验记录，处理缺失值和异常检验数据，并整理成监管申报需要的SDTM数据。"},
+    {"id":"drizzle-merge","targets":["drizzle-migration-conflict"],"en":"Two branches generated conflicting Drizzle Kit migration snapshots and journals. Repair the merge and validate the database migration.","zh":"两个分支生成的Drizzle Kit数据库迁移快照和日志发生冲突，请修复合并并验证迁移。"},
+    {"id":"invoice-tax","targets":["invoice-organizer"],"en":"Organize a folder of scattered invoices and receipts for tax preparation, extract key fields and sort consistently.","zh":"为报税整理散乱的发票收据，提取关键信息并按一致规则分类命名。"},
+    {"id":"container-build","targets":["docker-expert"],"en":"Reduce the size of our Docker image with a secure multi-stage build and check the production Compose configuration.","zh":"用安全的Docker多阶段构建缩小镜像，并检查生产环境Compose配置。"},
+    {"id":"messy-data-plots","targets":["data-cleaning-and-visualization"],"en":"Clean missing values, outliers and mixed formats in a scraped dataset, then produce charts showing its main patterns.","zh":"清洗爬取数据中的缺失值、异常和混合格式，再生成展示主要规律的可视化图表。"},
+    {"id":"alignment-trim","targets":["bio-alignment-trimming"],"en":"Remove unreliable columns from a multiple sequence alignment with ClipKIT or trimAl before phylogenetic analysis.","zh":"在系统发育分析之前，使用ClipKIT或trimAl去掉多序列比对中不可靠的列。"},
+    {"id":"postgres-startup-deadlock","targets":["postgres-concurrent-schema-init-deadlock"],"en":"Several Kubernetes workers start together and PostgreSQL deadlocks during CREATE INDEX IF NOT EXISTS. Diagnose concurrent schema initialization.","zh":"多个Kubernetes worker同时启动，在PostgreSQL执行CREATE INDEX IF NOT EXISTS时死锁，请定位并发建表初始化问题。"},
+    {"id":"contract-change","targets":["evolve-contracts"],"en":"Change a shared HTTP response schema consumed by multiple services and update the producers and consumers with explicit failure semantics.","zh":"修改多个服务消费的共享HTTP响应结构，协调生产者和消费者，并明确失败语义和端到端证据。"},
+    {"id":"confirmed-regression","targets":["fix-regression-with-tdd"],"en":"Yesterday's working behavior now fails after a code change. Establish a failing regression test before the smallest repair.","zh":"昨天正常的功能在一次代码改动后坏了，请先建立失败的回归测试，再做最小修复并核验。"},
+    {"id":"clip-crosslink-annotation","targets":["bio-clip-seq-crosslink-site-detection","bio-clip-seq-binding-site-annotation"],"en":"Detect nucleotide-resolution crosslink sites from eCLIP truncation data, then annotate the sites to RNA features.","zh":"根据eCLIP截断数据识别单核苷酸分辨率的交联位点，并把位点注释到RNA功能区域。"},
+    {"id":"design-tokens-rules","targets":["figma-extract-tokens","figma-create-design-system-rules"],"en":"Extract tokens and variables from a Figma file and use them to define project-specific design system rules.","zh":"从Figma设计文件提取token和变量，用来定义项目自己的设计系统规则。"},
+    {"id":"global-debug-information-flow","targets":["systematic-debugging"],"en":"A request succeeds at the API but disappears before the actual consumer. Trace each information-flow boundary to locate the first divergence.","zh":"请求在API端显示成功，但真实消费者没收到，请沿信息流逐层检查，找出第一个偏离预期的边界。"}
+  ],
+  "limitations":["Small manually labelled retrieval diagnostics; no agent execution success claim.","Frozen after implementation but before querying this final candidate, so not a pristine project-level holdout.","Target lists admit alternative appropriate entries; a miss is a diagnostic signal, not proof that every returned entry is irrelevant."]
+}

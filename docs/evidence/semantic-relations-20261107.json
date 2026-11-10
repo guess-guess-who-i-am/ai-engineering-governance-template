@@ -1,0 +1,4655 @@
+{
+  "schemaVersion": "global-semantic-delivery/1",
+  "recordedAt": "2026-11-07T09:50:31.997775+00:00",
+  "registry": {
+    "path": "codex-profile/mac/hooks/semantic-relations.json",
+    "sha256": "7ccd1ba4ba4f01db31a35a7afe9337d8e4c0c488015f3a6381701bb4492d8c62",
+    "bytes": 21551688,
+    "coverage": {
+      "processed": 19756,
+      "candidatePairs": 41625,
+      "reviewedPairs": 41625,
+      "relatedNodes": 8442,
+      "unrelatedNodes": 11314,
+      "relationCounts": {
+        "similar_to": 5669,
+        "precedes": 225,
+        "complementary": 1224
+      }
+    },
+    "verification": {
+      "complete": true,
+      "firstReviewed": 41625,
+      "secondReviewed": 13149,
+      "disagreements": 3977,
+      "promptSha256": "919eddd64aefe512460597eb5c9ad02bc6d218022787f98ea9008a3cad6e50d0",
+      "citationAuditComplete": true,
+      "citationReviewed": 9140,
+      "citationRejected": 2022,
+      "citationPromptSha256": "c79589bf045b80c3fa35c94c1f0b1adfe068c760db5a5680020bc2a10ce1dd71"
+    },
+    "nodeKinds": {
+      "skill": 18804,
+      "expert": 447,
+      "mcp-service": 478,
+      "mcp": 27
+    }
+  },
+  "hosts": {
+    "mac": {
+      "graphSha256": "35b5e1555095edf31f1ed30f8e1ab8b8486a384b7b546cfee22d56c90781aa98",
+      "nodes": 19756,
+      "semanticProcessed": 19756,
+      "semanticUnmatched": 0,
+      "semanticEdgesAdded": 7100,
+      "existingExplicitArtifactEdges": 9,
+      "buildSeconds": 70.274,
+      "newEncodedUniqueTexts": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "hookWorkspaces": 2,
+      "hookRelationCases": 6,
+      "hookCasesPassed": true,
+      "hookLoad": {
+        "burst": {
+          "count": 100,
+          "success": 100,
+          "longInputs": true,
+          "uniqueQueries": true,
+          "wallSeconds": 13.8479,
+          "p50Seconds": 8.8454,
+          "p95Seconds": 10.9326,
+          "maxSeconds": 11.4992
+        },
+        "stagger": {
+          "count": 100,
+          "success": 100,
+          "longInputs": true,
+          "uniqueQueries": true,
+          "wallSeconds": 12.7188,
+          "p50Seconds": 5.6152,
+          "p95Seconds": 8.2471,
+          "maxSeconds": 8.578
+        }
+      },
+      "socketLoad": {
+        "retries": 0,
+        "waves": [
+          {
+            "name": "burst",
+            "requests": 100,
+            "successes": 100,
+            "peakOverlappingRequests": 80,
+            "p50Ms": 18.7,
+            "p95Ms": 32.4,
+            "maxMs": 33.9,
+            "queryPids": [
+              10860,
+              10861,
+              10862,
+              10863
+            ],
+            "supervisorPids": [
+              10857
+            ],
+            "observedLoadCounts": [
+              1
+            ]
+          },
+          {
+            "name": "staggered",
+            "requests": 100,
+            "successes": 100,
+            "peakOverlappingRequests": 20,
+            "p50Ms": 42.3,
+            "p95Ms": 76.0,
+            "maxMs": 76.5,
+            "queryPids": [
+              10860,
+              10861,
+              10862,
+              10863
+            ],
+            "supervisorPids": [
+              10857
+            ],
+            "observedLoadCounts": [
+              1
+            ]
+          },
+          {
+            "name": "distinct-burst",
+            "requests": 100,
+            "successes": 100,
+            "peakOverlappingRequests": 100,
+            "p50Ms": 2568.7,
+            "p95Ms": 4833.8,
+            "maxMs": 5154.9,
+            "queryPids": [
+              10860,
+              10861,
+              10862,
+              10863
+            ],
+            "supervisorPids": [
+              10857
+            ],
+            "observedLoadCounts": [
+              1
+            ]
+          }
+        ]
+      },
+      "ide": {
+        "passed": true,
+        "workspaces": 2,
+        "globalOriginalBytesVerified": true,
+        "experts": 447,
+        "externalSkillRead": true,
+        "modelWorkflowExecuted": false
+      },
+      "evidenceFiles": {
+        "published.json": {
+          "sha256": "a59534ccb6bd7c322072ee590fc71d204bf80390d8d50a0724aa5b89c6fb6172",
+          "bytes": 895
+        },
+        "final-build.json": {
+          "sha256": "cfdc3fb323eb056b2a38fddc9b182f055ae1847fa3fef51dc326cb1146989d0b",
+          "bytes": 897
+        },
+        "final-primary.json": {
+          "sha256": "bd73191a80dd70e8adb4ccb8e89cf940fa62a420d7a5f7452738d90e6ace4ac8",
+          "bytes": 613982
+        },
+        "final-extended.json": {
+          "sha256": "161cce8978529d5dfb82b1cade0dff3ec45016a08b683b3ae56e390bd83c0355",
+          "bytes": 529533
+        },
+        "live-semantic-check.json": {
+          "sha256": "7dbc6fb21939f101c9b39e381c45214821125966a16fe14795278bbc03e68f2d",
+          "bytes": 2535
+        },
+        "socket-load.json": {
+          "sha256": "06298b2faed2cf4080453c12ae9b8b9366efa433f34e0c86c9255b5ba26b57c6",
+          "bytes": 160269
+        },
+        "load-burst.json": {
+          "sha256": "a9f7727d5e1611f7b40a814662d134272a89bfa03cad28a09c859f667883a10e",
+          "bytes": 15366
+        },
+        "load-stagger.json": {
+          "sha256": "e5fb0ec84839545ff0de409752f298c8c44b96c3c50141113c172707ee3f8660",
+          "bytes": 15339
+        },
+        "ide-consumer.json": {
+          "sha256": "9faadba6c3987403f68f557d98b2b478edc77e5f46365b93098da43cb81a2f3c",
+          "bytes": 1981
+        }
+      },
+      "currentState": {
+        "graphSha256": "35b5e1555095edf31f1ed30f8e1ab8b8486a384b7b546cfee22d56c90781aa98",
+        "nodes": 19756,
+        "semantic": {
+          "revision": "source-grounded-semantic-relations/v1",
+          "state": "ready",
+          "processed": 19756,
+          "unmatched": 0,
+          "added": 7100,
+          "registrySha256": "7ccd1ba4ba4f01db31a35a7afe9337d8e4c0c488015f3a6381701bb4492d8c62"
+        },
+        "artifactEdges": 9,
+        "registrySha256": "7ccd1ba4ba4f01db31a35a7afe9337d8e4c0c488015f3a6381701bb4492d8c62",
+        "serviceRunning": true,
+        "serviceQueryExit": 0
+      }
+    },
+    "194": {
+      "graphSha256": "391d89ad131ffb239cea0b454bb50ff6abb1bb360d85b5b8c14a68d5ad012a35",
+      "nodes": 19752,
+      "semanticProcessed": 19752,
+      "semanticUnmatched": 0,
+      "semanticEdgesAdded": 7100,
+      "existingExplicitArtifactEdges": 9,
+      "buildSeconds": 189.186,
+      "newEncodedUniqueTexts": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "hookWorkspaces": 2,
+      "hookRelationCases": 6,
+      "hookCasesPassed": true,
+      "hookLoad": {
+        "burst": {
+          "count": 100,
+          "success": 100,
+          "longInputs": true,
+          "uniqueQueries": true,
+          "wallSeconds": 22.4259,
+          "p50Seconds": 11.857199999999999,
+          "p95Seconds": 21.3048,
+          "maxSeconds": 22.3848
+        },
+        "stagger": {
+          "count": 100,
+          "success": 100,
+          "longInputs": true,
+          "uniqueQueries": true,
+          "wallSeconds": 22.2796,
+          "p50Seconds": 8.7132,
+          "p95Seconds": 17.3046,
+          "maxSeconds": 18.2629
+        }
+      },
+      "socketLoad": {
+        "retries": 0,
+        "waves": [
+          {
+            "name": "burst",
+            "requests": 100,
+            "successes": 100,
+            "peakOverlappingRequests": 61,
+            "p50Ms": 23.9,
+            "p95Ms": 42.9,
+            "maxMs": 45.1,
+            "queryPids": [
+              4107889,
+              4107892,
+              4107893,
+              4107894
+            ],
+            "supervisorPids": [
+              4107862
+            ],
+            "observedLoadCounts": [
+              1
+            ]
+          },
+          {
+            "name": "staggered",
+            "requests": 100,
+            "successes": 100,
+            "peakOverlappingRequests": 19,
+            "p50Ms": 8.8,
+            "p95Ms": 18.0,
+            "maxMs": 19.6,
+            "queryPids": [
+              4107889,
+              4107892,
+              4107893,
+              4107894
+            ],
+            "supervisorPids": [
+              4107862
+            ],
+            "observedLoadCounts": [
+              1
+            ]
+          },
+          {
+            "name": "distinct-burst",
+            "requests": 100,
+            "successes": 100,
+            "peakOverlappingRequests": 100,
+            "p50Ms": 5281.7,
+            "p95Ms": 10369.3,
+            "maxMs": 10857.3,
+            "queryPids": [
+              4107889,
+              4107892,
+              4107893,
+              4107894
+            ],
+            "supervisorPids": [
+              4107862
+            ],
+            "observedLoadCounts": [
+              1
+            ]
+          }
+        ]
+      },
+      "ide": {
+        "passed": true,
+        "workspaces": 2,
+        "globalOriginalBytesVerified": true,
+        "experts": 447,
+        "externalSkillRead": true,
+        "modelWorkflowExecuted": false
+      },
+      "evidenceFiles": {
+        "published.json": {
+          "sha256": "ba672e9e39a0e4a3a683dd8a3dd08f0716ed145851f709a2a22ffdca7fcf2301",
+          "bytes": 895
+        },
+        "final-build.json": {
+          "sha256": "b19d024cf88d00637bfe85c451fb67da1c67043feb72b6c5c953d8516d3f60aa",
+          "bytes": 898
+        },
+        "final-primary.json": {
+          "sha256": "454212283236d1e587249567a7b34cb882fab81459f8529cf4d63f9af50b8ac7",
+          "bytes": 623560
+        },
+        "final-extended.json": {
+          "sha256": "5772bba9d97455f06b7295d0040e49b386fc299f6453f3c82275ec7faee462ca",
+          "bytes": 544016
+        },
+        "live-semantic-check.json": {
+          "sha256": "4ffc40e7bb16e276e9eb40f93adcd274f5507c71908827d2f6d02fdc0fa6435b",
+          "bytes": 2296
+        },
+        "socket-load.json": {
+          "sha256": "073e003480e1e3c98b6e0d3331f758d1a99e9c398e47c192383de06ec9e998a9",
+          "bytes": 161934
+        },
+        "load-burst.json": {
+          "sha256": "f6ffab14eb435774b3751089e678a6e786dbc33cda606390fd7b959e4f238c1d",
+          "bytes": 15405
+        },
+        "load-stagger.json": {
+          "sha256": "eeee0de8bcf30ae9c36b0ed1a0264e1c4969f3632d53755f8a5beda3555f0edc",
+          "bytes": 15391
+        },
+        "ide-consumer.json": {
+          "sha256": "f2ba54fc10a1a71a06e52898f0d1fc09ad2c47973a294dd2194fcb176e79bd76",
+          "bytes": 1873
+        }
+      },
+      "currentState": {
+        "graphSha256": "391d89ad131ffb239cea0b454bb50ff6abb1bb360d85b5b8c14a68d5ad012a35",
+        "nodes": 19752,
+        "semantic": {
+          "revision": "source-grounded-semantic-relations/v1",
+          "state": "ready",
+          "processed": 19752,
+          "unmatched": 0,
+          "added": 7100,
+          "registrySha256": "7ccd1ba4ba4f01db31a35a7afe9337d8e4c0c488015f3a6381701bb4492d8c62"
+        },
+        "artifactEdges": 9,
+        "registrySha256": "7ccd1ba4ba4f01db31a35a7afe9337d8e4c0c488015f3a6381701bb4492d8c62",
+        "serviceActive": "active",
+        "serviceEnabled": "enabled",
+        "linger": "Linger=yes"
+      }
+    }
+  },
+  "queryComparison": {
+    "mac/original28": {
+      "count": 28,
+      "beforePrimary": 21,
+      "afterPrimary": 21,
+      "beforeAssisted": 21,
+      "afterAssisted": 24,
+      "primaryRegressions": [],
+      "rankingChanges": 2,
+      "newAssistedHits": [
+        {
+          "id": "document-extract",
+          "language": "en"
+        },
+        {
+          "id": "spreadsheet-formulas",
+          "language": "en"
+        },
+        {
+          "id": "spreadsheet-formulas",
+          "language": "zh"
+        }
+      ],
+      "rows": [
+        {
+          "id": "research-evidence",
+          "language": "en",
+          "query": "Investigate a technical topic with several researchers, reconcile sources, review a draft and deliver a cited report.",
+          "targets": [
+            "gpt-researcher-team"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "research-evidence",
+          "language": "zh",
+          "query": "把一个技术课题交给研究团队，分头调查、核对来源、审稿，最后交付有引用的报告。",
+          "targets": [
+            "gpt-researcher-team"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "architecture-handoff",
+          "language": "en",
+          "query": "Coordinate specialists to produce system architecture, deployment and security designs with explicit handoffs.",
+          "targets": [
+            "aicoding-architecture-expert-team"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "architecture-handoff",
+          "language": "zh",
+          "query": "请一个完整专家团队协作，产出系统架构、部署和安全设计，并明确各阶段交接。",
+          "targets": [
+            "aicoding-architecture-expert-team"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "latency-load",
+          "language": "en",
+          "query": "Our API slows during bursts. Design a realistic load experiment, identify the bottleneck and validate the optimization.",
+          "targets": [
+            "performance-testing-expert",
+            "apm-performance-expert"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "latency-load",
+          "language": "zh",
+          "query": "API在突发流量时变慢，请设计贴近实际的压测，定位瓶颈并验证优化前后效果。",
+          "targets": [
+            "performance-testing-expert",
+            "apm-performance-expert"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "requirements-tests",
+          "language": "en",
+          "query": "Turn business requirements into a structured test design covering boundaries, exceptions and traceability.",
+          "targets": [
+            "aladin-test-design"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "requirements-tests",
+          "language": "zh",
+          "query": "把业务需求转为结构化测试设计，覆盖边界、异常，并能追溯到原需求。",
+          "targets": [
+            "aladin-test-design"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "parallel-feature-delivery",
+          "language": "en",
+          "query": "Deliver a coding feature through focused parallel implementers, test-first steps, separate specification and quality reviews, and final integration.",
+          "targets": [
+            "dev-pipeline-orchestrator"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "parallel-feature-delivery",
+          "language": "zh",
+          "query": "把编码功能交给多个独立执行者并行实现，先建失败测试，分别做规格与质量评审，再集成验收。",
+          "targets": [
+            "dev-pipeline-orchestrator"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "paper-language",
+          "language": "en",
+          "query": "Polish and translate a machine learning paper into English while preserving equations and citations.",
+          "targets": [
+            "academic-translation"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "paper-language",
+          "language": "zh",
+          "query": "把机器学习论文翻译润色成英文，保留公式与引用，检查术语表达。",
+          "targets": [
+            "academic-translation"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "browser-functional",
+          "language": "en",
+          "query": "Verify the login flow of a local web app in a browser and capture screenshots and console errors.",
+          "targets": [
+            "webapp-testing"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "browser-functional",
+          "language": "zh",
+          "query": "在浏览器里验证本地网页应用的登录流程，保留截图和控制台报错。",
+          "targets": [
+            "webapp-testing"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "document-extract",
+          "language": "en",
+          "query": "Extract text and tabular data from a PDF and combine its pages into a new document.",
+          "targets": [
+            "pdf",
+            "pdf-extraction",
+            "pdf-toolbox"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "document-extract",
+          "language": "zh",
+          "query": "从PDF提取文字和表格，再把指定页面合并成一份新文档。",
+          "targets": [
+            "pdf",
+            "pdf-extraction",
+            "pdf-toolbox"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "spreadsheet-formulas",
+          "language": "en",
+          "query": "Create an Excel workbook with editable formulas, consistent formatting and recalculated results.",
+          "targets": [
+            "xlsx",
+            "xlsx-author",
+            "xlsx-manipulation"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "spreadsheet-formulas",
+          "language": "zh",
+          "query": "制作Excel工作簿，保留可编辑公式、统一格式并重新计算结果。",
+          "targets": [
+            "xlsx",
+            "xlsx-author",
+            "xlsx-manipulation"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "trip-budget-feasibility",
+          "language": "en",
+          "query": "Check whether a travel itinerary is affordable using transportation, accommodation and meal costs, and suggest cost-saving alternatives.",
+          "targets": [
+            "budget-balance"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "trip-budget-feasibility",
+          "language": "zh",
+          "query": "按交通、住宿和餐饮费用核算旅行行程预算，判断是否超支并给出省钱替代方案。",
+          "targets": [
+            "budget-balance"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "live-library-docs",
+          "language": "en",
+          "query": "Find current documentation and code examples for a specific version of a programming library.",
+          "targets": [
+            "context7"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "live-library-docs",
+          "language": "zh",
+          "query": "查询某个编程库指定版本的最新文档与代码示例，避免旧版接口。",
+          "targets": [
+            "context7"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "repository-collaboration",
+          "language": "en",
+          "query": "Use GitHub to inspect a repository's issues and pull requests through its service connector.",
+          "targets": [
+            "github"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "repository-collaboration",
+          "language": "zh",
+          "query": "通过服务连接器查看GitHub仓库的issue和pull request。",
+          "targets": [
+            "github"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "workspace-notes",
+          "language": "en",
+          "query": "Search my Notion workspace pages and fetch the relevant page content through its connector.",
+          "targets": [
+            "notion"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "workspace-notes",
+          "language": "zh",
+          "query": "通过连接器搜索我的Notion工作区页面，并读取相关页面内容。",
+          "targets": [
+            "notion"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "employee-social-insurance",
+          "language": "en",
+          "query": "Find an HR service connector for employee social insurance and benefits administration.",
+          "targets": [
+            "51shebao-hr-tools"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "employee-social-insurance",
+          "language": "zh",
+          "query": "寻找可以处理员工社保、公积金等人事业务的服务连接器。",
+          "targets": [
+            "51shebao-hr-tools"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        }
+      ]
+    },
+    "mac/additional24": {
+      "count": 24,
+      "beforePrimary": 17,
+      "afterPrimary": 17,
+      "beforeAssisted": 17,
+      "afterAssisted": 17,
+      "primaryRegressions": [],
+      "rankingChanges": 1,
+      "newAssistedHits": [],
+      "rows": [
+        {
+          "id": "clinical-cleaning",
+          "language": "en",
+          "query": "Clean clinical trial records and standardize them to SDTM for regulatory submission, handling missing and abnormal laboratory values.",
+          "targets": [
+            "clinical-data-cleaner"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "clinical-cleaning",
+          "language": "zh",
+          "query": "清理临床试验记录，处理缺失值和异常检验数据，并整理成监管申报需要的SDTM数据。",
+          "targets": [
+            "clinical-data-cleaner"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "drizzle-merge",
+          "language": "en",
+          "query": "Two branches generated conflicting Drizzle Kit migration snapshots and journals. Repair the merge and validate the database migration.",
+          "targets": [
+            "drizzle-migration-conflict"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "drizzle-merge",
+          "language": "zh",
+          "query": "两个分支生成的Drizzle Kit数据库迁移快照和日志发生冲突，请修复合并并验证迁移。",
+          "targets": [
+            "drizzle-migration-conflict"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "invoice-tax",
+          "language": "en",
+          "query": "Organize a folder of scattered invoices and receipts for tax preparation, extract key fields and sort consistently.",
+          "targets": [
+            "invoice-organizer"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "invoice-tax",
+          "language": "zh",
+          "query": "为报税整理散乱的发票收据，提取关键信息并按一致规则分类命名。",
+          "targets": [
+            "invoice-organizer"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "container-build",
+          "language": "en",
+          "query": "Reduce the size of our Docker image with a secure multi-stage build and check the production Compose configuration.",
+          "targets": [
+            "docker-expert"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "container-build",
+          "language": "zh",
+          "query": "用安全的Docker多阶段构建缩小镜像，并检查生产环境Compose配置。",
+          "targets": [
+            "docker-expert"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "messy-data-plots",
+          "language": "en",
+          "query": "Clean missing values, outliers and mixed formats in a scraped dataset, then produce charts showing its main patterns.",
+          "targets": [
+            "data-cleaning-and-visualization"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "messy-data-plots",
+          "language": "zh",
+          "query": "清洗爬取数据中的缺失值、异常和混合格式，再生成展示主要规律的可视化图表。",
+          "targets": [
+            "data-cleaning-and-visualization"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "alignment-trim",
+          "language": "en",
+          "query": "Remove unreliable columns from a multiple sequence alignment with ClipKIT or trimAl before phylogenetic analysis.",
+          "targets": [
+            "bio-alignment-trimming"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "alignment-trim",
+          "language": "zh",
+          "query": "在系统发育分析之前，使用ClipKIT或trimAl去掉多序列比对中不可靠的列。",
+          "targets": [
+            "bio-alignment-trimming"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "postgres-startup-deadlock",
+          "language": "en",
+          "query": "Several Kubernetes workers start together and PostgreSQL deadlocks during CREATE INDEX IF NOT EXISTS. Diagnose concurrent schema initialization.",
+          "targets": [
+            "postgres-concurrent-schema-init-deadlock"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "postgres-startup-deadlock",
+          "language": "zh",
+          "query": "多个Kubernetes worker同时启动，在PostgreSQL执行CREATE INDEX IF NOT EXISTS时死锁，请定位并发建表初始化问题。",
+          "targets": [
+            "postgres-concurrent-schema-init-deadlock"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "contract-change",
+          "language": "en",
+          "query": "Change a shared HTTP response schema consumed by multiple services and update the producers and consumers with explicit failure semantics.",
+          "targets": [
+            "evolve-contracts"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "contract-change",
+          "language": "zh",
+          "query": "修改多个服务消费的共享HTTP响应结构，协调生产者和消费者，并明确失败语义和端到端证据。",
+          "targets": [
+            "evolve-contracts"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "confirmed-regression",
+          "language": "en",
+          "query": "Yesterday's working behavior now fails after a code change. Establish a failing regression test before the smallest repair.",
+          "targets": [
+            "fix-regression-with-tdd"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "confirmed-regression",
+          "language": "zh",
+          "query": "昨天正常的功能在一次代码改动后坏了，请先建立失败的回归测试，再做最小修复并核验。",
+          "targets": [
+            "fix-regression-with-tdd"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "clip-crosslink-annotation",
+          "language": "en",
+          "query": "Detect nucleotide-resolution crosslink sites from eCLIP truncation data, then annotate the sites to RNA features.",
+          "targets": [
+            "bio-clip-seq-crosslink-site-detection",
+            "bio-clip-seq-binding-site-annotation"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "clip-crosslink-annotation",
+          "language": "zh",
+          "query": "根据eCLIP截断数据识别单核苷酸分辨率的交联位点，并把位点注释到RNA功能区域。",
+          "targets": [
+            "bio-clip-seq-crosslink-site-detection",
+            "bio-clip-seq-binding-site-annotation"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "design-tokens-rules",
+          "language": "en",
+          "query": "Extract tokens and variables from a Figma file and use them to define project-specific design system rules.",
+          "targets": [
+            "figma-extract-tokens",
+            "figma-create-design-system-rules"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "design-tokens-rules",
+          "language": "zh",
+          "query": "从Figma设计文件提取token和变量，用来定义项目自己的设计系统规则。",
+          "targets": [
+            "figma-extract-tokens",
+            "figma-create-design-system-rules"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "global-debug-information-flow",
+          "language": "en",
+          "query": "A request succeeds at the API but disappears before the actual consumer. Trace each information-flow boundary to locate the first divergence.",
+          "targets": [
+            "systematic-debugging"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "global-debug-information-flow",
+          "language": "zh",
+          "query": "请求在API端显示成功，但真实消费者没收到，请沿信息流逐层检查，找出第一个偏离预期的边界。",
+          "targets": [
+            "systematic-debugging"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        }
+      ]
+    },
+    "194/original28": {
+      "count": 28,
+      "beforePrimary": 21,
+      "afterPrimary": 21,
+      "beforeAssisted": 21,
+      "afterAssisted": 24,
+      "primaryRegressions": [],
+      "rankingChanges": 13,
+      "newAssistedHits": [
+        {
+          "id": "document-extract",
+          "language": "en"
+        },
+        {
+          "id": "spreadsheet-formulas",
+          "language": "en"
+        },
+        {
+          "id": "spreadsheet-formulas",
+          "language": "zh"
+        }
+      ],
+      "rows": [
+        {
+          "id": "research-evidence",
+          "language": "en",
+          "query": "Investigate a technical topic with several researchers, reconcile sources, review a draft and deliver a cited report.",
+          "targets": [
+            "gpt-researcher-team"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "research-evidence",
+          "language": "zh",
+          "query": "把一个技术课题交给研究团队，分头调查、核对来源、审稿，最后交付有引用的报告。",
+          "targets": [
+            "gpt-researcher-team"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "architecture-handoff",
+          "language": "en",
+          "query": "Coordinate specialists to produce system architecture, deployment and security designs with explicit handoffs.",
+          "targets": [
+            "aicoding-architecture-expert-team"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "architecture-handoff",
+          "language": "zh",
+          "query": "请一个完整专家团队协作，产出系统架构、部署和安全设计，并明确各阶段交接。",
+          "targets": [
+            "aicoding-architecture-expert-team"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "latency-load",
+          "language": "en",
+          "query": "Our API slows during bursts. Design a realistic load experiment, identify the bottleneck and validate the optimization.",
+          "targets": [
+            "performance-testing-expert",
+            "apm-performance-expert"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "latency-load",
+          "language": "zh",
+          "query": "API在突发流量时变慢，请设计贴近实际的压测，定位瓶颈并验证优化前后效果。",
+          "targets": [
+            "performance-testing-expert",
+            "apm-performance-expert"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "requirements-tests",
+          "language": "en",
+          "query": "Turn business requirements into a structured test design covering boundaries, exceptions and traceability.",
+          "targets": [
+            "aladin-test-design"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "requirements-tests",
+          "language": "zh",
+          "query": "把业务需求转为结构化测试设计，覆盖边界、异常，并能追溯到原需求。",
+          "targets": [
+            "aladin-test-design"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "parallel-feature-delivery",
+          "language": "en",
+          "query": "Deliver a coding feature through focused parallel implementers, test-first steps, separate specification and quality reviews, and final integration.",
+          "targets": [
+            "dev-pipeline-orchestrator"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "parallel-feature-delivery",
+          "language": "zh",
+          "query": "把编码功能交给多个独立执行者并行实现，先建失败测试，分别做规格与质量评审，再集成验收。",
+          "targets": [
+            "dev-pipeline-orchestrator"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "paper-language",
+          "language": "en",
+          "query": "Polish and translate a machine learning paper into English while preserving equations and citations.",
+          "targets": [
+            "academic-translation"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "paper-language",
+          "language": "zh",
+          "query": "把机器学习论文翻译润色成英文，保留公式与引用，检查术语表达。",
+          "targets": [
+            "academic-translation"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "browser-functional",
+          "language": "en",
+          "query": "Verify the login flow of a local web app in a browser and capture screenshots and console errors.",
+          "targets": [
+            "webapp-testing"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "browser-functional",
+          "language": "zh",
+          "query": "在浏览器里验证本地网页应用的登录流程，保留截图和控制台报错。",
+          "targets": [
+            "webapp-testing"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "document-extract",
+          "language": "en",
+          "query": "Extract text and tabular data from a PDF and combine its pages into a new document.",
+          "targets": [
+            "pdf",
+            "pdf-extraction",
+            "pdf-toolbox"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "document-extract",
+          "language": "zh",
+          "query": "从PDF提取文字和表格，再把指定页面合并成一份新文档。",
+          "targets": [
+            "pdf",
+            "pdf-extraction",
+            "pdf-toolbox"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "spreadsheet-formulas",
+          "language": "en",
+          "query": "Create an Excel workbook with editable formulas, consistent formatting and recalculated results.",
+          "targets": [
+            "xlsx",
+            "xlsx-author",
+            "xlsx-manipulation"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "spreadsheet-formulas",
+          "language": "zh",
+          "query": "制作Excel工作簿，保留可编辑公式、统一格式并重新计算结果。",
+          "targets": [
+            "xlsx",
+            "xlsx-author",
+            "xlsx-manipulation"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "trip-budget-feasibility",
+          "language": "en",
+          "query": "Check whether a travel itinerary is affordable using transportation, accommodation and meal costs, and suggest cost-saving alternatives.",
+          "targets": [
+            "budget-balance"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "trip-budget-feasibility",
+          "language": "zh",
+          "query": "按交通、住宿和餐饮费用核算旅行行程预算，判断是否超支并给出省钱替代方案。",
+          "targets": [
+            "budget-balance"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "live-library-docs",
+          "language": "en",
+          "query": "Find current documentation and code examples for a specific version of a programming library.",
+          "targets": [
+            "context7"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "live-library-docs",
+          "language": "zh",
+          "query": "查询某个编程库指定版本的最新文档与代码示例，避免旧版接口。",
+          "targets": [
+            "context7"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "repository-collaboration",
+          "language": "en",
+          "query": "Use GitHub to inspect a repository's issues and pull requests through its service connector.",
+          "targets": [
+            "github"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "repository-collaboration",
+          "language": "zh",
+          "query": "通过服务连接器查看GitHub仓库的issue和pull request。",
+          "targets": [
+            "github"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "workspace-notes",
+          "language": "en",
+          "query": "Search my Notion workspace pages and fetch the relevant page content through its connector.",
+          "targets": [
+            "notion"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "workspace-notes",
+          "language": "zh",
+          "query": "通过连接器搜索我的Notion工作区页面，并读取相关页面内容。",
+          "targets": [
+            "notion"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "employee-social-insurance",
+          "language": "en",
+          "query": "Find an HR service connector for employee social insurance and benefits administration.",
+          "targets": [
+            "51shebao-hr-tools"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "employee-social-insurance",
+          "language": "zh",
+          "query": "寻找可以处理员工社保、公积金等人事业务的服务连接器。",
+          "targets": [
+            "51shebao-hr-tools"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": true
+        }
+      ]
+    },
+    "194/additional24": {
+      "count": 24,
+      "beforePrimary": 17,
+      "afterPrimary": 17,
+      "beforeAssisted": 17,
+      "afterAssisted": 17,
+      "primaryRegressions": [],
+      "rankingChanges": 13,
+      "newAssistedHits": [],
+      "rows": [
+        {
+          "id": "clinical-cleaning",
+          "language": "en",
+          "query": "Clean clinical trial records and standardize them to SDTM for regulatory submission, handling missing and abnormal laboratory values.",
+          "targets": [
+            "clinical-data-cleaner"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "clinical-cleaning",
+          "language": "zh",
+          "query": "清理临床试验记录，处理缺失值和异常检验数据，并整理成监管申报需要的SDTM数据。",
+          "targets": [
+            "clinical-data-cleaner"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "drizzle-merge",
+          "language": "en",
+          "query": "Two branches generated conflicting Drizzle Kit migration snapshots and journals. Repair the merge and validate the database migration.",
+          "targets": [
+            "drizzle-migration-conflict"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "drizzle-merge",
+          "language": "zh",
+          "query": "两个分支生成的Drizzle Kit数据库迁移快照和日志发生冲突，请修复合并并验证迁移。",
+          "targets": [
+            "drizzle-migration-conflict"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "invoice-tax",
+          "language": "en",
+          "query": "Organize a folder of scattered invoices and receipts for tax preparation, extract key fields and sort consistently.",
+          "targets": [
+            "invoice-organizer"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "invoice-tax",
+          "language": "zh",
+          "query": "为报税整理散乱的发票收据，提取关键信息并按一致规则分类命名。",
+          "targets": [
+            "invoice-organizer"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "container-build",
+          "language": "en",
+          "query": "Reduce the size of our Docker image with a secure multi-stage build and check the production Compose configuration.",
+          "targets": [
+            "docker-expert"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "container-build",
+          "language": "zh",
+          "query": "用安全的Docker多阶段构建缩小镜像，并检查生产环境Compose配置。",
+          "targets": [
+            "docker-expert"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "messy-data-plots",
+          "language": "en",
+          "query": "Clean missing values, outliers and mixed formats in a scraped dataset, then produce charts showing its main patterns.",
+          "targets": [
+            "data-cleaning-and-visualization"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "messy-data-plots",
+          "language": "zh",
+          "query": "清洗爬取数据中的缺失值、异常和混合格式，再生成展示主要规律的可视化图表。",
+          "targets": [
+            "data-cleaning-and-visualization"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "alignment-trim",
+          "language": "en",
+          "query": "Remove unreliable columns from a multiple sequence alignment with ClipKIT or trimAl before phylogenetic analysis.",
+          "targets": [
+            "bio-alignment-trimming"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "alignment-trim",
+          "language": "zh",
+          "query": "在系统发育分析之前，使用ClipKIT或trimAl去掉多序列比对中不可靠的列。",
+          "targets": [
+            "bio-alignment-trimming"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "postgres-startup-deadlock",
+          "language": "en",
+          "query": "Several Kubernetes workers start together and PostgreSQL deadlocks during CREATE INDEX IF NOT EXISTS. Diagnose concurrent schema initialization.",
+          "targets": [
+            "postgres-concurrent-schema-init-deadlock"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "postgres-startup-deadlock",
+          "language": "zh",
+          "query": "多个Kubernetes worker同时启动，在PostgreSQL执行CREATE INDEX IF NOT EXISTS时死锁，请定位并发建表初始化问题。",
+          "targets": [
+            "postgres-concurrent-schema-init-deadlock"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "contract-change",
+          "language": "en",
+          "query": "Change a shared HTTP response schema consumed by multiple services and update the producers and consumers with explicit failure semantics.",
+          "targets": [
+            "evolve-contracts"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "contract-change",
+          "language": "zh",
+          "query": "修改多个服务消费的共享HTTP响应结构，协调生产者和消费者，并明确失败语义和端到端证据。",
+          "targets": [
+            "evolve-contracts"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "confirmed-regression",
+          "language": "en",
+          "query": "Yesterday's working behavior now fails after a code change. Establish a failing regression test before the smallest repair.",
+          "targets": [
+            "fix-regression-with-tdd"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "confirmed-regression",
+          "language": "zh",
+          "query": "昨天正常的功能在一次代码改动后坏了，请先建立失败的回归测试，再做最小修复并核验。",
+          "targets": [
+            "fix-regression-with-tdd"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "clip-crosslink-annotation",
+          "language": "en",
+          "query": "Detect nucleotide-resolution crosslink sites from eCLIP truncation data, then annotate the sites to RNA features.",
+          "targets": [
+            "bio-clip-seq-crosslink-site-detection",
+            "bio-clip-seq-binding-site-annotation"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "clip-crosslink-annotation",
+          "language": "zh",
+          "query": "根据eCLIP截断数据识别单核苷酸分辨率的交联位点，并把位点注释到RNA功能区域。",
+          "targets": [
+            "bio-clip-seq-crosslink-site-detection",
+            "bio-clip-seq-binding-site-annotation"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "design-tokens-rules",
+          "language": "en",
+          "query": "Extract tokens and variables from a Figma file and use them to define project-specific design system rules.",
+          "targets": [
+            "figma-extract-tokens",
+            "figma-create-design-system-rules"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": false
+        },
+        {
+          "id": "design-tokens-rules",
+          "language": "zh",
+          "query": "从Figma设计文件提取token和变量，用来定义项目自己的设计系统规则。",
+          "targets": [
+            "figma-extract-tokens",
+            "figma-create-design-system-rules"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "global-debug-information-flow",
+          "language": "en",
+          "query": "A request succeeds at the API but disappears before the actual consumer. Trace each information-flow boundary to locate the first divergence.",
+          "targets": [
+            "systematic-debugging"
+          ],
+          "beforePrimary": true,
+          "afterPrimary": true,
+          "beforeAssisted": true,
+          "afterAssisted": true,
+          "primaryRankingChanged": true
+        },
+        {
+          "id": "global-debug-information-flow",
+          "language": "zh",
+          "query": "请求在API端显示成功，但真实消费者没收到，请沿信息流逐层检查，找出第一个偏离预期的边界。",
+          "targets": [
+            "systematic-debugging"
+          ],
+          "beforePrimary": false,
+          "afterPrimary": false,
+          "beforeAssisted": false,
+          "afterAssisted": false,
+          "primaryRankingChanged": true
+        }
+      ]
+    }
+  },
+  "checks": {
+    "semanticRelations": 21,
+    "graphWorker": 16,
+    "artifactRelations": 12,
+    "publisher": 12,
+    "portableResources": 2,
+    "macInstaller": "passed, including byte-identical global relation registry, cross-workspace, idempotence and rollback",
+    "securityBaseline": "passed, including credential-shaped positive fixtures and Skill-name negative fixtures",
+    "governance": "passed",
+    "skills": "passed",
+    "originalWorkspaceQualityGates": {
+      "passed": 14,
+      "total": 15,
+      "failure": "document-integrity: 56 externally deleted tracked versions files; preserved and excluded from this delivery"
+    },
+    "deliverySnapshotDocuments": "passed: 336 tracked text files; HEAD historical files retained only in independent delivery-check copy",
+    "taskTree": {
+      "mcpCompact": "passed",
+      "flow": "not applicable: no execution flow script",
+      "shellCompact": "passed with TASK_TREE_KIT_DIR pointing to installed global kit",
+      "initialShellFailure": "configured sibling toolkit absent next to this worktree; original stderr retained in final-compact.log"
+    }
+  },
+  "citationAudit": {
+    "calibration": true,
+    "batches": [
+      {
+        "signature": "1df02699393589e3a05f120b0865102ca6520060bfc2b62857feff098e257174",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "d62188639310201198c2df8544c3a825dd8a4adfde9193ee6c21a6dfc4ce4621",
+        "start": 36343.588709625,
+        "end": 36370.597951666,
+        "seconds": 27.009,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17276,
+          "output_tokens": 1037,
+          "total_tokens": 18313
+        },
+        "batch": 0,
+        "attempt": 1,
+        "waveWidth": 4
+      },
+      {
+        "signature": "c14460a34821b07e145709029b8367a9b70c5d942cc12babba2b436b58382aaf",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "d0a49bf29a129b5d2c85494ad0d58c26808ecb0e166a63ee37c99f696f31af7b",
+        "start": 36343.589843083,
+        "end": 36373.532311458,
+        "seconds": 29.942,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18472,
+          "output_tokens": 1216,
+          "total_tokens": 19688
+        },
+        "batch": 1,
+        "attempt": 1,
+        "waveWidth": 4
+      },
+      {
+        "signature": "005c9aca11b23c25a76cf9132113c9ed6004ed424d8ecf90355544fa85bf9518",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "ab3c221f126cd8aa49e4d6a7af076d9e52af71a6d916797f9efa083feff31ad6",
+        "start": 36343.588607916,
+        "end": 36379.276441208,
+        "seconds": 35.688,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 19261,
+          "output_tokens": 1257,
+          "total_tokens": 20518
+        },
+        "batch": 2,
+        "attempt": 1,
+        "waveWidth": 4
+      },
+      {
+        "signature": "ccd92c7556d30963d163477fc756495048824793ba6e2fd57e106ed12f5c915c",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "99f405f60e82779b45bf57772c9760b00fd83b072d69292b5796f42a43f0e081",
+        "start": 36343.590167416,
+        "end": 36371.158889041,
+        "seconds": 27.569,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17932,
+          "output_tokens": 1098,
+          "total_tokens": 19030
+        },
+        "batch": 3,
+        "attempt": 1,
+        "waveWidth": 4
+      },
+      {
+        "signature": "84d7185517abd56ebcaa0e617d598d76906c6ba81a566e689faf7dd3443a4733",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "1bc72b5a76d918ba9b46cff8146b4a811c1e18b802affb4661204269e1b20850",
+        "start": 36379.283401083,
+        "end": 36403.450648041,
+        "seconds": 24.167,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 19160,
+          "output_tokens": 1086,
+          "total_tokens": 20246
+        },
+        "batch": 4,
+        "attempt": 1,
+        "waveWidth": 5
+      },
+      {
+        "signature": "bebddf27e165811a412248bee7f114a4fe81519e4e10bbb75b8b1416323591c7",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "48a09f418e0670aa41245b834d240836cd81b43e04397968a86849a5e82b5ac0",
+        "start": 36379.284797166,
+        "end": 36405.926956083,
+        "seconds": 26.642,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18039,
+          "output_tokens": 1144,
+          "total_tokens": 19183
+        },
+        "batch": 5,
+        "attempt": 1,
+        "waveWidth": 5
+      },
+      {
+        "signature": "cafd38018a82d3a14287c3821f4d714779954e6c669a00abd7bf0d937bdb34f0",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "bc9a07867c220e151cf8886e1c498b6d0dea64a14be3b0568b9c41a7572f670e",
+        "start": 36379.283442,
+        "end": 36410.132006916,
+        "seconds": 30.849,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18355,
+          "output_tokens": 1105,
+          "total_tokens": 19460
+        },
+        "batch": 6,
+        "attempt": 1,
+        "waveWidth": 5
+      },
+      {
+        "signature": "9a8a43c8852220c3ef0a02518fc3ed8f7e71501d26fc12e01019376679aa2912",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "7ed1dbe3a80dad532d35066b69dde95b200048ddcdef70b392ac4243016631d8",
+        "start": 36379.28323625,
+        "end": 36405.376467208,
+        "seconds": 26.093,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17726,
+          "output_tokens": 1104,
+          "total_tokens": 18830
+        },
+        "batch": 7,
+        "attempt": 1,
+        "waveWidth": 5
+      },
+      {
+        "signature": "840b3f525cb2881703e615617cd6623566cad3710d0f24bbb4717209e875dddd",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "9666aa544b4702c19cd5cec177da966e7d66ba9e8b9d8c2101b410d9efd90aa1",
+        "start": 36379.283427875,
+        "end": 36405.409851708,
+        "seconds": 26.126,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17192,
+          "output_tokens": 1205,
+          "total_tokens": 18397
+        },
+        "batch": 8,
+        "attempt": 1,
+        "waveWidth": 5
+      },
+      {
+        "signature": "a77b35e83e1265db8a2b686749af39891f24332cb8ef1cb5cfc7f5f9b002f189",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "2b98d8fe4dd6f20094b98b194086487257b1d0bc1544292b8f86d2d0cd8aed71",
+        "start": 36410.138935541,
+        "end": 36436.986068541,
+        "seconds": 26.847,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17245,
+          "output_tokens": 1222,
+          "total_tokens": 18467
+        },
+        "batch": 9,
+        "attempt": 1,
+        "waveWidth": 6
+      },
+      {
+        "signature": "6bc9c93804d2297fbb50841dd29332323bc70059e9dd63d7d0cfb752094c2218",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "f3041d5aef89581a9ff19a8df0c65ded95b2f50c1ee8bbfbd4d6e64353ec5862",
+        "start": 36410.141054916,
+        "end": 36436.920347541,
+        "seconds": 26.779,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17433,
+          "output_tokens": 1173,
+          "total_tokens": 18606
+        },
+        "batch": 10,
+        "attempt": 1,
+        "waveWidth": 6
+      },
+      {
+        "signature": "d053289dbf6dd5865757daeab222300e3a6d1c7e770ede81bb4e7173be669335",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "f616964f584b408f8d9b5f13fb9a83e2616d1e017933bce423f69d5e3706822e",
+        "start": 36410.1410405,
+        "end": 36437.882514375,
+        "seconds": 27.741,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16834,
+          "output_tokens": 1113,
+          "total_tokens": 17947
+        },
+        "batch": 11,
+        "attempt": 1,
+        "waveWidth": 6
+      },
+      {
+        "signature": "040a6e5adc522653fcfc0c2f64d61637fc8594f7249f0bcdc7809ca3fe4395e5",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "7af5dd7cca2cc8564a2a6cb4b50dabdb12b5f340bc5db2b1c51bd22cee629e46",
+        "start": 36410.141009,
+        "end": 36435.253763,
+        "seconds": 25.113,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16570,
+          "output_tokens": 1070,
+          "total_tokens": 17640
+        },
+        "batch": 12,
+        "attempt": 1,
+        "waveWidth": 6
+      },
+      {
+        "signature": "0bb81c36839b5ab80ede4942e0db5b56587ef415c52747a49d93520253ddb2bc",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "398b74d89b1a5ef24711169a51737a9d145dcd4d3e23d22b0159021286a960dc",
+        "start": 36410.141328,
+        "end": 36434.5243535,
+        "seconds": 24.383,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17464,
+          "output_tokens": 1054,
+          "total_tokens": 18518
+        },
+        "batch": 13,
+        "attempt": 1,
+        "waveWidth": 6
+      },
+      {
+        "signature": "a71ca6c83888d24d2a34c7e3ace07b07f8e29a1e0010d9b57cf825a7e99c1482",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "ec02b5db2cb0ee3ae6408f6cbb0bf304e308ab32af3436a602b2867352561ff5",
+        "start": 36410.140044208,
+        "end": 36443.316952291,
+        "seconds": 33.177,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17289,
+          "output_tokens": 1250,
+          "total_tokens": 18539
+        },
+        "batch": 14,
+        "attempt": 1,
+        "waveWidth": 6
+      },
+      {
+        "signature": "5543a991d13f364eba4517535423fc04ef3028032fe9000657fd442982b52890",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "86c7d75c916c67eb595f2d60fa4942459c73015a1876ddfb409282d7fce3ee8d",
+        "start": 36443.32983125,
+        "end": 36467.197536583,
+        "seconds": 23.868,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18269,
+          "output_tokens": 1107,
+          "total_tokens": 19376
+        },
+        "batch": 15,
+        "attempt": 1,
+        "waveWidth": 7
+      },
+      {
+        "signature": "01ab8ab4a9cde8abf372a3f4fd14ac43ae0dec69d6cfbf36b6715c128d38de83",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "331baf9ced0d9ee72229bb4541390f8e9c0bff4cf2b6b78c8133d3f758ebe817",
+        "start": 36443.325377416,
+        "end": 36469.903163583,
+        "seconds": 26.578,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17212,
+          "output_tokens": 1222,
+          "total_tokens": 18434
+        },
+        "batch": 16,
+        "attempt": 1,
+        "waveWidth": 7
+      },
+      {
+        "signature": "f4d282cd9eb28ffad1ae2d235352d9c6bf6215ece57e2aa9f0c82fbdc9cccc90",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "b08b6ac9416d6c68604778b9f95cdfc328be7f075d2d3e2beea0c9ae293d55d4",
+        "start": 36443.326440833,
+        "end": 36469.930412333,
+        "seconds": 26.604,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17574,
+          "output_tokens": 1189,
+          "total_tokens": 18763
+        },
+        "batch": 17,
+        "attempt": 1,
+        "waveWidth": 7
+      },
+      {
+        "signature": "1a332ba5bc6d56fde1fd37951284e910a501b92d4549beddc6dfc7f271657573",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "368f25f198f13a07a062550a8df97de992fb97f877f35bd4ffb00eb6b1310f7b",
+        "start": 36443.329723375,
+        "end": 36475.087121083,
+        "seconds": 31.757,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17465,
+          "output_tokens": 1157,
+          "total_tokens": 18622
+        },
+        "batch": 18,
+        "attempt": 1,
+        "waveWidth": 7
+      },
+      {
+        "signature": "4d8004b169f3521d28181490b5ba0d212ad199ff66811053a1646078b60fc607",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "7d5422d2d0d5def066ad76bdb368e0dbbd76a52595ecdca72a4f5d1c1bc42b37",
+        "start": 36443.329929416,
+        "end": 36473.374255625,
+        "seconds": 30.044,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17115,
+          "output_tokens": 1270,
+          "total_tokens": 18385
+        },
+        "batch": 19,
+        "attempt": 1,
+        "waveWidth": 7
+      },
+      {
+        "signature": "74a205ca68e9433dd9648d6488e4bbf0a68c71af60ce7a13b8425ef0e69bfaa0",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "8f5d6815550d0881caff076bd96fb63a6b76504713583a5e79876355fe33a2ac",
+        "start": 36443.327532375,
+        "end": 36468.826632791,
+        "seconds": 25.499,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17795,
+          "output_tokens": 1198,
+          "total_tokens": 18993
+        },
+        "batch": 20,
+        "attempt": 1,
+        "waveWidth": 7
+      },
+      {
+        "signature": "0ee8d4c22be10dce993016fa9a42e46104f626d6e19f985572563043a54adda1",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "1dadca9f23b4345158fa74b2fbfe2d52ef35f51af5bf0e25e778db960241474c",
+        "start": 36443.329877,
+        "end": 36473.554494875,
+        "seconds": 30.225,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17771,
+          "output_tokens": 1356,
+          "total_tokens": 19127
+        },
+        "batch": 21,
+        "attempt": 1,
+        "waveWidth": 7
+      },
+      {
+        "signature": "f0b8efe7af59a6fbf5c65b4ec671d14dad81e5e4285e31e1b1a52778d0ff0a9c",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "c2b8bdc0aeb282ca51b541fcc2307d75fbc006cc85c842f23e202541204ec98c",
+        "start": 36475.100184125,
+        "end": 36506.664348791,
+        "seconds": 31.564,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17849,
+          "output_tokens": 1285,
+          "total_tokens": 19134
+        },
+        "batch": 22,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "8570df0bf7acfa9e65741760ddb96d6df045b91db1c2abe25e8b375e944e264c",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "bbcda126ca933970058cce6c5f9fb862fe7f0bdb37b65b30c0974dca96be6ba7",
+        "start": 36475.100118083,
+        "end": 36507.538424166,
+        "seconds": 32.438,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18076,
+          "output_tokens": 1392,
+          "total_tokens": 19468
+        },
+        "batch": 23,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "9c6800d37e1eb9fcaccd7c3b1d3d5aa5b8e26c85f1ea647093c21a0ac79aa5b7",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "1b9fcc1daa5d8ace877aa09a13a024fc2f971020c040be41d94f8e475c8e907d",
+        "start": 36475.100052041,
+        "end": 36506.107129208,
+        "seconds": 31.007,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17577,
+          "output_tokens": 1376,
+          "total_tokens": 18953
+        },
+        "batch": 24,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "4dc63045ea2cc3b73c79b8cb9d61482da3847d0d3be52f1cdfd8948e7692ae6c",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "0187b15a164cd9c65ce1a2f8599d694e2f784cbbc41c860d4461ed0f864435e1",
+        "start": 36475.099770041,
+        "end": 36504.772014791,
+        "seconds": 29.672,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17421,
+          "output_tokens": 1362,
+          "total_tokens": 18783
+        },
+        "batch": 25,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "38b09a395f0e56150159614b15aa04764a6ef2b9d5a4fa47e804eb1a9202d950",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "f6b20df7cbf3fcbddd2b154812545af64fc7ecbd44d7e219a3302cb1021e7ead",
+        "start": 36475.100214458,
+        "end": 36514.6089435,
+        "seconds": 39.509,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 20351,
+          "output_tokens": 1395,
+          "total_tokens": 21746
+        },
+        "batch": 26,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "94f3967259b32ae31d7af25a1ada1c211856d40f37fa1c9b93fb5f6b17d36fad",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "5a1f9c2dce257a77ed08370af2dad34834a5355c87d48ab236c5d479b522e18c",
+        "start": 36475.10003775,
+        "end": 36506.075518083,
+        "seconds": 30.975,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 21453,
+          "output_tokens": 1461,
+          "total_tokens": 22914
+        },
+        "batch": 27,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "a782f2fd5c26a1bc4e03cc4892e246cafccfba2adc38bad1e7936268488346ef",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "c1b0248f2397d2a49fc234179042e778a32e70310e2d7f63983b60403339e515",
+        "start": 36475.100149583,
+        "end": 36504.457933208,
+        "seconds": 29.358,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 21034,
+          "output_tokens": 1272,
+          "total_tokens": 22306
+        },
+        "batch": 28,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "94c98471891596cf1b1c2dac465079d9a02c61cc67f8df010192774b02bdab05",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "301b884c4cb696d9694f069cb0965be0488521a3cc90bd7336bf2a35ed0d6db9",
+        "start": 36475.100005041,
+        "end": 36508.44807825,
+        "seconds": 33.348,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 19248,
+          "output_tokens": 1444,
+          "total_tokens": 20692
+        },
+        "batch": 29,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "9cd4081f9dfc12e2901d32eeeafb1ec39e64ef98dac806a0fef73eb96498763e",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "a47169e2ae0658aa23acd00f45c85295d71c5faa2dc48d867235c7504294df0b",
+        "start": 36514.62243825,
+        "end": 36546.099649833,
+        "seconds": 31.477,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17711,
+          "output_tokens": 1395,
+          "total_tokens": 19106
+        },
+        "batch": 30,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "6fa2390438289a6976a87205a8fa2662869a73d6dd6a8a1a96d2c7d5c3aa902c",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "fc90020c4116d51f9bf1e48448706e34ffd19df8931f7248c047a4d7214477e2",
+        "start": 36514.622617333,
+        "end": 36546.064805625,
+        "seconds": 31.442,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17489,
+          "output_tokens": 1258,
+          "total_tokens": 18747
+        },
+        "batch": 31,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "ce446d1cb99d48c537b82bcbb963f039cfd420ab013846c5667e02999b7f19e4",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "fe4000cd6073f264541212504fbb02552f97702a4af19217bb29f069b8d7d7bb",
+        "start": 36514.622112916,
+        "end": 36545.143774333,
+        "seconds": 30.522,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17227,
+          "output_tokens": 1258,
+          "total_tokens": 18485
+        },
+        "batch": 32,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "9184c20e4d860b8c75883cc24d2d3c9821d163083fc6ab218f5f367d3b075d9b",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "0bb35f99edde8d54c57dab0e561db04b14703f10254655bf68fb7a5ad6996828",
+        "start": 36514.622247625,
+        "end": 36544.887562291,
+        "seconds": 30.265,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17945,
+          "output_tokens": 1251,
+          "total_tokens": 19196
+        },
+        "batch": 33,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "ab68c328968f1e21fcb085e8e90edcdf351f3823ccdc818baf8cad8cd8134717",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "563c558b64a7fdbf66a61e3fe985928ec4ebdaba2a27041b7584c0e6368d5b8e",
+        "start": 36514.623860208,
+        "end": 36545.827119958,
+        "seconds": 31.203,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 19479,
+          "output_tokens": 1298,
+          "total_tokens": 20777
+        },
+        "batch": 34,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "f5cae37cf2e20115fab77c3355dbe536c12e8461726d636ea66691bf631a68b7",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "4a84fff9c68ef8bf428d67a0d213e07a02c60283c22ff43593e2f7c6ca429f81",
+        "start": 36514.62219075,
+        "end": 36545.099149041,
+        "seconds": 30.477,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 21171,
+          "output_tokens": 1334,
+          "total_tokens": 22505
+        },
+        "batch": 35,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "e037f896413bc9fd6cb8a8070fd1fe3a059b245e2a1a8e72aaacb79fa72211a1",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "16c7c768ef9601e886339e1c8690b253c3180ed621d637e21af962c37ecedf7c",
+        "start": 36514.622333666,
+        "end": 36550.92367225,
+        "seconds": 36.301,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18092,
+          "output_tokens": 1253,
+          "total_tokens": 19345
+        },
+        "batch": 36,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "b4c895868045b6988dc01db1f07133f0dcd6e3a6982774e7c87d3725a571231b",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "ac624f79404723c632b8d8f8d6ec23b70cb067859b8a9abb600bef84d0ed0ae9",
+        "start": 36514.62117325,
+        "end": 36541.374713166,
+        "seconds": 26.754,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17789,
+          "output_tokens": 1218,
+          "total_tokens": 19007
+        },
+        "batch": 37,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "f5d657c49e8e731be67e29fee56e151c08bdef274d7e669bde1810ecff296b58",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "76b82a5647502bb948ea143ecc7af471f6628cfe26e49360e02130f082ff970c",
+        "start": 36550.938597,
+        "end": 36585.868062916,
+        "seconds": 34.929,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17513,
+          "output_tokens": 1141,
+          "total_tokens": 18654
+        },
+        "batch": 38,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "8cc8649a368b09922daf5e83e87707d897a0a29cc997fbbc4650739ff2b550c7",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "f1291b4b3c56b96b0ed0a2d033de719d0594cc6087a0133d41bc8cad70c2be93",
+        "start": 36550.938944708,
+        "end": 36584.281418166,
+        "seconds": 33.342,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17491,
+          "output_tokens": 1142,
+          "total_tokens": 18633
+        },
+        "batch": 39,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "9d71ad58c801f79e41fb1621f16e3f9397cfe584046a8482ea4aaf77b38e69bc",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "9b28788623e28b71ef6d649e64e9a945da4e0f7425a04872739a243a5ce16fa2",
+        "start": 36550.938777083,
+        "end": 36583.468318625,
+        "seconds": 32.53,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17733,
+          "output_tokens": 1312,
+          "total_tokens": 19045
+        },
+        "batch": 40,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "a681ff60dd7167579fba9c697c2caf9d49e3fae26066d7a410359c0f03856aa1",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "e7018add1b50132ce94f3643eb4db2b5359e956f00dd73ad5ea21d1464dc86a9",
+        "start": 36550.93848575,
+        "end": 36583.286887291,
+        "seconds": 32.348,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16599,
+          "output_tokens": 1266,
+          "total_tokens": 17865
+        },
+        "batch": 41,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "118382b83081024b4e840be0aadbf2c9c52f0d9fcc64e17c6d8f2b8384aedf77",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "720c446a60b8bdd0b13ac382583b893038f6f104e6f486191239aa6b7e86911b",
+        "start": 36550.935373375,
+        "end": 36581.598943208,
+        "seconds": 30.664,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 15978,
+          "output_tokens": 1201,
+          "total_tokens": 17179
+        },
+        "batch": 42,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "1b10410d3de2d008f30dba559afbec06e0f8e56d9b48a51236c55d7157e23862",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "4d9050d251a22eee0a221cdfd42ed720c680d4d7b941db3a659446636e856dde",
+        "start": 36550.93729975,
+        "end": 36580.400903041,
+        "seconds": 29.464,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17253,
+          "output_tokens": 1133,
+          "total_tokens": 18386
+        },
+        "batch": 43,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "0861a43fcfc8b23a1dfd7eb9182940739eff14cfae251ddd47dda6b80256d964",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "76b36af9e1adab6751e1ceee3f939c660043c9e04bef380dfaa8d9806664ce67",
+        "start": 36550.9384315,
+        "end": 36584.718337708,
+        "seconds": 33.78,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17756,
+          "output_tokens": 1195,
+          "total_tokens": 18951
+        },
+        "batch": 44,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "c3036f7055708b0d6aceca703485109ba77cff4e6a3b7a1ce6271de670f07910",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "7219ebe711362fe5d3b74ed6e0a27c0dcb449339d24b0077c0eef11bfce84af7",
+        "start": 36550.9385565,
+        "end": 36584.913680916,
+        "seconds": 33.975,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17786,
+          "output_tokens": 1198,
+          "total_tokens": 18984
+        },
+        "batch": 45,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "7bd2845a484497058117586748ee9f45ebd6f2e97b95043f9f5a3136b8cc26c4",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "90dbda8e6804f505ce442fb56556dc7983864e33136525507798cd4bd4e5d679",
+        "start": 36585.879374333,
+        "end": 36614.501574166,
+        "seconds": 28.622,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17187,
+          "output_tokens": 1265,
+          "total_tokens": 18452
+        },
+        "batch": 46,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "b8973fd2f54ed17577eb56e426cfee1f81d7b0c8650e9d255ef918272327ae08",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "ebdef879b79081a3f08d4fbf7cdcd6a9e43ad23e3855096ae91901d6560cd651",
+        "start": 36585.87958125,
+        "end": 36616.247628375,
+        "seconds": 30.368,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18634,
+          "output_tokens": 1285,
+          "total_tokens": 19919
+        },
+        "batch": 47,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "d3f6ce7a3852aa30026f84397e47de3d185ef94a77ba337e42ce70de87269874",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "30dd0e4d675dbfadf513488c30e1e58ee204f7759dbf99cecc60f22d06baca22",
+        "start": 36585.879641,
+        "end": 36614.252947291,
+        "seconds": 28.373,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17802,
+          "output_tokens": 1153,
+          "total_tokens": 18955
+        },
+        "batch": 48,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "5231172afc4bc8d307a133224de500b83a5c5e8d1d7c4744b6e0a8463cf3d640",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "df3790fd0cded37fdecda446109f263794a097520b7d556cb4b708309d98cae0",
+        "start": 36585.881033958,
+        "end": 36614.822269041,
+        "seconds": 28.941,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17668,
+          "output_tokens": 1199,
+          "total_tokens": 18867
+        },
+        "batch": 49,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "f9b6e804566fc0b5400efb5bc0bebc097bece31022213ed93e515522c9115fb5",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "a91d2be1bdd04177c6325d0e3de09728ac9bee1de748a3b6319770fadd422e56",
+        "start": 36585.879657583,
+        "end": 36614.869360666,
+        "seconds": 28.99,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16843,
+          "output_tokens": 1156,
+          "total_tokens": 17999
+        },
+        "batch": 50,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "56339bc02265f233661528152e550e11c20fcd7cbac91ab4409570cefdf89ea4",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "8af90ac9961836e181fd9efa6d23891fbdf0328ffc081ad0a1fde4a25240863e",
+        "start": 36585.879695916,
+        "end": 36614.907775833,
+        "seconds": 29.028,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17495,
+          "output_tokens": 1225,
+          "total_tokens": 18720
+        },
+        "batch": 51,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "6454ba4c0ae49d095cde9d7d8a762a5821054c9170cb2667edc1ac234696cb88",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "03d8e2cbde0a208211ed4e6030e6c537dcf8d235027bbcbd1e7e92b69c7b608b",
+        "start": 36585.880654,
+        "end": 36616.648233041,
+        "seconds": 30.768,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16078,
+          "output_tokens": 1118,
+          "total_tokens": 17196
+        },
+        "batch": 52,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "ae46e7ba519999388a00e239fc3a724eaa4ea077c47d41d3206e96ccb84cf0e3",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "63847b9c770b6e98f91c88a75ed775a3bd1f259084423a734906aad0229eed28",
+        "start": 36585.879709541,
+        "end": 36615.1709265,
+        "seconds": 29.291,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17068,
+          "output_tokens": 1194,
+          "total_tokens": 18262
+        },
+        "batch": 53,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "0308682609fd19fec96afa82421e0bdf6ff48689bda3b3832d84d91c02cb4b6e",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "bbf7eaece442e2ebbe490ee4f1da5bacff03e3edaef3cce0528221068a84a503",
+        "start": 36616.657925291,
+        "end": 36646.077942791,
+        "seconds": 29.42,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17087,
+          "output_tokens": 1181,
+          "total_tokens": 18268
+        },
+        "batch": 54,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "e8fa0dacdd59a9a4b25bce77331870a50a5a2ae7dd54d86da1cd099a616a00c8",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "aab08452ee4402a9f9364995929bc54a5a217c0ce0feaaad28f174361575e609",
+        "start": 36616.661381666,
+        "end": 36642.720112916,
+        "seconds": 26.059,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16527,
+          "output_tokens": 1244,
+          "total_tokens": 17771
+        },
+        "batch": 55,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "49b701cb3e17b0cc6d3875a115cd540378436b7be70c90b278ae72de3ece4f05",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "a232b93bd882db7e9b154f7cc7c47ae22a963306218fb867f88d59ca5c45cfd5",
+        "start": 36616.661108583,
+        "end": 36645.650491916,
+        "seconds": 28.989,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16746,
+          "output_tokens": 1188,
+          "total_tokens": 17934
+        },
+        "batch": 56,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "fbad3c08279059fda96d0af0092f42a3597e753eb0f46aa1a6ccd3e05c869e24",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "92371d2bcd6b6d063f5e84fefd7ab2ef6d5e3884ae3140f574733dad7bd49642",
+        "start": 36616.661087916,
+        "end": 36643.71983825,
+        "seconds": 27.059,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17836,
+          "output_tokens": 1168,
+          "total_tokens": 19004
+        },
+        "batch": 57,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "6942a46c5a0586d593b281574575bce36329f7131a5d12da670c1d24652ab1b5",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "9670c686181e7d7afb853ec738b600ea9f54e6de45a7d484e55a31689501214e",
+        "start": 36616.65813525,
+        "end": 36647.426216958,
+        "seconds": 30.768,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17269,
+          "output_tokens": 1182,
+          "total_tokens": 18451
+        },
+        "batch": 58,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "7b53ad374b625a63f5785ec3652857fa6336f1ab0b0da12d1236386130f522e6",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "4bba3213b16eaa733df4e1f56666342556b18077fdb4c92443c9e1f96d5c6290",
+        "start": 36616.660014375,
+        "end": 36641.398629166,
+        "seconds": 24.739,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16453,
+          "output_tokens": 1139,
+          "total_tokens": 17592
+        },
+        "batch": 59,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "19cfaacadc70fabbd308f9914625ed36f533666453c7ffc694ada608bf3c3970",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "23609a40d4e4cc87183e0444af27df5da3aedd359abf100206fe62d9129918e4",
+        "start": 36616.661520833,
+        "end": 36643.203717541,
+        "seconds": 26.542,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17514,
+          "output_tokens": 1157,
+          "total_tokens": 18671
+        },
+        "batch": 60,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "4839e1db0ef039f6cd916863f88837770913c5dfb4613c44c5ac56d16fecf1f3",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "ab889da0f99bf3b3e00fcff41df258151aab2421c4228974a2dd8fd1fba5f829",
+        "start": 36616.660031208,
+        "end": 36653.963178541,
+        "seconds": 37.303,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17145,
+          "output_tokens": 1296,
+          "total_tokens": 18441
+        },
+        "batch": 61,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "8b6502dcaf8f5a1b65ae25d02492bb93d1f464606025ea4be158d8025471e4bb",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "5b0becba05817422be4d4e4e773581e175fc0748294eb9550d1dce944270f004",
+        "start": 36653.977957333,
+        "end": 36681.664220708,
+        "seconds": 27.686,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17425,
+          "output_tokens": 1135,
+          "total_tokens": 18560
+        },
+        "batch": 62,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "e758c6c1f23f16b00e8c3a9eb0cc2b57689f68a74ea44e211259e9dadfcd2b2b",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "e82fca5a3df4325a92e9efa7b1ad5212ae73a36962a4b14c14b40bff89247794",
+        "start": 36653.978094333,
+        "end": 36678.892375708,
+        "seconds": 24.914,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17152,
+          "output_tokens": 1145,
+          "total_tokens": 18297
+        },
+        "batch": 63,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "825c60537da65a06fb8690259ee576a7e5f7a5281b31f51ff356dff691914963",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "97195f615087a54ca9151e16b5dcbc85a0128fc30afa9901e3affc7bee8a4b17",
+        "start": 36653.973839666,
+        "end": 36681.481433375,
+        "seconds": 27.508,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17345,
+          "output_tokens": 1182,
+          "total_tokens": 18527
+        },
+        "batch": 64,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "cfc1a7bef323960c62a3ab36ba03cc88fff56f074a8ea5febd1f2217727638c5",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "5cfc61d155e9575e8151a3d64381b928f3b64425c489f20050a642180957fc3e",
+        "start": 36653.977996166,
+        "end": 36680.880452916,
+        "seconds": 26.902,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17572,
+          "output_tokens": 1251,
+          "total_tokens": 18823
+        },
+        "batch": 65,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "3ca6c7309e54e4d8846f21aa7c9d8c5d48346b2a26b4e48d47684db61cf57120",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "2f651acd9ef7c10ef3f3a828a2db55862eb01b5d2d39561945688db72e2f242c",
+        "start": 36653.975853083,
+        "end": 36688.305494791,
+        "seconds": 34.33,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16814,
+          "output_tokens": 1182,
+          "total_tokens": 17996
+        },
+        "batch": 66,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "aeb614f2f5cee0b8bfe682f4131636a596e1d8a4a0ea976dcbae3d663f0adf41",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "bf44045b329325bb9d0fa88e3ba2a53b6390b71376606ec23a60d9217cf0eeff",
+        "start": 36653.978200291,
+        "end": 36686.839033958,
+        "seconds": 32.861,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17378,
+          "output_tokens": 1198,
+          "total_tokens": 18576
+        },
+        "batch": 67,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "fc5160f69163eac935d2ca1be73da55b24d0c00a1a0ab0d1b5a4595ed433bb30",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "21367876a762d0c5b627dcf80f318b32db2065d7381f7d735b7d0323442a961d",
+        "start": 36653.977798333,
+        "end": 36680.407766583,
+        "seconds": 26.43,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17577,
+          "output_tokens": 1140,
+          "total_tokens": 18717
+        },
+        "batch": 68,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "0e9ed82d55a9f61798ad85bef77ffd4cd149294a2ea5d98ccab4eca03af7a185",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "2f70af6dd9c13fd698255230f9c8e00751c952d14f999e869286bfa05cabe5a3",
+        "start": 36653.977699916,
+        "end": 36681.678215958,
+        "seconds": 27.701,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16360,
+          "output_tokens": 1130,
+          "total_tokens": 17490
+        },
+        "batch": 69,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "9b963eac41fbd20e38a3326d685d9c5ad10ecdd55628e8a9b18ac40a4f6da87c",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "420efef611925fb4449c5d5c4b2b7d53a33de3925019159542f0a4839ed5dbc0",
+        "start": 36688.312516333,
+        "end": 36713.818343291,
+        "seconds": 25.506,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17618,
+          "output_tokens": 1164,
+          "total_tokens": 18782
+        },
+        "batch": 70,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "acdefc53d740a63ac3446d8a2a933996be7379f0862573f42c674fc13c2bd3e1",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "f059172384467ac05e3143563f7a31ead5caccebf58d0feb2187fd7cfb9bc988",
+        "start": 36688.31778225,
+        "end": 36718.629220541,
+        "seconds": 30.311,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18069,
+          "output_tokens": 1272,
+          "total_tokens": 19341
+        },
+        "batch": 71,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "3a09cff75c9cc011549fc40ff476a78d46a63cd4853c71e4f6a05979573be128",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "4e5d9aa22858cdd4e6b76920128a240d9071c8cab870ecb39011aa2eaa7f9a4a",
+        "start": 36688.317749666,
+        "end": 36716.85033425,
+        "seconds": 28.533,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17801,
+          "output_tokens": 1132,
+          "total_tokens": 18933
+        },
+        "batch": 72,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "7c1652c58f875d9b2628f08a839e62b2638d5ba424874c4f9451c8082c8240ca",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "3a54a4b687febd3bc4df4425fd07b67698bc0a2c93460ff8fae6a9571e115dba",
+        "start": 36688.314434583,
+        "end": 36716.41226875,
+        "seconds": 28.098,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17324,
+          "output_tokens": 1215,
+          "total_tokens": 18539
+        },
+        "batch": 73,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "b002e30fec6809d6113e67b87126bff8b1202ad34a0e033a5d1f9cb33578079d",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "cf1f510164e94cfea884788b48e339cffe9ac7af41db6003f388d3186e9f5cd0",
+        "start": 36688.316659416,
+        "end": 36714.074374375,
+        "seconds": 25.758,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17354,
+          "output_tokens": 1199,
+          "total_tokens": 18553
+        },
+        "batch": 74,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "a0ca7a3acc137642b88959af4f9881f1965331cb29d7d8f73fed6d8b33063f4f",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "8eb67046964ed001a4ab371ebdd0ed7e66c5ed3929f435150ca26917685c470e",
+        "start": 36688.31761825,
+        "end": 36724.5353625,
+        "seconds": 36.218,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17037,
+          "output_tokens": 1206,
+          "total_tokens": 18243
+        },
+        "batch": 75,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "b836db18a66818e36f814e43ed28edc813d9d0ba1980f3dd9d97f35626edc277",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "a76862e8e6c5adb3dc16345fc68014f14a051fec5a2bb7122a52ab77e277b93b",
+        "start": 36688.315505875,
+        "end": 36716.272763833,
+        "seconds": 27.957,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16791,
+          "output_tokens": 1252,
+          "total_tokens": 18043
+        },
+        "batch": 76,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "e7aaac0c47b6654af5912e1828eeec39e90e24b49b6cf85af46b82351b2356e5",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "a4068114858bb0443bcac6365b897a23fe15098791a6b5bb09de1e6ab526ca75",
+        "start": 36688.3181625,
+        "end": 36718.711762791,
+        "seconds": 30.394,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17448,
+          "output_tokens": 1276,
+          "total_tokens": 18724
+        },
+        "batch": 77,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "1282db2eed813ef2c0bbf7382ac134fe7fd8e548b0393ed59fcd9efac9c4d4fb",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "73ab2119ec5da43d356bd172117eaeec1bb71ea429bd8ec00e02907bf37a6f42",
+        "start": 36724.547334916,
+        "end": 36755.122729958,
+        "seconds": 30.575,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17493,
+          "output_tokens": 1200,
+          "total_tokens": 18693
+        },
+        "batch": 78,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "cdb3857456114ce5b535a8a08a8b22be47b0e08f1c2d23a331480777f06b19db",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "6269d195d10e4f3e3a23fb699d707d8a850222a3ebb1528b625387034ec36702",
+        "start": 36724.547179291,
+        "end": 36757.369755458,
+        "seconds": 32.823,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17903,
+          "output_tokens": 1308,
+          "total_tokens": 19211
+        },
+        "batch": 79,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "97e53230808288f49eb141c55dafaddd52363cec424a6b0e3c66d5fb5582f9e7",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "a609942ea09e1fe89660af66233a75fbbd33af5943fc8a429046e867b866916b",
+        "start": 36724.54721225,
+        "end": 36756.327849166,
+        "seconds": 31.781,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17877,
+          "output_tokens": 1277,
+          "total_tokens": 19154
+        },
+        "batch": 80,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "99c146966e69dbcc425e4947437550f3024aa556e3ae174f283113c410896f46",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "1a40113c086213bf654e149ca7db3e3a8b61795735dd254a23e006b54c6e9d36",
+        "start": 36724.547374875,
+        "end": 36754.993152375,
+        "seconds": 30.446,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17748,
+          "output_tokens": 1220,
+          "total_tokens": 18968
+        },
+        "batch": 81,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "138a3ba6219794e2ed753389930114f2592ea38e060511a8101677018ede4be7",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "68100ab89a145cbf8de95ceb650fd8c0291ef4b0deb9e1385daf341851b62f9a",
+        "start": 36724.54612575,
+        "end": 36756.849398166,
+        "seconds": 32.303,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17790,
+          "output_tokens": 1268,
+          "total_tokens": 19058
+        },
+        "batch": 82,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "96baefb9780bfa88e7770dcb10866a7242f1fa7d4bebfefbdad69da75918fee2",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "d01f3d3fbbc27aa2eaca381b8333c0bba1c300083f769cb82d1037a8a7c6ff36",
+        "start": 36724.548838083,
+        "end": 36763.876018416,
+        "seconds": 39.327,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18274,
+          "output_tokens": 1316,
+          "total_tokens": 19590
+        },
+        "batch": 83,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "f673ea9e84cc836da2dcb27691a8d01e437f95706e085382491ed72e1fbf6bb4",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "63ad7d28fd362ecf064a99bcb431030de2969a28d1f975fbd9fc868ddc71bdb5",
+        "start": 36724.547385708,
+        "end": 36754.86133425,
+        "seconds": 30.314,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17754,
+          "output_tokens": 1204,
+          "total_tokens": 18958
+        },
+        "batch": 84,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "fb3530ff9ef31e6f66ec51b8882c73632c125083805dd06debb8716fe54484dd",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "734e7d5eb968664ad0189f8b32a61f38287c5ee19eef77d9c9dd8ae04a83d724",
+        "start": 36724.547118666,
+        "end": 36756.945929833,
+        "seconds": 32.399,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18301,
+          "output_tokens": 1307,
+          "total_tokens": 19608
+        },
+        "batch": 85,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "99f17b54119fca164f3a55889de62a533539f6920e6369d96430181f6b5119f0",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "940df670bfc1c72459734ebc2d3ca01626579a7ecb89e020a4b9d1994da7900c",
+        "start": 36763.888700875,
+        "end": 36797.032175791,
+        "seconds": 33.143,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18300,
+          "output_tokens": 1262,
+          "total_tokens": 19562
+        },
+        "batch": 86,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "ee01b872eca7c53281156c4e5c7266487c757df1325503a4a8b7bf25885556a8",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "21c9c7602280469006573ea65293e3f59dafd41c376bd4ceaf228ff1abf55545",
+        "start": 36763.888746375,
+        "end": 36790.694232125,
+        "seconds": 26.805,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18661,
+          "output_tokens": 1120,
+          "total_tokens": 19781
+        },
+        "batch": 87,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "231f4a7b6059dc6f0014dfc27d5d1aba794f13c4aee5f83db7210bbc13a23fb6",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "5a066a225b59129702230b546df7811809c72e45d53a33801e41ab00ce76fd40",
+        "start": 36763.889946541,
+        "end": 36790.954680208,
+        "seconds": 27.065,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18283,
+          "output_tokens": 1139,
+          "total_tokens": 19422
+        },
+        "batch": 88,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "ea762a53379d19fa043fe33d352588c751d2c5ab871a39f2bdc65e75cb1ea20b",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "73ce15124abb9517d5e41e730e04bdc199d7cb7b79aec970daa74d354406a290",
+        "start": 36763.888784208,
+        "end": 36795.260752958,
+        "seconds": 31.372,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18128,
+          "output_tokens": 1120,
+          "total_tokens": 19248
+        },
+        "batch": 89,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "a9b6a892bbfd60b22295f4c6050b2abba0c7b46bd2bbbe9392c9c1716f40d124",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "2b4fb4bfca70a2cbcd89928617d7db63142231de01701d8a4ce971e343b10286",
+        "start": 36763.884538666,
+        "end": 36794.373165583,
+        "seconds": 30.489,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18013,
+          "output_tokens": 1150,
+          "total_tokens": 19163
+        },
+        "batch": 90,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "3bcf04dee03f49e9961deed1061fb6f2d0a1d01e83b0fc2f23d44b67bfecb929",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "77cc9656f9062d6351c395b14fb2f86bae567576cca51b3cec54c2d6fef6bb2d",
+        "start": 36763.884646125,
+        "end": 36790.99155275,
+        "seconds": 27.107,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18406,
+          "output_tokens": 1214,
+          "total_tokens": 19620
+        },
+        "batch": 91,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "8ff35b1dbbabf426f9ea6d0ef2ccbb56164340d5813d2f384bcf92eaf5c5531d",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "bbf1e86fec215d73131b55242d72810c214152b14e664a4c239d99f4be808359",
+        "start": 36763.888835541,
+        "end": 36792.637742,
+        "seconds": 28.749,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17152,
+          "output_tokens": 1221,
+          "total_tokens": 18373
+        },
+        "batch": 92,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "56f8aac537e2e9f370ad669431e75e83dbb2f277c41573392663d170543ed059",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "4b28d9607b76c5a33255b422f19a072071975a34b122c4ec87407873921b2e85",
+        "start": 36763.889885833,
+        "end": 36792.572651208,
+        "seconds": 28.683,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17494,
+          "output_tokens": 1302,
+          "total_tokens": 18796
+        },
+        "batch": 93,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "620ddd18b33d57634ca25693a5640bf889b49b2daf33213ea8a6d983cd201863",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "ed47e519b30f08b72fae99511fd636b6980799fdb545977922507a7cb6787056",
+        "start": 36797.042369583,
+        "end": 36823.829248291,
+        "seconds": 26.787,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16818,
+          "output_tokens": 1278,
+          "total_tokens": 18096
+        },
+        "batch": 94,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "b0f7a3d2b1564f7417677c28dc9de04a68cfb70091a4cc9fc78329be38ee8710",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "8af4a7f52f7f80a07504aaf1aad487fddee5389012e2423b13b99684cda1e05e",
+        "start": 36797.042287875,
+        "end": 36827.893264083,
+        "seconds": 30.851,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 15524,
+          "output_tokens": 1314,
+          "total_tokens": 16838
+        },
+        "batch": 95,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "f24101b7b64b2a6a764905c299ba95bd7dbd3232b8f4fddfb41842e39cf1270b",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "cdec791ab02e837adcae7165d2ae3a3c92134003a32b9b123e44a7cdc7c769c9",
+        "start": 36797.042482375,
+        "end": 36833.195637375,
+        "seconds": 36.153,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 14130,
+          "output_tokens": 1347,
+          "total_tokens": 15477
+        },
+        "batch": 96,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "f3882111278bffda8a03d68168f8fffbc7438b67c9a2d2c316bae54f8ba5ab4c",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "414cf02db53468731a508d05b3f7952806d2b6c6c0a52b9dc09269bafef6f11b",
+        "start": 36797.044707166,
+        "end": 36827.919685666,
+        "seconds": 30.875,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 14936,
+          "output_tokens": 1344,
+          "total_tokens": 16280
+        },
+        "batch": 97,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "1fc76c6406de8903bebca33a8e9a84b7479651a6d3f32bf81d30f2f26fb9a9c0",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "c9abdc05356691539f4aaabc7b8b6ad6f5e9e89402339daa72d4eac725bba77e",
+        "start": 36797.044726541,
+        "end": 36824.220944125,
+        "seconds": 27.176,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 14934,
+          "output_tokens": 1252,
+          "total_tokens": 16186
+        },
+        "batch": 98,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "d3f611b48c122d2d7ad98d1b48afe69874384fef24cd7b7613a76f322f2cf4d9",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "9aeb94203d3da3627e723299c25a3722b1e24b7875e9b2454bf48178b12aa5a5",
+        "start": 36797.042508125,
+        "end": 36826.955469541,
+        "seconds": 29.913,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 14342,
+          "output_tokens": 1341,
+          "total_tokens": 15683
+        },
+        "batch": 99,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "8862d3d07a16f889fa619862962559ba0173da8c28e6aa0cbbaf8461648eab8f",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "2c5b41e9c4c2e07dad079d75d62cb51a778626989cb2717136b97f60318bd496",
+        "start": 36797.042529875,
+        "end": 36828.802835041,
+        "seconds": 31.76,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18933,
+          "output_tokens": 1340,
+          "total_tokens": 20273
+        },
+        "batch": 100,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "ded28cbcc29b41e50a645349893f42c85117b54af838c4e791c88cdb3e22d697",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "d94d4be03909d58fa9ffc1d19d7b16d745104ecee19db9c86860646f1e763163",
+        "start": 36797.042449541,
+        "end": 36824.054085625,
+        "seconds": 27.012,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16605,
+          "output_tokens": 1212,
+          "total_tokens": 17817
+        },
+        "batch": 101,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "14cc50c5d4f1d14e29582b64fd600c120dbe58549b2cd0723631b9a22dabdfcb",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "ddee650da7ec99e048abcaf5af1d67d6565703effd0c97e3e13179d126e93b79",
+        "start": 36833.207213208,
+        "end": 36860.677755708,
+        "seconds": 27.471,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 19153,
+          "output_tokens": 1327,
+          "total_tokens": 20480
+        },
+        "batch": 102,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "ce9916ba12fbc0d3e39d64e87ef6ec3168bfedad49255a6b4121892f59b6162b",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "34d4915ae324d7b5475120729d5c5f9034c3723d697b8e84c407b4ea2a6b7bde",
+        "start": 36833.20907875,
+        "end": 36867.5920315,
+        "seconds": 34.383,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 15833,
+          "output_tokens": 1303,
+          "total_tokens": 17136
+        },
+        "batch": 103,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "a54b00afb475fca399c8c4260fbebd67e3186a470c0107ce289dac3a2e36b6f7",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "2bd12a99f3bf7701754c83565c714758968c76a592631ae8b5223d2ad5ec32d3",
+        "start": 36833.20922825,
+        "end": 36865.999142333,
+        "seconds": 32.79,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18119,
+          "output_tokens": 1506,
+          "total_tokens": 19625
+        },
+        "batch": 104,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "00e5703dc318397839973bdf8756628806d763900f0cc3205558346f4240bea9",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "4474022ed8e3d165ee336d4bdff3d97d56f8f739a1183f3a26e41e8ec1b997f2",
+        "start": 36833.209167333,
+        "end": 36859.119429,
+        "seconds": 25.91,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 19277,
+          "output_tokens": 1191,
+          "total_tokens": 20468
+        },
+        "batch": 105,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "ef35eb5b2cc5aa63ce81734a8677f547744e711a48863140df470f8cbedc151b",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "1773b756426d2f46ccb9409b5d1f8d485e61bc0090a0c61f9c6cb5785d7cf643",
+        "start": 36833.209748333,
+        "end": 36871.781715916,
+        "seconds": 38.572,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18727,
+          "output_tokens": 1368,
+          "total_tokens": 20095
+        },
+        "batch": 106,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "a94b1fc4b37388c384f1332ad1653c7a439b53e9adafd5c0bd5de5cfda90bad6",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "c05c5ffb6b840006b50bb8f0f8e501a04371310d33319499ed0c12ca39ad8029",
+        "start": 36833.209266541,
+        "end": 36864.816680166,
+        "seconds": 31.607,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18870,
+          "output_tokens": 1432,
+          "total_tokens": 20302
+        },
+        "batch": 107,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "d24f84e6a0f707991d18bdfa8ed3f5612658a4f65485799809ba2ac38f2c4e5f",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "0e0f4a00e3c5b627a63ec9473725c9ccd1429fb5f1797d8c70783259506751e8",
+        "start": 36833.209496583,
+        "end": 36862.835349083,
+        "seconds": 29.626,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17310,
+          "output_tokens": 1396,
+          "total_tokens": 18706
+        },
+        "batch": 108,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "4af36e8e0b9e409e43cee90a755d03738f2d35357dc755a05d4766cb7edf2021",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "dd14a86f6c88576eb1b13fd8812b97dcfe381364a49d73f1c9709274459c2fcf",
+        "start": 36833.20715925,
+        "end": 36865.4141295,
+        "seconds": 32.207,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17708,
+          "output_tokens": 1382,
+          "total_tokens": 19090
+        },
+        "batch": 109,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "cca56dc004201c6cfd415fbe2c542552a5d170d7bd47a80ed8d99c59ab9d74b8",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "472c0034a3c24465fdefcccfcd723a0bfd23c77524ec2646ebf03fd8953c8be5",
+        "start": 36871.794027291,
+        "end": 36902.368009875,
+        "seconds": 30.574,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17444,
+          "output_tokens": 1334,
+          "total_tokens": 18778
+        },
+        "batch": 110,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "af83ffeb31e780353c86261065c335b3629a431d99a2e1f7b44b204aa73825d7",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "33b32d69063cf40c43a40f4487a5108d74cdeee17585e854646e7e312a26b872",
+        "start": 36871.795025583,
+        "end": 36900.658045833,
+        "seconds": 28.863,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17451,
+          "output_tokens": 1286,
+          "total_tokens": 18737
+        },
+        "batch": 111,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "8305c656fb02cee66f91f263751073d796e94804379429e47db018c799fc861a",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "d8d85ee9572e6d272fee852cfcc8e27349be08e29ebb7ced390ceaec85a4e5d8",
+        "start": 36871.796129791,
+        "end": 36900.478633208,
+        "seconds": 28.683,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17885,
+          "output_tokens": 1335,
+          "total_tokens": 19220
+        },
+        "batch": 112,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "10af996dc88964a8f3e3956ad8d8434b81a4235e8b67432556f9a4bc8ee7568b",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "f9bb17a9cb0fa6aae46c631b46bcb6b547a99490a611696fa58b7c191d8ad755",
+        "start": 36871.796736791,
+        "end": 36905.822559083,
+        "seconds": 34.026,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18461,
+          "output_tokens": 1314,
+          "total_tokens": 19775
+        },
+        "batch": 113,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "5fb36ce2691f757d227771f1e3b12f81288d50de2cb8f22ab011218110864cbd",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "05fecb550e36758ecfb791dd79cebf5ed245698912e22ae99a3c11d11ebb2a0d",
+        "start": 36871.795058791,
+        "end": 36899.53777675,
+        "seconds": 27.743,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 24897,
+          "output_tokens": 1281,
+          "total_tokens": 26178
+        },
+        "batch": 114,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "d117e0bed4f02de37bdea15c27658f99682229da9ba8e604b50ed09f184f8081",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "26c1b043e55a240ec40d7dec5e255fbe085bc7ec26ba2573d0e0319445d548d1",
+        "start": 36871.79620225,
+        "end": 36904.527646958,
+        "seconds": 32.731,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16917,
+          "output_tokens": 1412,
+          "total_tokens": 18329
+        },
+        "batch": 115,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "5257d5cc941ac3ca7d027ecbc3a21e36879141bd6e5647bf7439e56eb709d9c1",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "c5e63fabd11dd84620062365486bf2bb887c8d3bd9845dc81d24d10bec69331d",
+        "start": 36871.794009916,
+        "end": 36899.756027791,
+        "seconds": 27.962,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17912,
+          "output_tokens": 1315,
+          "total_tokens": 19227
+        },
+        "batch": 116,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "a6a9e058f3a4ea27e4287f03443ba0543718d12cd3abec04de559c12fe094ec2",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "8dca0bde187a2ff3523d2cd9a98331b5f1b5527baea534336c2647b0ed45c7bc",
+        "start": 36871.793948083,
+        "end": 36905.758933416,
+        "seconds": 33.965,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 15180,
+          "output_tokens": 1450,
+          "total_tokens": 16630
+        },
+        "batch": 117,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "b61f0b3cb78b6b160e4159badf4c03177a0c9bedf02d7a53878ead8543b14474",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "6dccef1f8e3097623549ae2558534b59f3c6d44c2163fc943d0f5160627323b7",
+        "start": 36905.837166291,
+        "end": 36934.994885791,
+        "seconds": 29.158,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 18727,
+          "output_tokens": 1399,
+          "total_tokens": 20126
+        },
+        "batch": 118,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "7191fe6890b524200e318de589fefbd1bd7f7b2bb724aaff6d58acd1570072ee",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "a96c24fe196b816a4a5eb31cd7a196fd353382c3499639c3aaaf62f9292ecde0",
+        "start": 36905.836733375,
+        "end": 36935.323852208,
+        "seconds": 29.487,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 16772,
+          "output_tokens": 1410,
+          "total_tokens": 18182
+        },
+        "batch": 119,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "dbde5cd0b3a1cc721f222564608f854d795c4b57d5f6d192b9ce387e2b8a5f77",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "6813ce78b2982ffce46f3211f6f65c6bdc2cb8d11f890c5f4a5f85c1f215a559",
+        "start": 36905.834733291,
+        "end": 36940.093341708,
+        "seconds": 34.259,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 15125,
+          "output_tokens": 1335,
+          "total_tokens": 16460
+        },
+        "batch": 120,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "6fba809e7c7e947128949131c99ecc465abec282fe23985a68935e3d469e53d0",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "993dad1ddc844adbbad0b3685feb34c11b09bf1e8397d86ceb85ba86a262b78b",
+        "start": 36905.83683075,
+        "end": 36932.792950916,
+        "seconds": 26.956,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17295,
+          "output_tokens": 1293,
+          "total_tokens": 18588
+        },
+        "batch": 121,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "e6cb59cec5c91b8f8a294ae396158c25a864cb1de6681991f1d6db82604d1e90",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "23fa8dbece7a3aa77adf87fc7765e778ea14519be883eeeb57e632003c6c098c",
+        "start": 36905.834621333,
+        "end": 36933.484302958,
+        "seconds": 27.65,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 20056,
+          "output_tokens": 1215,
+          "total_tokens": 21271
+        },
+        "batch": 122,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "91a04117a9f1be2432a394b84343693e6be99369d8893b9ceb2c42fb9d9fe671",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "4bff5b62a741014769291c315e98e048c92a00d46a331f63cb26ad16ce9521c7",
+        "start": 36905.835728583,
+        "end": 36935.516820625,
+        "seconds": 29.681,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 19243,
+          "output_tokens": 1328,
+          "total_tokens": 20571
+        },
+        "batch": 123,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "cf0d51ce593c21b9c2976cf4b0039f7d09f8cc38bd503a8baad11d96c1128d80",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "37b71bf027fb730205884d7ec218f486147d23f4800a98d171648a44c06ba0fb",
+        "start": 36905.831502083,
+        "end": 36937.719313958,
+        "seconds": 31.888,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17859,
+          "output_tokens": 1337,
+          "total_tokens": 19196
+        },
+        "batch": 124,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "4bf45fe4f74afca74a050fbe0bb0cb653e2c16f94c6dc6b85900a79516431a84",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "12f7d2c1319eae9e6ca1fbe114d98b27c0016cd91bb4ed5c64162898d43924a3",
+        "start": 36905.831555,
+        "end": 36936.2871075,
+        "seconds": 30.456,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17177,
+          "output_tokens": 1287,
+          "total_tokens": 18464
+        },
+        "batch": 125,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "37925bf327ce9775604ce13f27d3e53e41f87f26d4c339826be6d8798c1bbe76",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "ccd80e9c1f1d9b4d963602d31b4d9c4e66fddab3d68177f03a50bfa38e336c7b",
+        "start": 36940.106948541,
+        "end": 36972.726138416,
+        "seconds": 32.619,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 20725,
+          "output_tokens": 1352,
+          "total_tokens": 22077
+        },
+        "batch": 126,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "9da6f63ed4bad282877ad295bd2ae73ddafdd007cb0cba0a4be4de91bf415049",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "fc48a76b3dc98d4f87e9b3a8231d22732dcffd96cbe006569194314c04b6fe3b",
+        "start": 36940.107174125,
+        "end": 36968.7519125,
+        "seconds": 28.645,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17773,
+          "output_tokens": 1333,
+          "total_tokens": 19106
+        },
+        "batch": 127,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "9c9d49d4dba1cde82d06b677988256aec9ad7f6b40acd277a09157e5ae614d78",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "6894b4fa0c1621c161f33409db07c73ce3896c8eae96a4e6ce41450001307fe5",
+        "start": 36940.107494458,
+        "end": 36970.476519916,
+        "seconds": 30.369,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 17209,
+          "output_tokens": 1397,
+          "total_tokens": 18606
+        },
+        "batch": 128,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "b9e2a9e24efca299557df3ea99418d1634802287d94908a9c9ca71a64d31cf10",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "18d630f77343234261ec02cb05f5e48030bcface7503f31548f475ea507aa2c7",
+        "start": 36940.107008416,
+        "end": 36975.855496833,
+        "seconds": 35.748,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 20961,
+          "output_tokens": 1497,
+          "total_tokens": 22458
+        },
+        "batch": 129,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "1e0fff9955407d297cd1a88d39ade96bf520f9f5d8f6c667f094303e9c3547db",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "2338296bc4e935d99218aeca63042089b996fb25fb8cab86554728460ac886df",
+        "start": 36940.107160625,
+        "end": 36968.730485125,
+        "seconds": 28.623,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 20665,
+          "output_tokens": 1295,
+          "total_tokens": 21960
+        },
+        "batch": 130,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "8078bb31d61475ae4c04b5faf638af579d40aac204ca75e0708657eaaf2e2011",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "109c30083f180d51ce63385b96bf2feeb7112595f5f955b878722c3498d79932",
+        "start": 36940.10720125,
+        "end": 36968.777006875,
+        "seconds": 28.67,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 20489,
+          "output_tokens": 1267,
+          "total_tokens": 21756
+        },
+        "batch": 131,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "0ac1751f4bebe6a56e1786dd455335763b880d5bb51c5888d63df174aa97fbae",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "b63ceaf4a3f9dd7f7267cf903588796e3047137e65428662c11c7923790b7eb5",
+        "start": 36940.107147541,
+        "end": 36972.532148708,
+        "seconds": 32.425,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 22645,
+          "output_tokens": 1332,
+          "total_tokens": 23977
+        },
+        "batch": 132,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "360536b2c7790ad7ad61af08f53324cfc06407c201f84971af38962be1710d70",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "b34265d03cd6fe9fbd1ee23be5ce1776aa2c2ba9b04d38d0b89752e24bf7321a",
+        "start": 36940.1069675,
+        "end": 36974.083253791,
+        "seconds": 33.976,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 20159,
+          "output_tokens": 1333,
+          "total_tokens": 21492
+        },
+        "batch": 133,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "842f5a37a027a3e33b4fa0ae2656df9ee88f7d721f7d441b963f5e1ac3aea1c0",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "2602dbf35edc2a729d2cc1f385704337357d0e37f7391df1997e9ccf0a8073e8",
+        "start": 36975.86448,
+        "end": 36998.488579041,
+        "seconds": 22.624,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 11827,
+          "output_tokens": 890,
+          "total_tokens": 12717
+        },
+        "batch": 134,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "e2a480767b9d97d1353347ee3760e726b0285c2c00beb2857aab2e78215dbd0a",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "1a80264ae8cbfe648d12d538e9bc08aa47c28c70db724acf1a0b6c6394f17637",
+        "start": 36975.868334416,
+        "end": 37000.67970225,
+        "seconds": 24.811,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 13031,
+          "output_tokens": 1037,
+          "total_tokens": 14068
+        },
+        "batch": 135,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "b71461346314cd719982ef52115739bcf2a1ec09fdf4304e941210534dc1457f",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "8b1d7448b118ec179e3e86acbe372c792da5299da33fcdd977828d24e5d07536",
+        "start": 36975.868276791,
+        "end": 37001.506736541,
+        "seconds": 25.638,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 13200,
+          "output_tokens": 903,
+          "total_tokens": 14103
+        },
+        "batch": 136,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "6a4c3fe1f64216cfcf47a562acc468b035fb0bf8e4826279556e16351d1c1944",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "36944f9b70e3245dfe7691c01753af891cf3a3a30b223d3666ec8291ef0b3dc7",
+        "start": 36975.868365875,
+        "end": 36996.757747125,
+        "seconds": 20.889,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 12574,
+          "output_tokens": 917,
+          "total_tokens": 13491
+        },
+        "batch": 137,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "f5ec6dba80cb8d7a04552019f6ba323664cbc46b2bf4c65f0ccc158fe845c68c",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "312d577d06dd238391d730764f39e7e617c04a0b1e77bd78e956e1e3222fe205",
+        "start": 36975.867281833,
+        "end": 36996.406709416,
+        "seconds": 20.539,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 11167,
+          "output_tokens": 913,
+          "total_tokens": 12080
+        },
+        "batch": 138,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "afac27d61e2f63b6a731d281783ae0c3c8e7a96ad78e9066524beadd747fd6f7",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "e1bb8549a163e511c3d5e7810fd4652959943a31a14c6efc30e8cd9304cd337c",
+        "start": 36975.868545916,
+        "end": 37000.569256416,
+        "seconds": 24.701,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 12015,
+          "output_tokens": 935,
+          "total_tokens": 12950
+        },
+        "batch": 139,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "31de2097e26084049a9371489b3b608746b181e49435fbc9d2cc374445be01f5",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "b7bccbb4166d279d2ac16ccb312d7434f4f90f24e4aedc600d80bb890fe5a4fe",
+        "start": 36975.864463583,
+        "end": 37004.829611,
+        "seconds": 28.965,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 12142,
+          "output_tokens": 1051,
+          "total_tokens": 13193
+        },
+        "batch": 140,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "241ea8381f3dbcd777a417d4aef19a1a97620707b8151c6a88d4a9f2947776c8",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "55ffb5ca96a332a6a9baa33adbb0441ca550910388b7ccb574feab405e00f6c9",
+        "start": 36975.868163666,
+        "end": 36998.9674125,
+        "seconds": 23.099,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 14105,
+          "output_tokens": 1008,
+          "total_tokens": 15113
+        },
+        "batch": 141,
+        "attempt": 1,
+        "waveWidth": 8
+      },
+      {
+        "signature": "23a7f349190788817f379d6bb3f49ab3ade1299de580826e44779acec57ad8b0",
+        "model": "gpt-6.1-terra",
+        "provider": "custom",
+        "outputSha256": "36c228ebe2203fa5bf096364d51ee8349459fd5b0424aacb99616e12b32da1b3",
+        "start": 37004.833784041,
+        "end": 37027.755758125,
+        "seconds": 22.922,
+        "exitCode": 0,
+        "cacheHit": false,
+        "usage": {
+          "input_tokens": 15217,
+          "output_tokens": 939,
+          "total_tokens": 16156
+        },
+        "batch": 142,
+        "attempt": 1,
+        "waveWidth": 8
+      }
+    ],
+    "maximumWorkers": 8,
+    "fatal": [],
+    "skipped": 0,
+    "decisionsSha256": "59c47eab60a28e6fbc22bd8029b8838f5636dc016ab541babf3fed76701916db",
+    "timingSha256": "d29fd2b751bad16dc847969c34d8067e839c2028fb8034dc0f67cfac7feaa12d"
+  },
+  "rawEvidenceLocation": {
+    "mac": "/Users/pku1727/.codex/cache/global-semantic-relations-20261107",
+    "194": "/home/hyf/.codex/cache/global-semantic-relations-20261107",
+    "replicated194": "/Users/pku1727/.codex/cache/global-semantic-relations-20261107/remote"
+  },
+  "limitations": [
+    "Full-node candidate generation is not all-pairs enumeration; 11314 nodes have no supported relationship under the current candidate budget and remain searchable.",
+    "All model judging stages use configured gpt-6.1-terra; agreement and citation calibration are not independent human ground truth.",
+    "The original temporary first/second-pass batch cache was lost when /tmp was cleaned. The surviving full two-pass registry was re-audited for every retained citation and source fingerprints were rebound before deployment; original two-pass batch receipts are unavailable.",
+    "52 diagnostic queries are a small, non-pristine benchmark. Assisted hit includes conditional hints and is not business-task success; main ranking changed in some cases although binary primary hits did not regress.",
+    "100 overlapping socket requests are served by four query processes, not 100 simultaneous CPU computations. Hook timings include per-request process and context costs.",
+    "194 lacks four Mac-only node_repl tools; no Linux placeholders were introduced.",
+    "IDE tests verify actual discovery and exact global content reading; they do not execute every expert, Skill workflow, or remote MCP API.",
+    "Autostart service state was inspected but no complete machine reboot was performed.",
+    "No physical-footprint or peak-memory conclusion is supported by these runs.",
+    "Original workspace quality check was 14/15 because unrelated tracked history files are deleted; the independent delivery snapshot retains HEAD history and passes document checks."
+  ],
+  "finalValidationWave": {
+    "width": 5,
+    "checks": [
+      {
+        "name": "governance",
+        "start": 1794045094.797288,
+        "end": 1794045095.6742039,
+        "exitCode": 0,
+        "retries": 0,
+        "timeout": false
+      },
+      {
+        "name": "skills",
+        "start": 1794045094.797365,
+        "end": 1794045095.753512,
+        "exitCode": 0,
+        "retries": 0,
+        "timeout": false
+      },
+      {
+        "name": "security",
+        "start": 1794045094.79743,
+        "end": 1794045099.1117098,
+        "exitCode": 0,
+        "retries": 0,
+        "timeout": false
+      },
+      {
+        "name": "documents",
+        "start": 1794045094.798529,
+        "end": 1794045096.76146,
+        "exitCode": 0,
+        "retries": 0,
+        "timeout": false
+      },
+      {
+        "name": "compact",
+        "start": 1794045094.799802,
+        "end": 1794045094.978293,
+        "exitCode": 1,
+        "retries": 0,
+        "timeout": false
+      }
+    ],
+    "recovery": {
+      "name": "compact",
+      "exitCode": 0,
+      "method": "same checker with supported TASK_TREE_KIT_DIR override",
+      "logSha256": "87de744330afadde47950f234b0765c459f0c13bad5def040f55074a58561572"
+    }
+  }
+}

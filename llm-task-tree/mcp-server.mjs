@@ -16,13 +16,14 @@ if (!existsSync(configFile)) {
 }
 
 const config = JSON.parse((await readFile(configFile, "utf8")).replace(/^\uFEFF/, ""));
-const sharedKit = String(config.sharedKitDir || "");
+const projectRoot = path.resolve(stubDir, String(config.projectRoot || ".."));
+const sharedKitSetting = process.env.TASK_TREE_KIT_DIR || String(config.sharedKitDir || "");
+const sharedKit = sharedKitSetting ? path.resolve(projectRoot, sharedKitSetting) : "";
 const entry = sharedKit ? path.join(sharedKit, "scripts", "mcp-server.mjs") : "";
 if (!entry || !existsSync(entry)) {
   process.stderr.write(`shared kit MCP server missing: ${entry || "(no sharedKitDir)"}\n`);
   process.exit(1);
 }
 
-const projectRoot = path.resolve(stubDir, String(config.projectRoot || ".."));
 if (!process.argv.includes("--project-root")) process.argv.splice(2, 0, "--project-root", projectRoot);
 await import(pathToFileURL(entry).href);

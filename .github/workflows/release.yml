@@ -11,7 +11,7 @@ jobs:
   publish:
     permissions:
       contents: write
-    runs-on: windows-latest
+    runs-on: macos-15
     timeout-minutes: 30
     steps:
       - name: Checkout

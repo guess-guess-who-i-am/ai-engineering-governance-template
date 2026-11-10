@@ -1,0 +1,2 @@
+# HTTPResponse.read1 preserves streaming for non-chunked SSE; Python >=3.10.
+urllib3==2.8.0

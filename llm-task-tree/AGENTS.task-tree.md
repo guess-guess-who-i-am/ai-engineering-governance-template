@@ -506,7 +506,7 @@ Cursor: `.cursor/rules/llm-task-tree-flow-edit.mdc` · Full gate: `llm-task-tree
 
 Create from `llm-task-tree/templates/task-tree.starter.md`, or run **task-tree-grill** (Read tree paths above first).
 
-**UI**: `llm-task-tree/打开任务图.cmd` → **关系图 | 执行流程** for `scripts/project.json` / `scripts/run.json`.
+**UI**: `llm-task-tree/open-task-tree.command` → **关系图 | 执行流程** for `scripts/project.json` / `scripts/run.json`.
 <!-- llm-task-tree:end -->
 
 <!-- llm-task-tree:tool-calling:begin -->
