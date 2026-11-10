@@ -9,7 +9,7 @@
 - `method-research-evidence`：论文、文献综述、研究设计、科学基线或 benchmark、困难科研问题、需要科学依据的声明。
 - `method-engineering-execution`：代码修改、架构、调试、依赖、安装、复现、实现、集成、产品级测试。
 - `method-evaluation-gates`：验收条件、阈值、指标、验证策略、品味或意图、大模型门禁、完成声明。
-- `method-github-delivery`：用户要求或项目交付规则要求的 commit、push、创建或组织仓库、交付到 GitHub。
+- `method-github-delivery`：已获授权的 commit、push、创建或组织仓库、交付到 GitHub。
 - `method-task-tree`：只有存在任务树状态，或用户要求查看、编辑、运行、渲染、修复、推理任务图时才加载。
 
 用户级 Skill 根目录是 `~/.agents/skills`。没有专项路由直接匹配时，只使用常驻提醒。不能为了寻找可能匹配的方法而读取完整方法论档案。

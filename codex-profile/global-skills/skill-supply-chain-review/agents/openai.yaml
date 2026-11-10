@@ -1,4 +1,0 @@
-interface:
-  display_name: "技能供应链审查"
-  short_description: "检查第三方技能、插件与MCP的隐藏行为、权限边界和未覆盖证据"
-  default_prompt: "使用 $skill-supply-chain-review 审查这个技能或插件的供应链风险。"

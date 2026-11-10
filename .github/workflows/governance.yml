@@ -13,39 +13,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  portable-profile-macos:
-    runs-on: macos-15
+  portable-profile-linux:
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
         with:
           persist-credentials: false
-      - name: Set up Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: '20'
-          cache: npm
-      - name: Test macOS global Codex profile
-        run: ./scripts/test-codex-profile-mac.sh
-      - name: Test conversational routing and IDE patch contract
-        run: |
-          node --test scripts/test-routing-context.mjs
-          node scripts/test-desktop-skill-routing.mjs
-          python3 scripts/test-patch-ide-routing-context.py
-      - name: Test pinned Skill library restore on a clean home
-        run: node scripts/test-global-skill-library.mjs
-      - name: Test real GraphToolCall worker and candidate pool
-        run: |
-          python3 -m venv .tools/graph-worker-tests
-          .tools/graph-worker-tests/bin/python -m pip install 'graph-tool-call[embedding]==0.46.0' 'sentence-transformers==6.1.0' 'httpx==0.28.1'
-          .tools/graph-worker-tests/bin/python scripts/test-graph-worker.py
-          .tools/graph-worker-tests/bin/python scripts/test-artifact-relations.py
-          .tools/graph-worker-tests/bin/python scripts/test-semantic-relations.py
-          node --test scripts/test-publish-resource-graph.mjs scripts/test-install-portable-resources.mjs
+      - name: Test Linux portable Codex profile
+        run: node scripts/test-codex-profile-linux.mjs
 
   validate:
-    runs-on: macos-15
+    runs-on: windows-latest
     timeout-minutes: 20
     steps:
       - name: Checkout

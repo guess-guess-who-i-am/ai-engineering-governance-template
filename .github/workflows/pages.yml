@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: windows-latest
     timeout-minutes: 10
     steps:
       - name: Checkout

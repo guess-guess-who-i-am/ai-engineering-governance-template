@@ -1,0 +1,4 @@
+interface:
+  display_name: "Engineering Execution Method"
+  short_description: "Evidence-led engineering implementation and debugging"
+  default_prompt: "Use $method-engineering-execution to implement and verify this engineering task."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Evidence Method"
+  short_description: "Authoritative research and paper evidence workflow"
+  default_prompt: "Use $method-research-evidence to plan an evidence-grounded research task."

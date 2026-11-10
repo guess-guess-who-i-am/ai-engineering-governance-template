@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   verify:
-    runs-on: macos-15
+    runs-on: windows-latest
     timeout-minutes: 20
     steps:
       - name: Checkout
