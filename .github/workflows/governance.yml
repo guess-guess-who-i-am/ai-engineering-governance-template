@@ -32,6 +32,7 @@ jobs:
         run: |
           node --test scripts/test-routing-context.mjs
           node scripts/test-desktop-skill-routing.mjs
+          node scripts/test-routing-worker-errors.mjs
           python3 scripts/test-patch-ide-routing-context.py
       - name: Test pinned Skill library restore on a clean home
         run: node scripts/test-global-skill-library.mjs
@@ -40,6 +41,7 @@ jobs:
           python3 -m venv .tools/graph-worker-tests
           .tools/graph-worker-tests/bin/python -m pip install 'graph-tool-call[embedding]==0.46.0' 'sentence-transformers==6.1.0' 'httpx==0.28.1'
           .tools/graph-worker-tests/bin/python scripts/test-graph-worker.py
+          .tools/graph-worker-tests/bin/python scripts/test-description-cache.py
           .tools/graph-worker-tests/bin/python scripts/test-artifact-relations.py
           .tools/graph-worker-tests/bin/python scripts/test-semantic-relations.py
           node --test scripts/test-publish-resource-graph.mjs scripts/test-install-portable-resources.mjs

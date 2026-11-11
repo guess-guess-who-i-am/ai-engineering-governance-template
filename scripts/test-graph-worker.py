@@ -85,7 +85,7 @@ class WorkerTests(unittest.TestCase):
                 if stagger:
                     time.sleep((number // 20) * .05)
                 return self.request({'query': f'search alpha documents independent {number}'})
-            with concurrent.futures.ThreadPoolExecutor(max_workers=100) as pool:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=20) as pool:
                 results = list(pool.map(invoke, range(100)))
             self.assertTrue(all(result['ok'] and result['results'] for result in results), results)
             self.assertEqual(len({result['pid'] for result in results}), 1)
@@ -153,7 +153,8 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(first['results'][0]['name'], 'alpha')
         self.make_graph('beta')
         second = self.request()
-        self.assertEqual((second['pid'], second['loads']), (first['pid'], 2))
+        self.assertEqual((second['pid'], second['generation']), (first['pid'], 2))
+        self.assertEqual(second['loads'], 1)
         self.assertEqual(second['results'][0]['name'], 'beta')
         self.graph.write_text('{bad')
         self.assertFalse(self.request()['ok'])
@@ -162,6 +163,63 @@ class WorkerTests(unittest.TestCase):
         self.assertFalse(self.request({'query': 'alpha', 'deadline': 0})['ok'])
         self.assertFalse(self.request({'query': 'alpha', 'top_k': 'bad'})['ok'])
         self.assertTrue(self.request()['ok'])
+
+    def test_publish_prewarms_new_generation_before_visible_switch(self):
+        self.start()
+        first = self.request()
+        from graph_tool_call import ToolGraph
+        candidate = self.root/'candidate.json'
+        graph = indexer.graph_from_records([], [{'tool_name':'beta','name':'beta',
+            'server':'fixture','description':'search alpha documents'}])
+        graph.save(candidate)
+        original = self.graph.read_bytes()
+        # Invalid candidates fail without publishing or poisoning active queries.
+        bad = self.root/'bad.json'
+        bad.write_text('{bad')
+        failed = self.request({'operation':'publish','candidate':str(bad)})
+        self.assertFalse(failed['ok'], failed)
+        self.assertEqual(self.graph.read_bytes(), original)
+        self.assertEqual(self.request()['results'][0]['name'], 'alpha')
+        invalid_vectors = self.root/'invalid-vectors.json'
+        graph.save(invalid_vectors, metadata={'chinese_embedding':{
+            'file':'broken.npz', 'representation':'wrong'}})
+        (self.root/'broken.npz').write_bytes(b'broken')
+        self.assertFalse(self.request({'operation':'publish','candidate':str(invalid_vectors)})['ok'])
+        self.assertEqual(self.graph.read_bytes(), original)
+        self.assertEqual(self.request()['results'][0]['name'], 'alpha')
+        published = self.request({'operation':'publish','candidate':str(candidate)})
+        self.assertTrue(published['ok'], published)
+        self.assertTrue(published.get('prewarmed'), published)
+        self.assertEqual(self.graph.read_bytes(), candidate.read_bytes())
+        second = self.request()
+        self.assertEqual(second['results'][0]['name'], 'beta')
+        self.assertEqual(second['pid'], first['pid'])
+        self.assertNotEqual(second['queryPid'], first['queryPid'])
+
+    def test_build_publishes_through_ready_service(self):
+        import hashlib
+        self.sock = Path('/tmp')/f'codex-graph-{os.getuid()}'/(hashlib.sha256(str(self.graph.resolve()).encode()).hexdigest()[:24]+'.sock')
+        self.start()
+        first = self.request()
+        skills = self.root/'skills'
+        (skills/'beta').mkdir(parents=True)
+        (skills/'beta/SKILL.md').write_text('---\nname: beta\n---\nSearch alpha documents')
+        catalog = self.root/'catalog.json'
+        catalog.write_text(json.dumps({'skills':[{'name':'beta','dir':'beta','description':'search alpha documents'}]}))
+        result = subprocess.run([sys.executable,str(ENTRY),'build','--root',str(skills),
+            '--catalog',str(catalog),'--output',str(self.graph)],capture_output=True,text=True,timeout=20)
+        self.assertEqual(result.returncode,0,result.stderr)
+        second = self.request()
+        self.assertEqual(second['pid'],first['pid'])
+        self.assertEqual(second['generation'],2)
+        self.assertEqual(second['results'][0]['name'],'beta')
+        candidate = self.root/'cli-candidate.json'
+        candidate.write_bytes(self.graph.read_bytes())
+        published = subprocess.run([sys.executable,str(ENTRY),'publish','--candidate',str(candidate),
+            '--graph',str(self.graph)],capture_output=True,text=True,timeout=20)
+        self.assertEqual(published.returncode,0,published.stderr)
+        self.assertFalse(candidate.exists())
+        self.assertEqual(self.request()['generation'],3)
 
     def test_keyword_index_preserves_library_scores(self):
         worker = indexer._GraphWorker(self.graph)

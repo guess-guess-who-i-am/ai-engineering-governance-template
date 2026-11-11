@@ -1,0 +1,249 @@
+{
+  "schemaVersion": "graph-routing-verification/1",
+  "graphResources": 19756,
+  "businessDeadlineMs": 55000,
+  "computeProcesses": 4,
+  "testConcurrencyCeiling": 20,
+  "cache": {
+    "en": {
+      "vectors": 19416,
+      "bitIdenticalVectors": true,
+      "originalTextMemberBytes": 2022836672,
+      "compactTextMemberBytes": 8131838,
+      "completeUtf8Bytes": 8131710
+    },
+    "zh": {
+      "vectors": 19461,
+      "bitIdenticalVectors": true,
+      "originalTextMemberBytes": 2027524952,
+      "compactTextMemberBytes": 8217334,
+      "completeUtf8Bytes": 8217206
+    }
+  },
+  "graphUnchangedOutsideDescriptionCache": true,
+  "originalResultsExactlyEqual": true,
+  "coldOriginalSeconds": [
+    43.01165329199284,
+    43.20324479199189,
+    43.17443679198914
+  ],
+  "publication": {
+    "seconds": 40.19173616600165,
+    "ok": true,
+    "prewarmed": true,
+    "generation": 2
+  },
+  "duringPublication": {
+    "count": 26,
+    "allSucceeded": true,
+    "maxSeconds": 1.9881545410025865
+  },
+  "afterPublicationOriginalSeconds": [
+    3.822269291995326,
+    3.767151209001895,
+    3.8395738749968586
+  ],
+  "live20": {
+    "allSucceeded": true,
+    "processesUsed": 4,
+    "requests": [
+      {
+        "id": "0",
+        "startMs": 0.0,
+        "endMs": 5271.240290996502,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "1",
+        "startMs": 0.09049999061971903,
+        "endMs": 2868.691832991317,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "2",
+        "startMs": 0.3066249919356778,
+        "endMs": 2994.2283749987837,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "3",
+        "startMs": 0.4297909908927977,
+        "endMs": 2923.0303749936866,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "4",
+        "startMs": 0.4792079998878762,
+        "endMs": 2927.319707989227,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "5",
+        "startMs": 0.6579999899258837,
+        "endMs": 5188.3392079907935,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "6",
+        "startMs": 0.7150829915190116,
+        "endMs": 8528.162082991912,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "7",
+        "startMs": 0.8877499931259081,
+        "endMs": 8628.618957998697,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "8",
+        "startMs": 1.321165997069329,
+        "endMs": 8786.328624992166,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "9",
+        "startMs": 1.4180829894030467,
+        "endMs": 5186.991707989364,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "10",
+        "startMs": 1.5359999961219728,
+        "endMs": 5341.861041000811,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "11",
+        "startMs": 1.6780000005383044,
+        "endMs": 8957.277290988714,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "12",
+        "startMs": 1.78899998718407,
+        "endMs": 11998.606458000722,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "13",
+        "startMs": 1.8978329899255186,
+        "endMs": 12219.846332998713,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "14",
+        "startMs": 2.1744999976363033,
+        "endMs": 12948.26591599849,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "15",
+        "startMs": 2.227749995654449,
+        "endMs": 12485.298707993934,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "16",
+        "startMs": 2.400124998530373,
+        "endMs": 16204.207582995878,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "17",
+        "startMs": 2.456082991557196,
+        "endMs": 16456.720082991524,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "18",
+        "startMs": 2.6529999886406586,
+        "endMs": 16528.692832987872,
+        "results": 8,
+        "ok": true
+      },
+      {
+        "id": "19",
+        "startMs": 2.76583299273625,
+        "endMs": 16047.219165993738,
+        "results": 8,
+        "ok": true
+      }
+    ]
+  },
+  "initialColdStartupStillRequired": true,
+  "originalIncidentPythonStackAvailable": false,
+  "remote194Updated": false,
+  "mainMerged": false,
+  "paidModelCalls": 0,
+  "liveRouter": [
+    {
+      "id": "clinical-evidence",
+      "durationMs": 3505.80775,
+      "exitCode": 0,
+      "promptBytes": 20911,
+      "contextBytes": 9226,
+      "stderrEmpty": true
+    },
+    {
+      "id": "modalities-evidence",
+      "durationMs": 3501.6541660000003,
+      "exitCode": 0,
+      "promptBytes": 21325,
+      "contextBytes": 8482,
+      "stderrEmpty": true
+    },
+    {
+      "id": "report-engine",
+      "durationMs": 3595.562334,
+      "exitCode": 0,
+      "promptBytes": 21867,
+      "contextBytes": 8182,
+      "stderrEmpty": true
+    }
+  ],
+  "liveDispatcherCached": [
+    {
+      "id": "clinical-evidence",
+      "durationMs": 143.09625,
+      "exitCode": 0,
+      "promptBytes": 20911,
+      "contextBytes": 9226,
+      "stderrEmpty": true
+    },
+    {
+      "id": "modalities-evidence",
+      "durationMs": 143.381875,
+      "exitCode": 0,
+      "promptBytes": 21325,
+      "contextBytes": 8482,
+      "stderrEmpty": true
+    },
+    {
+      "id": "report-engine",
+      "durationMs": 146.970083,
+      "exitCode": 0,
+      "promptBytes": 21867,
+      "contextBytes": 8182,
+      "stderrEmpty": true
+    }
+  ]
+}

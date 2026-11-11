@@ -297,8 +297,7 @@ async function graphCandidates(graphPath, query, pythonPath, indexerPath) {
     })
     .then(asSkills)
     .catch((error) => {
-      process.stderr.write(`GraphToolCall routing failed (no per-request fallback): ${error.message}\n`);
-      return [];
+      throw new Error(`GraphToolCall routing failed (no per-request fallback): ${error.message}`);
     });
 }
 
@@ -414,4 +413,5 @@ if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[
 } catch (error) {
   process.stderr.write(`Skill router skipped: ${error.message}\n`);
   process.stdout.write("{}");
+  process.exitCode = 1;
 }

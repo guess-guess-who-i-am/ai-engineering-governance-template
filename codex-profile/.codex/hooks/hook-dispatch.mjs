@@ -101,7 +101,7 @@ try {
       process.stderr.write(`Hook dispatcher child ${result.file}: ${result.error || result.stderr.trim()}\n`);
     }
   }
-  if (testing && results.some((result) => result.error)) process.exitCode = 1;
+  if (results.some((result) => result.error)) process.exitCode = 1;
   const contexts = results.map((result) => result.context.trim()).filter(Boolean);
   if (!contexts.length) process.stdout.write("{}");
   else process.stdout.write(JSON.stringify({

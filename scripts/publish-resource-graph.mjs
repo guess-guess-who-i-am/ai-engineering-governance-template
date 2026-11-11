@@ -5,6 +5,8 @@ import { mkdir, readFile, realpath, rename, stat, unlink, writeFile } from 'node
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const json = value => Buffer.from(JSON.stringify(value, null, 2) + '\n');
@@ -16,6 +18,20 @@ async function atomic(file, bytes) {
   try { await writeFile(temporary, bytes, { mode: 0o600 }); await rename(temporary, file); }
   finally { await unlink(temporary).catch(error => { if (error.code !== 'ENOENT') throw error; }); }
 }
+async function publishAtomic(file, bytes) {
+  if (path.basename(file) !== 'skills.graph.json') return atomic(file, bytes);
+  const endpoint = process.platform === 'win32' ? file + '.worker.json'
+    : path.join('/tmp', `codex-graph-${process.getuid()}`, digest(Buffer.from(path.resolve(file))).slice(0, 24) + '.sock');
+  try { await stat(endpoint); }
+  catch (error) { if (error.code === 'ENOENT') return atomic(file, bytes); throw error; }
+  const root = path.dirname(path.dirname(file));
+  const candidate = file + `.prewarm-${process.pid}.tmp`;
+  await atomic(candidate, bytes);
+  try {
+    const python = path.join(root, 'tools/graph-tool-call-venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
+    await promisify(execFile)(python, [path.join(root, 'hooks/graph_skill_index.py'), 'publish', '--candidate', candidate, '--graph', file], { timeout: 185000 });
+  } finally { await unlink(candidate).catch(error => { if (error.code !== 'ENOENT') throw error; }); }
+}
 function sameSet(actual, expected, label) {
   if (actual.size !== expected.size || [...actual].some(value => !expected.has(value))) throw new Error(label + ' mismatch');
 }
@@ -24,7 +40,7 @@ function checkedNumber(value, label) {
   return value;
 }
 
-export async function publishResourceGraph({ codexRoot = path.join(os.homedir(), '.codex'), stage, ownedRoot = path.join(os.homedir(), '.agents/skills'), report, check = false, writer = atomic } = {}) {
+export async function publishResourceGraph({ codexRoot = path.join(os.homedir(), '.codex'), stage, ownedRoot = path.join(os.homedir(), '.agents/skills'), report, check = false, writer = publishAtomic } = {}) {
   codexRoot = path.resolve(codexRoot); ownedRoot = path.resolve(ownedRoot);
   const registry = path.join(codexRoot, 'skill-registry');
   stage = await realpath(stage || path.join(registry, 'resource-candidate'));
@@ -180,7 +196,7 @@ export async function publishResourceGraph({ codexRoot = path.join(os.homedir(),
   } catch (error) {
     const rollbackErrors = [];
     for (const file of touched.reverse()) {
-      try { const bytes = originals.get(file); if (bytes) await atomic(file, bytes); else await unlink(file).catch(e => { if (e.code !== 'ENOENT') throw e; }); }
+      try { const bytes = originals.get(file); if (bytes) await publishAtomic(file, bytes); else await unlink(file).catch(e => { if (e.code !== 'ENOENT') throw e; }); }
       catch (rollbackError) { rollbackErrors.push(rollbackError.message); }
     }
     if (rollbackErrors.length) throw new AggregateError([error, ...rollbackErrors.map(message => new Error(message))], 'Publish failed and rollback was incomplete');

@@ -27,11 +27,13 @@ from types import SimpleNamespace
 import re
 import secrets
 import signal
+import shutil
 import socket
 import socketserver
 import subprocess
 import sys
 import threading
+import tempfile
 import time
 import warnings
 
@@ -406,7 +408,7 @@ def build(args):
         }
     temporary = output.with_suffix(output.suffix + f".{os.getpid()}.tmp")
     graph.save(temporary, metadata=metadata)
-    temporary.replace(output)
+    publish_graph(temporary, output)
     digest = hashlib.sha256()
     with catalog.open("rb") as stream:
         for chunk in iter(lambda: stream.read(1024 * 1024), b""):
@@ -495,7 +497,7 @@ def load_chinese_embedding(graph, graph_path):
 def _description_cache_inputs(graph, output, model_name):
     from complete_embedding import REPRESENTATION
     texts = list(dict.fromkeys(tool.description for tool in graph.tools.values() if tool.description))
-    signature = hashlib.sha256(json.dumps([REPRESENTATION, model_name, texts], ensure_ascii=False).encode()).hexdigest()
+    signature = hashlib.sha256(json.dumps(['utf8-json-texts/v1', REPRESENTATION, model_name, texts], ensure_ascii=False).encode()).hexdigest()
     return texts, signature, output.parent / f'{output.stem}.rerank.{signature[:20]}.npz'
 
 
@@ -510,10 +512,14 @@ def build_description_embeddings(graph, output, model_name):
         vectors = encode_complete(model, texts)
         temporary = target.with_suffix(f'.{os.getpid()}.tmp')
         with temporary.open('wb') as stream:
-            np.savez_compressed(stream, texts=np.asarray(texts), vectors=vectors, signature=signature)
+            # Unicode ndarrays pad every row to the longest description. Store
+            # the complete ordered text as UTF-8 instead: no padding or pickle.
+            packed = np.frombuffer(json.dumps(texts, ensure_ascii=False).encode('utf-8'), dtype=np.uint8)
+            np.savez_compressed(stream, texts=packed, vectors=vectors, signature=signature)
         temporary.chmod(0o600)
         temporary.replace(target)
-    return {'file': target.name, 'model': model_name, 'representation': REPRESENTATION, 'signature': signature,
+    return {'file': target.name, 'model': model_name, 'representation': REPRESENTATION,
+            'text_storage': 'utf8-json-texts/v1', 'signature': signature,
             'sha256': hashlib.sha256(target.read_bytes()).hexdigest()}
 
 
@@ -525,13 +531,18 @@ def load_description_embeddings(graph, graph_path, language):
         return {}
     if config.get('representation') != REPRESENTATION:
         raise ValueError('Description embedding representation is obsolete; rebuild the graph')
+    if config.get('text_storage') != 'utf8-json-texts/v1':
+        raise ValueError('Description text storage is obsolete; rebuild the graph')
     texts, signature, expected = _description_cache_inputs(graph, graph_path, config['model'])
     if config['file'] != expected.name or config['signature'] != signature:
         raise ValueError('Description embedding identity/path mismatch')
     if hashlib.sha256(expected.read_bytes()).hexdigest() != config['sha256']:
         raise ValueError('Description embedding checksum mismatch')
     with np.load(expected, allow_pickle=False) as data:
-        if list(data['texts']) != texts or str(data['signature']) != signature:
+        packed = data['texts']
+        if packed.dtype != np.dtype('uint8') or packed.ndim != 1:
+            raise ValueError('Invalid description embedding text storage')
+        if json.loads(packed.tobytes().decode('utf-8')) != texts or str(data['signature']) != signature:
             raise ValueError('Description embedding text identity mismatch')
         vectors = data['vectors']
     if vectors.shape != (len(texts), 384) or not np.isfinite(vectors).all():
@@ -1451,6 +1462,13 @@ class _WorkerHandler(socketserver.StreamRequestHandler):
                 raise ValueError('worker authentication failed')
             if payload.get("deadline", time.time() * 1000 + 1) < time.time() * 1000:
                 raise ValueError("request expired in queue")
+            if payload.get('operation') == 'publish':
+                if not isinstance(self.server.worker, _ProcessGraphWorker):
+                    raise ValueError('Publication requires a process worker')
+                response = self.server.worker.publish(Path(payload['candidate']))
+                self.wfile.write((json.dumps(response) + '\n').encode())
+                self.wfile.flush()
+                return
             results = self.server.worker.query(payload)
             graph = self.server.worker._graph
             response = {"ok": True, "results": results, "pid": os.getpid(),
@@ -1551,6 +1569,81 @@ def _query_process(payload):
                      'coalesced': _process_worker.coalesced, 'peakQueries': _process_worker.peak_queries}}
 
 
+class _PreparedGraphPool:
+    """Pin one immutable graph and sidecars for the full process generation."""
+
+    def __init__(self, source, graph_name, processes):
+        self.directory = Path(tempfile.mkdtemp(prefix='.graph-worker-', dir=source.parent))
+        self.graph_path = self.directory / graph_name
+        self.pool = None
+        try:
+            before = source.stat()
+            os.link(source, self.graph_path)
+            # Pin immutable content-addressed sidecars without parsing the
+            # 338 MB graph a fifth time in the parent. Each child validates
+            # its own exact metadata, filenames, full texts and checksums.
+            for sidecar in source.parent.glob('*.npz'):
+                os.link(sidecar, self.directory / sidecar.name)
+            after = source.stat()
+            if (before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_ino, after.st_size, after.st_mtime_ns):
+                raise ValueError('Candidate graph changed while pinning its generation')
+            context = multiprocessing.get_context('spawn')
+            self.pool = ProcessPoolExecutor(max_workers=processes,
+                mp_context=context, initializer=_initialize_query_process,
+                initargs=(str(self.graph_path), context.Barrier(processes)))
+            self.readiness = [self.pool.submit(_query_process, {'query': ''}) for _ in range(processes)]
+        except BaseException:
+            self.shutdown(wait=True, cancel_futures=True)
+            raise
+
+    def ready(self):
+        deadline = time.monotonic() + 150
+        for future in self.readiness:
+            future.result(timeout=max(0, deadline - time.monotonic()))
+
+    def submit(self, *args):
+        return self.pool.submit(*args)
+
+    def shutdown(self, wait=True, cancel_futures=False):
+        if not wait:
+            threading.Thread(target=self.shutdown, kwargs={'cancel_futures': cancel_futures}, daemon=True).start()
+            return
+        if self.pool is not None:
+            self.pool.shutdown(wait=True, cancel_futures=cancel_futures)
+        shutil.rmtree(self.directory, ignore_errors=True)
+
+
+def graph_signature(path):
+    info = path.stat()
+    return info.st_ino, info.st_size, info.st_mtime_ns
+
+
+def publish_graph(candidate, output):
+    """An active service owns the prewarm/commit boundary; never bypass its failure."""
+    if candidate.resolve() == output.resolve():
+        raise ValueError('Candidate and active graph must be separate files')
+    endpoint = (Path(str(output) + '.worker.json') if os.name == 'nt' else
+        Path('/tmp') / f'codex-graph-{os.getuid()}' / (hashlib.sha256(str(output.resolve()).encode()).hexdigest()[:24] + '.sock'))
+    if not endpoint.exists():
+        candidate.replace(output)
+        return
+    payload = {'operation': 'publish', 'candidate': str(candidate.resolve())}
+    if os.name == 'nt':
+        config = json.loads(endpoint.read_text())
+        payload['token'] = config['token']
+        connection = socket.create_connection((config['host'], config['port']), timeout=180)
+    else:
+        connection = socket.socket(socket.AF_UNIX)
+        connection.settimeout(180)
+        connection.connect(str(endpoint))
+    with connection:
+        connection.sendall((json.dumps(payload) + '\n').encode())
+        reply = json.loads(connection.makefile('rb').readline())
+    if not reply.get('ok') or not reply.get('prewarmed'):
+        raise RuntimeError(f'Graph publication was not committed: {reply.get("error", "missing readiness receipt")}')
+    candidate.unlink()
+
+
 class _ProcessGraphWorker:
     """One socket supervisor with a bounded persistent CPU retrieval pool."""
 
@@ -1561,23 +1654,47 @@ class _ProcessGraphWorker:
         self.loads = self.cache_hits = self.coalesced = self.peak_queries = 0
         self.cancelled_pending = self.abandoned_running = 0
         self._path = Path(graph_path)
-        self._signature = None
+        self._signature = graph_signature(self._path)
         self._lock = threading.RLock()
+        self._publication_lock = threading.Lock()
+        self.generation = 1
         self._results = OrderedDict()
         self._pending = {}
         self._processes = processes
         self._pool = self._new_pool()
 
-    def _new_pool(self):
-        context = multiprocessing.get_context('spawn')
-        pool = ProcessPoolExecutor(max_workers=self._processes,
-            mp_context=context, initializer=_initialize_query_process,
-            initargs=(str(self._path), context.Barrier(self._processes)))
-        # ProcessPoolExecutor is otherwise lazy: start all initializers while
-        # the service is starting, rather than on the first user request.
-        for _ in range(self._processes):
-            pool.submit(_query_process, {'query': ''})
-        return pool
+    def _new_pool(self, source=None):
+        return _PreparedGraphPool(source or self._path, self._path.name, self._processes)
+
+    def publish(self, candidate):
+        # Expensive preparation holds no query lock: until the commit point,
+        # the canonical file and all observable responses belong to the old graph.
+        with self._publication_lock:
+            if candidate.resolve() == self._path.resolve():
+                raise ValueError('Candidate and active graph must be separate files')
+            expected = graph_signature(self._path)
+            prepared = self._new_pool(candidate)
+            committed = False
+            temporary = self._path.with_name(self._path.name + '.publish-' + secrets.token_hex(8))
+            try:
+                prepared.ready()
+                with self._lock:
+                    if graph_signature(self._path) != expected:
+                        raise ValueError('Active graph changed during candidate preparation')
+                    os.link(prepared.graph_path, temporary)
+                    temporary.replace(self._path)
+                    old = self._pool
+                    self._pool = prepared
+                    self._signature = graph_signature(self._path)
+                    self._results.clear()
+                    self.generation += 1
+                    committed = True
+                old.shutdown(wait=False)
+                return {'ok': True, 'prewarmed': True, 'generation': self.generation}
+            finally:
+                temporary.unlink(missing_ok=True)
+                if not committed:
+                    prepared.shutdown(wait=True, cancel_futures=True)
 
     def _finished(self, key, shared, future):
         with self._lock:
@@ -1602,21 +1719,27 @@ class _ProcessGraphWorker:
 
     def query(self, payload):
         remaining = max(0, (payload['deadline'] - time.time() * 1000) / 1000) if 'deadline' in payload else 50
-        info = self._path.stat()
-        signature = (info.st_ino, info.st_size, info.st_mtime_ns)
         top_k = max(1, min(int(payload.get('top_k', 8)), 50))
         category_slots = normalize_category_slots(payload.get('category_slots'), top_k)
         slots_key = tuple(sorted(category_slots.items())) if category_slots is not None else None
-        key = (signature, str(payload.get('query') or '').strip(), top_k, slots_key)
         with self._lock:
+            signature = graph_signature(self._path)
+            key = (signature, str(payload.get('query') or '').strip(), top_k, slots_key)
             if self._signature != signature:
+                # An unmanaged external replacement has no readiness receipt.
+                # Reload explicitly; managed builders use publish() instead.
+                old = self._pool
+                self._pool = self._new_pool()
+                old.shutdown(wait=False)
                 self._results.clear()
                 self._signature = signature
+                self.generation += 1
+            generation = self.generation
             if key in self._results:
                 self.cache_hits += 1
                 self._results.move_to_end(key)
                 records, report = self._results[key]
-                self._local.report = report
+                self._local.report = {**report, 'generation': self.generation}
                 return deepcopy(records)
             shared = self._pending.get(key)
             if shared is None or shared.abandoned:
@@ -1641,10 +1764,12 @@ class _ProcessGraphWorker:
             shared.waiters += 1
             future = shared.future
         try:
+            if 'deadline' in payload:
+                remaining = max(0, (payload['deadline'] - time.time() * 1000) / 1000)
             records, report = future.result(timeout=remaining)
         finally:
             self._release_waiter(key, shared)
-        self._local.report = report
+        self._local.report = {**report, 'generation': generation}
         return deepcopy(records)
 
     def close(self):
@@ -1750,6 +1875,10 @@ def main():
     retrieve_parser.add_argument("--query", required=True)
     retrieve_parser.add_argument("--top-k", type=int, default=8)
     retrieve_parser.set_defaults(func=retrieve)
+    publish_parser = subparsers.add_parser('publish')
+    publish_parser.add_argument('--candidate', required=True)
+    publish_parser.add_argument('--graph', required=True)
+    publish_parser.set_defaults(func=lambda args: publish_graph(Path(args.candidate), Path(args.graph)))
     serve_parser = subparsers.add_parser("serve")
     serve_parser.add_argument("--graph", required=True)
     serve_parser.add_argument("--socket", required=True)
