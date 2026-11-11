@@ -26,10 +26,15 @@ jobs:
         with:
           node-version: '20'
           cache: npm
+      - name: Install pinned Node dependencies
+        run: npm ci --ignore-scripts
       - name: Test macOS global Codex profile
         run: |
           ./scripts/test-codex-profile-mac.sh
           node scripts/test-global-graph-service.mjs
+      - name: Test shared search service, limits and MCP recovery
+        run: |
+          npm run test:research-search
       - name: Test conversational routing and IDE patch contract
         run: |
           node --test scripts/test-routing-context.mjs
