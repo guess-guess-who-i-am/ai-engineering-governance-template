@@ -16,12 +16,15 @@ function canonicalUrl(text) {
 function prepare(operation, topK, providerEndpoints) {
   if (!PROVIDERS.includes(operation?.source) || typeof operation.query !== 'string' || !operation.query.trim()) throw new Error('Each query requires a supported source and non-empty query');
   const query = operation.query.trim();
+  // Repository search omits README by default. Respect explicit caller scope;
+  // this is repository discovery, never a claim to search arbitrary source code.
+  const requestQuery=operation.source==='github'&&!/(?:^|\s)in:[^\s]+/i.test(query)?query+' in:name,description,readme':query;
   const url = new URL(providerEndpoints[operation.source]);
   if (operation.source === 'stackoverflow') for(const [key,value] of Object.entries({site:'stackoverflow',q:query,pagesize:String(topK),sort:'relevance',filter:'withbody'}))url.searchParams.set(key,value);
-  if (operation.source === 'github') for(const [key,value] of Object.entries({q:query,per_page:String(topK)}))url.searchParams.set(key,value);
+  if (operation.source === 'github') for(const [key,value] of Object.entries({q:requestQuery,per_page:String(topK)}))url.searchParams.set(key,value);
   if (operation.source === 'openalex') {url.searchParams.set('search',query);url.searchParams.set('per-page',String(topK));}
   if (operation.source === 'crossref') {url.searchParams.set('query.bibliographic',query);url.searchParams.set('rows',String(topK));}
-  return {source:operation.source,query,url:url.href,key:hash(JSON.stringify({version:1,source:operation.source,query,topK,endpoint:url.origin+url.pathname}))};
+  return {source:operation.source,query,requestQuery,url:url.href,key:hash(JSON.stringify({version:2,source:operation.source,query,requestQuery,topK,endpoint:url.origin+url.pathname}))};
 }
 function cards(source, data) {
   const rows = source === 'openalex' ? data.results : source === 'crossref' ? data.message?.items : data.items;
@@ -83,7 +86,8 @@ export class TechnicalResearch {
     if(!response.ok||data.error_id||data.error)return rejectResponse('Provider HTTP '+response.status+': '+String(data.error_message||data.message||data.error||response.statusText).slice(0,300));
     const results=cards(task.source,data);
     const fetchedAt=Date.now();
-    const result={source:task.source,query:task.query,status:'ok',cache:'miss',ageMs:0,fetchedAt:new Date(fetchedAt).toISOString(),httpStatus:response.status,
+    const result={source:task.source,query:task.query,requestQuery:task.requestQuery,status:results.length?'ok':'empty',cache:'miss',ageMs:0,fetchedAt:new Date(fetchedAt).toISOString(),httpStatus:response.status,
+      ...(!results.length?{diagnostic:'No hits for this query; do not infer absence. Supply a short source-specific query (apiQuery in complementary search) or search another source.'}:{}),
       results,network,totalReported:data.total_count??data.meta?.count??data.message?.['total-results']??null,returnedCount:results.length,
       providerHasMore:data.has_more??null,requestedCount:topK,rawSha256:hash(rawText),rawUtf8Bytes:Buffer.byteLength(rawText),elapsedMs:performance.now()-began};
     await this.#write(file,{key:task.key,fetchedAt,result,rawText});
@@ -154,11 +158,12 @@ export class TechnicalResearch {
     const report={schemaVersion:'technical-research-batch/1',startedAt:new Date(startedAt).toISOString(),retrievalMs:performance.now()-began,
       cacheMode,requestedOperations:queries.length,uniqueOperations:tasks.length,duplicateOperations:queries.length-tasks.length,peakConcurrency:peak,
       peakConcurrencyKind:'scheduled-origin-operations',cachePhaseMs,httpRequests:networkSpans.length,peakHttpRequests,
-      successfulOperations:operations.filter(op=>op.status==='ok').length,failedOperations:operations.filter(op=>op.status==='error').length,
+      successfulOperations:operations.filter(op=>op.status==='ok').length,emptyOperations:operations.filter(op=>op.status==='empty').length,
+      completedOperations:operations.filter(op=>['ok','empty'].includes(op.status)).length,failedOperations:operations.filter(op=>op.status==='error').length,
       cacheHits:operations.filter(op=>op.cache==='hit').length,returnedCount:operations.reduce((sum,op)=>sum+op.results.length,0),uniqueCount:ranked.length,
       selected:ranked.slice(0,selectedCount),selectionOmitted:Math.max(0,ranked.length-selectedCount),operations,
       limitations:'Technical-source APIs, not a replacement for general web search. Cached data is explicitly dated, not real-time. Metadata is not full-page verification. Stars/citations are context, not correctness. CCF rank is unverified. Partial failures are retained; no provider fallback.'};
-    report.status=report.failedOperations?'partial':operations.some(op=>op.status==='cache-miss')?'cache-miss':'ok';
+    report.status=report.failedOperations===operations.length?'error':report.failedOperations?'partial':operations.some(op=>op.status==='cache-miss')?'cache-miss':report.emptyOperations===operations.length?'empty':'ok';
     const artifact=path.join(this.cacheDirectory,'batches',Date.now()+'-'+randomUUID()+'.json');
     await this.#write(artifact,report);
     return {...report,artifact,elapsedMs:performance.now()-began};

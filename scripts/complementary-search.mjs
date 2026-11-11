@@ -12,9 +12,10 @@ export function canonical(value){try{const u=new URL(value);if(!['http:','https:
 export async function atomicJson(file,value){await mkdir(path.dirname(file),{recursive:true,mode:0o700});const tmp=file+'.'+randomUUID()+'.tmp';await writeFile(tmp,JSON.stringify(value)+'\n',{mode:0o600});await rename(tmp,file);}
 function bound(name,value,min,max){if(!Number.isInteger(value)||value<min||value>max)throw Object.assign(new RangeError(`${name} must be an integer in [${min}, ${max}]`),{code:'INVALID_ARGUMENT',field:name,minimum:min,maximum:max});}
 function loopback(value){const u=new URL(value);if(u.protocol!=='http:'||!['localhost','127.0.0.1','[::1]'].includes(u.hostname)||u.username||u.password||u.search||u.hash||u.pathname!=='/')throw new Error('Web base URL must be an HTTP loopback origin without credentials');return u.origin;}
+function matchesTarget(operation,item){return Boolean((operation.expectedTitle&&normalized(item.title)===normalized(operation.expectedTitle))||(operation.expectedUrl&&canonical(item.url)===canonical(operation.expectedUrl)));}
 function targetMissing(operation,results){
   if(!operation.expectedTitle&&!operation.expectedUrl)return false;
-  return !results.some(item=>(operation.expectedTitle&&normalized(item.title)===normalized(operation.expectedTitle))||(operation.expectedUrl&&canonical(item.url)===canonical(operation.expectedUrl)));
+  return !results.some(item=>matchesTarget(operation,item));
 }
 function plan(operation){
   const apiQuery=operation.apiQuery||operation.query;
@@ -24,15 +25,15 @@ function plan(operation){
   return {api:true,web:false,reason:'technical-api-first',apiSource:operation.source,apiQuery};
 }
 function webQuery(op){return op.source==='github'?`${op.query} site:github.com`:op.source==='stackoverflow'?`${op.query} site:stackoverflow.com`:op.query;}
-function errorOperation(query,error){return {query,status:'error',results:[],error:error.message};}
+function errorOperation(query,error){return {query,status:'error',results:[],error:[error.message,error.cause?.code].filter(Boolean).join(': ')};}
 
 export class FreeWebSearch {
-  constructor({baseUrl=process.env.CODEX_SEARCH_WEB_BASE_URL||'http://127.0.0.1:5505',cacheDirectory,fetchImpl=fetch}={}){
+  constructor({baseUrl=process.env.CODEX_SEARCH_WEB_BASE_URL||'http://127.0.0.1:3210',cacheDirectory,fetchImpl=fetch}={}){
     this.baseUrl=loopback(baseUrl);this.cacheDirectory=cacheDirectory;this.fetch=fetchImpl;this.inflight=new Map();
   }
   async batch({queries,topK,cacheMode,maxAgeSeconds,concurrency,timeoutMs}){
     const start=performance.now(),deadline=start+timeoutMs,unique=[...new Set(queries)],output=new Map();
-    const file=q=>path.join(this.cacheDirectory,'web',hash(JSON.stringify([this.baseUrl,q,topK]))+'.json');
+    const file=q=>path.join(this.cacheDirectory,'web',hash(JSON.stringify([2,this.baseUrl,q,topK,'duckduckgo,bing']))+'.json');
     await Promise.all(unique.map(async query=>{
       if(cacheMode==='refresh')return;
       try{const saved=JSON.parse(await readFile(file(query),'utf8'));const ageMs=Date.now()-saved.fetchedAt;
@@ -49,23 +50,49 @@ export class FreeWebSearch {
     }
     return {operations:unique.map(query=>output.get(query)),elapsedMs:performance.now()-start};
   }
-  async #request(queries,{topK,cacheMode,concurrency,deadline}){
+  async #request(queries,{topK,concurrency,deadline}){
     const remaining=()=>{const value=Math.floor(deadline-performance.now());if(value<=0)throw new Error('Shared search deadline exceeded');return value;};
-    const configResponse=await this.fetch(this.baseUrl+'/api/web-search/config',{signal:AbortSignal.timeout(remaining()),redirect:'error'});
-    if(!configResponse.ok)throw new Error('Cannot verify free web provider: HTTP '+configResponse.status);
-    const configured=(await configResponse.json()).config;
-    if(configured?.provider!=='openwebsearch'||configured.enabled!==true||configured.requiresApiKey!==false)throw new Error('Web provider must be enabled keyless Open-WebSearch; paid or unknown providers are not called');
-    const response=await this.fetch(this.baseUrl+'/api/web-search/batch',{method:'POST',headers:{'content-type':'application/json'},redirect:'error',
-      body:JSON.stringify({queries,topK,concurrency,refresh:cacheMode==='refresh'}),signal:AbortSignal.timeout(remaining())});
-    if(!response.ok)throw new Error('Web service HTTP '+response.status);
-    const body=await response.json();if(!Array.isArray(body.queries)||!Array.isArray(body.results))throw new Error('Invalid web batch result contract');
-    return queries.map(query=>{
-      const record=body.queries.find(item=>item.query===query);
-      if(!record)return errorOperation(query,new Error('Missing web query result'));
-      const results=body.results.flatMap(item=>{const match=item.matches?.find(m=>m.query===query);return match?[{source:'web',title:match.title||item.title,url:item.url,summary:match.content||item.content||'',rank:match.rank,engine:match.engine||item.engine}]:[];}).sort((a,b)=>a.rank-b.rank);
-      return {query,status:record.status==='failed'?'error':'ok',results,cache:record.cache?.hit?'upstream-hit':'miss',fetchedAt:new Date().toISOString(),
-        ...(record.error?{error:record.error}:{}),warnings:record.warnings||[],failures:record.failures||[],elapsedMs:record.elapsedMs};
-    });
+    // The daemon belongs to the user, not to a workspace IDE. Only explicitly
+    // keyless engines are requested; never discover ports or use paid engines.
+    const statusResponse=await this.fetch(this.baseUrl+'/status',{redirect:'error',signal:AbortSignal.timeout(remaining())});
+    const status=await statusResponse.json(),allowed=status.data?.configSummary?.allowedSearchEngines;
+    if(!statusResponse.ok||status.status!=='ok'||!status.data?.capabilities?.includes('search')||!Array.isArray(allowed))throw new Error('Cannot verify keyless Open-WebSearch daemon /status');
+    const engines=['duckduckgo','bing'].filter(engine=>!allowed.length||allowed.includes(engine));
+    if(!engines.length)throw new Error('No allowed keyless engines (duckduckgo/bing); refusing daemon default substitution');
+    const output=new Array(queries.length);let next=0;
+    await Promise.all(Array.from({length:Math.min(concurrency,queries.length)},async()=>{
+      while(next<queries.length){
+        const index=next++,query=queries[index],began=performance.now();let requestStartedAt;
+        try{
+          const budget=remaining();requestStartedAt=Date.now();
+          const response=await this.fetch(this.baseUrl+'/search',{method:'POST',headers:{'content-type':'application/json'},redirect:'error',
+            // The daemon divides limit among engines; give each the full quota.
+            body:JSON.stringify({query,limit:topK*engines.length,engines}),signal:AbortSignal.timeout(budget)});
+          const body=await response.json();
+          if(!response.ok||body.status==='error')throw new Error(`Open-WebSearch HTTP ${response.status}: ${body.error?.message||body.hint||response.statusText}`);
+          if(body.status!=='ok'||!Array.isArray(body.data?.results)||!Array.isArray(body.data?.partialFailures))throw new Error('Invalid Open-WebSearch /search envelope');
+          const seen=new Set(),groups=new Map(engines.map(engine=>[engine,[]]));
+          for(const item of body.data.results){
+            if(typeof item.title!=='string'||!canonical(item.url))throw new Error('Invalid Open-WebSearch result card');
+            if(!groups.has(item.engine))throw new Error('Daemon returned an unrequested engine: '+item.engine);
+            groups.get(item.engine).push(item);
+          }
+          const results=[];
+          for(let rank=0;[...groups.values()].some(group=>group.length>rank);rank++)for(const group of groups.values()){
+            const item=group[rank],url=canonical(item?.url);if(!item||seen.has(url))continue;seen.add(url);
+            results.push({source:'web',title:item.title,url:item.url,summary:item.description||'',rank:results.length+1,engine:item.engine});
+          }
+          results.splice(topK);
+          const failures=body.data.partialFailures;
+          output[index]={query,status:results.length?'ok':failures.length?'error':'empty',results,cache:'miss',fetchedAt:new Date().toISOString(),
+            ...(results.length||!failures.length?{}:{error:'All requested web engines failed or returned no candidates'}),
+            warnings:results.length?[]:[{code:'empty_results',message:'No candidates; this does not prove that relevant pages do not exist.'}],failures};
+        }catch(error){output[index]=errorOperation(query,error);}
+        output[index].elapsedMs=performance.now()-began;
+        if(requestStartedAt!==undefined)output[index].network={requestStartedAt,bodyReceivedAt:Date.now()};
+      }
+    }));
+    return output;
   }
 }
 
@@ -115,7 +142,7 @@ export class ComplementarySearch {
     const supplements=[];
     for(const op of primaryApi.filter(op=>!op.route.web)){
       const api=op.branches.api;
-      const reason=api.status!=='ok'?'api-'+api.status:!api.results.length?'api-empty':targetMissing(op,api.results)?'explicit-target-missing':null;
+      const reason=api.status==='empty'||(api.status==='ok'&&!api.results.length)?'api-empty':api.status!=='ok'?'api-'+api.status:targetMissing(op,api.results)?'explicit-target-missing':null;
       if(reason){op.reasons.push(reason);supplements.push(op);}
     }
     await attachWeb(supplements,'web-supplement');
@@ -126,7 +153,7 @@ export class ComplementarySearch {
         const match={operation:op.index,branch,source:card.source,query:data.query,rank:card.rank};
         if(candidates.has(url))candidates.get(url).provenance.push(match);else candidates.set(url,{...card,url,provenance:[match]});
       }
-      op.results=[...candidates.values()].sort((a,b)=>a.rank-b.rank);op.targetMissing=targetMissing(op,op.results);
+      op.results=[...candidates.values()].sort((a,b)=>Number(matchesTarget(op,b))-Number(matchesTarget(op,a))||a.rank-b.rank);op.targetMissing=targetMissing(op,op.results);
       const branches=Object.values(op.branches);const failed=branches.some(b=>b.status==='error'||b.status==='cache-miss'||b.failures?.length);
       op.status=op.results.length?(failed||op.targetMissing?'partial':'completed'):branches.some(b=>b.status==='error')?'error':branches.some(b=>b.status==='cache-miss')?'cache-miss':'empty';
     }
