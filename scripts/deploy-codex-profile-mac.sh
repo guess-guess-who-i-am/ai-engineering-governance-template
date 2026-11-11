@@ -21,13 +21,15 @@ skill_library=$("$node_bin" "$script_dir/ensure-global-skill-library.mjs" "$@" -
 if [ -z "${CODEX_PROFILE_SKILL_SOURCE:-}" ]; then
   export CODEX_PROFILE_SKILL_SOURCE="$skill_library"
 fi
-"$script_dir/install-codex-profile-mac.sh" "$@"
 "$node_bin" "$script_dir/install-task-tree-mcp-mac.mjs" "$@"
+"$node_bin" "$script_dir/install-research-services-mac.mjs" "$@"
+"$script_dir/install-codex-profile-mac.sh" "$@"
 "$node_bin" "$script_dir/install-global-graph-service-mac.mjs" "$@"
 "$script_dir/install-codex-profile-service-mac.sh" "$@"
 "$script_dir/install-codex-profile-mac.sh" "$@" --check
 "$node_bin" "$script_dir/install-global-graph-service-mac.mjs" "$@" --check
 "$node_bin" "$script_dir/install-task-tree-mcp-mac.mjs" "$@" --check
+"$node_bin" "$script_dir/install-research-services-mac.mjs" "$@" --check
 "$script_dir/install-codex-profile-service-mac.sh" "$@" --check
 
 printf '%s\n' "Global Codex profile deployment passed and is available to every Codex workspace for this user."

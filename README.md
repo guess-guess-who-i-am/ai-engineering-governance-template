@@ -4,7 +4,7 @@
 
 最后更新：2026-11-11
 
-GitHub、Stack Overflow 与论文搜索的连接、查询范围、空结果语义及全局 MCP 验收，见 [2026-11-11 搜索修复说明](docs/SEARCH_REPAIR_20261111.zh.md)。已运行的 MCP 连接需要重新加载实现。
+GitHub、Stack Overflow 与论文搜索现由用户级常驻服务共享，仅调用官方 API，复用 GitHub 登录，支持跨工作区限流、相同请求合并和崩溃恢复；已有右键部署入口包含官方 API 服务。安装、真实检索和稳定性证据见 [搜索说明](docs/SEARCH_REPAIR_20261111.zh.md)。升级前已运行的旧版 MCP 需重新连接一次；新适配器可继续使用重启后的常驻服务。
 
 全局检索服务的常驻共享方式、100 请求测试、评分缓存及 Mac 内存边界，见 [共享 Worker 实测](docs/GLOBAL_SHARED_WORKER_20261111.zh.md)。
 

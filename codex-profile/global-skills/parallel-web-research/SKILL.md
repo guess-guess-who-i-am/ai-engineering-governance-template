@@ -1,6 +1,6 @@
 ---
 name: parallel-web-research
-description: Discover external technical sources and research across independent directions with complementary free API and web search. Use for libraries, GitHub repositories, Stack Overflow, papers and broad online evidence gathering; not local-only lookup, Git writes or an already-known page.
+description: Discover external technical sources and research across independent directions with free official APIs. Use for libraries, GitHub repositories, Stack Overflow, papers and broad online evidence gathering; not local-only lookup, Git writes or an already-known page.
 ---
 
 # Parallel Web Research
@@ -15,17 +15,17 @@ description: Discover external technical sources and research across independent
 
 “Make them complement each other; after adding it, update Git.”
 
+“Do not use a local dataset; use the official interfaces.”
+
 ## Select and batch
 
-Use the global index/router to discover `technical_research/complementary_search_batch` when exposed. Send the independent directions together, up to 20 `{source, query}` operations. Choose `github`, `stackoverflow`, `papers`, or `web` according to what must be found. Default topK is 10; deepen deficient directions only. Do not manufacture queries to meet a count.
+Use the global index/router to discover `technical_research/complementary_search_batch` when exposed. Send independent directions together, up to 20 operations. Choose `github`, `stackoverflow`, `papers`, `openalex`, or `crossref`; default topK is 10. Both search entries now use official APIs only. No scraped-engine fallback or local corpus. General web/news discovery has no configured official endpoint; state that boundary honestly.
 
-English repo/SO queries use direct APIs first; only errors, empty results or a missing explicit `expectedTitle`/`expectedUrl` get a web supplement. Chinese queries use the existing free web search; optionally supply a short English `apiQuery` yourself when useful, keeping the original user question. Do not send untranslated Chinese descriptions to technical APIs and assume nonempty means useful. Papers use scholarly API plus web concurrently; OpenAlex is opt-in because free quota may be exhausted. No paid search or translation fallback.
+Use short distinctive English `apiQuery` terms for Chinese or long questions while preserving the original question. `papers` uses Crossref title search; query OpenAlex explicitly for complementary coverage, including preprints. Crossref title search is for paper subjects/titles, not author or full citation lookup; it does not cover every paper. Known targets can use `expectedTitle`/`expectedUrl`; an unrelated nonempty result is not a target hit.
 
-For live facts use `cacheMode: refresh`; otherwise dated cache is acceptable when sufficiently fresh. `only` makes no HTTP requests. Never network when the user prohibits it. The older `technical_research_batch` is API-only, not the mixed default.
+The shared global service reuses the existing GitHub CLI login. Optional Stack Exchange/OpenAlex keys come from environment or the user's Keychain, never chat or Git. Read `authentication`, `quota`, `retryAt` and branch errors. GitHub repository search is normally 30/minute authenticated, not the core API's 5000/hour. Concurrency does not remove provider quotas. An account alone does not prove a key or higher quota is configured. Honor backoff; do not repeat successful siblings when one provider fails.
 
-Read each operation's status, reasons, branch failures, cache age and provenance. The merged pool preserves source errors. A known-title match is not verified correctness; metadata and question excerpts are not full papers or accepted answers. Candidate counts and selected cards are not accuracy measurements. If an API returns irrelevant nonempty results without a known target, supplement that direction with `source: web`; do not repeat the entire successful batch.
-
-If the mixed entry or local free web service is unavailable, report the actual limitation and use the session's exposed `web_search_batch`, or independent `web_search` calls together. Never claim an IDE-specific tool is present when it is not. Do not switch to a paid provider or install a replacement engine without authorization.
+Use `cacheMode: refresh` for current claims; otherwise explicitly dated short-term request cache is acceptable. `only` makes no HTTP or credential lookup. Never network when the user prohibits it. No paid API, paid translation, local snapshot or silent provider substitution. When the official quota is exhausted, report the actual reset/retry information and retain other sources' evidence.
 
 ## Read and report
 

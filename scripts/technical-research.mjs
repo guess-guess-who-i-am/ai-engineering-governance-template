@@ -3,12 +3,28 @@ import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import {OriginLimiter,withinDeadline} from './research-concurrency.mjs';
+import {createCredentialProvider} from './research-credentials.mjs';
+import {setTimeout as delay} from 'node:timers/promises';
 
 export const PROVIDERS = ['stackoverflow', 'github', 'openalex', 'crossref'];
 const endpoints = { stackoverflow: 'https://api.stackexchange.com/2.3/search/advanced', github: 'https://api.github.com/search/repositories',
   openalex: 'https://api.openalex.org/works', crossref: 'https://api.crossref.org/works' };
 const hash = value => createHash('sha256').update(value).digest('hex');
 const plain = text => String(text || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+const numeric=value=>value!==null&&value!==undefined&&Number.isFinite(Number(value))?Number(value):null;
+function quotaState(source,response,data){
+  const now=Date.now(),header=name=>numeric(response.headers.get(name));
+  const limit=source==='stackoverflow'?numeric(data.quota_max):header('x-ratelimit-limit');
+  const remaining=source==='stackoverflow'?numeric(data.quota_remaining):header('x-ratelimit-remaining');
+  const reset=header('x-ratelimit-reset');
+  const resetMs=reset===null?null:source==='openalex'?now+reset*1000:reset*1000;
+  // Stack Exchange's no-key quota is shared by IP and has no reset header.
+  // A bounded recheck is honest; do not invent a daily reset timestamp.
+  return {limit,remaining,unit:source==='openalex'?'credits':source==='stackoverflow'?'requests/day':source==='github'?'search requests/minute':'requests',
+    resetAt:resetMs&&resetMs>now?new Date(resetMs).toISOString():null,
+    ...(source==='openalex'?{creditsUsed:header('x-ratelimit-credits-used')}:{})};
+}
 function canonicalUrl(text) {
   try { const url = new URL(text);url.hash='';for(const key of [...url.searchParams.keys()])if(/^utm_/.test(key))url.searchParams.delete(key);return url.href; }
   catch { return String(text); }
@@ -23,8 +39,8 @@ function prepare(operation, topK, providerEndpoints) {
   if (operation.source === 'stackoverflow') for(const [key,value] of Object.entries({site:'stackoverflow',q:query,pagesize:String(topK),sort:'relevance',filter:'withbody'}))url.searchParams.set(key,value);
   if (operation.source === 'github') for(const [key,value] of Object.entries({q:requestQuery,per_page:String(topK)}))url.searchParams.set(key,value);
   if (operation.source === 'openalex') {url.searchParams.set('search',query);url.searchParams.set('per-page',String(topK));}
-  if (operation.source === 'crossref') {url.searchParams.set('query.bibliographic',query);url.searchParams.set('rows',String(topK));}
-  return {source:operation.source,query,requestQuery,url:url.href,key:hash(JSON.stringify({version:2,source:operation.source,query,requestQuery,topK,endpoint:url.origin+url.pathname}))};
+  if (operation.source === 'crossref') {url.searchParams.set('query.title',query);url.searchParams.set('rows',String(topK));}
+  return {source:operation.source,query,requestQuery,url:url.href,key:hash(JSON.stringify({version:3,source:operation.source,query,requestQuery,topK,endpoint:url.origin+url.pathname}))};
 }
 function cards(source, data) {
   const rows = source === 'openalex' ? data.results : source === 'crossref' ? data.message?.items : data.items;
@@ -39,9 +55,10 @@ function cards(source, data) {
 }
 
 export class TechnicalResearch {
-  constructor({ cacheDirectory = path.join(process.env.CODEX_HOME || path.join(os.homedir(),'.codex'),'technical-research-cache'), fetchImpl=fetch, providerEndpoints=endpoints }={}) {
+  constructor({ cacheDirectory = path.join(process.env.CODEX_HOME || path.join(os.homedir(),'.codex'),'technical-research-cache'), fetchImpl=fetch, providerEndpoints=endpoints,credentialProvider=createCredentialProvider(),githubIntervalMs }={}) {
     this.cacheDirectory=cacheDirectory;this.fetch=fetchImpl;this.endpoints=providerEndpoints;this.inflight=new Map();this.cooldown=new Map();
-    this.githubTail=Promise.resolve();
+    this.limiter=new OriginLimiter({perOrigin:source=>source==='github'?1:2});
+    this.credentials=credentialProvider;this.githubIntervalMs=githubIntervalMs;this.githubNextStart=0;this.quotas=new Map();
   }
   async #write(file,data) {
     await mkdir(path.dirname(file),{recursive:true,mode:0o700});const tmp=file+'.'+randomUUID()+'.tmp';
@@ -60,35 +77,65 @@ export class TechnicalResearch {
   }
   async #one(task,{timeoutMs,topK}) {
     const began=performance.now(),file=path.join(this.cacheDirectory,'requests',task.key+'.json');
-    if((this.cooldown.get(task.source)||0)>Date.now())throw new Error('Provider backoff active until '+new Date(this.cooldown.get(task.source)).toISOString());
+    const deadline=Date.now()+timeoutMs;
+    const checkCooldown=()=>{
+      const until=this.cooldown.get(task.source)||0;
+      if(until>Date.now())throw Object.assign(new Error('Provider backoff active until '+new Date(until).toISOString()),
+        {code:'PROVIDER_COOLDOWN',retryAt:new Date(until).toISOString(),quota:this.quotas.get(task.source)});
+    };
+    checkCooldown();
+    const credential=await withinDeadline(Promise.resolve().then(()=>this.credentials(task.source)),performance.now()+Math.max(1,deadline-Date.now()));
+    const authentication=credential.kind||'anonymous',token=credential.token;
+    const redact=value=>token?String(value).split(token).join('[REDACTED]'):String(value);
+    if(task.source==='github'){
+      const waitMs=Math.max(0,this.githubNextStart-Date.now());
+      if(waitMs>=deadline-Date.now())throw Object.assign(new Error('GitHub search pacing exceeds this request deadline; retry at the reported time'),
+        {code:'PROVIDER_PACING',retryAt:new Date(this.githubNextStart).toISOString(),authentication,quota:this.quotas.get(task.source)});
+      if(waitMs)await delay(waitMs);
+      checkCooldown();
+      this.githubNextStart=Date.now()+(this.githubIntervalMs??(token?2050:6050));
+    }
+    checkCooldown();
+    const headers={'User-Agent':'AI-engineering-technical-research/2.1','Accept':'application/json'};
+    if(token){
+      if(new URL(task.url).origin!==new URL(endpoints[task.source]).origin)throw new Error('Refusing credentials to a nonofficial origin');
+      headers.Authorization='Bearer '+token;
+    }
+    const budget=deadline-Date.now();if(budget<=0)throw new Error('Deadline exceeded before official API dispatch');
     const requestStartedAt=Date.now(),networkBegan=performance.now(),requestId=randomUUID();
     let response,rawText,headersReceivedAt,network;
     try {
-      response=await this.fetch(task.url,{signal:AbortSignal.timeout(timeoutMs),headers:{'User-Agent':'AI-engineering-technical-research/1.0','Accept':'application/json'}});
-      headersReceivedAt=Date.now();rawText=await response.text();
+      response=await this.fetch(task.url,{redirect:'error',signal:AbortSignal.timeout(budget),headers});
+      headersReceivedAt=Date.now();rawText=redact(await response.text());
       network={requestId,requestStartedAt,headersReceivedAt,bodyReceivedAt:Date.now(),elapsedMs:performance.now()-networkBegan};
     } catch(error) {
-      throw Object.assign(error,{network:{requestId,requestStartedAt,headersReceivedAt:headersReceivedAt??null,bodyReceivedAt:Date.now(),elapsedMs:performance.now()-networkBegan}});
+      throw Object.assign(new Error(redact(error.message)),{network:{requestId,requestStartedAt,headersReceivedAt:headersReceivedAt??null,bodyReceivedAt:Date.now(),elapsedMs:performance.now()-networkBegan}});
     }
     let data;
     const rejectResponse=async message=>{
       const artifact=path.join(this.cacheDirectory,'errors',task.key+'-'+randomUUID()+'.json');
       await this.#write(artifact,{source:task.source,query:task.query,httpStatus:response.status,fetchedAt:new Date().toISOString(),rawText});
-      throw Object.assign(new Error(message),{artifact,httpStatus:response.status,network});
+      throw Object.assign(new Error(redact(message)),{artifact,httpStatus:response.status,network,authentication,quota:this.quotas.get(task.source),
+        ...(this.cooldown.get(task.source)>Date.now()?{retryAt:new Date(this.cooldown.get(task.source)).toISOString()}:{} )});
     };
     const retryAfter=response.headers.get('retry-after');
     const headerPause=retryAfter?Number(retryAfter)||Math.max(0,(Date.parse(retryAfter)-Date.now())/1000):0;
     if(headerPause>0)this.cooldown.set(task.source,Date.now()+headerPause*1000);
+    const headerQuota=quotaState(task.source,response,{});this.quotas.set(task.source,headerQuota);
+    if(headerQuota.remaining===0)this.cooldown.set(task.source,Math.max(this.cooldown.get(task.source)||0,headerQuota.resetAt?Date.parse(headerQuota.resetAt):Date.now()+60000));
+    if(([429,503].includes(response.status)||(task.source==='github'&&response.status===403))&&!(this.cooldown.get(task.source)>Date.now()))this.cooldown.set(task.source,Date.now()+60000);
     try{data=JSON.parse(rawText);}catch{return rejectResponse('Provider did not return JSON (HTTP '+response.status+')');}
+    if(!data||typeof data!=='object'||Array.isArray(data))return rejectResponse('Provider returned an invalid JSON object');
     const pause=Number(data.backoff)||headerPause;
     if(pause>0)this.cooldown.set(task.source,Date.now()+pause*1000);
-    if(response.headers.get('x-ratelimit-remaining')==='0')this.cooldown.set(task.source,Math.max(this.cooldown.get(task.source)||0,Number(response.headers.get('x-ratelimit-reset'))*1000||Date.now()+60000));
+    const quota=quotaState(task.source,response,data);this.quotas.set(task.source,quota);
+    if(quota.remaining===0)this.cooldown.set(task.source,Math.max(this.cooldown.get(task.source)||0,quota.resetAt?Date.parse(quota.resetAt):Date.now()+60000));
     if(!response.ok||data.error_id||data.error)return rejectResponse('Provider HTTP '+response.status+': '+String(data.error_message||data.message||data.error||response.statusText).slice(0,300));
     const results=cards(task.source,data);
     const fetchedAt=Date.now();
     const result={source:task.source,query:task.query,requestQuery:task.requestQuery,status:results.length?'ok':'empty',cache:'miss',ageMs:0,fetchedAt:new Date(fetchedAt).toISOString(),httpStatus:response.status,
       ...(!results.length?{diagnostic:'No hits for this query; do not infer absence. Supply a short source-specific query (apiQuery in complementary search) or search another source.'}:{}),
-      results,network,totalReported:data.total_count??data.meta?.count??data.message?.['total-results']??null,returnedCount:results.length,
+      authentication,...(credential.diagnostic?{authenticationDiagnostic:credential.diagnostic}:{}),quota,officialEndpoint:new URL(task.url).origin,results,network,totalReported:data.total_count??data.meta?.count??data.message?.['total-results']??null,returnedCount:results.length,
       providerHasMore:data.has_more??null,requestedCount:topK,rawSha256:hash(rawText),rawUtf8Bytes:Buffer.byteLength(rawText),elapsedMs:performance.now()-began};
     await this.#write(file,{key:task.key,fetchedAt,result,rawText});
     return {...result,artifact:file,elapsedMs:performance.now()-began};
@@ -115,6 +162,7 @@ export class TechnicalResearch {
     }));
     const cachePhaseMs=performance.now()-began,queue=tasks.filter(task=>!output.has(task.key));
     const queueError=(task,error)=>({source:task.source,query:task.query,status:'error',error:error.message,cache:'none',results:[],
+      ...Object.fromEntries(['code','retryAt','quota','authentication'].filter(key=>error[key]!==undefined).map(key=>[key,error[key]])),
       ...(error.artifact?{artifact:error.artifact,httpStatus:error.httpStatus}:{}),...(error.network?{network:error.network}:{})});
     if(queue.length) {
     await new Promise(resolve=>{
@@ -128,7 +176,7 @@ export class TechnicalResearch {
           const index=queue.findIndex(task=>(busy.get(task.source)||0)<(task.source==='github'?1:2));
           if(index<0)break;
           const [task]=queue.splice(index,1);running++;peak=Math.max(peak,running);busy.set(task.source,(busy.get(task.source)||0)+1);
-          const key=task.key+':'+cacheMode+':'+maxAgeSeconds+':'+timeoutMs;
+          const key=task.key;
           let work=this.inflight.get(key);
           if(!work){
             const execute=()=>{
@@ -136,10 +184,10 @@ export class TechnicalResearch {
               if(remaining<=0)throw new Error('Batch deadline exceeded before HTTP dispatch');
               return this.#one(task,{timeoutMs:remaining,topK});
             };
-            if(task.source==='github'){work=this.githubTail.then(execute);this.githubTail=work.catch(()=>{});}else work=Promise.resolve().then(execute);
+            work=this.limiter.run(task.source,deadline,execute);
             this.inflight.set(key,work);work.finally(()=>this.inflight.delete(key)).catch(()=>{});
           }
-          work.then(result=>output.set(task.key,result),error=>output.set(task.key,queueError(task,error)))
+          withinDeadline(work,deadline).then(result=>output.set(task.key,result),error=>output.set(task.key,queueError(task,error)))
             .finally(()=>{running--;busy.set(task.source,busy.get(task.source)-1);if(!queue.length&&!running)resolve();else dispatch();});
         }
       };dispatch();

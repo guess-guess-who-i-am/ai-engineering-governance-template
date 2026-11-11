@@ -98,7 +98,7 @@ try {
   const results = await Promise.all(handlers.map((handler) => runHandler(handler, raw)));
   for (const result of results) {
     if (result.error || result.stderr.trim()) {
-      process.stderr.write(`Hook dispatcher child ${result.file}: ${result.error || result.stderr.trim()}\n`);
+      process.stderr.write(`Hook dispatcher child ${result.file}: ${[result.error, result.stderr.trim()].filter(Boolean).join(": ")}\n`);
     }
   }
   if (results.some((result) => result.error)) process.exitCode = 1;

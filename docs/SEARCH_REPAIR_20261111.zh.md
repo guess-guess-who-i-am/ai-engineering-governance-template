@@ -1,63 +1,65 @@
-# GitHub、Stack Overflow 与论文搜索修复
+# 官方技术检索：全局安装、认证与额度
 
-2026-11-11。目标是区分连接失败、查询不命中、来源覆盖不足和结果误报，再验证用户级 MCP 实际可用。
+2026-11-11。当前采用 GitHub、Stack Exchange、OpenAlex、Crossref 的官方在线 API，不建立本地文献/网页语料库，不使用付费服务，不再自动抓取 DuckDuckGo/Bing。请求缓存与诊断证据仍保存在用户目录，默认仅复用五分钟内的请求结果；这不是本地搜索数据库。
 
-## 根因与修复
+## 现在能用什么
 
-| 环节 | 实测偏差 | 本次处理 |
+| 来源 | 本机认证与实测 | 额度边界 |
 |---|---|---|
-| 网页互补 | 固定连接工作区 IDE 的 5505 端口；该端口已无监听，真实搜索 daemon 在 3210 | 直接调用用户级 Open-WebSearch `/status`、`/search`，解除工作区 IDE 端口依赖 |
-| GitHub 查询 | 默认 repository search 未搜索 README；原长查询 HTTP 200、零命中 | 默认增加 `in:name,description,readme`；保留显式 `in:`；同时返回原始 `query` 和实际 `requestQuery` |
-| Stack Overflow 查询 | 简单查询有结果；长的 MCP 查询在 API 与网页均为空 | 空结果明确标记 `empty`，提示用短的 `apiQuery`；保留原问题，不擅自删除关键词 |
-| 论文覆盖 | Crossref 的相似标题不是目标 Transformer 论文；原网页分支断连 | 修通 Crossref 与网页并行互补；已知目标优先展示；预印本/覆盖缺口可另加 `source: openalex`，保留免费额度错误 |
-| 成功统计 | HTTP 200 空数组也计入 `successfulOperations` | 分开统计命中、空结果与完成请求；全空返回 `empty`，不误报工具故障或发现成功 |
-| 引擎配额 | daemon 会把 `limit` 分给多个引擎 | 每引擎给足配额，再交错、去重，按调用方 `topK` 截取 |
+| GitHub 仓库 | 从现有官方 `gh` 登录私下读取凭据，命中 ripgrep | 本次官方响应为 30 次仓库搜索/分钟；不能用 core 的 5000/小时替代 |
+| Stack Overflow | 未注册账号，匿名官方 API 命中已知问题 | 本次为 300 次/日、剩余 257；共享 IP 与其他调用可能改变剩余额度 |
+| OpenAlex | 未注册账号，本次匿名请求命中 Tail at Scale | 本次响应预算 1000 credits，搜索消耗 10，剩余 910；并非 1000 次搜索 |
+| Crossref | 无需账号，标题搜索命中 Tail at Scale | 保留官方限流和错误；不承诺无限请求 |
 
-网页只请求明确免费的 DuckDuckGo/Bing。先检查 daemon 允许的引擎，拒绝将不允许的引擎悄悄替换成默认供应商。查询并发有界，共享截止时间；一个失败不抹去已完成的其他查询。`cacheMode: only` 不联网，旧协议缓存通过新键隔离。
+全局真实 MCP 四来源请求在 4832 ms 内全部命中目标。只证明本次接口和目标可用，不证明任意查询相关、论文全文可读或永久免费额度永远足够。OpenAlex 的匿名策略可能改变；不能把匿名可用描述成已接入注册密钥。
 
-## 实际验收
+`complementary_search_batch` 和 `technical_research_batch` 均只访问官方 API。前者保留原问题、支持短 `apiQuery` 与目标核对；`papers` 指 Crossref 标题搜索。OpenAlex 需单独选择。Crossref 不覆盖全部预印本，标题检索也不是作者/完整引文检索。通用网页与新闻没有配置免费的官方搜索接口，`source: web` 已移除，不会用抓取或付费服务替代。
 
-- 修复前新增的 11 项回归中，9 项失败、2 项通过；修复后包含免费引擎限制的 13 项全部通过。
-- 全局安装目录的真实 stdio MCP 入口：9 项查询一批，8,545 ms；请求时间区间有真实重叠，观测到 9 个并发 HTTP 区间（不含 daemon 内部引擎请求）。
-- GitHub 原长查询由零命中变为报告 90 个仓库，返回前 5 项；第一项是 `modelcontextprotocol/rust-sdk`。这只证明候选发现恢复，不证明每个仓库实现了所需机制。
-- `ripgrep` 命中官方仓库；Stack Overflow 命中 `if/else in a list comprehension`；Transformer 命中 arXiv `1706.03762`；OpenAlex 命中《The Tail at Scale》DOI `10.1145/2408776.2408794`。中文网页有候选；没有把数量当成准确率。
-- 不存在的目标保持未命中；原长 Stack Overflow 查询仍为空，没有伪造成功。
-- 复核后的全局入口再验用时 8,412 ms；API-only 工具从仅缓存读取到空结果，正确返回 `empty`、零成功发现且 `isError: false`。同一实际查询对应不同原始输入时，各自的查询身份也保持完整。
+## 为什么此前不稳定
 
-原始证据保存在运行机器 `.reports/search-repair-20261111/`：`before.tap`、`live-local.json`、`live-global.json`、`live-global-final.json`、`proxy-comparison.json`、`bing-exact-trace.json`、`deployment.json`。API 原始响应及每次查询的 artifact 路径由报告返回，未作为机器配置上传。
+1. 官方 API 请求未读取已存在的 GitHub 登录，只能消耗匿名额度；现在复用 `gh`，不复制 token 到文件。
+2. 仅限制同时连接数不能限制每分钟请求数。全工作区共享常驻服务、来源并发、请求合并、冷却状态；GitHub 认证/匿名请求间隔分别至少约 2050/6050 ms，仍服从服务器实际额度与退避。
+3. GitHub 的 reset 为时间戳，OpenAlex 的 reset 为距离重置的秒数。此前通用解析错误；现在分来源处理。Stack Exchange 没有提供 reset 时不伪造时间，只给出下一次允许复查的时间。
+4. Crossref `query.bibliographic` 在本次已知标题检索中返回相似文献，前五项无目标；相同标题用 `query.title` 命中第一项。现按论文标题检索，不把 HTTP 200 或非空误认为目标成功。
+5. 自动网页补搜增加验证码、抓取协议与引擎变化的失败边界，已从该检索入口删除。task-tree 自有的独立网页能力不在本次所有权内。
 
-## 网络边界与尚未验证的部分
+额度不足或本轮时限不足时返回 `quota`、`retryAt`、错误码，并保留其他来源的成功结果。不能保证 100 个不同的外部查询同时立即成功；100 个相同查询可以合并一次上游请求，这与突破官方额度不同。
 
-常驻 daemon 开启代理时，部分 Bing 查询报 `Bing exceeded the regional redirect limit (1)`；独立直连进程的相同论文查询能正确返回。禁用整个 daemon 的代理后，DuckDuckGo 超时，说明不能用全局关代理修复 Bing。保留原代理设置，Bing 失败通过 `failures` 和 `partial` 报告；本次没有修改第三方引擎代码，也没有声称 Bing 全部修复。
+## 账号与凭据
 
-搜索候选、README 检索和网页摘要不等于源码、accepted answer 或论文全文。Stack Overflow 原网页可能返回 403，但官方 StackExchange API 的答案正文可读，已实际读取 accepted answer `74368828`、`76554695`。该搜索 MCP 尚无通用正文读取工具；需要通过官方 API 或独立正文读取工具继续取证。付费、验证码或权限边界没有绕过。
+当前四来源均已有真实请求证据，不必先注册两个账号才能使用。需要增加官方额度时：
 
-本次已将三个搜索实现文件部署到用户级 `~/.codex/tools/complementary-search/scripts/` 并备份原文件，新连接实测通过。**已经运行的 MCP 进程仍持有旧模块，需要在客户端重新连接 `technical_research` 或重启客户端后加载新实现。** 没有停止其他聊天，也没有宣称跨电脑或重启后的 daemon 启动已验收。
+- [Stack Overflow 免费注册](https://stackoverflow.com/users/signup)，然后按 [Stack Exchange 认证说明](https://api.stackexchange.com/docs/authentication)申请官方 API 凭据。账号本身不等于已签发应用密钥。
+- 在 [OpenAlex 官方网站](https://openalex.org)注册免费账号，参考 [官方认证说明](https://help.openalex.org/api/authentication/)获取免费 API key。不要启用付费购买。
 
-本机没有 `pwsh`，因此未运行 PowerShell 全仓门禁；Skill 提及的 `scripts/verify-repository.ps1`、`scripts/new-debug-record.ps1` 及资源登记文档在当前树不存在，不作为已执行证据。
+凭据不要发到聊天、写进仓库、日志或 URL。macOS 可用“钥匙串访问”添加密码项目：项目名分别为 `com.codex.research.stackoverflow`、`com.codex.research.openalex`，账户填当前 macOS 登录用户名，密码栏填官方凭据。服务只读取这两个确切项目，并每分钟重新检查一次。Keychain 访问若弹出系统授权，应由用户自行处理。无钥匙串项目时保留匿名状态和实际额度，不伪报认证成功。
 
-## 复测与使用
+直接启动服务时也可从环境读取 `GH_TOKEN`/`GITHUB_TOKEN`、`STACKEXCHANGE_ACCESS_TOKEN`/`STACKEXCHANGE_KEY`、`OPENALEX_API_KEY`；终端环境不会自动传给登录启动的 LaunchAgent，长期使用优先钥匙串。所有认证均放 `Authorization: Bearer` 请求头；禁跟随重定向，拒绝向非官方来源发凭据，并对可能反射凭据的响应/错误脱敏。
 
-先在仓库执行 `npm ci --ignore-scripts`，再运行：
+## 日常使用和迁移
+
+继续使用已有“部署 Codex 全局配置”右键入口。它安装用户级服务及代码，不要求每个工作区运行脚本。部署源已纳入认证模块、官方 API 工具说明和全局 `parallel-web-research` Skill。新电脑须满足 README 安装条件，并自行完成 GitHub 官方登录及可选账号凭据配置；登录态和密钥不随 Git 迁移。
+
+`com.codex.research` 在 `127.0.0.1:3211` 提供共享服务，由 LaunchAgent 的 `RunAtLoad`/`KeepAlive` 管理。原专用抓取服务 `com.codex.research-web` 已退役。SDK 使用固定 1.32.1，优先链接全局 task-tree runtime，不再要求 Open-WebSearch。旧版直连 API 的 MCP 进程需要重新连接一次；当前适配器可在服务恢复后沿用原连接。
+
+开发诊断命令（用户日常无需执行）：
 
 ```sh
 npm run test:research-search
 npm run test:research-search:live
+node scripts/install-research-services-mac.mjs --check --json
 ```
 
-后者会访问真实免费来源；断网、限流和上游内容变化可能使其失败。测试通过 SDK 连接实际 MCP 入口，并保存原始响应。也可指定全局入口与报告路径：
+安装器备份受管文件并检查代码、MCP 注册、SDK 链接、LaunchAgent 和运行版本。`--home` 指向其他用户时只落盘；`--no-start` 不启动服务。只恢复安装文件无需注册账号。
 
-```sh
-node scripts/test-research-search-live.mjs "$HOME/.codex/tools/complementary-search/scripts/technical-research-mcp.mjs" .reports/search-live-global.json
-```
+## 验证与边界
 
-混合检索使用 `complementary_search_batch`；`technical_research_batch` 仅访问 API。自然语言长问题应显式提供源适配的短 `apiQuery`；已知目标提供 `expectedUrl` 或 `expectedTitle`。`CODEX_SEARCH_WEB_BASE_URL` 如需设置，必须是 Open-WebSearch daemon 的 loopback origin，不能再指向 IDE 的 `/api/web-search` 协议。
+- 全量全局图已重建，4个常驻查询进程中英文通道预热通过；真实socket检索返回新版官方API工具说明和全局Skill。全量重建是发布时的一次性编码，不是每次搜索都做。
+- 26 项隔离回归通过：官方路由、凭据隔离/反射脱敏、跨批次节流、配额与 reset、非 JSON 限流、同查询合并、独立截止时间、部分失败、无抓取依赖的安装与漂移检查、MCP 恢复。
+- 真实 MCP 四来源目标均命中，认证与实际额度见 `.reports/search-official-20261111/live.json`；首次 Crossref 未命中的结果保留为 `live-before-crossref-fix.json`。
+- macOS 全新安装、右键部署源、幂等更新及回滚隔离测试通过；使用受控 MCP fixture，不冒充跨电脑实装。
+- 本轮五个独立 MCP 进程的100次相同查询全部成功，1.644秒且只发出一次上游请求；强退后原MCP连接约178ms恢复。证据在 `.reports/search-official-20261111/recovery-live.json`；不能替代100种不同查询的外部额度验收。
+- 硬重启、其他电脑、注册后的 Stack Exchange/OpenAlex 密钥尚未实测。本机没有 `pwsh`，PowerShell 全仓与 Skill 门禁未运行；缺失的 `scripts/verify-repository.ps1`、`docs/RESOURCE_REGISTRY.md` 不作为通过证据。
+- Stack Apps 补充认证帮助页触发验证码；OpenAlex 帮助页本轮读取不完整。认证机制依据可访问的 Stack Exchange 官方 API 文档、先前已读取的 OpenAlex 官方说明及本轮响应；未假装完成这两个账号的认证验收。
 
-## 决策依据
-
-- [GitHub 官方 repository search 范围](https://docs.github.com/en/search-github/searching-on-github/searching-for-repositories)：省略 `in:` 时仅 name、description、topics；README 需要明确范围。
-- [StackExchange advanced search 官方契约](https://api.stackexchange.com/docs/advanced-search)：`q` 是未公开算法的自由文本搜索；不能武断解释为严格 AND。
-- [SO 关于 README 搜索的讨论](https://stackoverflow.com/questions/76554338/)：accepted answer 建议 `in:readme`，与官方文档一致。
-- [另一 SO 讨论](https://stackoverflow.com/questions/74363221/)的 accepted answer 对默认 README 范围的说法与当前官方文档冲突；采用官方契约，并用同一查询实测确认。
-
-这是检索范围与接口协议问题，以官方契约、源码和控制变量实测作判断；没有用不相干的论文替代工程证据。
+官方依据：[GitHub 搜索限流](https://docs.github.com/en/rest/search/search)、[GitHub REST 限流](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api)、[Stack Exchange 节流](https://api.stackexchange.com/docs/throttle)、[Crossref REST 建议](https://www.crossref.org/documentation/retrieve-metadata/rest-api/tips-for-using-the-crossref-rest-api/)。

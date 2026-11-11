@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import { createHash } from "node:crypto";
-import { chmod, cp, mkdtemp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
+import { chmod, cp, mkdtemp, mkdir, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import { once } from 'node:events';
 import { fileURLToPath } from "node:url";
+import { managedFiles as researchFiles } from './install-research-services-mac.mjs';
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const INSTALLER = path.join(SCRIPT_DIR, "install-codex-profile-mac.mjs");
@@ -64,6 +66,7 @@ await writeFile(skillCatalog, JSON.stringify({ skills: [
   { name: "astro-islands", dir: "acme-astro-islands", description: "Build Astro islands architecture", problem_cn: "Astro islands", when_cn: "Astro rendering", c1: "islands", c2: "hydration", key: "astro-islands" },
   { name: "missing-skill", dir: "missing-skill", description: "missing", problem_cn: "missing", when_cn: "missing", key: "missing-skill" }
 ] }));
+let researchFixture;
 try {
   const home = path.join(root, "home with spaces");
   await seedHome(home, "KEEP_CUSTOM_CONFIGURATION");
@@ -281,10 +284,20 @@ for await (const line of createInterface({ input: process.stdin })) {
     }
   });
   assert(failedHandler.status !== 0 && failedHandler.stderr.includes("exited with code"), "dispatcher test mode hid a child failure");
+  assert(failedHandler.stderr.includes("Cannot find module"), "dispatcher discarded the failing child's stderr");
 
   const deployHome = path.join(root, "one-click-home");
   await seedHome(deployHome, "ONE_CLICK_SENTINEL");
   const taskTreeRuntime = path.join(root, "task-tree-runtime");
+  await mkdir(path.join(taskTreeRuntime, "node_modules/@modelcontextprotocol"), { recursive: true });
+  await symlink(path.join(REPOSITORY_ROOT, "node_modules/@modelcontextprotocol/sdk"), path.join(taskTreeRuntime, "node_modules/@modelcontextprotocol/sdk"), 'dir');
+  researchFixture = spawn(process.execPath, ['--input-type=module', '-e', `
+    import http from 'node:http';
+    const server=http.createServer((req,res)=>{req.resume();res.setHeader('content-type','application/json');res.end(JSON.stringify({tools:[{name:'technical_research_batch',inputSchema:{type:'object'}},{name:'complementary_search_batch',inputSchema:{type:'object'}}]}));});
+    server.listen(0,'127.0.0.1',()=>console.log(server.address().port));
+  `], {stdio:['ignore','pipe','inherit']});
+  const [fixturePort] = await once(researchFixture.stdout, 'data');
+  process.env.CODEX_RESEARCH_BASE_URL = 'http://127.0.0.1:' + String(fixturePort).trim();
   await mkdir(path.join(taskTreeRuntime, "scripts"), { recursive: true });
   await writeFile(path.join(taskTreeRuntime, "scripts", "mcp-server.mjs"), `#!/usr/bin/env node
 import { createInterface } from 'node:readline';
@@ -328,6 +341,8 @@ await writeFile(configPath, config);
   const deploy = runShell(DEPLOYER, ["--home", deployHome], { home: deployHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython, CODEX_PROFILE_SKILL_SOURCE: skillFixture, CODEX_PROFILE_SKILL_CATALOG: skillCatalog, TASK_TREE_RUNTIME_ROOT: taskTreeRuntime } });
   assert(deploy.status === 0, `one-click deployment failed: ${deploy.stderr || deploy.stdout}`);
   assert(deploy.stdout.includes("available to every Codex workspace"), "one-click deployment did not report its global workspace scope");
+  const initialCatalog = JSON.parse(await readFile(path.join(deployHome, ".codex/skill-registry/mcp-tools.json"), "utf8"));
+  assert(JSON.stringify(initialCatalog).includes('complementary_search_batch'), "one-click deployment activated routing before indexing the search MCP");
   const deployedRefresh = run(path.join(deployHome, ".codex", "hooks", "refresh-skill-registry.mjs"), [], { home: deployHome, extraEnv: { CODEX_GRAPH_TOOL_PYTHON: graphToolPython }, input: refreshInput });
   assert(deployedRefresh.status === 0, `one-click SessionStart refresh failed: ${deployedRefresh.stderr || deployedRefresh.stdout}`);
   const deployedRegistry = JSON.parse(await readFile(path.join(deployHome, ".codex", "skill-registry", "skills-index.json"), "utf8"));
@@ -368,6 +383,8 @@ await writeFile(configPath, config);
   await writeFile(path.join(syncSource, "scripts", "run-codex-profile-service-mac.sh"), await readFile(syncRunner));
   await writeFile(path.join(syncSource, "scripts", "install-codex-profile-service-mac.sh"), await readFile(path.join(SCRIPT_DIR, "install-codex-profile-service-mac.sh")));
   await writeFile(path.join(syncSource, "scripts", "install-task-tree-mcp-mac.mjs"), "process.exit(0);\n");
+  for (const name of ["install-research-services-mac.mjs", ...researchFiles]) await cp(path.join(SCRIPT_DIR, name), path.join(syncSource, "scripts", name));
+  await cp(path.join(REPOSITORY_ROOT, "package.json"), path.join(syncSource, "package.json"));
   await cp(path.join(SCRIPT_DIR, "ensure-global-skill-library.mjs"), path.join(syncSource, "scripts", "ensure-global-skill-library.mjs"));
   await writeFile(path.join(syncSource, "scripts", "parallel-run.mjs"), await readFile(path.join(SCRIPT_DIR, "parallel-run.mjs"), "utf8"));
   for (const name of ["install-global-graph-service-mac.mjs", "warm-global-graph.py"]) await cp(path.join(SCRIPT_DIR, name), path.join(syncSource, "scripts", name));
@@ -445,5 +462,6 @@ await writeFile(configPath, config);
 
   console.log("PASS: macOS one-click deployment, profile install, GraphToolCall Skill graph index and routing, global task_tree MCP, 25 owned Skills, global-only registry, system/task-tree/supply-chain routing, merge, manifest backup, credential isolation, 76-rule validation, adaptive scheduling contract, dispatcher overlap, failure visibility, idempotent update, check mode, and rollback.");
 } finally {
+  if(researchFixture)researchFixture.kill();
   await rm(root, { recursive: true, force: true });
 }

@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
-    "test:research-search": "node --test scripts/test-research-search.mjs",
+    "test:research-search": "node --test scripts/test-research-official.mjs scripts/test-research-search.mjs scripts/test-research-stability.mjs scripts/test-research-transport.mjs",
     "test:research-search:live": "node scripts/test-research-search-live.mjs",
     "deploy:codex-profile:mac": "./scripts/deploy-codex-profile-mac.sh",
     "install:codex-profile-service:mac": "./scripts/install-codex-profile-service-mac.sh",

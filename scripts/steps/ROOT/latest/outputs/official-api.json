@@ -1,0 +1,122 @@
+{
+  "scope": "官方API与全局调用验收；不包含账号注册后的认证",
+  "unitTests": 26,
+  "live": {
+    "passed": true,
+    "elapsedMs": 4832,
+    "peakHttpOverlap": 4,
+    "checks": [
+      {
+        "source": "github",
+        "nonempty": true,
+        "targetHit": true,
+        "authentication": "github-cli",
+        "quota": {
+          "limit": 30,
+          "remaining": 29,
+          "unit": "search requests/minute",
+          "resetAt": "2026-11-11T10:44:59.000Z"
+        }
+      },
+      {
+        "source": "stackoverflow",
+        "nonempty": true,
+        "targetHit": true,
+        "authentication": "anonymous",
+        "quota": {
+          "limit": 300,
+          "remaining": 257,
+          "unit": "requests/day",
+          "resetAt": null
+        }
+      },
+      {
+        "source": "crossref",
+        "nonempty": true,
+        "targetHit": true,
+        "authentication": "public",
+        "quota": {
+          "limit": null,
+          "remaining": null,
+          "unit": "requests",
+          "resetAt": null
+        }
+      },
+      {
+        "source": "openalex",
+        "nonempty": true,
+        "targetHit": true,
+        "authentication": "anonymous",
+        "quota": {
+          "limit": 1000,
+          "remaining": 910,
+          "unit": "credits",
+          "resetAt": "2026-11-12T00:00:01.011Z",
+          "creditsUsed": 10
+        }
+      }
+    ]
+  },
+  "recovery": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "100 live requests through 5 separate MCP processes",
+        "passed": true,
+        "elapsedMs": 1644.3169579999999,
+        "peakClientOverlap": 100
+      },
+      {
+        "name": "resident SIGKILL and original MCP connection recovery",
+        "passed": true,
+        "elapsedMs": 2.154834000000392,
+        "elapsedSinceKillMs": 177.80770900000016
+      }
+    ]
+  },
+  "limits": [
+    "Stack Exchange/OpenAlex匿名额度；注册密钥未验证",
+    "硬重启和其他电脑未复验",
+    "无pwsh，PowerShell仓库门禁未运行"
+  ],
+  "globalGraphReady": {
+    "ready": true,
+    "requests": 4,
+    "queryProcesses": 4,
+    "readyLanguages": [
+      "en",
+      "zh"
+    ],
+    "prefilter": true
+  },
+  "globalRoutingChecks": [
+    {
+      "query": "mcp_technical_research_complementary_search_batch",
+      "ok": true,
+      "names": [
+        "technical_research",
+        "batch",
+        "complementary_search_batch",
+        "wf-search-download-mcp",
+        "not-human-search-mcp",
+        "parallel-web-research",
+        "technical_research_batch",
+        "gemini-deep-research"
+      ]
+    },
+    {
+      "query": "parallel-web-research official API github stackoverflow papers",
+      "ok": true,
+      "names": [
+        "parallel-web-research",
+        "github",
+        "parallel",
+        "web-research",
+        "parallel-web",
+        "parallel-web-research",
+        "parallel-web-research",
+        "exa-web-search-free"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "schema": "flow-step/v1",
+  "nodeId": "ROOT",
+  "title": "macOS 全局 Codex 治理配置",
+  "reportZh": "report.zh.md",
+  "substeps": [
+    {
+      "title": "官方API全局接入",
+      "functions": [
+        {
+          "path": "scripts/technical-research.mjs",
+          "name": "TechnicalResearch.batch"
+        },
+        {
+          "path": "scripts/research-credentials.mjs",
+          "name": "createCredentialProvider"
+        }
+      ],
+      "promptEn": "prompts/official-api.en.md",
+      "promptZh": "prompts/official-api.zh.md",
+      "outputs": [
+        {
+          "path": "outputs/official-api.json"
+        }
+      ]
+    }
+  ]
+}

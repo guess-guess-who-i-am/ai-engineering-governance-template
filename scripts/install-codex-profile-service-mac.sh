@@ -76,6 +76,14 @@ if [ "$check" -eq 1 ]; then
       install-global-graph-service-mac.mjs \
       warm-global-graph.py \
       install-task-tree-mcp-mac.mjs \
+      install-research-services-mac.mjs \
+      research-concurrency.mjs \
+      technical-research.mjs \
+      complementary-search.mjs \
+      research-tools.mjs \
+      technical-research-mcp.mjs \
+      research-service.mjs \
+      research-credentials.mjs \
       ensure-global-skill-library.mjs \
       install-codex-profile-service-mac.sh \
     run-codex-profile-service-mac.sh \
@@ -153,6 +161,14 @@ if [ "$repository_root" != "$source_destination" ]; then
     install-global-graph-service-mac.mjs \
     warm-global-graph.py \
     install-task-tree-mcp-mac.mjs \
+    install-research-services-mac.mjs \
+    research-concurrency.mjs \
+    technical-research.mjs \
+    complementary-search.mjs \
+    research-tools.mjs \
+    technical-research-mcp.mjs \
+    research-service.mjs \
+    research-credentials.mjs \
     ensure-global-skill-library.mjs \
     install-codex-profile-service-mac.sh \
     run-codex-profile-service-mac.sh \
@@ -161,6 +177,7 @@ if [ "$repository_root" != "$source_destination" ]; then
   do
     /usr/bin/ditto "$repository_root/scripts/$script" "$source_temporary/scripts/$script"
   done
+  /usr/bin/ditto "$repository_root/package.json" "$source_temporary/package.json"
   /bin/chmod 700 "$source_temporary/scripts"/*.sh "$source_temporary/scripts"/*.mjs
   /bin/rm -rf "$source_destination"
   /bin/mv "$source_temporary" "$source_destination"
