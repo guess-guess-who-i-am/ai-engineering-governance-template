@@ -174,6 +174,12 @@ async function buildOperations(home) {
     (source) => !source.endsWith("methodology-targets.json")
   );
   await addTree(path.join(PROFILE_ROOT, "mac", "hooks"), path.join(codexHome, "hooks"));
+  operations.set(path.join(codexHome, 'hooks', 'warm-global-graph.py'), {
+    destination: path.join(codexHome, 'hooks', 'warm-global-graph.py'),
+    content: await readFile(path.join(SCRIPT_DIR, 'warm-global-graph.py')),
+    mode: 0o700,
+    source: path.join(SCRIPT_DIR, 'warm-global-graph.py')
+  });
   const graphIndexerSource = path.join(PROFILE_ROOT, "mac", "hooks", "graph_skill_index.py");
   operations.set(path.join(codexHome, "hooks", "graph_skill_index.py"), {
     destination: path.join(codexHome, "hooks", "graph_skill_index.py"),
@@ -424,7 +430,7 @@ async function verifyInstallation(home, codexHome, operations) {
   catch { throw new Error(`Methodology publisher returned invalid JSON: ${publisher.stdout.trim()}`); }
   const hookInput = `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "hello", cwd: REPOSITORY_ROOT })}\n`;
   const context = await run(process.execPath, [path.join(codexHome, "hooks", "hook-dispatch.mjs")], { env, input: hookInput, timeoutMs: 300000 });
-  if (context.code !== 0 || !context.stdout.includes("ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5")) throw new Error("Hook dispatcher did not emit the adaptive scheduling contract");
+  if (context.code !== 0 || !context.stdout.includes("ADAPTIVE_TOOL_SCHEDULING_CONTRACT_V5")) throw new Error(`Hook dispatcher did not emit the adaptive scheduling contract (exit ${context.code}): ${context.stderr.trim() || "no child diagnostic"}; stdout bytes=${Buffer.byteLength(context.stdout)}`);
   return { validation: publication.validation, trust: await inspectHookTrust(codexHome) };
 }
 
@@ -453,6 +459,18 @@ async function install(options) {
   let transaction = null;
   try {
     if (changes.length) transaction = await applyTransaction(codexHome, changes);
+    if (changes.length || !await exists(path.join(codexHome, "skill-registry", "skills-index.json"))) {
+      // Routing consumes this registry. A first install must finish publishing
+      // it before verifying or activating a UserPromptSubmit consumer.
+      const refresh = await run(process.execPath, [path.join(codexHome, "hooks", "refresh-skill-registry.mjs")], {
+        env: { ...process.env, HOME: options.home, USERPROFILE: options.home, CODEX_HOME: codexHome,
+          CODEX_GRAPH_TOOL_PYTHON: graphToolPython, CODEX_SKILL_REGISTRY_FOREGROUND: "1", CODEX_SKIP_EXTERNAL_INDEX_REFRESH: "0" },
+        // Full bilingual indexing of the global library is an installation
+        // operation; it must not inherit the interactive request budget.
+        timeoutMs: 1800000
+      });
+      if (refresh.code !== 0) throw new Error(`Initial Skill registry publication failed (exit ${refresh.code}): ${refresh.stderr.trim()}`);
+    }
     const verification = await verifyInstallation(options.home, codexHome, operations);
     return {
       status: changes.length ? "installed" : "already-current",

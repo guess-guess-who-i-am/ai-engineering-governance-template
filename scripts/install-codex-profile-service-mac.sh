@@ -73,6 +73,8 @@ if [ "$check" -eq 1 ]; then
       deploy-codex-profile-mac.sh \
       install-codex-profile-mac.sh \
       install-codex-profile-mac.mjs \
+      install-global-graph-service-mac.mjs \
+      warm-global-graph.py \
       install-task-tree-mcp-mac.mjs \
       ensure-global-skill-library.mjs \
       install-codex-profile-service-mac.sh \
@@ -148,6 +150,8 @@ if [ "$repository_root" != "$source_destination" ]; then
     deploy-codex-profile-mac.sh \
     install-codex-profile-mac.sh \
     install-codex-profile-mac.mjs \
+    install-global-graph-service-mac.mjs \
+    warm-global-graph.py \
     install-task-tree-mcp-mac.mjs \
     ensure-global-skill-library.mjs \
     install-codex-profile-service-mac.sh \

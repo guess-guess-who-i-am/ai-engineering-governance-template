@@ -99,6 +99,7 @@ elif "serve" in args:
         while time.time() < deadline:
             try: connection, _ = server.accept()
             except socket.timeout: continue
+            deadline = time.time() + float(os.environ.get("CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS", "10"))
             with connection:
                 payload = json.loads(connection.recv(65536))
                 if marker: pathlib.Path(marker).open("a", encoding="utf-8").write("request\\n")
@@ -118,9 +119,11 @@ elif "retrieve" in args:
   const authFile = path.join(home, ".codex", "auth.json");
   const configFile = path.join(home, ".codex", "config.toml");
   const authBefore = hash(await readFile(authFile));
+  const workerMarker = path.join(root, "graph-worker-marker.txt");
 
-  const install = run(INSTALLER, ["--home", home, "--json"], { home, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: skillFixture, CODEX_EXTERNAL_SKILL_CATALOG: skillCatalog, CODEX_GRAPH_TOOL_PYTHON: graphToolPython } });
+  const install = run(INSTALLER, ["--home", home, "--json"], { home, extraEnv: { CODEX_EXTERNAL_SKILL_ROOT: skillFixture, CODEX_EXTERNAL_SKILL_CATALOG: skillCatalog, CODEX_GRAPH_TOOL_PYTHON: graphToolPython, CODEX_GRAPH_TOOL_WORKER_MARKER: workerMarker } });
   assert(install.status === 0, `clean install failed: ${install.stderr || install.stdout}`);
+  assert(JSON.parse(await readFile(path.join(home, ".codex/skill-registry/skills-index.json"), "utf8")).skills.length > 0, "clean install did not publish the registry before activating routing");
   const semanticSource = await readFile(path.join(REPOSITORY_ROOT, "codex-profile/mac/hooks/semantic-relations.json"));
   const installedSemantic = await readFile(path.join(home, ".codex/hooks/semantic-relations.json"));
   assert(installedSemantic.equals(semanticSource), "global install omitted or modified the portable relation registry");
@@ -239,14 +242,14 @@ for await (const line of createInterface({ input: process.stdin })) {
   assert(supplyChain.status === 0 && supplyChain.stdout.includes("skill-supply-chain-review"), `supply-chain review route did not match: ${supplyChain.stderr || supplyChain.stdout}`);
   const simpleFileQuestion = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "这个文件有几行", cwd: REPOSITORY_ROOT })}\n` });
   assert(simpleFileQuestion.status === 0 && !simpleFileQuestion.stdout.includes("desktop-task-workflow"), "simple factual file question received desktop workflow Skill");
-  const workerMarker = path.join(root, "graph-worker-marker.txt");
   const workerEnv = { CODEX_GRAPH_TOOL_PYTHON: graphToolPython, CODEX_GRAPH_TOOL_WORKER_MARKER: workerMarker, CODEX_GRAPH_TOOL_WORKER_IDLE_SECONDS: "2" };
   const externalRoute = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, extraEnv: workerEnv, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Help implement Astro islands hydration patterns", cwd: REPOSITORY_ROOT })}\n` });
   assert(externalRoute.status === 0 && externalRoute.stdout.includes("astro-islands") && externalRoute.stdout.includes("external skills with spaces/acme-astro-islands/SKILL.md"), `GraphToolCall Skill route failed: ${externalRoute.stderr || externalRoute.stdout}`);
+  const workerMarkerAfterFirst = await readFile(workerMarker, "utf8");
   const externalRouteAgain = run(path.join(home, ".codex", "hooks", "skill-router.mjs"), [], { ...envArgs, extraEnv: workerEnv, input: `${JSON.stringify({ hook_event_name: "UserPromptSubmit", prompt: "Help implement Astro islands hydration patterns", cwd: REPOSITORY_ROOT })}\n` });
   assert(externalRouteAgain.status === 0 && externalRouteAgain.stdout.includes("astro-islands"), `Persistent GraphToolCall worker did not answer a second route: ${externalRouteAgain.stderr || externalRouteAgain.stdout}`);
   const workerMarkerContents = await readFile(workerMarker, "utf8").catch(() => "missing");
-  assert(workerMarkerContents === "serve\nrequest\nrequest\n", `GraphToolCall route did not reuse the persistent worker protocol: ${workerMarkerContents}`);
+  assert(workerMarkerContents === workerMarkerAfterFirst + "request\n", `GraphToolCall route did not reuse the persistent worker protocol: ${workerMarkerContents}`);
 
   const fixtureDirectory = path.join(root, "dispatcher-fixtures");
   await mkdir(fixtureDirectory, { recursive: true });
@@ -367,6 +370,7 @@ await writeFile(configPath, config);
   await writeFile(path.join(syncSource, "scripts", "install-task-tree-mcp-mac.mjs"), "process.exit(0);\n");
   await cp(path.join(SCRIPT_DIR, "ensure-global-skill-library.mjs"), path.join(syncSource, "scripts", "ensure-global-skill-library.mjs"));
   await writeFile(path.join(syncSource, "scripts", "parallel-run.mjs"), await readFile(path.join(SCRIPT_DIR, "parallel-run.mjs"), "utf8"));
+  for (const name of ["install-global-graph-service-mac.mjs", "warm-global-graph.py"]) await cp(path.join(SCRIPT_DIR, name), path.join(syncSource, "scripts", name));
   const syncTools = path.join(syncHome, ".codex", "tools");
   const stagedProfile = path.join(syncTools, "ai-engineering-governance-template");
   await mkdir(path.join(stagedProfile, "scripts"), { recursive: true });

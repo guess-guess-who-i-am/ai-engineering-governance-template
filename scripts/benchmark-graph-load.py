@@ -27,6 +27,9 @@ PROMPTS = [
 
 
 def run(args):
+    prompts = json.loads(Path(args.prompts_json).read_text()) if args.prompts_json else PROMPTS
+    if not isinstance(prompts, list) or not prompts or any(not isinstance(item, str) or not item.strip() for item in prompts):
+        raise ValueError('--prompts-json must contain a nonempty JSON array of nonempty strings')
     codex = Path(args.codex_home).expanduser()
     graph = Path(json.loads((codex / 'skill-registry/skills-index.json').read_text())['externalGraphPath']).resolve()
     digest = hashlib.sha256(str(graph).encode()).hexdigest()[:24]
@@ -48,7 +51,7 @@ def run(args):
     if args.warm:
         if not Path(sock).exists() and not args.worker_entry:
             bootstrap = subprocess.run([args.node, str(codex / 'hooks/hook-dispatch.mjs')],
-                input=json.dumps({'hook_event_name': 'UserPromptSubmit', 'prompt': PROMPTS[0], 'cwd': '/tmp'}),
+                input=json.dumps({'hook_event_name': 'UserPromptSubmit', 'prompt': prompts[0], 'cwd': '/tmp'}),
                 capture_output=True, text=True, timeout=65, env={**os.environ, 'CODEX_HOME': str(codex)})
             if bootstrap.returncode or 'routing failed' in bootstrap.stderr:
                 raise RuntimeError(bootstrap.stderr)
@@ -56,7 +59,8 @@ def run(args):
             with socket.socket(socket.AF_UNIX) as connection:
                 connection.settimeout(55)
                 connection.connect(sock)
-                connection.sendall((json.dumps({'query': PROMPTS[number], 'top_k': 8,
+                connection.sendall((json.dumps({'query': prompts[number % len(prompts)], 'top_k': 8,
+                    'category_slots': {'expert': 2, 'skill': 4, 'mcp': 2},
                     'deadline': time.time() * 1000 + 55000}) + '\n').encode())
                 response = json.loads(connection.makefile('rb').readline())
                 if not response.get('ok'):
@@ -70,7 +74,7 @@ def run(args):
         remaining = start + delay - time.monotonic()
         if remaining > 0:
             time.sleep(remaining)
-        query = PROMPTS[number % len(PROMPTS)]
+        query = prompts[number % len(prompts)]
         if args.long:
             query += (' 验证要求：请保留原始目标与所有约束，沿真实输入、处理、输出和实际消费者检查；'
                       '读取真实文件，运行必要测试，核验每个节点的完成状态，保留并发Agent的修改。') * 6
@@ -92,6 +96,7 @@ def run(args):
                     connection.settimeout(args.timeout)
                     connection.connect(sock)
                     connection.sendall((json.dumps({'query': query, 'top_k': 8,
+                        'category_slots': {'expert': 2, 'skill': 4, 'mcp': 2},
                         'deadline': time.time() * 1000 + args.timeout * 1000}) + '\n').encode())
                     line = connection.makefile('rb').readline()
                     response = json.loads(line)
@@ -105,6 +110,7 @@ def run(args):
         rows = list(pool.map(request, range(args.count)))
     times = sorted(row['seconds'] for row in rows)
     report = {'schema': 'graph-load/v1', 'count': args.count, 'pattern': args.pattern,
+        'basePromptBytes': [len(prompt.encode()) for prompt in prompts],
         'transport': args.transport, 'seed': args.seed, 'warm': args.warm, 'longInputs': args.long, 'uniqueQueries': not args.repeated,
         'success': sum(row['ok'] for row in rows), 'wallSeconds': round(time.monotonic() - start, 4),
         'p50Seconds': statistics.median(times), 'p95Seconds': times[int(.95 * (len(times) - 1))],
@@ -135,6 +141,7 @@ if __name__ == '__main__':
     parser.add_argument('--node', default='/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node')
     parser.add_argument('--timeout', type=float, default=55)
     parser.add_argument('--long', action='store_true')
+    parser.add_argument('--prompts-json', help='private JSON array of representative user prompts; contents are not included in the report')
     parser.add_argument('--repeated', action='store_true')
     parser.add_argument('--output')
     parser.add_argument('--worker-entry', help='launch an isolated test worker against the existing graph')

@@ -739,6 +739,45 @@ def prepare_graph_read_cache(engine):
     engine._searcher._graph = view
 
 
+def prepare_bm25_score_cache(engine):
+    """Reuse identical clause scoring within one immutable graph generation."""
+    bm25 = engine._get_bm25()
+    if hasattr(bm25.score, 'cache_info'):
+        return
+    original = bm25.score
+    cache, lock = OrderedDict(), threading.Lock()
+    cells = hits = misses = 0
+
+    def score(query, *, restrict=None):
+        nonlocal cells, hits, misses
+        key = (query, None if restrict is None else frozenset(restrict))
+        with lock:
+            if key in cache:
+                hits += 1
+                cache.move_to_end(key)
+                return cache[key].copy()
+            misses += 1
+        result = original(query, restrict=restrict)
+        if len(result) <= 524288:
+            with lock:
+                # Concurrent callers may have filled this key while scoring.
+                previous = cache.pop(key, None)
+                if previous is not None:
+                    cells -= len(previous)
+                cache[key] = result.copy()
+                cells += len(result)
+                while len(cache) > 64 or cells > 524288:
+                    _, removed = cache.popitem(last=False)
+                    cells -= len(removed)
+        return result
+
+    def cache_info():
+        with lock:
+            return {'entries': len(cache), 'scoreCells': cells, 'hits': hits, 'misses': misses}
+    score.cache_info = cache_info
+    bm25.score = score
+
+
 def prepare_sparse_bm25(engine):
     """Replace only BM25.score with exact, precomputed sparse contributions."""
     import math
@@ -1259,6 +1298,20 @@ class _SharedQuery:
         self.abandoned = False
 
 
+def prepare_cpu_embedding_model(provider):
+    """Keep the certified load/CPU transfer, release unused Metal buffers.
+
+    A CPU transfer frees tensors but retains the MPS allocator's large reserve.
+    empty_cache releases only unused buffers, never live model tensors. Keep
+    the original loading path and model state unchanged.
+    """
+    import torch
+    model = provider._get_model().to('cpu')
+    if torch.backends.mps.is_available():
+        torch.mps.empty_cache()
+    return model
+
+
 class _GraphWorker:
     """Keep one graph and its retrieval caches alive across Hook requests."""
 
@@ -1320,10 +1373,10 @@ class _GraphWorker:
                     # Shared MPS inference crashes when independent requests
                     # overlap, even with a lock around encode. Use CPU for
                     # this small query model; graph scoring still overlaps.
-                    provider._get_model().to('cpu')
+                    prepare_cpu_embedding_model(provider)
                     import torch
                     torch.set_num_threads(1)
-                    complete_provider(provider)
+                    complete_provider(provider, cache_windows=True)
                 if provider is not None:
                     engine._embedding_index._provider = _CachedEmbeddingProvider(provider)
                 engine.set_embedding_index(_SerializedEmbeddingIndex(engine._embedding_index))
@@ -1340,7 +1393,9 @@ class _GraphWorker:
             chinese_index = load_chinese_embedding(graph, self.graph_path)
             if chinese_index is not None:
                 # The English graph keeps its original model and vectors.
-                chinese_index._provider._get_model().to('cpu')
+                prepare_cpu_embedding_model(chinese_index._provider)
+                from complete_embedding import complete_provider
+                complete_provider(chinese_index._provider, cache_windows=True)
                 chinese_index._provider = _CachedEmbeddingProvider(chinese_index._provider,
                     load_description_embeddings(graph, self.graph_path, 'zh'))
                 engine.set_embedding_index(_SerializedEmbeddingIndex(chinese_index))
@@ -1354,6 +1409,8 @@ class _GraphWorker:
             prepare_service_identity_routing(english_engine)
             prepare_service_identity_routing(engine)
             prepare_candidate_pool_fusion(english_engine)
+            prepare_bm25_score_cache(english_engine)
+            prepare_bm25_score_cache(engine)
             # Finish both lazy retrieval channels before publishing this load.
             # An English-only startup query must not leave the first Chinese
             # user request paying for BM25/prefilter/model initialization.

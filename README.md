@@ -2,9 +2,11 @@
 
 一个面向 Codex 和其他 Agent Skills 兼容工具的工程治理起点，将常驻规则、领域语义、设计上下文、按需 Skills、确定性门禁和可执行 Flow 分层组织。
 
-最后更新：2026-11-01
+最后更新：2026-11-11
 
 GitHub、Stack Overflow 与论文搜索的连接、查询范围、空结果语义及全局 MCP 验收，见 [2026-11-11 搜索修复说明](docs/SEARCH_REPAIR_20261111.zh.md)。已运行的 MCP 连接需要重新加载实现。
+
+全局检索服务的常驻共享方式、100 请求测试、评分缓存及 Mac 内存边界，见 [共享 Worker 实测](docs/GLOBAL_SHARED_WORKER_20261111.zh.md)。
 
 ## 已包含
 

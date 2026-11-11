@@ -27,7 +27,9 @@ jobs:
           node-version: '20'
           cache: npm
       - name: Test macOS global Codex profile
-        run: ./scripts/test-codex-profile-mac.sh
+        run: |
+          ./scripts/test-codex-profile-mac.sh
+          node scripts/test-global-graph-service.mjs
       - name: Test conversational routing and IDE patch contract
         run: |
           node --test scripts/test-routing-context.mjs
@@ -40,8 +42,13 @@ jobs:
         run: |
           python3 -m venv .tools/graph-worker-tests
           .tools/graph-worker-tests/bin/python -m pip install 'graph-tool-call[embedding]==0.46.0' 'sentence-transformers==6.1.0' 'httpx==0.28.1'
+          .tools/graph-worker-tests/bin/python -c "from sentence_transformers import SentenceTransformer; [SentenceTransformer(name, device='cpu') for name in ['sentence-transformers/all-MiniLM-L6-v2', 'paraphrase-multilingual-MiniLM-L12-v2']]"
           .tools/graph-worker-tests/bin/python scripts/test-graph-worker.py
           .tools/graph-worker-tests/bin/python scripts/test-description-cache.py
+          .tools/graph-worker-tests/bin/python scripts/test-bm25-score-cache.py
+          .tools/graph-worker-tests/bin/python scripts/test-worker-cpu-model.py
+          .tools/graph-worker-tests/bin/python scripts/test-complete-window-cache.py
+          .tools/graph-worker-tests/bin/python scripts/test-graph-load-inputs.py
           .tools/graph-worker-tests/bin/python scripts/test-artifact-relations.py
           .tools/graph-worker-tests/bin/python scripts/test-semantic-relations.py
           node --test scripts/test-publish-resource-graph.mjs scripts/test-install-portable-resources.mjs
