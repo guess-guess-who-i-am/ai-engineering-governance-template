@@ -9,7 +9,7 @@ const run=(...args)=>spawnSync(process.execPath,[script,'--home',home,...args],{
 try{
  assert.notEqual(run('--check').status,0);
  const first=run();assert.equal(first.status,0,first.stderr);const result=JSON.parse(first.stdout);
- assert.equal(result.processes,4);assert.equal(result.registered,false);
+ assert.equal(result.processes,2);assert.equal(result.registered,false);
  const text=await readFile(result.plist,'utf8');assert.ok(text.includes('&amp;'));assert.ok(text.includes('<key>RunAtLoad</key><true/>'));assert.ok(text.includes('<key>KeepAlive</key><true/>'));
  const second=run();assert.equal(second.status,0,second.stderr);assert.equal(JSON.parse(second.stdout).status,'already-current');
  const checked=run('--check');assert.equal(checked.status,0,checked.stderr);

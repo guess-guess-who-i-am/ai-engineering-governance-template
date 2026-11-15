@@ -17,7 +17,13 @@ export async function configuredServers(config, python) {
 
 export async function discover(server, { timeoutMs = 20000, cwd } = {}) {
   return new Promise((resolve, reject) => {
-    const child = spawn(server.command, server.args, { cwd, env: { ...process.env, ...server.env }, stdio: ['pipe', 'pipe', 'pipe'] });
+    // A global directory follows global MCP configuration, not whichever IDE
+    // task happened to request a refresh. These per-task values change tools/
+    // list descriptions and bind projects/scopes, causing endless rebuilds.
+    const env = { ...process.env };
+    for (const key of ['TASK_TREE_QUALITY_MODE', 'TASK_TREE_EXECUTION_SCOPE',
+      'TASK_TREE_CONTEXT_TREE_FILE', 'TASK_TREE_PROJECT_ROOT']) delete env[key];
+    const child = spawn(server.command, server.args, { cwd, env: { ...env, ...server.env }, stdio: ['pipe', 'pipe', 'pipe'] });
     let buffer = '', settled = false, tools = [];
     const cursors = new Set();
     const finish = (error, value) => {

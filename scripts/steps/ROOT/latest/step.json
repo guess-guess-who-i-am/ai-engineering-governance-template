@@ -23,6 +23,31 @@
           "path": "outputs/official-api.json"
         }
       ]
+    },
+    {
+      "title": "全局图资源降低与并发验收",
+      "functions": [
+        {
+          "path": "codex-profile/mac/hooks/registry-inputs.mjs",
+          "name": "graphInputsHash"
+        },
+        {
+          "path": "codex-profile/mac/hooks/graph_skill_index.py",
+          "name": "compact_embedding_storage"
+        },
+        {
+          "path": "codex-profile/mac/hooks/graph_skill_index.py",
+          "name": "prepare_cpu_embedding_model"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "../../../../docs/GRAPH_RESOURCE_AUDIT_20261115.zh.md"
+        },
+        {
+          "path": "../../../../docs/evidence/graph-resources-20261115.json"
+        }
+      ]
     }
   ]
 }

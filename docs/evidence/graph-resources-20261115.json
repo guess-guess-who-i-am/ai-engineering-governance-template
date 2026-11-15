@@ -1,0 +1,240 @@
+{
+  "before-load": {
+    "status": "PASS",
+    "newSkillsRetrievedThroughGraph": true,
+    "retries": 0,
+    "modelQualityMeasured": false,
+    "waves": [
+      {
+        "name": "burst",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 87,
+        "p50Ms": 20.7,
+        "p95Ms": 34.1,
+        "maxMs": 35.5
+      },
+      {
+        "name": "staggered",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 20,
+        "p50Ms": 23.0,
+        "p95Ms": 62.4,
+        "maxMs": 64.2
+      },
+      {
+        "name": "distinct-burst",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 100,
+        "p50Ms": 3960.9,
+        "p95Ms": 8070.6,
+        "maxMs": 8896.6
+      }
+    ]
+  },
+  "after-load": {
+    "status": "PASS",
+    "newSkillsRetrievedThroughGraph": true,
+    "retries": 0,
+    "modelQualityMeasured": false,
+    "waves": [
+      {
+        "name": "burst",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 82,
+        "p50Ms": 16.9,
+        "p95Ms": 27.9,
+        "maxMs": 29.6
+      },
+      {
+        "name": "staggered",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 20,
+        "p50Ms": 20.3,
+        "p95Ms": 49.3,
+        "maxMs": 52.9
+      },
+      {
+        "name": "distinct-burst",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 100,
+        "p50Ms": 2081.9,
+        "p95Ms": 3766.9,
+        "maxMs": 4085.5
+      }
+    ]
+  },
+  "two-process-load": {
+    "status": "PASS",
+    "newSkillsRetrievedThroughGraph": true,
+    "retries": 0,
+    "modelQualityMeasured": false,
+    "waves": [
+      {
+        "name": "burst",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 84,
+        "p50Ms": 19.2,
+        "p95Ms": 29.6,
+        "maxMs": 31.0
+      },
+      {
+        "name": "staggered",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 20,
+        "p50Ms": 13.6,
+        "p95Ms": 28.7,
+        "maxMs": 31.2
+      },
+      {
+        "name": "distinct-burst",
+        "requests": 100,
+        "successes": 100,
+        "peakOverlappingRequests": 100,
+        "p50Ms": 3446.4,
+        "p95Ms": 6476.0,
+        "maxMs": 7033.0
+      }
+    ]
+  },
+  "two-process-long": {
+    "schema": "graph-load/v1",
+    "count": 100,
+    "pattern": "burst",
+    "basePromptBytes": [
+      60,
+      63,
+      55,
+      64,
+      262,
+      224,
+      141,
+      141,
+      132,
+      156
+    ],
+    "transport": "socket",
+    "seed": "resource-two-20261115",
+    "warm": true,
+    "longInputs": true,
+    "uniqueQueries": true,
+    "success": 100,
+    "wallSeconds": 19.6507,
+    "p50Seconds": 8.6297,
+    "p95Seconds": 18.7912,
+    "maxSeconds": 19.629,
+    "queryProcesses": 2,
+    "poolResidentMiB": 969.7
+  },
+  "two-process-stagger-long": {
+    "schema": "graph-load/v1",
+    "count": 100,
+    "pattern": "stagger",
+    "basePromptBytes": [
+      60,
+      63,
+      55,
+      64,
+      262,
+      224,
+      141,
+      141,
+      132,
+      156
+    ],
+    "transport": "socket",
+    "seed": "resource-stagger-two-20261115",
+    "warm": true,
+    "longInputs": true,
+    "uniqueQueries": true,
+    "success": 100,
+    "wallSeconds": 10.1097,
+    "p50Seconds": 2.54895,
+    "p95Seconds": 5.6613,
+    "maxSeconds": 6.1024,
+    "queryProcesses": 2,
+    "poolResidentMiB": 2673.7
+  },
+  "two-process-hook-long": {
+    "schema": "graph-load/v1",
+    "count": 100,
+    "pattern": "burst",
+    "basePromptBytes": [
+      60,
+      63,
+      55,
+      64,
+      262,
+      224,
+      141,
+      141,
+      132,
+      156
+    ],
+    "transport": "hook",
+    "seed": "resource-hook-two-20261115",
+    "warm": true,
+    "longInputs": true,
+    "uniqueQueries": true,
+    "success": 100,
+    "wallSeconds": 15.7761,
+    "p50Seconds": 8.78305,
+    "p95Seconds": 12.4751,
+    "maxSeconds": 12.9421,
+    "queryProcesses": 0
+  },
+  "sameGraphRecords": {
+    "graphSha256": "508be2cd053915d93e1e2a287ce3aeb000292ccdbc49aacf7b50bd8cd3532fde",
+    "queries": 13,
+    "fullRecordsExactlyEqual": true
+  },
+  "observedMemory": {
+    "singleProcessPhysicalGiBApproxBefore": 2.0,
+    "singleProcessPhysicalGiBApproxAfter": 1.9,
+    "copiesBefore": 4,
+    "copiesAfter": 2,
+    "totalGiBApproxBefore": 8.0,
+    "totalGiBApproxAfter": 3.8,
+    "aggregateIsExtrapolated": true,
+    "source": "macOS vmmap, rounded physical footprint, includes compressed pages; not RSS",
+    "laterIdleSingleProcessGiB": 1.5,
+    "observedSingleProcessPeakGiB": 3.4,
+    "finalTwoProcessesPhysicalGiBRounded": [
+      1.9,
+      1.9
+    ],
+    "finalTwoProcessesPhysicalSumGiBRounded": 3.8,
+    "finalTwoProcessesPeakGiBRounded": [
+      3.0,
+      2.8
+    ],
+    "sumIsExclusiveMemory": false
+  },
+  "limits": [
+    "Sequential before/after, machine load not controlled; no stable speedup percentage",
+    "100 unique IDs across shared task families are not 100 unrelated tasks",
+    "A two-process comparison rejected a changed graph SHA; not counted as equality evidence",
+    "Whole PR gate: 14/15 pass; pre-existing deleted tracked history blocks document-integrity",
+    "No hard reboot or cross-machine deployment tested"
+  ],
+  "workspaceRefresh": {
+    "workspaces": 2,
+    "callerModes": [
+      "advisory",
+      "strict"
+    ],
+    "seconds": [
+      0.4772,
+      0.4157
+    ],
+    "unchangedGraphAndPids": true,
+    "computationProcesses": 2
+  }
+}

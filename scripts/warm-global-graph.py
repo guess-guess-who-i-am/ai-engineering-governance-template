@@ -13,7 +13,7 @@ import time
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--graph', required=True)
-    parser.add_argument('--processes', type=int, choices=range(1, 21), default=4)
+    parser.add_argument('--processes', type=int, choices=range(1, 21), default=2)
     args = parser.parse_args()
     graph = str(Path(args.graph).resolve())
     digest = hashlib.sha256(graph.encode()).hexdigest()[:24]

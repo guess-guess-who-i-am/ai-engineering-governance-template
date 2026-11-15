@@ -13,10 +13,21 @@ class CpuModelTests(unittest.TestCase):
         events=[]
         model=Mock()
         model.to.side_effect=lambda device: events.append(('to',device)) or model
-        provider=SimpleNamespace(_get_model=lambda: events.append(('load',)) or model)
+        provider=SimpleNamespace(_model=model, _get_model=lambda: events.append(('load',)) or model)
         torch=SimpleNamespace(backends=SimpleNamespace(mps=SimpleNamespace(is_available=lambda: available)),
                               mps=SimpleNamespace(empty_cache=lambda: events.append(('release',))))
         return model,provider,torch,events
+
+    def test_fresh_query_model_loads_directly_on_cpu(self):
+        model,provider,torch,events=self.fixture(True)
+        provider._model=None
+        provider.model_name='fixture-model'
+        constructor=Mock(return_value=model)
+        with patch.dict(sys.modules,{'torch':torch,'sentence_transformers':SimpleNamespace(SentenceTransformer=constructor)}):
+            self.assertIs(indexer.prepare_cpu_embedding_model(provider),model)
+        constructor.assert_called_once_with('fixture-model',device='cpu')
+        self.assertIs(provider._model,model)
+        self.assertEqual(events,[],'fresh CPU loading must not allocate or clear Metal buffers')
 
     def test_keeps_original_model_then_releases_after_cpu_transfer(self):
         model,provider,torch,events=self.fixture(True)

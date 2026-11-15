@@ -1299,17 +1299,40 @@ class _SharedQuery:
 
 
 def prepare_cpu_embedding_model(provider):
-    """Keep the certified load/CPU transfer, release unused Metal buffers.
+    """Load query models on their inference device without a Metal round trip.
 
-    A CPU transfer frees tensors but retains the MPS allocator's large reserve.
-    empty_cache releases only unused buffers, never live model tensors. Keep
-    the original loading path and model state unchanged.
+    The native provider otherwise auto-selects MPS and transfers a full model
+    to it before we move it back. Keep identical model configuration/weights.
+    An already-loaded model still releases unused Metal buffers after transfer.
     """
+    if provider._model is None:
+        from sentence_transformers import SentenceTransformer
+        provider._model = SentenceTransformer(provider.model_name, device='cpu')
+        return provider._model
     import torch
     model = provider._get_model().to('cpu')
     if torch.backends.mps.is_available():
         torch.mps.empty_cache()
     return model
+
+
+def compact_embedding_storage(index):
+    """Store native float32 inputs once, without millions of Python floats.
+
+    GraphToolCall casts every scoring/centroid/MMR input to float32. Keep the
+    original, unnormalized rows for those consumers; the library still owns
+    normalization and search. This is runtime storage only, never serialization.
+    """
+    if not index._embeddings or getattr(index, '_codex_compact_vectors', False):
+        return
+    import numpy as np
+    names = list(index._embeddings)
+    matrix = np.asarray(list(index._embeddings.values()), dtype=np.float32)
+    if matrix.ndim != 2 or not np.isfinite(matrix).all():
+        raise ValueError('Invalid embedding storage')
+    matrix.flags.writeable = False
+    index._embeddings = dict(zip(names, matrix))
+    index._codex_compact_vectors = True
 
 
 class _GraphWorker:
@@ -1353,6 +1376,9 @@ class _GraphWorker:
             self._results.clear()
             gc.collect()
             graph = ToolGraph.load(self.graph_path)
+            stored_index = graph._get_retrieval_engine()._embedding_index
+            if stored_index is not None:
+                compact_embedding_storage(stored_index)
             graph.set_tokenizer(chinese_tokenize)
             # The serialized retrieval state does not persist this scale hook.
             graph.tune_for_scale()
@@ -1506,11 +1532,15 @@ class _WorkerHandler(socketserver.StreamRequestHandler):
     def handle(self):
         self.connection.settimeout(2)
         try:
-            line = self.rfile.readline(262145)
+            # NDJSON framing is the newline, not a model/context byte budget.
+            # Integration prompts include complete Unicode evidence and can be
+            # larger than 256 KiB. Read the full frame without losing content;
+            # the private endpoint, socket timeout and admission limits remain.
+            line = self.rfile.readline()
             if not line:
                 return
-            if len(line) > 262144 or not line.endswith(b"\n"):
-                raise ValueError("request exceeds 256 KiB")
+            if not line.endswith(b"\n"):
+                raise ValueError("incomplete JSON request frame")
             payload = json.loads(line.decode("utf-8"))
             if not isinstance(payload, dict):
                 raise ValueError("request must be an object")
@@ -1704,7 +1734,7 @@ def publish_graph(candidate, output):
 class _ProcessGraphWorker:
     """One socket supervisor with a bounded persistent CPU retrieval pool."""
 
-    def __init__(self, graph_path, processes=4):
+    def __init__(self, graph_path, processes=2):
         self._graph = None
         self._local = threading.local()
         self._last_request = time.monotonic()
@@ -1941,8 +1971,8 @@ def main():
     serve_parser.add_argument("--socket", required=True)
     serve_parser.add_argument("--tcp", action="store_true", help="Authenticated loopback transport (automatic on Windows)")
     serve_parser.add_argument("--idle-timeout", type=float, default=0.0)
-    serve_parser.add_argument("--processes", type=int, choices=range(1, 21), default=4,
-                              help="Persistent CPU retrieval processes (1-20; default: 4)")
+    serve_parser.add_argument("--processes", type=int, choices=range(1, 21), default=2,
+                              help="Persistent CPU retrieval processes (1-20; default: 2)")
     serve_parser.set_defaults(func=serve)
     refresh_parser = subparsers.add_parser("refresh")
     refresh_parser.add_argument("--lock", required=True)

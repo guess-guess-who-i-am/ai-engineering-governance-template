@@ -91,6 +91,14 @@ class WorkerTests(unittest.TestCase):
             self.assertEqual(len({result['pid'] for result in results}), 1)
             self.assertTrue(all(result['queryPid'] != result['pid'] for result in results))
 
+    def test_complete_large_unicode_frame_survives_deployment(self):
+        self.start()
+        # A >256KiB frame must reach validation rather than being truncated.
+        reply = self.request({'query': '搜索证据' * 30000, 'top_k': 'invalid-frame-fixture'})
+        self.assertFalse(reply['ok'])
+        self.assertIn('invalid-frame-fixture', reply['error'])
+        self.assertTrue(self.request()['ok'])
+
     def test_provider_cache_covers_rerank_and_is_bounded(self):
         class Provider:
             calls = []

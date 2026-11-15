@@ -37,7 +37,13 @@ export async function graphInputsHash(ownedRoot, mcpTools, resourceCatalog) {
     hash.update(path.relative(ownedRoot, file)); hash.update('\0');
     hash.update(await readFile(file)); hash.update('\0');
   }
-  hash.update(JSON.stringify(mcpTools.map(tool => JSON.stringify(stableJson(tool))).sort()));
+  // Match graph_from_records: UI bindings (_meta), titles and other discovery
+  // metadata are not graph inputs. In particular task_tree_open's UI URI is
+  // bound to the discovering workspace, not a change to tool capabilities.
+  const graphFields=['tool_name','name','server','description','inputSchema','outputSchema','annotations'];
+  hash.update(JSON.stringify(mcpTools.map(tool => JSON.stringify(stableJson(
+    Object.fromEntries(graphFields.filter(key=>Object.hasOwn(tool,key)).map(key=>[key,tool[key]]))
+  ))).sort()));
   // Importers publish content hashes in this small manifest. Do not walk every
   // complete third-party package from a Hook or query worker.
   if (resourceCatalog) {
