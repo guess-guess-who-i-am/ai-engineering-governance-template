@@ -1,0 +1,188 @@
+{
+  "measuredAt": "2026-11-16T12:05:39.722Z",
+  "nativeHarness": {
+    "exitCode": 0,
+    "durationMs": 2305,
+    "modelRequests": 3,
+    "phaseInjected": true,
+    "outcomeInjected": true
+  },
+  "nativeFixtureModelQualityMeasured": false,
+  "liveIde": {
+    "status": "PASS",
+    "measuredAt": "2026-11-16T12:08:26.755Z",
+    "waveWidth": 2,
+    "rows": [
+      {
+        "workspace": 0,
+        "started": 1794830906182,
+        "ended": 1794830906753,
+        "candidates": [
+          "pytest-skill",
+          "temporal-python-testing",
+          "test-detect",
+          "python-testing-patterns",
+          "arpes",
+          "technical_research_batch",
+          "dev-pipeline-orchestrator",
+          "gstack"
+        ],
+        "failureCandidates": [
+          "diagnose",
+          "task_tree_flow_write",
+          "ket-prep-team",
+          "python-fullstack-engineer"
+        ],
+        "firstBytes": 8692,
+        "repeatBytes": 0,
+        "failureBytes": 5061,
+        "successfulPostBytes": 0,
+        "entryReadable": true,
+        "firstReports": [
+          {
+            "durationMs": 186,
+            "ok": true
+          }
+        ],
+        "failureReports": [
+          {
+            "durationMs": 165,
+            "ok": true
+          }
+        ]
+      },
+      {
+        "workspace": 1,
+        "started": 1794830906181,
+        "ended": 1794830906755,
+        "candidates": [
+          "migration",
+          "migrations",
+          "database-migrations-sql-migrations",
+          "console-operation",
+          "crdb-change",
+          "database-operations",
+          "ai-data-copilot",
+          "gt-generate-sql-data"
+        ],
+        "failureCandidates": [
+          "postgresql-cli",
+          "tencent-DLC",
+          "data"
+        ],
+        "firstBytes": 8420,
+        "repeatBytes": 0,
+        "failureBytes": 4011,
+        "successfulPostBytes": 0,
+        "entryReadable": true,
+        "firstReports": [
+          {
+            "durationMs": 194,
+            "ok": true
+          }
+        ],
+        "failureReports": [
+          {
+            "durationMs": 168,
+            "ok": true
+          }
+        ]
+      }
+    ],
+    "modelQualityMeasured": false
+  },
+  "unitChecks": {
+    "routingContextTests": 45,
+    "identicalCheckpointConcurrency": 20,
+    "identicalCandidateConcurrency": 20,
+    "failedBeforeFix": "PreToolUse was discarded before routing"
+  },
+  "installation": {
+    "profile": "PASS",
+    "globalCheck": "PASS",
+    "methodologyRules": 76,
+    "portableSource": "PASS",
+    "hookTrust": "4 events trusted via actual TUI then hooks/list"
+  },
+  "resourceBoundary": {
+    "workerPid": 811,
+    "queryProcesses": 2,
+    "sampledIdleCpuPercent": [
+      0,
+      0,
+      0
+    ],
+    "newModelProcess": false
+  },
+  "limitations": [
+    "Finite capability signals cannot infer every semantic change; explicit --query remains available.",
+    "Native shell PostToolUse has stdout only; no exit status is inferred.",
+    "No broad recommendation-quality or reboot claim.",
+    "PR gate has a pre-existing failure; see local .reports/quality/pr.json."
+  ],
+  "initialLiveIde": {
+    "status": "PASS",
+    "measuredAt": "2026-11-16T12:03:15.535Z",
+    "waveWidth": 2,
+    "rows": [
+      {
+        "workspace": 0,
+        "started": 1794830593946,
+        "ended": 1794830595491,
+        "firstBytes": 8662,
+        "repeatBytes": 0,
+        "failureBytes": 5051,
+        "successfulPostBytes": 0,
+        "entryReadable": true,
+        "firstReports": [
+          {
+            "durationMs": 937,
+            "ok": true
+          }
+        ],
+        "failureReports": [
+          {
+            "durationMs": 400,
+            "ok": true
+          }
+        ]
+      },
+      {
+        "workspace": 1,
+        "started": 1794830593949,
+        "ended": 1794830595535,
+        "firstBytes": 8385,
+        "repeatBytes": 0,
+        "failureBytes": 4001,
+        "successfulPostBytes": 0,
+        "entryReadable": true,
+        "firstReports": [
+          {
+            "durationMs": 1001,
+            "ok": true
+          }
+        ],
+        "failureReports": [
+          {
+            "durationMs": 374,
+            "ok": true
+          }
+        ]
+      }
+    ],
+    "modelQualityMeasured": false
+  },
+  "deploymentNote": "Initial full install/check passed. Final checkpoint module updated atomically after cancelling a redundant foreground graph rebuild while a background refresh was active; deployed source digest verified. Existing index refresh left intact.",
+  "installedSourceMatches": {
+    "routing-checkpoint.mjs": true,
+    "routing-context.mjs": true,
+    "skill-router.mjs": true,
+    "hook-dispatch.mjs": true
+  },
+  "hookTrustVerifiedEvents": [
+    "preToolUse",
+    "postToolUse",
+    "sessionStart",
+    "userPromptSubmit"
+  ]
+}

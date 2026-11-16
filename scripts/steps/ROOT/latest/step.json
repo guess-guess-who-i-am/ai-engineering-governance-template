@@ -48,6 +48,27 @@
           "path": "../../../../docs/evidence/graph-resources-20261115.json"
         }
       ]
+    },
+    {
+      "title": "全局任务中推荐与真实宿主验证",
+      "functions": [
+        {
+          "path": "codex-profile/.codex/hooks/routing-checkpoint.mjs",
+          "name": "toolRoutingSignal"
+        },
+        {
+          "path": "codex-profile/.codex/hooks/skill-router.mjs",
+          "name": "recommendResources"
+        }
+      ],
+      "outputs": [
+        {
+          "path": "../../../../docs/IN_TASK_ROUTING.zh.md"
+        },
+        {
+          "path": "../../../../docs/evidence/in-task-routing-20261116.json"
+        }
+      ]
     }
   ]
 }

@@ -73,6 +73,7 @@ async function filesUnder(root) {
   const output = [];
   async function visit(directory) {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
+      if (entry.name === '__pycache__' || entry.name.endsWith('.pyc')) continue;
       const target = path.join(directory, entry.name);
       if (entry.isDirectory()) await visit(target);
       else if (entry.isFile()) output.push(target);
@@ -148,6 +149,12 @@ function hooksDocument(codexHome) {
       ] }],
       SessionStart: [{ matcher: "^(startup|resume|clear|compact)$", hooks: [
         { type: "command", command: command("hook-dispatch.mjs"), timeout: 70, statusMessage: "Restoring reminders and refreshing indexes in parallel", additionalContextLimit: 15000 }
+      ] }],
+      PreToolUse: [{ hooks: [
+        { type: "command", command: command("hook-dispatch.mjs"), timeout: 60, parallelSafe: true, statusMessage: "Checking for a new Skill or expert requirement", additionalContextLimit: 12000 }
+      ] }],
+      PostToolUse: [{ hooks: [
+        { type: "command", command: command("hook-dispatch.mjs"), timeout: 60, parallelSafe: true, statusMessage: "Routing newly observed tool failures", additionalContextLimit: 12000 }
       ] }]
     }
   };
@@ -157,7 +164,13 @@ async function buildOperations(home) {
   const codexHome = path.join(home, ".codex");
   const agentsHome = path.join(home, ".agents");
   const operations = new Map();
-  const externalSkillRoot = process.env.CODEX_EXTERNAL_SKILL_ROOT || process.env.CODEX_PROFILE_SKILL_SOURCE || path.join(home, ".codex", "tools", "skills");
+  const externalConfigFile = path.join(codexHome, 'skill-registry', 'external-library-config.json');
+  let existingExternalConfig = {};
+  try { existingExternalConfig = JSON.parse(await readFile(externalConfigFile, 'utf8')); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
+  const externalSkillRoot = process.env.CODEX_EXTERNAL_SKILL_ROOT || process.env.CODEX_PROFILE_SKILL_SOURCE || existingExternalConfig.root || path.join(home, ".codex", "tools", "skills");
+  const externalCatalog = process.env.CODEX_EXTERNAL_SKILL_CATALOG || process.env.CODEX_PROFILE_SKILL_CATALOG ||
+    (existingExternalConfig.root === externalSkillRoot ? existingExternalConfig.catalog : undefined) || path.join(externalSkillRoot, '_catalog_cn.json');
   const bundledSkillLibrary = path.join(codexHome, "tools", "skills");
   const addTree = async (sourceRoot, destinationRoot, filter = () => true) => {
     for (const source of await filesUnder(sourceRoot)) {
@@ -240,7 +253,7 @@ async function buildOperations(home) {
   }
   operations.set(path.join(codexHome, "skill-registry", "external-library-config.json"), {
     destination: path.join(codexHome, "skill-registry", "external-library-config.json"),
-    content: Buffer.from(`${JSON.stringify({ root: externalSkillRoot, catalog: process.env.CODEX_EXTERNAL_SKILL_CATALOG || process.env.CODEX_PROFILE_SKILL_CATALOG || path.join(externalSkillRoot, "_catalog_cn.json") }, null, 2)}\n`),
+    content: Buffer.from(`${JSON.stringify({ ...existingExternalConfig, root: externalSkillRoot, catalog: externalCatalog }, null, 2)}\n`),
     mode: 0o600,
     source: "generated:external-library-config"
   });
@@ -251,7 +264,7 @@ async function buildOperations(home) {
     mode: 0o700,
     source: dispatcherSource
   });
-  for (const name of ["routing-context.mjs", "skill-router.mjs"]) {
+  for (const name of ["routing-context.mjs", "routing-checkpoint.mjs", "skill-router.mjs"]) {
     const source = path.join(PROFILE_ROOT, ".codex", "hooks", name);
     operations.set(path.join(codexHome, "hooks", name), {
       destination: path.join(codexHome, "hooks", name),
@@ -439,10 +452,10 @@ async function inspectHookTrust(codexHome) {
   if (!await exists(configFile)) return { status: "action-required", reason: "config.toml is absent, so Hook trust cannot be confirmed" };
   const config = await readFile(configFile, "utf8");
   const hookFile = path.join(codexHome, "hooks.json");
-  const identifiers = ["session_start:0:0", "user_prompt_submit:0:0"];
+  const identifiers = ["session_start:0:0", "user_prompt_submit:0:0", "pre_tool_use:0:0", "post_tool_use:0:0"];
   const present = identifiers.filter((id) => config.includes(`${hookFile}:${id}`) && config.slice(config.indexOf(`${hookFile}:${id}`)).slice(0, 300).includes("trusted_hash"));
   return present.length === identifiers.length
-    ? { status: "recorded", reason: "both stable dispatcher entries have persisted trust records; Codex still decides whether hashes remain current" }
+    ? { status: "recorded", reason: "all four stable dispatcher entries have persisted trust records; Codex still decides whether hashes remain current" }
     : { status: "action-required", reason: "start Codex interactively and approve each Hook when prompted" };
 }
 

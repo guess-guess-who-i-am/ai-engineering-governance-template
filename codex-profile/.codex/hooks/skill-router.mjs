@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 export { routingQuery } from './routing-context.mjs';
 import { routingQuery } from './routing-context.mjs';
+import { toolRoutingSignal, claimCheckpoint, finishCheckpoint, novelCandidates, rememberCandidates, pruneCheckpoints } from './routing-checkpoint.mjs';
 
 async function readInput() {
   let raw = "";
@@ -316,6 +317,8 @@ export function renderRoutingContext(selected, codexRoot) {
     "[CODEX_SKILL_ROUTER_V2]",
     "Assistive routing: match the latest task's action and intended output; Skill and service names are optional. Load directly fitting entries and follow their workflows. Complete expert modules retain their original team, roles and artifact flow. Load only selected work, never the whole catalog."
   ];
+  const quote = value => `'${String(value).replaceAll("'", `'"'"'`)}'`;
+  lines.push(`During execution, re-evaluate routing when the needed expertise, artifact or phase changes. For a semantic change not visible to tool hooks, query the same global index with ${quote(process.execPath)} ${quote(path.join(codexRoot, 'hooks', 'skill-router.mjs'))} --query '<current specific need>'. This returns candidates, never execution authorization.`);
   if (selected.some(item => item.skill.moduleId)) {
     lines.push(`Audit evidence: ${path.join(codexRoot, 'resource-evidence')} — experts: experts-audit.json; Skills: skills-audit.json; MCP services: mcp-audit.json; package integrity: package-integrity.json.`);
   }
@@ -357,18 +360,8 @@ export function renderRoutingContext(selected, codexRoot) {
   return lines.join('\n');
 }
 
-if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) try {
-  const input = await readInput();
-  const prompt = String(input.prompt || input.user_prompt || input.message || input.text || "").trim();
-  if (input.hook_event_name !== "UserPromptSubmit" || !prompt) {
-    process.stdout.write("{}");
-    process.exit(0);
-  }
-  const retrievalQuery = await routingQuery(input, prompt);
-  if (!retrievalQuery) {
-    process.stdout.write('{}');
-    process.exit(0);
-  }
+export async function recommendResources(input, prompt, retrievalQuery = prompt) {
+  if (!retrievalQuery) return [];
   const codexRoot = process.env.CODEX_HOME || path.join(os.homedir(), ".codex");
   const [registry, ruleDocument] = await Promise.all([
     readFile(path.join(codexRoot, "skill-registry", "skills-index.json"), "utf8").then(JSON.parse),
@@ -392,8 +385,7 @@ if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[
     .filter(item => hasActionRoute(item.skill, query, aliases, ruleDocument._capabilityRoutes));
   scored.sort((a, b) => b.score - a.score || Number(a.skill.rank || 0) - Number(b.skill.rank || 0) || String(a.skill.name).localeCompare(String(b.skill.name)));
   if (!graphScored.length && (!scored.length || scored[0].score < 6)) {
-    process.stdout.write("{}");
-    process.exit(0);
+    return [];
   }
   // Lexical aliases and graph RRF scores have different scales. Preserve one
   // explicitly requested workflow, then use the graph's own ranking. Topic
@@ -406,12 +398,43 @@ if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[
   const minimum = Math.max(6, Math.floor((scored[0]?.score || 0) * 0.55));
   const ranked = [...explicit, ...direct, ...graphScored,
     ...scored.filter(item => item.score >= minimum)];
-  const selected = selectCategoryBudget(ranked);
+  return selectCategoryBudget(ranked);
+}
+
+if (process.argv[1] && existsSync(process.argv[1]) && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+ let claim;
+ try {
+  const explicitQuery = process.argv[2] === '--query' ? process.argv.slice(3).join(' ').trim() : '';
+  const input = explicitQuery ? { hook_event_name: 'UserPromptSubmit', prompt: explicitQuery } : await readInput();
+  const codexRoot = process.env.CODEX_HOME || path.join(os.homedir(), '.codex');
+  if (input.hook_event_name === 'SessionStart') {
+    await pruneCheckpoints(codexRoot);
+    process.stdout.write('{}');
+    process.exit(0);
+  }
+  const midTask = ['PreToolUse', 'PostToolUse'].includes(input.hook_event_name);
+  const signal = midTask ? toolRoutingSignal(input) : null;
+  const prompt = midTask ? signal?.query || '' : String(input.prompt || input.user_prompt || input.message || input.text || '').trim();
+  if ((!midTask && input.hook_event_name !== 'UserPromptSubmit') || !prompt) {
+    process.stdout.write('{}'); process.exit(0);
+  }
+  if (midTask) {
+    claim = await claimCheckpoint(codexRoot, input, signal.key);
+    if (!claim) { process.stdout.write('{}'); process.exit(0); }
+  }
+  const query = midTask || explicitQuery ? prompt : await routingQuery(input, prompt);
+  let selected = await recommendResources(input, prompt, query);
+  if (midTask) selected = await novelCandidates(codexRoot, input, selected);
+  else await rememberCandidates(codexRoot, input, selected);
+  await finishCheckpoint(claim, true);
+  if (!selected.length) { process.stdout.write('{}'); process.exit(0); }
   process.stdout.write(JSON.stringify({
-    hookSpecificOutput: { hookEventName: "UserPromptSubmit", additionalContext: renderRoutingContext(selected, codexRoot) }
+    hookSpecificOutput: { hookEventName: input.hook_event_name, additionalContext: renderRoutingContext(selected, codexRoot) }
   }));
 } catch (error) {
+  await finishCheckpoint(claim, false).catch(() => {});
   process.stderr.write(`Skill router skipped: ${error.message}\n`);
   process.stdout.write("{}");
   process.exitCode = 1;
+}
 }

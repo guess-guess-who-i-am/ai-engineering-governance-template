@@ -25,7 +25,7 @@ const server=net.createServer(connection=>connection.once('data',()=>{
 }));
 try{
  await mkdir(hooks,{recursive:true});await mkdir(registry,{recursive:true});await mkdir(path.dirname(socketPath),{recursive:true,mode:0o700});
- for(const name of ['skill-router.mjs','routing-context.mjs','hook-dispatch.mjs'])await copyFile(path.join(process.env.ROUTING_HOOK_SOURCE || path.join(root,'codex-profile/.codex/hooks'),name),path.join(hooks,name));
+ for(const name of ['skill-router.mjs','routing-context.mjs','routing-checkpoint.mjs','hook-dispatch.mjs'])await copyFile(path.join(process.env.ROUTING_HOOK_SOURCE || path.join(root,'codex-profile/.codex/hooks'),name),path.join(hooks,name));
  await writeFile(path.join(hooks,'context-refresh.mjs'),`process.stdout.write(JSON.stringify({hookSpecificOutput:{additionalContext:'fixed context remains observable'}}));`);
  await writeFile(path.join(hooks,'graph_skill_index.py'),'# transport fixture');await writeFile(graph,'{}');
  await writeFile(path.join(registry,'skills-index.json'),JSON.stringify({skills:[],externalGraphPath:graph}));await writeFile(path.join(registry,'routing-rules.json'),'{}');

@@ -70,10 +70,11 @@ let researchFixture;
 try {
   const home = path.join(root, "home with spaces");
   await seedHome(home, "KEEP_CUSTOM_CONFIGURATION");
+  await mkdir(path.join(home, '.codex/skill-registry'), { recursive: true });
   await mkdir(path.join(home, ".codex", "tools", "graph-tool-call-venv", "bin"), { recursive: true });
   await mkdir(path.join(home, ".codex", "skill-registry"), { recursive: true });
   await cp(path.join(REPOSITORY_ROOT, "codex-profile", "mac", "hooks", "graph_skill_index.py"), path.join(home, ".codex", "hooks", "graph_skill_index.py"));
-  await writeFile(path.join(home, ".codex", "skill-registry", "external-library-config.json"), JSON.stringify({ root: skillFixture, catalog: skillCatalog }));
+  await writeFile(path.join(home, ".codex", "skill-registry", "external-library-config.json"), JSON.stringify({ root: skillFixture, catalog: skillCatalog, requireComplete: false, chineseEmbedding: 'paraphrase-multilingual-MiniLM-L12-v2' }));
   const graphPython = path.join(home, ".codex", "tools", "graph-tool-call-venv", "bin", "python");
   const graphShim = path.join(root, "graph-tool-call-python-shim");
   await writeFile(graphShim, `#!/usr/bin/env python3
@@ -87,7 +88,7 @@ if "build" in args:
     output = pathlib.Path(value("--output"))
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("{}\\n", encoding="utf-8")
-    print(json.dumps({"schemaVersion":"graph-tool-call-skills/1","graphToolCallVersion":"test-shim","embedding":"sentence-transformers/all-MiniLM-L6-v2","catalogSkillCount":2,"skillCount":1,"externalSkillCount":1,"ownedSkillCount":0,"mcpToolCount":0,"missingSkillCount":1,"invalidSkillCount":0,"graphPath":str(output)}))
+    print(json.dumps({"schemaVersion":"graph-tool-call-skills/1","graphToolCallVersion":"test-shim","embedding":"sentence-transformers/all-MiniLM-L6-v2","chineseEmbedding":value("--chinese-embedding") if "--chinese-embedding" in args else "","catalogSkillCount":2,"skillCount":1,"externalSkillCount":1,"ownedSkillCount":0,"mcpToolCount":0,"missingSkillCount":1,"invalidSkillCount":0,"graphPath":str(output)}))
 elif "serve" in args:
     socket_path = pathlib.Path(value("--socket"))
     socket_path.parent.mkdir(parents=True, exist_ok=True)
@@ -135,6 +136,8 @@ elif "retrieve" in args:
   const result = JSON.parse(install.stdout);
   assert(result.status === "installed" && result.changedFiles > 0, "installer did not report a real installation");
   assert((await readFile(path.join(home, ".codex", "skill-registry", "external-library-config.json"), "utf8")).includes(skillFixture), "installer did not configure the external global Skill library");
+  const externalSettings = JSON.parse(await readFile(path.join(home, '.codex/skill-registry/external-library-config.json'), 'utf8'));
+  assert(externalSettings.requireComplete === false && externalSettings.chineseEmbedding === 'paraphrase-multilingual-MiniLM-L12-v2', 'update erased existing embedding/completeness settings');
   assert(hash(await readFile(authFile)) === authBefore, "installer changed auth.json");
   const config = await readFile(configFile, "utf8");
   assert(config.includes('sentinel = "KEEP_CUSTOM_CONFIGURATION"'), "installer removed unrelated config.toml content");
@@ -147,6 +150,8 @@ elif "retrieve" in args:
   assert((agents.match(/ai-engineering-governance-template:begin/g) || []).length === 1, "managed AGENTS.md block is missing or duplicated");
   const hooks = JSON.parse(await readFile(path.join(home, ".codex", "hooks.json"), "utf8"));
   assert(hooks.hooks.UserPromptSubmit[0].hooks.length === 1 && hooks.hooks.SessionStart[0].hooks.length === 1, "hooks.json does not use one stable dispatcher per event");
+  for (const event of ['PreToolUse', 'PostToolUse']) assert(hooks.hooks[event]?.[0]?.hooks[0]?.command.includes('hook-dispatch.mjs'), `${event} in-task routing not installed`);
+  assert((await readFile(path.join(home, '.codex/hooks/routing-checkpoint.mjs'))).equals(await readFile(path.join(REPOSITORY_ROOT, 'codex-profile/.codex/hooks/routing-checkpoint.mjs'))), 'in-task routing dependency missing');
   assert(hooks.hooks.UserPromptSubmit[0].hooks[0].timeout === 60, "UserPromptSubmit dispatcher timeout is below the GraphToolCall route budget");
   const hookCommand = hooks.hooks.UserPromptSubmit[0].hooks[0].command;
   assert(hookCommand.includes(process.execPath) && hookCommand.includes("hook-dispatch.mjs"), "hooks.json does not pin the absolute Node executable and dispatcher path");

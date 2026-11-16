@@ -75,12 +75,12 @@ function defaultHandlers(eventName, codexRoot) {
   const handlers = eventName === "UserPromptSubmit"
     ? [own("context-refresh", 7000), own("skill-router", 60000)]
     : eventName === "SessionStart"
-      ? [own("context-refresh", 7000), own("refresh-skill-registry", 65000)]
-      : [];
+      ? [own("context-refresh", 7000), own("refresh-skill-registry", 65000), own("skill-router", 7000)]
+      : [own("skill-router", 60000)];
 
   const external = eventName === "UserPromptSubmit"
     ? process.env.CODEX_CAPABILITY_HOOK
-    : process.env.CODEX_CAPABILITY_REFRESH_HOOK;
+    : eventName === "SessionStart" ? process.env.CODEX_CAPABILITY_REFRESH_HOOK : undefined;
   if (external) handlers.push({ file: external, timeoutMs: eventName === "UserPromptSubmit" ? 12000 : 30000 });
   return handlers.filter((handler) => existsSync(handler.file));
 }
@@ -88,7 +88,7 @@ function defaultHandlers(eventName, codexRoot) {
 try {
   const { raw, parsed } = await readInput();
   const eventName = String(parsed.hook_event_name || "");
-  if (!new Set(["UserPromptSubmit", "SessionStart"]).has(eventName)) {
+  if (!new Set(["UserPromptSubmit", "SessionStart", "PreToolUse", "PostToolUse"]).has(eventName)) {
     process.stdout.write("{}");
     process.exit(0);
   }
