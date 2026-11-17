@@ -14,7 +14,7 @@ const plist=path.join(home,'Library/LaunchAgents',label+'.plist');
 const xml=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const wanted=`<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict><key>Label</key><string>${label}</string><key>ProgramArguments</key><array><string>${xml(process.execPath)}</string><string>${xml(path.join(codex,'hooks/graph-worker-supervisor.mjs'))}</string><string>--processes</string><string>2</string></array><key>RunAtLoad</key><true/><key>KeepAlive</key><true/><key>ThrottleInterval</key><integer>3</integer><key>EnvironmentVariables</key><dict><key>CODEX_HOME</key><string>${xml(codex)}</string><key>HOME</key><string>${xml(home)}</string></dict></dict></plist>\n`;
+<plist version="1.0"><dict><key>Label</key><string>${label}</string><key>ProgramArguments</key><array><string>${xml(process.execPath)}</string><string>${xml(path.join(codex,'hooks/graph-worker-supervisor.mjs'))}</string><string>--query-workers</string><string>2</string></array><key>RunAtLoad</key><true/><key>KeepAlive</key><true/><key>ThrottleInterval</key><integer>3</integer><key>EnvironmentVariables</key><dict><key>CODEX_HOME</key><string>${xml(codex)}</string><key>HOME</key><string>${xml(home)}</string></dict></dict></plist>\n`;
 let before;try{before=await readFile(plist,'utf8');}catch(error){if(error.code!=='ENOENT')throw error;}
 // HOME is overridden by clean-home tests; only the OS account directory may
 // own a live launchd service for this UID.
@@ -38,4 +38,4 @@ if(check){
   throw error;
  }finally{await unlink(temporary).catch(error=>{if(error.code!=='ENOENT')throw error;});}
 }
-console.log(JSON.stringify({status:check?'current':before===wanted&&(!realHome||active)?'already-current':'installed',plist,processes:2,registered:realHome,runAtLoad:true,keepAlive:true}));
+console.log(JSON.stringify({status:check?'current':before===wanted&&(!realHome||active)?'already-current':'installed',plist,queryWorkers:2,queryProcesses:1,registered:realHome,runAtLoad:true,keepAlive:true}));

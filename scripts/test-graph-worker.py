@@ -89,7 +89,8 @@ class WorkerTests(unittest.TestCase):
                 results = list(pool.map(invoke, range(100)))
             self.assertTrue(all(result['ok'] and result['results'] for result in results), results)
             self.assertEqual(len({result['pid'] for result in results}), 1)
-            self.assertTrue(all(result['queryPid'] != result['pid'] for result in results))
+            self.assertTrue(all(result['queryPid'] == result['pid'] for result in results),
+                            'all queries must share one in-process graph and models')
 
     def test_complete_large_unicode_frame_survives_deployment(self):
         self.start()
@@ -113,16 +114,72 @@ class WorkerTests(unittest.TestCase):
         cached.encode_batch([str(number) for number in range(4100)])
         self.assertEqual(len(cached._vectors), 4096)
 
-    def test_pool_recovers_after_query_process_crash(self):
+    def test_query_exception_does_not_poison_shared_generation(self):
+        generation = indexer._PreparedGraphGeneration(self.graph, self.graph.name, 2)
+        try:
+            generation.ready()
+            with patch.object(generation.worker, '_retrieve', side_effect=RuntimeError('fixture query failure')):
+                with self.assertRaisesRegex(RuntimeError, 'fixture query failure'):
+                    generation.submit({'query': 'broken query'}).result(timeout=5)
+            self.assertTrue(generation.submit({'query': 'alpha search'}).result(timeout=5)[0])
+            self.assertEqual(generation.worker.loads, 1)
+        finally:
+            generation.shutdown()
+
+    def test_failed_prewarm_is_not_retried_by_every_request(self):
+        with patch.object(indexer._GraphWorker, '_load_if_stale', side_effect=RuntimeError('missing model fixture')) as load, \
+             patch.object(indexer._GraphWorker, 'query') as query:
+            generation = indexer._PreparedGraphGeneration(self.graph, self.graph.name, 2)
+            try:
+                with self.assertRaisesRegex(RuntimeError, 'missing model fixture'):
+                    generation.ready()
+                for _ in range(3):
+                    with self.assertRaisesRegex(RuntimeError, 'missing model fixture'):
+                        generation.submit({'query': 'alpha search'}).result(timeout=2)
+                self.assertEqual(load.call_count, 1)
+                query.assert_not_called()
+            finally:
+                generation.shutdown()
+
+    def test_status_does_not_run_retrieval(self):
         self.start()
-        first = self.request({'query': 'alpha search'})
-        self.assertTrue(first['ok'])
-        os.kill(first['queryPid'], signal.SIGKILL)
-        time.sleep(.2)
-        recovered = self.request({'query': 'alpha independent after crash'})
-        self.assertTrue(recovered['ok'], recovered)
-        self.assertEqual(first['pid'], recovered['pid'])
-        self.assertNotEqual(first['queryPid'], recovered['queryPid'])
+        status = self.request({'operation': 'status'})
+        self.assertTrue(status['ok'])
+        self.assertIsInstance(status['ready'], bool)
+        self.assertNotIn('results', status)
+        self.assertTrue(self.request()['ok'])
+
+    def test_shared_generation_overlaps_and_keeps_inflight_snapshot_on_publish(self):
+        worker = indexer._SharedGraphWorker(self.graph, query_workers=2)
+        worker._pool.ready()
+        old = worker._pool.worker
+        original = old._retrieve
+        entered = threading.Barrier(3)
+        release = threading.Event()
+        def blocked(*args):
+            entered.wait(timeout=5)
+            release.wait(timeout=5)
+            return original(*args)
+        candidate = self.root / 'candidate.json'
+        graph = indexer.graph_from_records([], [{'tool_name': 'beta', 'name': 'beta',
+            'server': 'fixture', 'description': 'search alpha documents'}])
+        graph.save(candidate)
+        try:
+            with patch.object(old, '_retrieve', blocked), concurrent.futures.ThreadPoolExecutor(max_workers=2) as callers:
+                first = callers.submit(worker.query, {'query': 'search alpha one'})
+                second = callers.submit(worker.query, {'query': 'search alpha two'})
+                entered.wait(timeout=5)  # Both real retrieval threads overlap.
+                with old._condition:
+                    self.assertEqual(old.loads, 1)
+                    self.assertEqual(old.peak_queries, 2)
+                worker.publish(candidate)
+                self.assertEqual(worker.query({'query': 'search alpha new'})[0]['name'], 'beta')
+                release.set()
+                self.assertEqual(first.result(timeout=5)[0]['name'], 'alpha')
+                self.assertEqual(second.result(timeout=5)[0]['name'], 'alpha')
+        finally:
+            release.set()
+            worker.close()
 
     def test_independent_requests_overlap_in_one_worker(self):
         worker = indexer._GraphWorker(self.graph)
@@ -202,7 +259,8 @@ class WorkerTests(unittest.TestCase):
         second = self.request()
         self.assertEqual(second['results'][0]['name'], 'beta')
         self.assertEqual(second['pid'], first['pid'])
-        self.assertNotEqual(second['queryPid'], first['queryPid'])
+        self.assertEqual(second['queryPid'], first['queryPid'])
+        self.assertEqual(second['generation'], first['generation'] + 1)
 
     def test_build_publishes_through_ready_service(self):
         import hashlib
@@ -325,18 +383,18 @@ class WorkerTests(unittest.TestCase):
             release.set()
             worker.close()
 
-    def test_process_callers_keep_independent_deadlines(self):
+    def test_shared_callers_keep_independent_deadlines(self):
         class Pool:
             def __init__(self):
                 self.calls = []
                 self.future = concurrent.futures.Future()
                 self.future.set_running_or_notify_cancel()
-            def submit(self, fn, payload):
+            def submit(self, payload):
                 self.calls.append(payload)
                 return self.future
         pool = Pool()
-        with patch.object(indexer._ProcessGraphWorker, '_new_pool', return_value=pool):
-            worker = indexer._ProcessGraphWorker(self.graph)
+        with patch.object(indexer._SharedGraphWorker, '_new_pool', return_value=pool):
+            worker = indexer._SharedGraphWorker(self.graph)
         with concurrent.futures.ThreadPoolExecutor(max_workers=2) as callers:
             short = callers.submit(worker.query, {'query':'shared deadline', 'deadline':time.time()*1000+80})
             until = time.monotonic()+2
@@ -352,13 +410,13 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(worker.coalesced,1)
         self.assertEqual(next(iter(worker._results.values()))[0][0]['name'],'shared-success')
 
-    def test_process_last_waiter_cancels_queued_future(self):
+    def test_shared_last_waiter_cancels_queued_future(self):
         class Pool:
             def __init__(self): self.future = concurrent.futures.Future()
             def submit(self, *_): return self.future
         pool = Pool()
-        with patch.object(indexer._ProcessGraphWorker, '_new_pool', return_value=pool):
-            worker = indexer._ProcessGraphWorker(self.graph)
+        with patch.object(indexer._SharedGraphWorker, '_new_pool', return_value=pool):
+            worker = indexer._SharedGraphWorker(self.graph)
         with self.assertRaises(TimeoutError):
             worker.query({'query':'queued', 'deadline':time.time()*1000+10})
         self.assertTrue(pool.future.cancelled())
@@ -366,15 +424,14 @@ class WorkerTests(unittest.TestCase):
         self.assertFalse(worker._pending)
         self.assertFalse(worker._results)
 
-    def test_process_computation_drops_first_caller_deadline(self):
+    def test_shared_computation_drops_first_caller_deadline(self):
         from types import SimpleNamespace
         seen = []
         fake = SimpleNamespace(query=lambda payload: seen.append(payload) or [], loads=1,
             _ready_languages=set(), _english_graph=SimpleNamespace(_get_retrieval_engine=lambda: SimpleNamespace(_embedding_index=None)),
             _graph=SimpleNamespace(_get_retrieval_engine=lambda: SimpleNamespace(_embedding_index=None, _prefilter_enabled=True)),
             cache_hits=0, coalesced=0, peak_queries=0)
-        with patch.object(indexer, '_process_worker', fake):
-            indexer._query_process({'query':'shared', 'deadline':0,
+        indexer._query_graph(fake, {'query':'shared', 'deadline':0,
                 'execution_deadline':time.time()*1000+55000})
         self.assertGreater(seen[0]['deadline'],time.time()*1000+50000)
 

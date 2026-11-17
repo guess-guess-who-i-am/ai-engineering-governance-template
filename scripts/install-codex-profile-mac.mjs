@@ -484,6 +484,17 @@ async function install(options) {
       });
       if (refresh.code !== 0) throw new Error(`Initial Skill registry publication failed (exit ${refresh.code}): ${refresh.stderr.trim()}`);
     }
+    // A restored graph can reuse vectors without ever loading its query models.
+    // Populate the declared official models during installation, before the
+    // persistent service switches to offline inference. No network on queries.
+    const models = await run(graphToolPython, ['-c',
+      ["import json,sys", "from pathlib import Path", "from sentence_transformers import SentenceTransformer",
+       "p=Path(sys.argv[1])", "m=json.loads(p.read_text()) if p.exists() else {}",
+       "for n in dict.fromkeys(filter(None,[m.get('embedding'),m.get('chineseEmbedding')])):",
+       " model=SentenceTransformer(n,device='cpu')", " del model", " print('model cache ready: '+n,flush=True)"].join('\n'),
+      path.join(codexHome, 'skill-registry', 'skills.graph.manifest.json')],
+      { env: { ...process.env, HOME: options.home, HF_HUB_OFFLINE: '0', TRANSFORMERS_OFFLINE: '0' }, timeoutMs: 300000 });
+    if (models.code !== 0) throw new Error(`Official embedding model cache preparation failed: ${models.stderr.trim()}`);
     const verification = await verifyInstallation(options.home, codexHome, operations);
     return {
       status: changes.length ? "installed" : "already-current",

@@ -154,11 +154,17 @@ class ResourceGraphTests(unittest.TestCase):
 
         names = [f'skill-{i}' for i in range(10)] + ['expert-a', 'expert-b', 'mcp-a', 'mcp-b']
         values = [0.99 - i * 0.01 for i in range(10)] + [0.30, 0.29, 0.20, 0.19]
-        tools = {
+        class CountedTools(dict):
+            reads = 0
+            def get(self, *args):
+                self.reads += 1
+                return super().get(*args)
+
+        tools = CountedTools({
             name: SimpleNamespace(metadata={'kind': 'expert' if name.startswith('expert') else
                 'mcp-service' if name.startswith('mcp') else 'skill'})
             for name in names
-        }
+        })
 
         class Index:
             size = len(names)
@@ -206,6 +212,9 @@ class ResourceGraphTests(unittest.TestCase):
         try:
             pool = engine._get_prefilter().candidate_pool('fixture query', None, [])
             semantic = engine._compute_embedding_scores('fixture query', 8, pool)
+            reads = tools.reads
+            engine._get_prefilter().candidate_pool('second independent query', None, [])
+            self.assertEqual(tools.reads, reads, 'immutable category membership must be indexed once')
         finally:
             slots.reset(token)
         self.assertEqual(len(pool), 8)

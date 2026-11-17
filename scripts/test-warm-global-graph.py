@@ -32,7 +32,7 @@ class WarmTests(unittest.TestCase):
                 finally:
                     server.close()
             thread=threading.Thread(target=serve);thread.start()
-            result=subprocess.run(['python3',str(SCRIPT),'--graph',graph,'--processes','1'],capture_output=True,text=True,timeout=8)
+            result=subprocess.run(['python3',str(SCRIPT),'--graph',graph],capture_output=True,text=True,timeout=8)
             thread.join();endpoint.unlink(missing_ok=True)
             return result,received
 

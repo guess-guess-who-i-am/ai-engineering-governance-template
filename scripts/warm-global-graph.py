@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Prewarm the real global graph socket; no credentials or model API calls."""
 import argparse
-from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import os
@@ -13,7 +12,6 @@ import time
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--graph', required=True)
-    parser.add_argument('--processes', type=int, choices=range(1, 21), default=2)
     args = parser.parse_args()
     graph = str(Path(args.graph).resolve())
     digest = hashlib.sha256(graph.encode()).hexdigest()[:24]
@@ -55,8 +53,7 @@ def main():
                     raise
                 time.sleep(.1)
 
-    with ThreadPoolExecutor(max_workers=args.processes) as pool:
-        rows = list(pool.map(query, range(args.processes)))
+    rows = [query(0)]
     print(json.dumps({'ready': True, 'socket': sock, 'requests': len(rows),
                       'queryProcesses': len({row['queryPid'] for row in rows}),
                       'readyLanguages': sorted(set.intersection(*(set(row['readyLanguages']) for row in rows))),

@@ -81,6 +81,9 @@ try {
 import json, os, pathlib, socket, sys, time
 args = sys.argv[1:]
 if "-c" in args:
+    if "model cache ready:" in args[args.index("-c")+1]:
+        print("model cache ready: installation fixture (no real models)")
+        raise SystemExit(0)
     os.execv(sys.executable, [sys.executable, *args])
 def value(name):
     return args[args.index(name) + 1]

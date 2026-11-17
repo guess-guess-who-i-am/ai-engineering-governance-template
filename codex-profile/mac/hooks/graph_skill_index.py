@@ -9,8 +9,7 @@ import inspect
 import textwrap
 from collections import OrderedDict
 from contextvars import ContextVar
-from concurrent.futures import Future, ProcessPoolExecutor, ThreadPoolExecutor
-from concurrent.futures.process import BrokenProcessPool
+from concurrent.futures import ThreadPoolExecutor
 from copy import copy, deepcopy
 import os
 if os.name == 'nt':
@@ -21,7 +20,6 @@ from functools import lru_cache
 import gc
 import hashlib
 import json
-import multiprocessing
 from pathlib import Path
 from types import SimpleNamespace
 import re
@@ -43,6 +41,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 # Import GraphToolCall only after the worker owns the inter-process lock.
 QUERY_EXECUTION_MAX_MS = 55_000
+
+
+def release_unused_memory():
+    """Return free loader arenas to macOS; never discard graph/model data."""
+    gc.collect()
+    if sys.platform == 'darwin':
+        import ctypes
+        relief = ctypes.CDLL('/usr/lib/libSystem.B.dylib').malloc_zone_pressure_relief
+        relief.argtypes = [ctypes.c_void_p, ctypes.c_size_t]
+        relief.restype = ctypes.c_size_t
+        return relief(None, 0)
+    return 0
 
 RETRIEVAL_CONTENT = 'declared-name-capability-only/v1'
 
@@ -847,6 +857,25 @@ def prepare_semantic_candidate_guard(engine):
     original = prefilter.candidate_pool
     category_scores_context = ContextVar('category_semantic_scores', default=None)
     original_embedding_scores = engine._compute_embedding_scores
+    category_layout = None
+    layout_lock = threading.Lock()
+
+    def immutable_category_layout(names):
+        nonlocal category_layout
+        with layout_lock:
+            if category_layout is None or category_layout[0] is not names:
+                groups = {'expert': [], 'skill': [], 'mcp': []}
+                positions = {}
+                for position, name in enumerate(names):
+                    positions[name] = position
+                    tool = prefilter._tools.get(name)
+                    if tool is None:
+                        continue
+                    kind = str((tool.metadata or {}).get('kind', 'skill')).casefold()
+                    group = 'expert' if kind == 'expert' else 'mcp' if kind in ('mcp', 'mcp-service') else 'skill'
+                    groups[group].append(position)
+                category_layout = names, groups, positions
+            return category_layout[1:]
 
     def compute_embedding_scores(query, top_k, restrict=None):
         scoped = category_scores_context.get()
@@ -887,17 +916,10 @@ def prepare_semantic_candidate_guard(engine):
             else:
                 global_positions = list(range(len(names)))
             global_positions.sort(key=lambda i: (-float(similarities[i]), names[i].casefold(), names[i]))
-            groups = {'expert': [], 'skill': [], 'mcp': []}
-            for position, name in enumerate(names):
-                tool = prefilter._tools.get(name)
-                if tool is None:
-                    continue
-                kind = str((tool.metadata or {}).get('kind', 'skill')).casefold()
-                group = 'expert' if kind == 'expert' else 'mcp' if kind in ('mcp', 'mcp-service') else 'skill'
-                groups[group].append(position)
+            groups, name_positions = immutable_category_layout(names)
             selected = set()
             for group, limit in quotas.items():
-                positions = groups[group]
+                positions = list(groups[group])
                 if not positions or limit <= 0:
                     continue
                 values = similarities[positions]
@@ -907,7 +929,7 @@ def prepare_semantic_candidate_guard(engine):
                     positions = [positions[int(i)] for i in local]
                 positions.sort(key=lambda i: (-float(similarities[i]), names[i].casefold(), names[i]))
                 selected.update(names[i] for i in positions[:take])
-            category_scores = {name: float(similarities[names.index(name)]) for name in selected}
+            category_scores = {name: float(similarities[name_positions[name]]) for name in selected}
             return (names, similarities), {names[i] for i in global_positions}, category_scores
         except (AttributeError, ImportError, TypeError, ValueError):
             return None, {}, {}
@@ -1338,7 +1360,7 @@ def compact_embedding_storage(index):
 class _GraphWorker:
     """Keep one graph and its retrieval caches alive across Hook requests."""
 
-    def __init__(self, graph_path: Path):
+    def __init__(self, graph_path: Path, query_workers=2):
         self.graph_path = graph_path
         self._graph: ToolGraph | None = None
         self._english_graph = None
@@ -1350,7 +1372,7 @@ class _GraphWorker:
         self._ready = False
         self._results = OrderedDict()
         self._pending = {}
-        self._executor = ThreadPoolExecutor(max_workers=8, thread_name_prefix="graph-query")
+        self._executor = ThreadPoolExecutor(max_workers=query_workers, thread_name_prefix="graph-query")
         self.cancelled_pending = self.abandoned_running = 0
         self.cache_hits = 0
         self.coalesced = 0
@@ -1547,11 +1569,19 @@ class _WorkerHandler(socketserver.StreamRequestHandler):
             if getattr(self.server, 'auth_token', None) and not secrets.compare_digest(
                     str(payload.get('token', '')), self.server.auth_token):
                 raise ValueError('worker authentication failed')
+            if payload.get('operation') == 'status' and isinstance(self.server.worker, _SharedGraphWorker):
+                readiness = self.server.worker._pool.readiness
+                error = readiness.exception() if readiness.done() and not readiness.cancelled() else None
+                response = {'ok': True, 'pid': os.getpid(), 'ready': readiness.done() and error is None,
+                            'initializationError': str(error) if error else None}
+                self.wfile.write((json.dumps(response) + '\n').encode())
+                self.wfile.flush()
+                return
             if payload.get("deadline", time.time() * 1000 + 1) < time.time() * 1000:
                 raise ValueError("request expired in queue")
             if payload.get('operation') == 'publish':
-                if not isinstance(self.server.worker, _ProcessGraphWorker):
-                    raise ValueError('Publication requires a process worker')
+                if not isinstance(self.server.worker, _SharedGraphWorker):
+                    raise ValueError('Publication requires a generation worker')
                 response = self.server.worker.publish(Path(payload['candidate']))
                 self.wfile.write((json.dumps(response) + '\n').encode())
                 self.wfile.flush()
@@ -1564,7 +1594,7 @@ class _WorkerHandler(socketserver.StreamRequestHandler):
                                     "coalesced": self.server.worker.coalesced,
                                     "peakQueries": self.server.worker.peak_queries},
                         "prefilter": bool(graph and graph._get_retrieval_engine()._prefilter_enabled)}
-            if isinstance(self.server.worker, _ProcessGraphWorker):
+            if isinstance(self.server.worker, _SharedGraphWorker):
                 response.update(self.server.worker._local.report)
         except Exception as error:
             response = {"ok": False, "error": str(error) or type(error).__name__}
@@ -1626,70 +1656,65 @@ def acquire_process_lock(lock):
         return False
 
 
-_process_worker = None
-
-
-def _initialize_query_process(graph_path, startup_barrier):
-    global _process_worker
-    _process_worker = _GraphWorker(Path(graph_path))
-    _process_worker._load_if_stale()
-    # Do not call the pool ready while other processes are still loading.
-    startup_barrier.wait(timeout=150)
-
-
-def _query_process(payload):
+def _query_graph(worker, payload):
     if payload.get('execution_deadline', time.time() * 1000 + QUERY_EXECUTION_MAX_MS) < time.time() * 1000:
         raise TimeoutError('request expired before retrieval')
     computation = dict(payload)
     computation.pop('deadline', None)
     if 'execution_deadline' in payload:
         computation['deadline'] = payload['execution_deadline']
-    records = _process_worker.query(computation)
-    return records, {'queryPid': os.getpid(), 'loads': _process_worker.loads,
-                     'readyLanguages': sorted(_process_worker._ready_languages),
+    records = worker.query(computation)
+    return records, {'queryPid': os.getpid(), 'loads': worker.loads,
+                     'readyLanguages': sorted(worker._ready_languages),
                      'staticDescriptions': {
                          language: len(channel._get_retrieval_engine()._embedding_index._provider._precomputed)
                          if channel._get_retrieval_engine()._embedding_index is not None else 0
-                         for language, channel in [('en', _process_worker._english_graph), ('zh', _process_worker._graph)]},
-                     'prefilter': bool(_process_worker._graph and _process_worker._graph._get_retrieval_engine()._prefilter_enabled),
-                     'metrics': {'cacheHits': _process_worker.cache_hits,
-                     'coalesced': _process_worker.coalesced, 'peakQueries': _process_worker.peak_queries}}
+                         for language, channel in [('en', worker._english_graph), ('zh', worker._graph)]},
+                     'prefilter': bool(worker._graph and worker._graph._get_retrieval_engine()._prefilter_enabled),
+                     'metrics': {'cacheHits': worker.cache_hits,
+                     'coalesced': worker.coalesced, 'peakQueries': worker.peak_queries}}
 
 
-class _PreparedGraphPool:
-    """Pin one immutable graph and sidecars for the full process generation."""
+class _PreparedGraphGeneration:
+    """Pin one immutable graph; share its models across bounded query threads."""
 
-    def __init__(self, source, graph_name, processes):
+    def __init__(self, source, graph_name, query_workers):
         self.directory = Path(tempfile.mkdtemp(prefix='.graph-worker-', dir=source.parent))
         self.graph_path = self.directory / graph_name
-        self.pool = None
+        self.pool = self.worker = None
         try:
             before = source.stat()
             os.link(source, self.graph_path)
-            # Pin immutable content-addressed sidecars without parsing the
-            # 338 MB graph a fifth time in the parent. Each child validates
-            # its own exact metadata, filenames, full texts and checksums.
             for sidecar in source.parent.glob('*.npz'):
                 os.link(sidecar, self.directory / sidecar.name)
             after = source.stat()
             if (before.st_ino, before.st_size, before.st_mtime_ns) != (after.st_ino, after.st_size, after.st_mtime_ns):
                 raise ValueError('Candidate graph changed while pinning its generation')
-            context = multiprocessing.get_context('spawn')
-            self.pool = ProcessPoolExecutor(max_workers=processes,
-                mp_context=context, initializer=_initialize_query_process,
-                initargs=(str(self.graph_path), context.Barrier(processes)))
-            self.readiness = [self.pool.submit(_query_process, {'query': ''}) for _ in range(processes)]
+            self.worker = _GraphWorker(self.graph_path, query_workers=query_workers)
+            self.pool = ThreadPoolExecutor(max_workers=query_workers, thread_name_prefix='graph-request')
+            self.readiness = self.pool.submit(self._prewarm)
         except BaseException:
             self.shutdown(wait=True, cancel_futures=True)
             raise
 
-    def ready(self):
-        deadline = time.monotonic() + 150
-        for future in self.readiness:
-            future.result(timeout=max(0, deadline - time.monotonic()))
+    def _prewarm(self):
+        # Loading and the first arriving query use the same lock. No query can
+        # observe half-initialized language channels or initialize a second copy.
+        with self.worker._condition:
+            self.worker._load_if_stale()
+        release_unused_memory()
 
-    def submit(self, *args):
-        return self.pool.submit(*args)
+    def ready(self):
+        self.readiness.result(timeout=150)
+
+    def submit(self, payload):
+        return self.pool.submit(self._query_ready_graph, payload)
+
+    def _query_ready_graph(self, payload):
+        # A failed initializer is a generation failure. Propagate its original
+        # error instead of reloading the full graph separately for every caller.
+        self.readiness.result()
+        return _query_graph(self.worker, payload)
 
     def shutdown(self, wait=True, cancel_futures=False):
         if not wait:
@@ -1697,6 +1722,11 @@ class _PreparedGraphPool:
             return
         if self.pool is not None:
             self.pool.shutdown(wait=True, cancel_futures=cancel_futures)
+        if self.worker is not None:
+            self.worker.close()
+            self.worker = None
+        self.readiness = None
+        release_unused_memory()
         shutil.rmtree(self.directory, ignore_errors=True)
 
 
@@ -1731,10 +1761,10 @@ def publish_graph(candidate, output):
     candidate.unlink()
 
 
-class _ProcessGraphWorker:
-    """One socket supervisor with a bounded persistent CPU retrieval pool."""
+class _SharedGraphWorker:
+    """One graph/model generation shared by bounded in-process retrieval."""
 
-    def __init__(self, graph_path, processes=2):
+    def __init__(self, graph_path, query_workers=2):
         self._graph = None
         self._local = threading.local()
         self._last_request = time.monotonic()
@@ -1747,11 +1777,11 @@ class _ProcessGraphWorker:
         self.generation = 1
         self._results = OrderedDict()
         self._pending = {}
-        self._processes = processes
+        self._query_workers = query_workers
         self._pool = self._new_pool()
 
     def _new_pool(self, source=None):
-        return _PreparedGraphPool(source or self._path, self._path.name, self._processes)
+        return _PreparedGraphGeneration(source or self._path, self._path.name, self._query_workers)
 
     def publish(self, candidate):
         # Expensive preparation holds no query lock: until the commit point,
@@ -1830,17 +1860,9 @@ class _ProcessGraphWorker:
                 return deepcopy(records)
             shared = self._pending.get(key)
             if shared is None or shared.abandoned:
-                try:
-                    execution_payload = dict(payload)
-                    execution_payload['execution_deadline'] = time.time() * 1000 + QUERY_EXECUTION_MAX_MS
-                    future = self._pool.submit(_query_process, execution_payload)
-                except BrokenProcessPool:
-                    self._pool.shutdown(wait=False, cancel_futures=True)
-                    self._pool = self._new_pool()
-                    self._pending.clear()
-                    execution_payload = dict(payload)
-                    execution_payload['execution_deadline'] = time.time() * 1000 + QUERY_EXECUTION_MAX_MS
-                    future = self._pool.submit(_query_process, execution_payload)
+                execution_payload = dict(payload)
+                execution_payload['execution_deadline'] = time.time() * 1000 + QUERY_EXECUTION_MAX_MS
+                future = self._pool.submit(execution_payload)
                 shared = _SharedQuery(future)
                 self._pending[key] = shared
                 future.add_done_callback(
@@ -1879,7 +1901,7 @@ def serve(args):
 
 def _serve_locked(args, socket_path):
     socket_path.unlink(missing_ok=True)
-    worker = _ProcessGraphWorker(Path(args.graph), processes=args.processes)
+    worker = _SharedGraphWorker(Path(args.graph), query_workers=args.query_workers)
     if os.name == 'nt' or getattr(args, 'tcp', False):
         server = _TcpWorkerServer(('127.0.0.1', 0), worker)
         server.auth_token = secrets.token_hex(32)
@@ -1971,8 +1993,8 @@ def main():
     serve_parser.add_argument("--socket", required=True)
     serve_parser.add_argument("--tcp", action="store_true", help="Authenticated loopback transport (automatic on Windows)")
     serve_parser.add_argument("--idle-timeout", type=float, default=0.0)
-    serve_parser.add_argument("--processes", type=int, choices=range(1, 21), default=2,
-                              help="Persistent CPU retrieval processes (1-20; default: 2)")
+    serve_parser.add_argument("--query-workers", type=int, choices=range(1, 21), default=2,
+                              help="Concurrent queries sharing one graph and models (1-20; default: 2)")
     serve_parser.set_defaults(func=serve)
     refresh_parser = subparsers.add_parser("refresh")
     refresh_parser.add_argument("--lock", required=True)

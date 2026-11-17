@@ -33,7 +33,7 @@ def run(args):
     codex = Path(args.codex_home).expanduser()
     graph = Path(json.loads((codex / 'skill-registry/skills-index.json').read_text())['externalGraphPath']).resolve()
     digest = hashlib.sha256(str(graph).encode()).hexdigest()[:24]
-    sock = str(Path('/tmp') / f'codex-graph-{os.getuid()}' / f'{digest}.sock')
+    sock = args.socket or str(Path('/tmp') / f'codex-graph-{os.getuid()}' / f'{digest}.sock')
     process = None
     temporary = None
     if args.worker_entry:
@@ -145,6 +145,7 @@ if __name__ == '__main__':
     parser.add_argument('--repeated', action='store_true')
     parser.add_argument('--output')
     parser.add_argument('--worker-entry', help='launch an isolated test worker against the existing graph')
+    parser.add_argument('--socket', help='query an isolated worker without replacing the global service')
     parser.add_argument('--warm', action='store_true')
     parser.add_argument('--seed', default='default', help='change query IDs to force a fresh uncached workload')
     args = parser.parse_args()
