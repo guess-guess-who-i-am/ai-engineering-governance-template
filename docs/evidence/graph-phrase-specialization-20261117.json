@@ -1,0 +1,2792 @@
+{
+  "schema": "graph-phrase-specialization/v1",
+  "baselineRef": "6d218cf",
+  "graphSha256": "d419138e8f95c6f8e2710ac57576e95b91c6babb611b13e8cb9994e584ca036f",
+  "queryWorkers": 2,
+  "completeRecordComparisons": 440,
+  "allRecordsExactlyEqual": true,
+  "rounds": [
+    {
+      "order": [
+        "shared-baseline",
+        "optimized-shared"
+      ],
+      "cases": {
+        "sequential": {
+          "baselineP95Seconds": 0.21737237499837647,
+          "optimizedP95Seconds": 0.17666633300177637,
+          "p95ReductionFraction": 0.18726409920719744,
+          "baselineWallSeconds": 3.544137665998278,
+          "optimizedWallSeconds": 2.879615666999598,
+          "rows": [
+            {
+              "baselineSeconds": 0.2968257079992327,
+              "optimizedSeconds": 0.17666633300177637,
+              "recordCount": 8,
+              "equalRecordSha256": "6efbf4b3745a6a15fa1437f06860bd046e189a50f4605a9ba71e8e7adf912044"
+            },
+            {
+              "baselineSeconds": 0.21737237499837647,
+              "optimizedSeconds": 0.15141037500143284,
+              "recordCount": 8,
+              "equalRecordSha256": "aa8ca062d10567c74fc5370470bf782c40d8dd0734b447a1bcd4990c284fdc5f"
+            },
+            {
+              "baselineSeconds": 0.21286604099805118,
+              "optimizedSeconds": 0.1766706670023268,
+              "recordCount": 8,
+              "equalRecordSha256": "63b69e94fd56d776abb88725b3ada0c1e8a66137d6640f04b696e61db62c3ac4"
+            },
+            {
+              "baselineSeconds": 0.18657154199900106,
+              "optimizedSeconds": 0.15554762499959907,
+              "recordCount": 8,
+              "equalRecordSha256": "f56e8bdaedf669355bbd4ad5d662d516c8c0aff0e0477f5b85f1d5b09e18bd43"
+            },
+            {
+              "baselineSeconds": 0.20428116699986276,
+              "optimizedSeconds": 0.16412950000085402,
+              "recordCount": 8,
+              "equalRecordSha256": "98229bfa4ba003c4ffd6f873052cd22259e8a11b4e2a5fd3c130268d648325fd"
+            },
+            {
+              "baselineSeconds": 0.2046163750019332,
+              "optimizedSeconds": 0.16218479199960711,
+              "recordCount": 8,
+              "equalRecordSha256": "cd61abb1cdb1d328d31a7320b26bf3bad48ab688c361a7b4d1900b3dab55b687"
+            },
+            {
+              "baselineSeconds": 0.18088870900101028,
+              "optimizedSeconds": 0.1561710000023595,
+              "recordCount": 8,
+              "equalRecordSha256": "b25b5c1bfb4077c241f08162749eb842be67aab6bd204320701c0e1a3df78d5c"
+            },
+            {
+              "baselineSeconds": 0.18003520900310832,
+              "optimizedSeconds": 0.15729841600114014,
+              "recordCount": 8,
+              "equalRecordSha256": "9ae28a052f445fe4807c63368c1f3002f5d40d0c745ec2a2c7c47257f870e83e"
+            },
+            {
+              "baselineSeconds": 0.1687867919972632,
+              "optimizedSeconds": 0.14461537500028498,
+              "recordCount": 8,
+              "equalRecordSha256": "ef5792bac0cf80c718e77bef0822c08c52ee293f2f4e57ce5aae0b4b0d18b469"
+            },
+            {
+              "baselineSeconds": 0.18991458299933583,
+              "optimizedSeconds": 0.15276033299960545,
+              "recordCount": 8,
+              "equalRecordSha256": "b0320fe5c7ede1bc2688017b24db7a935295304f64284acda1d6234a30a90773"
+            },
+            {
+              "baselineSeconds": 0.15578995900068549,
+              "optimizedSeconds": 0.1365066670005035,
+              "recordCount": 8,
+              "equalRecordSha256": "ac161a5f19365ecb3a25eed4736a46dc246a67ad21f634eea1cdfa3929e685fb"
+            },
+            {
+              "baselineSeconds": 0.13801770799909718,
+              "optimizedSeconds": 0.11886583299929043,
+              "recordCount": 8,
+              "equalRecordSha256": "2a47629055407fbce439b80e6cddcbfddf5203299aa863d3391deb2263a0a4f8"
+            },
+            {
+              "baselineSeconds": 0.16327287500098464,
+              "optimizedSeconds": 0.1449522499970044,
+              "recordCount": 8,
+              "equalRecordSha256": "af6acbcd1c55dc3eab99eec96c1cf67acf3be6d37a6a181ae450ea678ba8d670"
+            },
+            {
+              "baselineSeconds": 0.14848508299837704,
+              "optimizedSeconds": 0.1196665830029815,
+              "recordCount": 8,
+              "equalRecordSha256": "184b894b92332b2c55731a692ed95a9f614a3c4d5dc06380e31a5e61fb94c91a"
+            },
+            {
+              "baselineSeconds": 0.15656929100077832,
+              "optimizedSeconds": 0.1298733750008978,
+              "recordCount": 8,
+              "equalRecordSha256": "0082043f216695679ba4789b6c55ee5a0e9baa47eea13ca9293f5641524cad4a"
+            },
+            {
+              "baselineSeconds": 0.15098049999869545,
+              "optimizedSeconds": 0.13285645799987833,
+              "recordCount": 8,
+              "equalRecordSha256": "538f7e16e134b8880dadb2dafbc8462baec30f5e45e6264404a49ce9390ec378"
+            },
+            {
+              "baselineSeconds": 0.15420504199937568,
+              "optimizedSeconds": 0.12205308400007198,
+              "recordCount": 8,
+              "equalRecordSha256": "1709c99f0788ac736932756860b64942e30a0e37b920363d88d212699e47f794"
+            },
+            {
+              "baselineSeconds": 0.1509665830017184,
+              "optimizedSeconds": 0.1284002499996859,
+              "recordCount": 8,
+              "equalRecordSha256": "c08f7e5e05aba5f9c9e553d9f41fe994941a7a56b77e97167914bbccc148bcf4"
+            },
+            {
+              "baselineSeconds": 0.1262088750008843,
+              "optimizedSeconds": 0.11672520899810479,
+              "recordCount": 8,
+              "equalRecordSha256": "fd1201e916970eca00c96372cd63cd1b7f6b53a4f094096ad79328d1c632ae00"
+            },
+            {
+              "baselineSeconds": 0.15237762499964447,
+              "optimizedSeconds": 0.1309030000011262,
+              "recordCount": 8,
+              "equalRecordSha256": "dc17cb73cf49e6ca4d6721013997ea6f2c88100e55c77411306a3caece664061"
+            }
+          ]
+        },
+        "burst-short": {
+          "baselineP95Seconds": 16.347949832997983,
+          "optimizedP95Seconds": 13.299622958002146,
+          "p95ReductionFraction": 0.18646539206052948,
+          "baselineWallSeconds": 17.04721512499964,
+          "optimizedWallSeconds": 13.856576999998651,
+          "rows": [
+            {
+              "baselineSeconds": 0.6133552079991205,
+              "optimizedSeconds": 0.5557725420003408,
+              "recordCount": 8,
+              "equalRecordSha256": "c746fe89ec3bc37793341064bec5c18928c1a5f003f35c49657b609f5e8c386d"
+            },
+            {
+              "baselineSeconds": 0.29847595899991575,
+              "optimizedSeconds": 0.27979291600058787,
+              "recordCount": 8,
+              "equalRecordSha256": "e66d3da013131d17cf520923a9a5dd3c8791105e7fa4d1a3c54e408a0d78698c"
+            },
+            {
+              "baselineSeconds": 0.6125249159995292,
+              "optimizedSeconds": 0.2800963750014489,
+              "recordCount": 8,
+              "equalRecordSha256": "b8c7ac413b98a874c4919e819f0b38d28cc306a6b2daeca9cecae0aae4278fbb"
+            },
+            {
+              "baselineSeconds": 0.2981502090005961,
+              "optimizedSeconds": 0.5528354999987641,
+              "recordCount": 8,
+              "equalRecordSha256": "75367788b3f9c26874e62de5fcdf101831b4a7e50a992c781640a98f8420c203"
+            },
+            {
+              "baselineSeconds": 1.0276410830010718,
+              "optimizedSeconds": 0.8433869590007816,
+              "recordCount": 8,
+              "equalRecordSha256": "cfd40c18763a64050fda87b51dd21a6abe820b58c8775ffc7b3d3d2138330713"
+            },
+            {
+              "baselineSeconds": 1.0238530409988016,
+              "optimizedSeconds": 0.8427656669991848,
+              "recordCount": 8,
+              "equalRecordSha256": "dbd3fc2e8e4fb3be5df7f45cfa181fae032b0920d73ae0b375561be7f5863cee"
+            },
+            {
+              "baselineSeconds": 1.6709883330004232,
+              "optimizedSeconds": 1.151257583998813,
+              "recordCount": 8,
+              "equalRecordSha256": "6097ad6238a19623a2f4b95bc97d25210f472b6a8acd84895b6c247c83e7f139"
+            },
+            {
+              "baselineSeconds": 1.6655010409995157,
+              "optimizedSeconds": 1.1535357920001843,
+              "recordCount": 8,
+              "equalRecordSha256": "8d83e20484f40448ff0340b54fe09f181fa5ad7934d7f0e1fad2c7a70c179b8b"
+            },
+            {
+              "baselineSeconds": 2.060471500000858,
+              "optimizedSeconds": 1.444816292001633,
+              "recordCount": 8,
+              "equalRecordSha256": "544cfefd4dff1f75a6f0d9868d25dcbd423ef99d8dc999a121cb2ddcdff79ab2"
+            },
+            {
+              "baselineSeconds": 2.0619606250002107,
+              "optimizedSeconds": 1.726616791998822,
+              "recordCount": 8,
+              "equalRecordSha256": "ebbb6ded63b4c12a7d5f8cc777b701961a60f477dd7b36b1a54e83b63c2b8764"
+            },
+            {
+              "baselineSeconds": 2.3923942080000415,
+              "optimizedSeconds": 1.4465726670023287,
+              "recordCount": 8,
+              "equalRecordSha256": "df27b5d0b015da20e408b52d551a48b484909cc348f11bfaf85560a3d74c5ec1"
+            },
+            {
+              "baselineSeconds": 2.389528125000652,
+              "optimizedSeconds": 1.723194665999472,
+              "recordCount": 8,
+              "equalRecordSha256": "c1d9d108b00bd7ae00549ccf764fa3bd8fc916dfd5f399d425444c379ce712ca"
+            },
+            {
+              "baselineSeconds": 2.785719790997973,
+              "optimizedSeconds": 1.99922266700014,
+              "recordCount": 8,
+              "equalRecordSha256": "5a8978507600241f7f775420f0711ad9256126a11a5dfb3b9bb851341250874b"
+            },
+            {
+              "baselineSeconds": 2.7808886670027277,
+              "optimizedSeconds": 1.995109333001892,
+              "recordCount": 8,
+              "equalRecordSha256": "770af5c02787d93908b5f1282549877923946358b0d2114d1e7c6b9b3bc12b99"
+            },
+            {
+              "baselineSeconds": 3.1155174579980667,
+              "optimizedSeconds": 2.271882541001105,
+              "recordCount": 8,
+              "equalRecordSha256": "008d5d23591b8428f7897ce7774a4b4dc64f4feeac8600974e385dfe0dd4e102"
+            },
+            {
+              "baselineSeconds": 3.111828124998283,
+              "optimizedSeconds": 2.274711958001717,
+              "recordCount": 8,
+              "equalRecordSha256": "f0aac453d3e5e987ce9a64dbee8a2e0c7ab5a2adcfafa6e18d54a95afb474385"
+            },
+            {
+              "baselineSeconds": 3.434203290998994,
+              "optimizedSeconds": 2.5240247500005353,
+              "recordCount": 8,
+              "equalRecordSha256": "a34eb2cda31d325e3b234dded94b04b79c35aa2bb679e58689d75324dc30213b"
+            },
+            {
+              "baselineSeconds": 3.4359269160013355,
+              "optimizedSeconds": 3.3394569589981984,
+              "recordCount": 8,
+              "equalRecordSha256": "9d7ada5940d17c13eb133aae95956a05ac15dad6f9c4dcafad2031025f797672"
+            },
+            {
+              "baselineSeconds": 3.724732792001305,
+              "optimizedSeconds": 2.5248890410002787,
+              "recordCount": 8,
+              "equalRecordSha256": "e0ae7028fd34a3fe853d9f1b4a9c6c8b185f4d9b0bd74cb87f53ce7eba439a53"
+            },
+            {
+              "baselineSeconds": 3.723964667002292,
+              "optimizedSeconds": 2.7958485829985875,
+              "recordCount": 8,
+              "equalRecordSha256": "4e1194702ea7073b1425e9984fe48f9406bedbbe8c7e1f2e8fd46eb435a05290"
+            },
+            {
+              "baselineSeconds": 4.027801749998616,
+              "optimizedSeconds": 2.7954022500016436,
+              "recordCount": 8,
+              "equalRecordSha256": "e6589df218f77ef7ab9dee63a516050f03adeff3da70ad56e011443bf363e577"
+            },
+            {
+              "baselineSeconds": 4.024580249999417,
+              "optimizedSeconds": 3.06745170800059,
+              "recordCount": 8,
+              "equalRecordSha256": "285008c3e84009eff285e2feb7d900d870e861f10eef8365cf5b8e53fa660e32"
+            },
+            {
+              "baselineSeconds": 4.3483100829980685,
+              "optimizedSeconds": 3.0679841249984747,
+              "recordCount": 8,
+              "equalRecordSha256": "f1b81dcf6b49d9ea4299a318e149bcfac8e648c894f4f708d1891ec76640eddf"
+            },
+            {
+              "baselineSeconds": 4.347017124997365,
+              "optimizedSeconds": 3.5882257079974806,
+              "recordCount": 8,
+              "equalRecordSha256": "8a3e4e59faad3fcefc8aa84f86bb74b15e7c2e097a0710c609a175c8699595e0"
+            },
+            {
+              "baselineSeconds": 4.650048583000171,
+              "optimizedSeconds": 3.338272750002943,
+              "recordCount": 8,
+              "equalRecordSha256": "126a68ad009a22318cad5e4773ca5caea2e3f4879a1424e7d68ce93e273d8356"
+            },
+            {
+              "baselineSeconds": 4.959344540999155,
+              "optimizedSeconds": 3.5906214580027154,
+              "recordCount": 8,
+              "equalRecordSha256": "c66e61d47ecd671a20760378df7305ef6669fc6bb9e7f2d645de6046ec0cba2a"
+            },
+            {
+              "baselineSeconds": 4.64919454199844,
+              "optimizedSeconds": 3.84162266599742,
+              "recordCount": 8,
+              "equalRecordSha256": "d4788b76efe3ea039e115b33daddaca38b6060b2160b47215699c4b021800ab0"
+            },
+            {
+              "baselineSeconds": 4.956943167002464,
+              "optimizedSeconds": 3.8422007910012326,
+              "recordCount": 8,
+              "equalRecordSha256": "db15536ee2a51e8db4b9b91fc411b16c05c6afc46b4429d7c64057baad131281"
+            },
+            {
+              "baselineSeconds": 5.292818000001716,
+              "optimizedSeconds": 4.085608167002647,
+              "recordCount": 8,
+              "equalRecordSha256": "41c85ad13cb1ad503705551f5cfe738a200f25fa2b9b8eee27b86ab1f8e5ec6c"
+            },
+            {
+              "baselineSeconds": 5.29365825000059,
+              "optimizedSeconds": 4.084944917001849,
+              "recordCount": 8,
+              "equalRecordSha256": "e568cd92c612396800ccb45f089037cca9907d6800a8020f6e59c970f1d0581c"
+            },
+            {
+              "baselineSeconds": 5.620552874999703,
+              "optimizedSeconds": 4.368352166999102,
+              "recordCount": 8,
+              "equalRecordSha256": "d49ab720110dbced7b87825ecb1cad765f8db764fe51db1dcb30072883eda5ab"
+            },
+            {
+              "baselineSeconds": 5.620241749998968,
+              "optimizedSeconds": 4.60601645800125,
+              "recordCount": 8,
+              "equalRecordSha256": "98851fa9e780608b38776b742ec6a8f7a2c6cca44a2c6c89b6f4543ae4496c6f"
+            },
+            {
+              "baselineSeconds": 6.0005481250009325,
+              "optimizedSeconds": 4.367933749999793,
+              "recordCount": 8,
+              "equalRecordSha256": "dcf637fd0d563279f7fd1a1781bd051a93f9f8de9dc5e979b48a17b5bccde854"
+            },
+            {
+              "baselineSeconds": 5.99917191699933,
+              "optimizedSeconds": 4.605744417000096,
+              "recordCount": 8,
+              "equalRecordSha256": "02f742f61ee254a1c818d7901e13b39a5076c16ad7871de4bd00e8bcf0e16834"
+            },
+            {
+              "baselineSeconds": 6.32948370899976,
+              "optimizedSeconds": 4.86824658399928,
+              "recordCount": 8,
+              "equalRecordSha256": "e5a9f913aeea381c167446bd71d96c25d96ce1b713859963801ab40265a9d333"
+            },
+            {
+              "baselineSeconds": 6.3212498339999,
+              "optimizedSeconds": 4.872756207998464,
+              "recordCount": 8,
+              "equalRecordSha256": "fa1fd783d1903c1afb6822398da7643652fda5dd90e6aedf836412e4bc955e71"
+            },
+            {
+              "baselineSeconds": 6.625606707999395,
+              "optimizedSeconds": 5.136026125001081,
+              "recordCount": 8,
+              "equalRecordSha256": "a78eedb565042b6bd00a7934c50900e0ae00018743d09d9025851ae12a2aa6f4"
+            },
+            {
+              "baselineSeconds": 6.94067908299985,
+              "optimizedSeconds": 5.136277459001576,
+              "recordCount": 8,
+              "equalRecordSha256": "f7fbbcde37b97ce341adf2a879237185753d87862c53ee49a2ced2632d049fcb"
+            },
+            {
+              "baselineSeconds": 6.625736750000215,
+              "optimizedSeconds": 5.65869254199788,
+              "recordCount": 8,
+              "equalRecordSha256": "93fc1929bd4b4d6d8cce6c687f257a7371a7ec3ac3ed5703170543dcae70a8b8"
+            },
+            {
+              "baselineSeconds": 6.940520584001206,
+              "optimizedSeconds": 5.417105333999643,
+              "recordCount": 8,
+              "equalRecordSha256": "30dad07b618f40ae677fb3ec8e1c68c07a181ed6965e5c56544a0b906e6e221c"
+            },
+            {
+              "baselineSeconds": 7.243870750000497,
+              "optimizedSeconds": 5.417326499999035,
+              "recordCount": 8,
+              "equalRecordSha256": "0588ee2b84aef6102340bed073078f465eb89480cffc1e9fd53f849631c24789"
+            },
+            {
+              "baselineSeconds": 7.244443959003547,
+              "optimizedSeconds": 5.658998709001025,
+              "recordCount": 8,
+              "equalRecordSha256": "848d1ba14f145ac0e663d11a7cb74c63ae044a4094fc339416d789b94cca8aa0"
+            },
+            {
+              "baselineSeconds": 7.577042500000971,
+              "optimizedSeconds": 5.947734332999971,
+              "recordCount": 8,
+              "equalRecordSha256": "d6df712ad5e4c1467fe2198086e79d08fde3d467c8414fed88c9768d6124543d"
+            },
+            {
+              "baselineSeconds": 7.570819292002852,
+              "optimizedSeconds": 6.207365124999342,
+              "recordCount": 8,
+              "equalRecordSha256": "267be9e056b01c7424bff0284c6991a7f4e5ef21ff7075eebc571c8697062cd3"
+            },
+            {
+              "baselineSeconds": 7.919848667002952,
+              "optimizedSeconds": 5.947749124999973,
+              "recordCount": 8,
+              "equalRecordSha256": "ffc4fb8a97cdf03f501f7f3247da6a766986d9b7fee3dd8e3d6d6d4aa786b19e"
+            },
+            {
+              "baselineSeconds": 7.916526375000103,
+              "optimizedSeconds": 6.209294584001327,
+              "recordCount": 8,
+              "equalRecordSha256": "1d06b428ef03205b943bea5510a90b6258f4eb648c02afa049259f390b6ddd82"
+            },
+            {
+              "baselineSeconds": 8.216429249998328,
+              "optimizedSeconds": 6.494546208999964,
+              "recordCount": 8,
+              "equalRecordSha256": "97427045ef0175c9cb9962c2d4d4a08792ddb9926aa026c7f9d7e7b7ca6de05a"
+            },
+            {
+              "baselineSeconds": 8.216189916998701,
+              "optimizedSeconds": 6.494242958000541,
+              "recordCount": 8,
+              "equalRecordSha256": "ddd4c82d91d716f2519e035d44437e7b364c2bada6246a6202ffcfe922669fd5"
+            },
+            {
+              "baselineSeconds": 8.50316945799932,
+              "optimizedSeconds": 6.7658393749989045,
+              "recordCount": 8,
+              "equalRecordSha256": "007dbf9ee86d1e1123499233ff384b409f2ae05888bc63806d4884c62ad1b24d"
+            },
+            {
+              "baselineSeconds": 8.506172540997795,
+              "optimizedSeconds": 7.053039041999,
+              "recordCount": 8,
+              "equalRecordSha256": "869838240cb26022ad3124c344f9290a2282430726d39cb91f1117f1c2f1231e"
+            },
+            {
+              "baselineSeconds": 8.802448833001108,
+              "optimizedSeconds": 6.764365209000971,
+              "recordCount": 8,
+              "equalRecordSha256": "ec9299a09d0812d53ab77e8af10e5f9f2df086732e738f6fc8f5c490758a9ce4"
+            },
+            {
+              "baselineSeconds": 8.79032533300051,
+              "optimizedSeconds": 7.294634249999945,
+              "recordCount": 8,
+              "equalRecordSha256": "0d3311cfc1b723838a4c8fc0e2896d88b93ffbf3e27151651847533494e294e9"
+            },
+            {
+              "baselineSeconds": 9.162925000000541,
+              "optimizedSeconds": 7.056298750001588,
+              "recordCount": 8,
+              "equalRecordSha256": "20a2afbd8be96a137d7efd6a582831382571ff0e0243c2f6dacab6719953a59d"
+            },
+            {
+              "baselineSeconds": 9.157922582999163,
+              "optimizedSeconds": 7.29965537499811,
+              "recordCount": 8,
+              "equalRecordSha256": "04307705650a14c2c07ea820cc9ecc16b28a6c19c9ac3f96892613e3c35a2fca"
+            },
+            {
+              "baselineSeconds": 9.482985874998121,
+              "optimizedSeconds": 7.563394415999937,
+              "recordCount": 8,
+              "equalRecordSha256": "6c34f10e5d0d4b1a9c037ebcd44bad946701c7c92fa16d7b46192a3d9a1bad00"
+            },
+            {
+              "baselineSeconds": 9.481450334002147,
+              "optimizedSeconds": 7.563489624997601,
+              "recordCount": 8,
+              "equalRecordSha256": "d05bfd015fca43e61b45ef1ec112f7570a9504d5b7f674da7f1ee6a7dfd9421e"
+            },
+            {
+              "baselineSeconds": 9.788802250001027,
+              "optimizedSeconds": 7.822103417001927,
+              "recordCount": 8,
+              "equalRecordSha256": "32950b131775216563df309da4c03fe9819da33fff01f21d2984dc563278778c"
+            },
+            {
+              "baselineSeconds": 9.78952025000035,
+              "optimizedSeconds": 8.36633675000121,
+              "recordCount": 8,
+              "equalRecordSha256": "9f71a8359129e1f331dffd013580ab414f53c24e4f1da73f2caa59c41790ed1b"
+            },
+            {
+              "baselineSeconds": 10.149716167001316,
+              "optimizedSeconds": 8.080031542001961,
+              "recordCount": 8,
+              "equalRecordSha256": "96efd4c353feb1ecb78c42171f7e4df3eb2a88a3e2624625b9d34dbc40935ddc"
+            },
+            {
+              "baselineSeconds": 10.158299124999758,
+              "optimizedSeconds": 7.8230410420001135,
+              "recordCount": 8,
+              "equalRecordSha256": "3edac5f87d5458ef1d18d2b850f0e003032b95d382f243ac11f66e7153649d74"
+            },
+            {
+              "baselineSeconds": 10.54372254199916,
+              "optimizedSeconds": 8.080306167001254,
+              "recordCount": 8,
+              "equalRecordSha256": "c450fee78e4f0fd00ba87fff9060c681f973cd12fda06e1be61f7b8b8eb0f965"
+            },
+            {
+              "baselineSeconds": 10.543418792000011,
+              "optimizedSeconds": 8.619444625001051,
+              "recordCount": 8,
+              "equalRecordSha256": "f4367cceb8c428c6361d750a9a9bcf32819d704e696f691966d603fed1f8dcb2"
+            },
+            {
+              "baselineSeconds": 10.997297624999192,
+              "optimizedSeconds": 8.367138249999698,
+              "recordCount": 8,
+              "equalRecordSha256": "425e750b58924b972a6dda69b0f86ce7ecafbf81028b14308f619401d605664c"
+            },
+            {
+              "baselineSeconds": 10.986482290998538,
+              "optimizedSeconds": 8.61636158300098,
+              "recordCount": 8,
+              "equalRecordSha256": "7955aec60e4397a11f0a7b52a4b0b55e017624ea7f835809e15726a4efd43d7e"
+            },
+            {
+              "baselineSeconds": 11.354570542000147,
+              "optimizedSeconds": 8.877447291000863,
+              "recordCount": 8,
+              "equalRecordSha256": "d0b5fe8b2fc0b981a544453b87c287c100d27d9226e269f02876693e9527f159"
+            },
+            {
+              "baselineSeconds": 11.350998666999658,
+              "optimizedSeconds": 9.143826583000191,
+              "recordCount": 8,
+              "equalRecordSha256": "a63d68d2834a36e8cdc43021d2e53229f39a588f77bc1cb4d990717ec1c42b18"
+            },
+            {
+              "baselineSeconds": 11.660074250001344,
+              "optimizedSeconds": 8.876440708998416,
+              "recordCount": 8,
+              "equalRecordSha256": "66d6767414bbbdf1eb5555d7ebda054337b7ec4c75f10c39c99032fb3838270f"
+            },
+            {
+              "baselineSeconds": 11.67599808399973,
+              "optimizedSeconds": 10.073012415999983,
+              "recordCount": 8,
+              "equalRecordSha256": "aee2ad16b72616d38f945eb0ff31f71eb1b4e4fbddda230d3face1c0c52368ce"
+            },
+            {
+              "baselineSeconds": 11.954529209000611,
+              "optimizedSeconds": 9.143063374998746,
+              "recordCount": 8,
+              "equalRecordSha256": "f1c62582740622014c4d41980a2fe8f0b07e1785104cfa0fe31d312a4192d8e5"
+            },
+            {
+              "baselineSeconds": 11.95609075000175,
+              "optimizedSeconds": 9.46822874999998,
+              "recordCount": 8,
+              "equalRecordSha256": "ddd4b74d6c44f75ed7ef937a327b719b5c4fa10dec97c65f329bd1e53ea26327"
+            },
+            {
+              "baselineSeconds": 12.277784207999503,
+              "optimizedSeconds": 9.501625375000003,
+              "recordCount": 8,
+              "equalRecordSha256": "54679006a2c276dff3b1029c5a95f9b29d53ecb9ac1cdef23cc1a03db526fd7d"
+            },
+            {
+              "baselineSeconds": 12.554732417000196,
+              "optimizedSeconds": 9.775276500000473,
+              "recordCount": 8,
+              "equalRecordSha256": "1977effa59a454e2ece4f75512c0165809a690547bab041126efecbdb93addc3"
+            },
+            {
+              "baselineSeconds": 12.27874279200114,
+              "optimizedSeconds": 10.394584000001487,
+              "recordCount": 8,
+              "equalRecordSha256": "cf11d5cfbfbc5e62f8bc17ce141cf01b9d031e5c5712cce81ec4a52d5dfd4ed9"
+            },
+            {
+              "baselineSeconds": 12.554510207999556,
+              "optimizedSeconds": 9.769116667001072,
+              "recordCount": 8,
+              "equalRecordSha256": "a7624e42d001fb6b6d006ca7ed613fa2535fc50b7ac32dbe573bc95c2f74dc03"
+            },
+            {
+              "baselineSeconds": 12.855168792000768,
+              "optimizedSeconds": 11.0004547919998,
+              "recordCount": 8,
+              "equalRecordSha256": "eca663fbae39d47e2a113a4425b189a206514187c147ed0dc0f3a8df5ea0110e"
+            },
+            {
+              "baselineSeconds": 12.857898082998872,
+              "optimizedSeconds": 10.692994542001543,
+              "recordCount": 8,
+              "equalRecordSha256": "c1105f679ec0c7ad201f001ab21d27183bcf895fe813e0f1bf94382e6e069c68"
+            },
+            {
+              "baselineSeconds": 13.154486082999938,
+              "optimizedSeconds": 10.07666424999843,
+              "recordCount": 8,
+              "equalRecordSha256": "54155e72ad623ada38157e034d056706768c98f2e4695d241eb51e7e65b9e83f"
+            },
+            {
+              "baselineSeconds": 13.154777625000861,
+              "optimizedSeconds": 10.690639167001791,
+              "recordCount": 8,
+              "equalRecordSha256": "ff545dcb8b198f8c4ac01f38b2fee67090a84aaa6616c47322e49d16f83b7327"
+            },
+            {
+              "baselineSeconds": 13.431888584000262,
+              "optimizedSeconds": 10.389473582999926,
+              "recordCount": 8,
+              "equalRecordSha256": "df7bdfd9ab226c6f0234def5ebc5c264ab7909773743f2f88691afefe940bec4"
+            },
+            {
+              "baselineSeconds": 13.433829375000641,
+              "optimizedSeconds": 11.003500792001432,
+              "recordCount": 8,
+              "equalRecordSha256": "f2efbcb50f6d2048f29329c69007acf47b6536ec9a1f05d757a9d57491a61f8e"
+            },
+            {
+              "baselineSeconds": 13.753889417002938,
+              "optimizedSeconds": 11.612698708002426,
+              "recordCount": 8,
+              "equalRecordSha256": "d45f49ff5ebb7b902f934eaec0c21fdb782a16c900f625cac21baf75436949c9"
+            },
+            {
+              "baselineSeconds": 14.051390459000686,
+              "optimizedSeconds": 11.286521958998492,
+              "recordCount": 8,
+              "equalRecordSha256": "2dc0e1bbf4d55b460b17febfb6286df1c791b7d4f417a96920cde9f2e991f8fb"
+            },
+            {
+              "baselineSeconds": 13.754201416999422,
+              "optimizedSeconds": 11.928421833999892,
+              "recordCount": 8,
+              "equalRecordSha256": "2563105b1b579cfec03254167da98bc35d009dfc1f3e5f4797dc7dcc641a480f"
+            },
+            {
+              "baselineSeconds": 14.051392582998233,
+              "optimizedSeconds": 12.190025333002268,
+              "recordCount": 8,
+              "equalRecordSha256": "9b5f36c48f4204d4dc27c91e3c673739dedee8dc18ecc8f9c56cb7b7754e6ad1"
+            },
+            {
+              "baselineSeconds": 14.348394749998988,
+              "optimizedSeconds": 11.929120541000884,
+              "recordCount": 8,
+              "equalRecordSha256": "24d0a4664bd360c0b6150f69e261aefd7608587edb7538422435380c297018d0"
+            },
+            {
+              "baselineSeconds": 14.802472249997663,
+              "optimizedSeconds": 11.28710583299835,
+              "recordCount": 8,
+              "equalRecordSha256": "1a4920e58a3c5d16465baf335c537b92dbfd5610f9d4f98d8df187026332f1b1"
+            },
+            {
+              "baselineSeconds": 14.348761290999391,
+              "optimizedSeconds": 12.439463790997252,
+              "recordCount": 8,
+              "equalRecordSha256": "5a79b6ab13114170502c4c3977545cd49e7bee90b81780a0300e21ab4e0e5c1d"
+            },
+            {
+              "baselineSeconds": 14.803114833001018,
+              "optimizedSeconds": 12.7054691250014,
+              "recordCount": 8,
+              "equalRecordSha256": "8b6f34b5713c72e013c09813a3988aed7f327bfbd8b9e1813630539f09383c3d"
+            },
+            {
+              "baselineSeconds": 15.132820625000022,
+              "optimizedSeconds": 12.188341625002067,
+              "recordCount": 8,
+              "equalRecordSha256": "1d2d01f402e0370a47ab5e3eefd364a0a75d94c8943a4de6e339ddad1d644037"
+            },
+            {
+              "baselineSeconds": 15.60549841700049,
+              "optimizedSeconds": 12.706470792003529,
+              "recordCount": 8,
+              "equalRecordSha256": "92731da42bc2357bf13b26360d84f66701a8b661a30478461fe6bb0944da67c2"
+            },
+            {
+              "baselineSeconds": 15.181374959000095,
+              "optimizedSeconds": 11.613588291998894,
+              "recordCount": 8,
+              "equalRecordSha256": "b251d74c14a5516f431bd90f3fad81b17b08b2084bc27259216d667fbaf39eb4"
+            },
+            {
+              "baselineSeconds": 15.944125375001022,
+              "optimizedSeconds": 12.439839082999242,
+              "recordCount": 8,
+              "equalRecordSha256": "aa398834d4ed64fa455727c78a48ec622897c63fe09948ac9f7131fed9efb4b2"
+            },
+            {
+              "baselineSeconds": 15.603419916998973,
+              "optimizedSeconds": 12.993653374996939,
+              "recordCount": 8,
+              "equalRecordSha256": "c210e3d09d2056680ad66c64964dc855cb6ab3bd9601e2f6bc9f23e186e7a8b4"
+            },
+            {
+              "baselineSeconds": 16.68652812500295,
+              "optimizedSeconds": 12.99006512500273,
+              "recordCount": 8,
+              "equalRecordSha256": "7f516743293219a79bfbb318f2461e295d31391987951dc17fcfc7fbc8e04a81"
+            },
+            {
+              "baselineSeconds": 16.351156749999063,
+              "optimizedSeconds": 13.300850499999797,
+              "recordCount": 8,
+              "equalRecordSha256": "8a9b1bd66f1ab0c424a2620623f86c4af88c377df50397d50e2c038902f17dcd"
+            },
+            {
+              "baselineSeconds": 15.94419041600122,
+              "optimizedSeconds": 13.841306750000513,
+              "recordCount": 8,
+              "equalRecordSha256": "51d06e4e499d79cffdb46c402e110981eeb3b855ab33a864e39cc09d4a56c58b"
+            },
+            {
+              "baselineSeconds": 16.686783708002622,
+              "optimizedSeconds": 13.299622958002146,
+              "recordCount": 8,
+              "equalRecordSha256": "8a1b770ef7425192e89f1b054e8a25dbed166fb325dd41eeaa4e0204f35c06c0"
+            },
+            {
+              "baselineSeconds": 16.347949832997983,
+              "optimizedSeconds": 13.568236082999647,
+              "recordCount": 8,
+              "equalRecordSha256": "c5a7745365650fa5d57a05466e7bfb107663e4ded1cb421b421793ee4a7c7659"
+            },
+            {
+              "baselineSeconds": 17.024864333998266,
+              "optimizedSeconds": 13.569944250000844,
+              "recordCount": 8,
+              "equalRecordSha256": "82dd7d9864f488e8e366bca13f29478b311817c37a9f13617c1abd4c4e5f8fd9"
+            },
+            {
+              "baselineSeconds": 17.02495533399997,
+              "optimizedSeconds": 13.844384457999695,
+              "recordCount": 8,
+              "equalRecordSha256": "3ab1c88a5bceb145aa8dd7cf1c6e9947d08ac950da27d12ee61a0a6fb47fdde8"
+            }
+          ]
+        },
+        "burst-long": {
+          "baselineP95Seconds": 15.727207249998173,
+          "optimizedP95Seconds": 16.19721333399866,
+          "p95ReductionFraction": -0.029884904327215578,
+          "baselineWallSeconds": 16.33407037500001,
+          "optimizedWallSeconds": 16.91217208300077,
+          "rows": [
+            {
+              "baselineSeconds": 0.49369287499939674,
+              "optimizedSeconds": 0.37837437500274973,
+              "recordCount": 8,
+              "equalRecordSha256": "42ab6fea712c5d15ecd2a6a2da6b3a0d8c620dcf173edfe3e83ef81aaed79f83"
+            },
+            {
+              "baselineSeconds": 0.8524951659965154,
+              "optimizedSeconds": 0.36599337499865214,
+              "recordCount": 8,
+              "equalRecordSha256": "aaec87420ea01468bfa7ab6cae5cca14173c942d85521ac3783d7dcfbd38e7e7"
+            },
+            {
+              "baselineSeconds": 0.490819916001783,
+              "optimizedSeconds": 0.7099252919979335,
+              "recordCount": 8,
+              "equalRecordSha256": "ff3967afbb3f5295c30559f2a1335c30e77d57e714a2a362ac0fb1458ce6545c"
+            },
+            {
+              "baselineSeconds": 0.8491653330020199,
+              "optimizedSeconds": 0.7094544579995272,
+              "recordCount": 8,
+              "equalRecordSha256": "ff9f97e63df0a5c645fc65d5bd557f23d7cfdcf011d526acfe238f9f15e657f4"
+            },
+            {
+              "baselineSeconds": 1.2604780420006136,
+              "optimizedSeconds": 1.183311083001172,
+              "recordCount": 8,
+              "equalRecordSha256": "e8fbd024af31704451f319e4d82f40a011a855064818f352726a4aa6b462aec0"
+            },
+            {
+              "baselineSeconds": 1.2617841249993944,
+              "optimizedSeconds": 1.1521021660009865,
+              "recordCount": 8,
+              "equalRecordSha256": "224d8d5c41df75db7cf6a1da547bd1445c98d81a26047848b8f625a6d877ca43"
+            },
+            {
+              "baselineSeconds": 1.6189952079985233,
+              "optimizedSeconds": 1.4866988339999807,
+              "recordCount": 8,
+              "equalRecordSha256": "5b253dba4392dc0bc7295b2fb617c02696411ba289b9f93b38815b9d53249ebb"
+            },
+            {
+              "baselineSeconds": 1.6219886669969128,
+              "optimizedSeconds": 1.8501216670010763,
+              "recordCount": 8,
+              "equalRecordSha256": "bd3c6c9fe7b5705d93bba70fe6790d1ababc88fe8954d23df6c56d89d87b57ba"
+            },
+            {
+              "baselineSeconds": 1.9736707910014957,
+              "optimizedSeconds": 1.4875543330017535,
+              "recordCount": 8,
+              "equalRecordSha256": "7f5184ee3d599db28d617d1d5ea0afb8c150efcd0939e4ccd0f6ac192e5dd24e"
+            },
+            {
+              "baselineSeconds": 1.9731052089991863,
+              "optimizedSeconds": 1.8504776660010975,
+              "recordCount": 8,
+              "equalRecordSha256": "79c83819450820cfeeb2005fb44251fae820bb819c29e4aa092123920d209488"
+            },
+            {
+              "baselineSeconds": 2.275399958998605,
+              "optimizedSeconds": 2.17455287499979,
+              "recordCount": 8,
+              "equalRecordSha256": "4c6f33762c153f80f18dbe8a1d567e5a7a92a43903a7b47f718c95ba1979cff0"
+            },
+            {
+              "baselineSeconds": 2.2723459160006314,
+              "optimizedSeconds": 2.1717187089998333,
+              "recordCount": 8,
+              "equalRecordSha256": "bd082fc13b57a3bdfebff8db5528df4b22ff2095e8705f4f4d508540e0090b84"
+            },
+            {
+              "baselineSeconds": 2.690648916999635,
+              "optimizedSeconds": 2.476595667001675,
+              "recordCount": 8,
+              "equalRecordSha256": "28195f5bfd29f2abf565a3cc9b77f6ba56d52498cdfec876c80210c5f2adb6ae"
+            },
+            {
+              "baselineSeconds": 2.6910914159998356,
+              "optimizedSeconds": 2.7603469169989694,
+              "recordCount": 8,
+              "equalRecordSha256": "e00a3245dcfe96bd274821a321a962cf28a9ce3fb6085053ef506ec9e88f64e1"
+            },
+            {
+              "baselineSeconds": 3.019491499999276,
+              "optimizedSeconds": 2.4763487909985997,
+              "recordCount": 8,
+              "equalRecordSha256": "38b4380fd96cb9ddaae484a3df98ff49787d6a4db761ccc928c4a82c4f410d6b"
+            },
+            {
+              "baselineSeconds": 3.462183957999514,
+              "optimizedSeconds": 2.760719624999183,
+              "recordCount": 8,
+              "equalRecordSha256": "6e2ddbf8d8116fbf04bf5f87df842ed44997918b7c80c7e5eb86b3f69754a036"
+            },
+            {
+              "baselineSeconds": 3.0127080000020214,
+              "optimizedSeconds": 3.037492250001378,
+              "recordCount": 8,
+              "equalRecordSha256": "b66a7dabc504521fc160cc6ffe15e4ec4d1111f75ccfe2abd6a4002e51647c39"
+            },
+            {
+              "baselineSeconds": 3.4647494169985293,
+              "optimizedSeconds": 3.037697540999943,
+              "recordCount": 8,
+              "equalRecordSha256": "6c7af401b2ebcb1f49ab11012c06700d1e7514d5a84373d69f5335b06faf3860"
+            },
+            {
+              "baselineSeconds": 3.7795047079998767,
+              "optimizedSeconds": 3.3196229170025617,
+              "recordCount": 8,
+              "equalRecordSha256": "8b0542a6fdfc2898e75b0733f2fa893508a56e1720b28707de557af972ed53c2"
+            },
+            {
+              "baselineSeconds": 3.781565125002089,
+              "optimizedSeconds": 3.6219704579998506,
+              "recordCount": 8,
+              "equalRecordSha256": "bed663e1cd47de9c3ca8f8f1dfef5b29549c957753515a3450c1be531ef37358"
+            },
+            {
+              "baselineSeconds": 4.103135166998982,
+              "optimizedSeconds": 3.3203018339991104,
+              "recordCount": 8,
+              "equalRecordSha256": "3fd4491ecfd333d1fa27d8401dd0581d898ed2d5f2d60a35bcb3042569832477"
+            },
+            {
+              "baselineSeconds": 4.101075792001211,
+              "optimizedSeconds": 3.878574000002118,
+              "recordCount": 8,
+              "equalRecordSha256": "248794ef95e916747e452df2349a3df422b02444ac6a03c5a9214fcd53a61361"
+            },
+            {
+              "baselineSeconds": 4.440679707997333,
+              "optimizedSeconds": 3.6222107079993293,
+              "recordCount": 8,
+              "equalRecordSha256": "5918067f1f53029e2d417a96e3fe1d1debcc27934fce8e0c4bb901615009b9d8"
+            },
+            {
+              "baselineSeconds": 4.439880291000009,
+              "optimizedSeconds": 3.8797942500023055,
+              "recordCount": 8,
+              "equalRecordSha256": "40d970fe64a0d1155bae12d56d6ff43f2a304ff8e56d31744b6cf55cf36e3b5a"
+            },
+            {
+              "baselineSeconds": 4.755466874998092,
+              "optimizedSeconds": 4.172614582999813,
+              "recordCount": 8,
+              "equalRecordSha256": "0d58d5be7a73618de6efa986c5450d8d7ea32bc259c1c63b5a9864bc8f13d33b"
+            },
+            {
+              "baselineSeconds": 4.755502874999365,
+              "optimizedSeconds": 4.172243832999811,
+              "recordCount": 8,
+              "equalRecordSha256": "a6ceb10d9a9ae13c618715c500c67ecca0ba04f239c3d927da9afd8d6d7d2530"
+            },
+            {
+              "baselineSeconds": 5.089811500001815,
+              "optimizedSeconds": 4.451844832998177,
+              "recordCount": 8,
+              "equalRecordSha256": "6d016f9176ef8b05f70bdac81942ca9b5bea4b5dea94e5f0bb36519e984fbe03"
+            },
+            {
+              "baselineSeconds": 5.093906165999215,
+              "optimizedSeconds": 4.4515401250027935,
+              "recordCount": 8,
+              "equalRecordSha256": "fde18c7196810cdd5716eca0093b21d80191cf1ebd4bf6f852acdfd50f2412d7"
+            },
+            {
+              "baselineSeconds": 5.429064166000899,
+              "optimizedSeconds": 4.713628250003239,
+              "recordCount": 8,
+              "equalRecordSha256": "725d2c8e0cc3c82cf9f57dd4db77c138b06ada6b41beb6877ac001fe3d936c7e"
+            },
+            {
+              "baselineSeconds": 5.428496542001085,
+              "optimizedSeconds": 4.7251608750011656,
+              "recordCount": 8,
+              "equalRecordSha256": "cadbb96e3e791f8b8506cc5adcc5e9e3cc17af55a1a31751e488757477073503"
+            },
+            {
+              "baselineSeconds": 5.759964666998712,
+              "optimizedSeconds": 5.001822666999942,
+              "recordCount": 8,
+              "equalRecordSha256": "cc9a1c26d53147c1f16216ecbf3c89b2a8dd0d413166bc5ac3d619639bbaa704"
+            },
+            {
+              "baselineSeconds": 5.759645750000345,
+              "optimizedSeconds": 5.00045712499923,
+              "recordCount": 8,
+              "equalRecordSha256": "d1b48d4c6a63a626bb661c4495b0f9753101cca66de01c19ef89458b1d2de328"
+            },
+            {
+              "baselineSeconds": 6.1012847920028435,
+              "optimizedSeconds": 5.292616957998689,
+              "recordCount": 8,
+              "equalRecordSha256": "bb6e6a24a38ed878985b22ac5276236a250c5f4afb06eba931c15a3c4802fb5b"
+            },
+            {
+              "baselineSeconds": 6.410839208001562,
+              "optimizedSeconds": 5.289239791,
+              "recordCount": 8,
+              "equalRecordSha256": "3d860bbb73c94f3c501e1798d0ab17b5970a8f04374d91b64abb7ef13f42842d"
+            },
+            {
+              "baselineSeconds": 6.099823249998735,
+              "optimizedSeconds": 5.5713843340017775,
+              "recordCount": 8,
+              "equalRecordSha256": "944a9ef20ea088e431a67aab88de716aac6d54cdbc3c5a9428c1acf86c37eb33"
+            },
+            {
+              "baselineSeconds": 6.722745458002464,
+              "optimizedSeconds": 5.865746374998707,
+              "recordCount": 8,
+              "equalRecordSha256": "06714fc881d2d93f2a09e7bddb4255cb17c7882b8088ccfc371c036db562d769"
+            },
+            {
+              "baselineSeconds": 6.401735792002,
+              "optimizedSeconds": 5.570702500001062,
+              "recordCount": 8,
+              "equalRecordSha256": "f9992a6aaa4905703c2a78a6534031d2f108d2b6bcdf96e6fd94a31192724585"
+            },
+            {
+              "baselineSeconds": 6.7219431659978,
+              "optimizedSeconds": 5.865752249999787,
+              "recordCount": 8,
+              "equalRecordSha256": "1157fde982358d9c30c399284f34b6af94e87fbd81e3818dd9cda2a98ac855f5"
+            },
+            {
+              "baselineSeconds": 7.0176881669976865,
+              "optimizedSeconds": 6.151598749998811,
+              "recordCount": 8,
+              "equalRecordSha256": "ad58baf8a861f2cb9082be42dc2971a950f563295066f5e0f0c5c7db53b6a0a7"
+            },
+            {
+              "baselineSeconds": 7.0187036669994995,
+              "optimizedSeconds": 6.15180429099928,
+              "recordCount": 8,
+              "equalRecordSha256": "642161998ea48ab99cad7e8f6b7e92dcf743ce8712ce1172a6639851a470f70a"
+            },
+            {
+              "baselineSeconds": 7.330166790998192,
+              "optimizedSeconds": 6.446332583000185,
+              "recordCount": 8,
+              "equalRecordSha256": "ddc13832d541c0335b4a29b56e23e44fde6c83f92b9e4374f1e9279bb9a13b59"
+            },
+            {
+              "baselineSeconds": 7.328889790998801,
+              "optimizedSeconds": 6.440834000000905,
+              "recordCount": 8,
+              "equalRecordSha256": "0d94e610af1c23e84ce2b4b128cc1ef0ec9a4a94765b5ddcd68a7fb2efddea27"
+            },
+            {
+              "baselineSeconds": 7.651201749999018,
+              "optimizedSeconds": 6.7563120419981715,
+              "recordCount": 8,
+              "equalRecordSha256": "93d491694c5a1abd66bc96e54ed12a69c1d2ded6614c85ab13846301c1b4d16b"
+            },
+            {
+              "baselineSeconds": 7.648338708997471,
+              "optimizedSeconds": 6.757955416000186,
+              "recordCount": 8,
+              "equalRecordSha256": "dca48ce28dea4b1b1d78222c848458b63536b68ac09ece1a052ee4b1256bce3f"
+            },
+            {
+              "baselineSeconds": 7.979305458000454,
+              "optimizedSeconds": 7.394952375001594,
+              "recordCount": 8,
+              "equalRecordSha256": "f8bd2283f61748cad27adf240ed90136e07c2d75cb8672ad585c95f32234566e"
+            },
+            {
+              "baselineSeconds": 7.978059916000348,
+              "optimizedSeconds": 7.063556749999407,
+              "recordCount": 8,
+              "equalRecordSha256": "9a418395255194626ca1baa311ccd0d362853c88c24fc3a5486cbf2d9cf773a3"
+            },
+            {
+              "baselineSeconds": 8.266021333001845,
+              "optimizedSeconds": 7.05938504200094,
+              "recordCount": 8,
+              "equalRecordSha256": "d092b29d713b1c1cd164cbe53e7192ed2800ab803976b548ecfd2696cfa6a2f0"
+            },
+            {
+              "baselineSeconds": 8.586670415999833,
+              "optimizedSeconds": 7.7009497079998255,
+              "recordCount": 8,
+              "equalRecordSha256": "42a41f5a6d7b66ff270bf647c2ca617ce8881a661e4bcfcfda92df1c7daf3fbd"
+            },
+            {
+              "baselineSeconds": 8.262920375000249,
+              "optimizedSeconds": 7.3884917909999785,
+              "recordCount": 8,
+              "equalRecordSha256": "5b7da5ee0db6cdf03b7b7bb274cd71c13cc82b291e8250425de89feb8dc3cc1e"
+            },
+            {
+              "baselineSeconds": 8.880793791999167,
+              "optimizedSeconds": 7.699900625000737,
+              "recordCount": 8,
+              "equalRecordSha256": "7e08ccb9842bd6722a626efb36a83747700e2c65125545c88fdd014a23196b84"
+            },
+            {
+              "baselineSeconds": 8.58732954199877,
+              "optimizedSeconds": 8.01314566700239,
+              "recordCount": 8,
+              "equalRecordSha256": "8244780f49d26ddd13cce5d3008a61e380a577dbe4f20e109139a49a3f61a329"
+            },
+            {
+              "baselineSeconds": 8.880618750001304,
+              "optimizedSeconds": 8.011951374999626,
+              "recordCount": 8,
+              "equalRecordSha256": "9d953688ecbf939b1a61a0bef951c80971356fb7ccc3b3e21eb88834063df09b"
+            },
+            {
+              "baselineSeconds": 9.197620416001882,
+              "optimizedSeconds": 8.326751625001634,
+              "recordCount": 8,
+              "equalRecordSha256": "6c8bc51e726eaaea0de8143be182690d7bff6464ac071b222206cacc0acae09b"
+            },
+            {
+              "baselineSeconds": 9.53479987499668,
+              "optimizedSeconds": 8.32375329199931,
+              "recordCount": 8,
+              "equalRecordSha256": "b74e7eafd45fa21f8a9151c3d07fd68861d334bf846e8bfe75e432541526c137"
+            },
+            {
+              "baselineSeconds": 9.197628459001862,
+              "optimizedSeconds": 8.658577875001356,
+              "recordCount": 8,
+              "equalRecordSha256": "a7733ae752bf3c8edbdae021cd34f7acd6f2e1dd2e2216f00eedb831ae2579ab"
+            },
+            {
+              "baselineSeconds": 10.470548833000066,
+              "optimizedSeconds": 8.670136708999053,
+              "recordCount": 8,
+              "equalRecordSha256": "705b9f43e2707509d5c5267248a319b228c5fa93764f22db462810c244d6a7b9"
+            },
+            {
+              "baselineSeconds": 9.535012459000427,
+              "optimizedSeconds": 8.989057416001742,
+              "recordCount": 8,
+              "equalRecordSha256": "8a92f6eec7eb7330043ab380415862db8e41c0cea2052ff16d3477820cacc406"
+            },
+            {
+              "baselineSeconds": 9.845824250001897,
+              "optimizedSeconds": 9.27977691599881,
+              "recordCount": 8,
+              "equalRecordSha256": "b4ec176fab91ee8cedb7b88be3545740a741f3442abdd11bdf0c2bcd9557905b"
+            },
+            {
+              "baselineSeconds": 9.84492416699868,
+              "optimizedSeconds": 8.986431083001662,
+              "recordCount": 8,
+              "equalRecordSha256": "52a35908328697158c2def2f7713f279ed65ae1f7ca5f8049e90ea2b75a5d654"
+            },
+            {
+              "baselineSeconds": 10.150643417000538,
+              "optimizedSeconds": 9.887114917000872,
+              "recordCount": 8,
+              "equalRecordSha256": "b32de4f51cb0e4fe3ac1f7ae4c0ffa8fc016753af494e40f0e9918c24accb1f5"
+            },
+            {
+              "baselineSeconds": 10.469209957998828,
+              "optimizedSeconds": 9.585782999998628,
+              "recordCount": 8,
+              "equalRecordSha256": "cf20f7afdf2d8b74a7fcdef066837a8f46e6226d910c7caa2d93b17abf9c75b9"
+            },
+            {
+              "baselineSeconds": 10.14915233300053,
+              "optimizedSeconds": 9.277721917002054,
+              "recordCount": 8,
+              "equalRecordSha256": "3116fec94bb43d2681cd8c78d0646cdfc45bc1cf8fe4e8ecfaf2660ba95505af"
+            },
+            {
+              "baselineSeconds": 10.79893308300234,
+              "optimizedSeconds": 9.588425292000466,
+              "recordCount": 8,
+              "equalRecordSha256": "14cba8762af60d866979bfb9f30baec3cec4c621805a9a7293b56dd881f4a308"
+            },
+            {
+              "baselineSeconds": 11.416819291000138,
+              "optimizedSeconds": 9.882550874997833,
+              "recordCount": 8,
+              "equalRecordSha256": "951acce642ab1f2e0e4e315b7d7953e001edc6c13558e56ed33e24721a7f5f97"
+            },
+            {
+              "baselineSeconds": 10.79905595800301,
+              "optimizedSeconds": 10.174506041999848,
+              "recordCount": 8,
+              "equalRecordSha256": "ab4026e6b5d77cd9d03e2aad587ab8d022414eafc477f894e72bd60891d68241"
+            },
+            {
+              "baselineSeconds": 11.131267290998949,
+              "optimizedSeconds": 10.541646249999758,
+              "recordCount": 8,
+              "equalRecordSha256": "6a1efb00f53dd762483508c2fa3f991afc7db38b629823f966870a1b9c88dc65"
+            },
+            {
+              "baselineSeconds": 11.418069583000033,
+              "optimizedSeconds": 10.173845958001039,
+              "recordCount": 8,
+              "equalRecordSha256": "532ff6cc2ab5c4363774ff32ed14517433a244bd274865768ee392218b3df2bf"
+            },
+            {
+              "baselineSeconds": 11.132464792000974,
+              "optimizedSeconds": 10.541459291998763,
+              "recordCount": 8,
+              "equalRecordSha256": "66ea1fa8bb8a8ef1f2f3f450f0e9eb7c0cbe712e8f3f0b6cf8b567f15aa62597"
+            },
+            {
+              "baselineSeconds": 11.708636417002708,
+              "optimizedSeconds": 10.882887499999924,
+              "recordCount": 8,
+              "equalRecordSha256": "f0dbfc0a47767f0990c6c13a4e32e9222fc056dac5ca3b22452bcf568fd0ca6b"
+            },
+            {
+              "baselineSeconds": 11.709760124998866,
+              "optimizedSeconds": 10.883797500002402,
+              "recordCount": 8,
+              "equalRecordSha256": "29014ad386e1967fa3e9476bde44209fe50342f2ef640dcddc115d561d0fdb2b"
+            },
+            {
+              "baselineSeconds": 12.013513959002012,
+              "optimizedSeconds": 11.432802500003163,
+              "recordCount": 8,
+              "equalRecordSha256": "b12e28e6155eae13014a2b295a690312c7d773763c8715caee84a22078e071a5"
+            },
+            {
+              "baselineSeconds": 12.010478000000148,
+              "optimizedSeconds": 11.347238082998956,
+              "recordCount": 8,
+              "equalRecordSha256": "810e173218b1239f45276c7482220115ff7f773713296ee08d0a0ecb8236fe7a"
+            },
+            {
+              "baselineSeconds": 12.32293404200027,
+              "optimizedSeconds": 11.903034457998729,
+              "recordCount": 8,
+              "equalRecordSha256": "44c7bae27157cd3dae4396d9b10c9b71bac1b3c5d4281e573e5bb9d8eefced58"
+            },
+            {
+              "baselineSeconds": 12.323097417000099,
+              "optimizedSeconds": 11.88516504099971,
+              "recordCount": 8,
+              "equalRecordSha256": "3ae4c8ca35deb2a4dd5e38c4e3e481a17b9ee9c4d6ae5bb9e63dab797748bb5d"
+            },
+            {
+              "baselineSeconds": 12.631182875000377,
+              "optimizedSeconds": 12.282217583000602,
+              "recordCount": 8,
+              "equalRecordSha256": "75edf65a62b3c47f6add51a3fc9a8e69f6c09b51ba6f9cc42fffa388f2d1d6ab"
+            },
+            {
+              "baselineSeconds": 12.631363249998685,
+              "optimizedSeconds": 12.276017000000138,
+              "recordCount": 8,
+              "equalRecordSha256": "529c3f28f36f2288bd28af31e401487fe987f61ed63b28be20252180a26cc9e1"
+            },
+            {
+              "baselineSeconds": 12.95262379199994,
+              "optimizedSeconds": 12.989795333000075,
+              "recordCount": 8,
+              "equalRecordSha256": "acfd65bd50732515f43c351305f7fb031b94943c56e6e7742ee02942bf1809cd"
+            },
+            {
+              "baselineSeconds": 12.953607834002469,
+              "optimizedSeconds": 12.666229375001421,
+              "recordCount": 8,
+              "equalRecordSha256": "c870fd2f0ad2888a671a65ba099bb976640681eb71eec0d9e71be2dd31b63863"
+            },
+            {
+              "baselineSeconds": 13.245690249998006,
+              "optimizedSeconds": 12.665691624999454,
+              "recordCount": 8,
+              "equalRecordSha256": "ae224005637d234f10f540576721275bee65b27d6a810931745db4e7686f17e4"
+            },
+            {
+              "baselineSeconds": 13.574096999996982,
+              "optimizedSeconds": 12.991711749997194,
+              "recordCount": 8,
+              "equalRecordSha256": "451653ba9c82744fb9947e4ac6fa7b423ccfabef6f4f62f4470595f487d3ee4c"
+            },
+            {
+              "baselineSeconds": 13.577164709000499,
+              "optimizedSeconds": 13.326937666999584,
+              "recordCount": 8,
+              "equalRecordSha256": "a2a83661f046cbae6b9ee8f031bf8560a2051589f9405c949e2c396c74623cd6"
+            },
+            {
+              "baselineSeconds": 13.244577040997683,
+              "optimizedSeconds": 13.327901832999487,
+              "recordCount": 8,
+              "equalRecordSha256": "da3f57d3c15f3b74f276c09c32f4fa481337273b32ea7a636449af9304b34e98"
+            },
+            {
+              "baselineSeconds": 13.895634374999645,
+              "optimizedSeconds": 13.724171875001048,
+              "recordCount": 8,
+              "equalRecordSha256": "c3ded1775ca4cc61ce8ea62d809b313253eb72fe713363e65f438fc8aa4eff74"
+            },
+            {
+              "baselineSeconds": 13.895269207998354,
+              "optimizedSeconds": 13.723729041998013,
+              "recordCount": 8,
+              "equalRecordSha256": "2e683a0586369107fcce2c52e5f76afb07739e0dec6d413acdefb16566714f40"
+            },
+            {
+              "baselineSeconds": 14.20643704199756,
+              "optimizedSeconds": 14.12011483400056,
+              "recordCount": 8,
+              "equalRecordSha256": "973bcfeb335a52fb22a09bf1b35157588231d3034effdeeb6a3940ed1496441a"
+            },
+            {
+              "baselineSeconds": 14.541917790997104,
+              "optimizedSeconds": 14.122422709002421,
+              "recordCount": 8,
+              "equalRecordSha256": "7e65a3eda999aae199617a6250664966c3efa35c969e0ae87c0077bb4277229e"
+            },
+            {
+              "baselineSeconds": 14.212437791000411,
+              "optimizedSeconds": 14.4322309579984,
+              "recordCount": 8,
+              "equalRecordSha256": "447e6036d894726dd371e1fd8c427e085815b5121898e66cf5cf9c7fe0e6355a"
+            },
+            {
+              "baselineSeconds": 14.541817666999123,
+              "optimizedSeconds": 14.43403641599798,
+              "recordCount": 8,
+              "equalRecordSha256": "3c5fb439efa94bc8cbb1f37c241067c670ccd94b44ee36eeef3bab4ee6a1973f"
+            },
+            {
+              "baselineSeconds": 14.83346366600017,
+              "optimizedSeconds": 14.76515741700132,
+              "recordCount": 8,
+              "equalRecordSha256": "0fb298c2b3242da47fbb804a9341fea9384faed3c12f3d81f5af60a3211c2e3a"
+            },
+            {
+              "baselineSeconds": 14.831315042003553,
+              "optimizedSeconds": 14.765819625001313,
+              "recordCount": 8,
+              "equalRecordSha256": "10efc1ff9c42ece703a9c9bc4a367e4d6ab7e0e4dd0d560cb2c9deb6ced1bbd6"
+            },
+            {
+              "baselineSeconds": 15.131660750001174,
+              "optimizedSeconds": 15.205770915999892,
+              "recordCount": 8,
+              "equalRecordSha256": "869bd2476b105ac9fbd2463c07a79ed2a7d01fd83e236d59c6394ebaf0e08678"
+            },
+            {
+              "baselineSeconds": 15.130555832998652,
+              "optimizedSeconds": 15.147692334001476,
+              "recordCount": 8,
+              "equalRecordSha256": "387180d15b721a41df471a18a78d5c48f6f176e8cfe3e7a9de19285110f57b1f"
+            },
+            {
+              "baselineSeconds": 15.43130970799757,
+              "optimizedSeconds": 15.773524583997641,
+              "recordCount": 8,
+              "equalRecordSha256": "d20f591de487163cc43bcf6e6ca05a8c4b3347438490b984c70a7187c789061d"
+            },
+            {
+              "baselineSeconds": 15.431401583999104,
+              "optimizedSeconds": 15.768885584002419,
+              "recordCount": 8,
+              "equalRecordSha256": "6b26ef388449e262be1b4ac0939e42e08290956c1d0b4d0d27c8dd40d9e1644d"
+            },
+            {
+              "baselineSeconds": 15.727207249998173,
+              "optimizedSeconds": 16.19721333399866,
+              "recordCount": 8,
+              "equalRecordSha256": "0365bfb611a19d60284755d6fb2c692dd67992bead7d3f1bf82b3ebd4dbbca89"
+            },
+            {
+              "baselineSeconds": 15.72787845899802,
+              "optimizedSeconds": 16.20553266600109,
+              "recordCount": 8,
+              "equalRecordSha256": "ccd2efc58e14a1230112d4e548b1cc8379d3d7f65af6b1cab73391b63922a833"
+            },
+            {
+              "baselineSeconds": 16.31903870899987,
+              "optimizedSeconds": 16.57614429199748,
+              "recordCount": 8,
+              "equalRecordSha256": "44743443717565159ca819653c9c78900c25cdd4ea251f777218e9e9bdc15cc6"
+            },
+            {
+              "baselineSeconds": 16.02588462499989,
+              "optimizedSeconds": 16.895173375000013,
+              "recordCount": 8,
+              "equalRecordSha256": "783d548eebee4d86523e96369b4613202a39cd835e4973f73dbf1fe1653e72a6"
+            },
+            {
+              "baselineSeconds": 16.02199770900188,
+              "optimizedSeconds": 16.576577625000937,
+              "recordCount": 8,
+              "equalRecordSha256": "d8a6cabdd8c2c1c011f3d1fdeabaefd51256a8fceb37d761d7e03becce558069"
+            },
+            {
+              "baselineSeconds": 16.318800666998868,
+              "optimizedSeconds": 16.894439625000814,
+              "recordCount": 8,
+              "equalRecordSha256": "2447ee8bbacb753315d1b58ef3dd5d7f98e58e8ce00babf628d1fc031be69b79"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "order": [
+        "optimized-shared",
+        "shared-baseline"
+      ],
+      "cases": {
+        "sequential": {
+          "baselineP95Seconds": 0.20623437500034925,
+          "optimizedP95Seconds": 0.31562133300030837,
+          "p95ReductionFraction": -0.5304011903921151,
+          "baselineWallSeconds": 3.648510584000178,
+          "optimizedWallSeconds": 4.043489417003002,
+          "rows": [
+            {
+              "baselineSeconds": 0.2199006670016388,
+              "optimizedSeconds": 0.1887891660007881,
+              "recordCount": 8,
+              "equalRecordSha256": "6efbf4b3745a6a15fa1437f06860bd046e189a50f4605a9ba71e8e7adf912044"
+            },
+            {
+              "baselineSeconds": 0.19183287499981816,
+              "optimizedSeconds": 0.1636078749979788,
+              "recordCount": 8,
+              "equalRecordSha256": "aa8ca062d10567c74fc5370470bf782c40d8dd0734b447a1bcd4990c284fdc5f"
+            },
+            {
+              "baselineSeconds": 0.20623437500034925,
+              "optimizedSeconds": 0.1918020000011893,
+              "recordCount": 8,
+              "equalRecordSha256": "63b69e94fd56d776abb88725b3ada0c1e8a66137d6640f04b696e61db62c3ac4"
+            },
+            {
+              "baselineSeconds": 0.17125366700201994,
+              "optimizedSeconds": 0.16068791699944995,
+              "recordCount": 8,
+              "equalRecordSha256": "f56e8bdaedf669355bbd4ad5d662d516c8c0aff0e0477f5b85f1d5b09e18bd43"
+            },
+            {
+              "baselineSeconds": 0.2028725830023177,
+              "optimizedSeconds": 0.829876666997734,
+              "recordCount": 8,
+              "equalRecordSha256": "98229bfa4ba003c4ffd6f873052cd22259e8a11b4e2a5fd3c130268d648325fd"
+            },
+            {
+              "baselineSeconds": 0.19884237500082236,
+              "optimizedSeconds": 0.31562133300030837,
+              "recordCount": 8,
+              "equalRecordSha256": "cd61abb1cdb1d328d31a7320b26bf3bad48ab688c361a7b4d1900b3dab55b687"
+            },
+            {
+              "baselineSeconds": 0.1847137919976376,
+              "optimizedSeconds": 0.164500874998339,
+              "recordCount": 8,
+              "equalRecordSha256": "b25b5c1bfb4077c241f08162749eb842be67aab6bd204320701c0e1a3df78d5c"
+            },
+            {
+              "baselineSeconds": 0.2013792090001516,
+              "optimizedSeconds": 0.1814930420005112,
+              "recordCount": 8,
+              "equalRecordSha256": "9ae28a052f445fe4807c63368c1f3002f5d40d0c745ec2a2c7c47257f870e83e"
+            },
+            {
+              "baselineSeconds": 0.18728558300063014,
+              "optimizedSeconds": 0.16776670800027205,
+              "recordCount": 8,
+              "equalRecordSha256": "ef5792bac0cf80c718e77bef0822c08c52ee293f2f4e57ce5aae0b4b0d18b469"
+            },
+            {
+              "baselineSeconds": 0.19407062499885797,
+              "optimizedSeconds": 0.17755166699862457,
+              "recordCount": 8,
+              "equalRecordSha256": "b0320fe5c7ede1bc2688017b24db7a935295304f64284acda1d6234a30a90773"
+            },
+            {
+              "baselineSeconds": 0.16986999999789987,
+              "optimizedSeconds": 0.15299462499751826,
+              "recordCount": 8,
+              "equalRecordSha256": "ac161a5f19365ecb3a25eed4736a46dc246a67ad21f634eea1cdfa3929e685fb"
+            },
+            {
+              "baselineSeconds": 0.1480842909986677,
+              "optimizedSeconds": 0.12260616700223181,
+              "recordCount": 8,
+              "equalRecordSha256": "2a47629055407fbce439b80e6cddcbfddf5203299aa863d3391deb2263a0a4f8"
+            },
+            {
+              "baselineSeconds": 0.19458525000300142,
+              "optimizedSeconds": 0.15906520900171017,
+              "recordCount": 8,
+              "equalRecordSha256": "af6acbcd1c55dc3eab99eec96c1cf67acf3be6d37a6a181ae450ea678ba8d670"
+            },
+            {
+              "baselineSeconds": 0.1594719589993474,
+              "optimizedSeconds": 0.134732124999573,
+              "recordCount": 8,
+              "equalRecordSha256": "184b894b92332b2c55731a692ed95a9f614a3c4d5dc06380e31a5e61fb94c91a"
+            },
+            {
+              "baselineSeconds": 0.17526262500177836,
+              "optimizedSeconds": 0.13376583399804076,
+              "recordCount": 8,
+              "equalRecordSha256": "0082043f216695679ba4789b6c55ee5a0e9baa47eea13ca9293f5641524cad4a"
+            },
+            {
+              "baselineSeconds": 0.17561216699687066,
+              "optimizedSeconds": 0.14526874999864958,
+              "recordCount": 8,
+              "equalRecordSha256": "538f7e16e134b8880dadb2dafbc8462baec30f5e45e6264404a49ce9390ec378"
+            },
+            {
+              "baselineSeconds": 0.172433457999432,
+              "optimizedSeconds": 0.14445504099785467,
+              "recordCount": 8,
+              "equalRecordSha256": "1709c99f0788ac736932756860b64942e30a0e37b920363d88d212699e47f794"
+            },
+            {
+              "baselineSeconds": 0.1853302090021316,
+              "optimizedSeconds": 0.1598240839994105,
+              "recordCount": 8,
+              "equalRecordSha256": "c08f7e5e05aba5f9c9e553d9f41fe994941a7a56b77e97167914bbccc148bcf4"
+            },
+            {
+              "baselineSeconds": 0.15037300000039977,
+              "optimizedSeconds": 0.15487183400182403,
+              "recordCount": 8,
+              "equalRecordSha256": "fd1201e916970eca00c96372cd63cd1b7f6b53a4f094096ad79328d1c632ae00"
+            },
+            {
+              "baselineSeconds": 0.15738841699931072,
+              "optimizedSeconds": 0.19100345900005777,
+              "recordCount": 8,
+              "equalRecordSha256": "dc17cb73cf49e6ca4d6721013997ea6f2c88100e55c77411306a3caece664061"
+            }
+          ]
+        },
+        "burst-short": {
+          "baselineP95Seconds": 16.025808124999458,
+          "optimizedP95Seconds": 13.647195416000613,
+          "p95ReductionFraction": 0.14842388542567952,
+          "baselineWallSeconds": 16.67009274999873,
+          "optimizedWallSeconds": 14.197434540998074,
+          "rows": [
+            {
+              "baselineSeconds": 0.36621958300020196,
+              "optimizedSeconds": 0.33320016600191593,
+              "recordCount": 8,
+              "equalRecordSha256": "c746fe89ec3bc37793341064bec5c18928c1a5f003f35c49657b609f5e8c386d"
+            },
+            {
+              "baselineSeconds": 0.366227374997834,
+              "optimizedSeconds": 0.3290672919974895,
+              "recordCount": 8,
+              "equalRecordSha256": "e66d3da013131d17cf520923a9a5dd3c8791105e7fa4d1a3c54e408a0d78698c"
+            },
+            {
+              "baselineSeconds": 0.7374040000031528,
+              "optimizedSeconds": 0.6332988329995715,
+              "recordCount": 8,
+              "equalRecordSha256": "b8c7ac413b98a874c4919e819f0b38d28cc306a6b2daeca9cecae0aae4278fbb"
+            },
+            {
+              "baselineSeconds": 1.0682634580007289,
+              "optimizedSeconds": 0.6322953330018208,
+              "recordCount": 8,
+              "equalRecordSha256": "75367788b3f9c26874e62de5fcdf101831b4a7e50a992c781640a98f8420c203"
+            },
+            {
+              "baselineSeconds": 0.7395481670027948,
+              "optimizedSeconds": 0.9321634580010141,
+              "recordCount": 8,
+              "equalRecordSha256": "cfd40c18763a64050fda87b51dd21a6abe820b58c8775ffc7b3d3d2138330713"
+            },
+            {
+              "baselineSeconds": 1.7641201670012379,
+              "optimizedSeconds": 0.9327714999999444,
+              "recordCount": 8,
+              "equalRecordSha256": "dbd3fc2e8e4fb3be5df7f45cfa181fae032b0920d73ae0b375561be7f5863cee"
+            },
+            {
+              "baselineSeconds": 1.0719281669989869,
+              "optimizedSeconds": 1.2408086670002376,
+              "recordCount": 8,
+              "equalRecordSha256": "6097ad6238a19623a2f4b95bc97d25210f472b6a8acd84895b6c247c83e7f139"
+            },
+            {
+              "baselineSeconds": 2.4866371660027653,
+              "optimizedSeconds": 1.8602513750010985,
+              "recordCount": 8,
+              "equalRecordSha256": "8d83e20484f40448ff0340b54fe09f181fa5ad7934d7f0e1fad2c7a70c179b8b"
+            },
+            {
+              "baselineSeconds": 1.4262080830012565,
+              "optimizedSeconds": 1.23946333299682,
+              "recordCount": 8,
+              "equalRecordSha256": "544cfefd4dff1f75a6f0d9868d25dcbd423ef99d8dc999a121cb2ddcdff79ab2"
+            },
+            {
+              "baselineSeconds": 1.426957208001113,
+              "optimizedSeconds": 1.5592152499993972,
+              "recordCount": 8,
+              "equalRecordSha256": "ebbb6ded63b4c12a7d5f8cc777b701961a60f477dd7b36b1a54e83b63c2b8764"
+            },
+            {
+              "baselineSeconds": 1.765056584001286,
+              "optimizedSeconds": 1.5563782079989323,
+              "recordCount": 8,
+              "equalRecordSha256": "df27b5d0b015da20e408b52d551a48b484909cc348f11bfaf85560a3d74c5ec1"
+            },
+            {
+              "baselineSeconds": 2.0710785419978492,
+              "optimizedSeconds": 1.8529440000020259,
+              "recordCount": 8,
+              "equalRecordSha256": "c1d9d108b00bd7ae00549ccf764fa3bd8fc916dfd5f399d425444c379ce712ca"
+            },
+            {
+              "baselineSeconds": 2.100351666998904,
+              "optimizedSeconds": 2.155461166999885,
+              "recordCount": 8,
+              "equalRecordSha256": "5a8978507600241f7f775420f0711ad9256126a11a5dfb3b9bb851341250874b"
+            },
+            {
+              "baselineSeconds": 2.817806541999744,
+              "optimizedSeconds": 2.154478000000381,
+              "recordCount": 8,
+              "equalRecordSha256": "770af5c02787d93908b5f1282549877923946358b0d2114d1e7c6b9b3bc12b99"
+            },
+            {
+              "baselineSeconds": 2.485647583998798,
+              "optimizedSeconds": 2.44655345800129,
+              "recordCount": 8,
+              "equalRecordSha256": "008d5d23591b8428f7897ce7774a4b4dc64f4feeac8600974e385dfe0dd4e102"
+            },
+            {
+              "baselineSeconds": 2.819797665997612,
+              "optimizedSeconds": 2.449146667000605,
+              "recordCount": 8,
+              "equalRecordSha256": "f0aac453d3e5e987ce9a64dbee8a2e0c7ab5a2adcfafa6e18d54a95afb474385"
+            },
+            {
+              "baselineSeconds": 3.1346311249981227,
+              "optimizedSeconds": 2.7334392920020036,
+              "recordCount": 8,
+              "equalRecordSha256": "a34eb2cda31d325e3b234dded94b04b79c35aa2bb679e58689d75324dc30213b"
+            },
+            {
+              "baselineSeconds": 3.1343053329983377,
+              "optimizedSeconds": 2.734169542000018,
+              "recordCount": 8,
+              "equalRecordSha256": "9d7ada5940d17c13eb133aae95956a05ac15dad6f9c4dcafad2031025f797672"
+            },
+            {
+              "baselineSeconds": 3.44271099999969,
+              "optimizedSeconds": 3.0047827499984123,
+              "recordCount": 8,
+              "equalRecordSha256": "e0ae7028fd34a3fe853d9f1b4a9c6c8b185f4d9b0bd74cb87f53ce7eba439a53"
+            },
+            {
+              "baselineSeconds": 3.4411270000018703,
+              "optimizedSeconds": 3.0056100840010913,
+              "recordCount": 8,
+              "equalRecordSha256": "4e1194702ea7073b1425e9984fe48f9406bedbbe8c7e1f2e8fd46eb435a05290"
+            },
+            {
+              "baselineSeconds": 3.761864042000525,
+              "optimizedSeconds": 3.278602124999452,
+              "recordCount": 8,
+              "equalRecordSha256": "e6589df218f77ef7ab9dee63a516050f03adeff3da70ad56e011443bf363e577"
+            },
+            {
+              "baselineSeconds": 3.7593477919981524,
+              "optimizedSeconds": 3.2713629999998375,
+              "recordCount": 8,
+              "equalRecordSha256": "285008c3e84009eff285e2feb7d900d870e861f10eef8365cf5b8e53fa660e32"
+            },
+            {
+              "baselineSeconds": 4.123344625000755,
+              "optimizedSeconds": 3.5710544159992423,
+              "recordCount": 8,
+              "equalRecordSha256": "f1b81dcf6b49d9ea4299a318e149bcfac8e648c894f4f708d1891ec76640eddf"
+            },
+            {
+              "baselineSeconds": 4.119129750000866,
+              "optimizedSeconds": 3.570551458000409,
+              "recordCount": 8,
+              "equalRecordSha256": "8a3e4e59faad3fcefc8aa84f86bb74b15e7c2e097a0710c609a175c8699595e0"
+            },
+            {
+              "baselineSeconds": 4.4626918339999975,
+              "optimizedSeconds": 3.850466666997818,
+              "recordCount": 8,
+              "equalRecordSha256": "126a68ad009a22318cad5e4773ca5caea2e3f4879a1424e7d68ce93e273d8356"
+            },
+            {
+              "baselineSeconds": 4.4612620000007155,
+              "optimizedSeconds": 4.126052957999491,
+              "recordCount": 8,
+              "equalRecordSha256": "c66e61d47ecd671a20760378df7305ef6669fc6bb9e7f2d645de6046ec0cba2a"
+            },
+            {
+              "baselineSeconds": 4.7804520839999896,
+              "optimizedSeconds": 3.8542825840013393,
+              "recordCount": 8,
+              "equalRecordSha256": "d4788b76efe3ea039e115b33daddaca38b6060b2160b47215699c4b021800ab0"
+            },
+            {
+              "baselineSeconds": 4.779406958001346,
+              "optimizedSeconds": 4.391982541001198,
+              "recordCount": 8,
+              "equalRecordSha256": "db15536ee2a51e8db4b9b91fc411b16c05c6afc46b4429d7c64057baad131281"
+            },
+            {
+              "baselineSeconds": 5.114138790999277,
+              "optimizedSeconds": 4.390897374996712,
+              "recordCount": 8,
+              "equalRecordSha256": "41c85ad13cb1ad503705551f5cfe738a200f25fa2b9b8eee27b86ab1f8e5ec6c"
+            },
+            {
+              "baselineSeconds": 5.759991750001063,
+              "optimizedSeconds": 4.1341732920009235,
+              "recordCount": 8,
+              "equalRecordSha256": "e568cd92c612396800ccb45f089037cca9907d6800a8020f6e59c970f1d0581c"
+            },
+            {
+              "baselineSeconds": 5.17260366699702,
+              "optimizedSeconds": 4.653164874998765,
+              "recordCount": 8,
+              "equalRecordSha256": "d49ab720110dbced7b87825ecb1cad765f8db764fe51db1dcb30072883eda5ab"
+            },
+            {
+              "baselineSeconds": 5.431901917003415,
+              "optimizedSeconds": 4.6540679589998035,
+              "recordCount": 8,
+              "equalRecordSha256": "98851fa9e780608b38776b742ec6a8f7a2c6cca44a2c6c89b6f4543ae4496c6f"
+            },
+            {
+              "baselineSeconds": 5.441448917001253,
+              "optimizedSeconds": 4.93444300000192,
+              "recordCount": 8,
+              "equalRecordSha256": "dcf637fd0d563279f7fd1a1781bd051a93f9f8de9dc5e979b48a17b5bccde854"
+            },
+            {
+              "baselineSeconds": 6.112268167002185,
+              "optimizedSeconds": 4.937403666001046,
+              "recordCount": 8,
+              "equalRecordSha256": "02f742f61ee254a1c818d7901e13b39a5076c16ad7871de4bd00e8bcf0e16834"
+            },
+            {
+              "baselineSeconds": 6.116171749999921,
+              "optimizedSeconds": 5.512069041997165,
+              "recordCount": 8,
+              "equalRecordSha256": "e5a9f913aeea381c167446bd71d96c25d96ce1b713859963801ab40265a9d333"
+            },
+            {
+              "baselineSeconds": 5.762029792000249,
+              "optimizedSeconds": 5.229451125000196,
+              "recordCount": 8,
+              "equalRecordSha256": "fa1fd783d1903c1afb6822398da7643652fda5dd90e6aedf836412e4bc955e71"
+            },
+            {
+              "baselineSeconds": 6.437407333996816,
+              "optimizedSeconds": 5.229471790997195,
+              "recordCount": 8,
+              "equalRecordSha256": "a78eedb565042b6bd00a7934c50900e0ae00018743d09d9025851ae12a2aa6f4"
+            },
+            {
+              "baselineSeconds": 6.437614916001621,
+              "optimizedSeconds": 5.511561875002371,
+              "recordCount": 8,
+              "equalRecordSha256": "f7fbbcde37b97ce341adf2a879237185753d87862c53ee49a2ced2632d049fcb"
+            },
+            {
+              "baselineSeconds": 6.774959999998828,
+              "optimizedSeconds": 5.777207957999053,
+              "recordCount": 8,
+              "equalRecordSha256": "93fc1929bd4b4d6d8cce6c687f257a7371a7ec3ac3ed5703170543dcae70a8b8"
+            },
+            {
+              "baselineSeconds": 6.775143500002741,
+              "optimizedSeconds": 5.775147457999992,
+              "recordCount": 8,
+              "equalRecordSha256": "30dad07b618f40ae677fb3ec8e1c68c07a181ed6965e5c56544a0b906e6e221c"
+            },
+            {
+              "baselineSeconds": 7.106555041998945,
+              "optimizedSeconds": 6.065554332999454,
+              "recordCount": 8,
+              "equalRecordSha256": "0588ee2b84aef6102340bed073078f465eb89480cffc1e9fd53f849631c24789"
+            },
+            {
+              "baselineSeconds": 7.098556707998796,
+              "optimizedSeconds": 6.063143250001303,
+              "recordCount": 8,
+              "equalRecordSha256": "848d1ba14f145ac0e663d11a7cb74c63ae044a4094fc339416d789b94cca8aa0"
+            },
+            {
+              "baselineSeconds": 7.447019332998025,
+              "optimizedSeconds": 6.390621459002432,
+              "recordCount": 8,
+              "equalRecordSha256": "d6df712ad5e4c1467fe2198086e79d08fde3d467c8414fed88c9768d6124543d"
+            },
+            {
+              "baselineSeconds": 7.442320041998755,
+              "optimizedSeconds": 6.390242916000716,
+              "recordCount": 8,
+              "equalRecordSha256": "267be9e056b01c7424bff0284c6991a7f4e5ef21ff7075eebc571c8697062cd3"
+            },
+            {
+              "baselineSeconds": 7.789950249996764,
+              "optimizedSeconds": 6.689293542000087,
+              "recordCount": 8,
+              "equalRecordSha256": "ffc4fb8a97cdf03f501f7f3247da6a766986d9b7fee3dd8e3d6d6d4aa786b19e"
+            },
+            {
+              "baselineSeconds": 7.790200666997407,
+              "optimizedSeconds": 6.685501208001369,
+              "recordCount": 8,
+              "equalRecordSha256": "1d06b428ef03205b943bea5510a90b6258f4eb648c02afa049259f390b6ddd82"
+            },
+            {
+              "baselineSeconds": 8.144215333999455,
+              "optimizedSeconds": 6.950490333998459,
+              "recordCount": 8,
+              "equalRecordSha256": "97427045ef0175c9cb9962c2d4d4a08792ddb9926aa026c7f9d7e7b7ca6de05a"
+            },
+            {
+              "baselineSeconds": 8.140109375002794,
+              "optimizedSeconds": 7.249370125002315,
+              "recordCount": 8,
+              "equalRecordSha256": "ddd4c82d91d716f2519e035d44437e7b364c2bada6246a6202ffcfe922669fd5"
+            },
+            {
+              "baselineSeconds": 8.766997750000883,
+              "optimizedSeconds": 6.946532250000018,
+              "recordCount": 8,
+              "equalRecordSha256": "007dbf9ee86d1e1123499233ff384b409f2ae05888bc63806d4884c62ad1b24d"
+            },
+            {
+              "baselineSeconds": 8.490484458001447,
+              "optimizedSeconds": 7.240017708998494,
+              "recordCount": 8,
+              "equalRecordSha256": "869838240cb26022ad3124c344f9290a2282430726d39cb91f1117f1c2f1231e"
+            },
+            {
+              "baselineSeconds": 8.504198124999675,
+              "optimizedSeconds": 7.567482416998246,
+              "recordCount": 8,
+              "equalRecordSha256": "ec9299a09d0812d53ab77e8af10e5f9f2df086732e738f6fc8f5c490758a9ce4"
+            },
+            {
+              "baselineSeconds": 8.766097791001812,
+              "optimizedSeconds": 7.834932124998886,
+              "recordCount": 8,
+              "equalRecordSha256": "0d3311cfc1b723838a4c8fc0e2896d88b93ffbf3e27151651847533494e294e9"
+            },
+            {
+              "baselineSeconds": 9.107891916999506,
+              "optimizedSeconds": 7.570511500001885,
+              "recordCount": 8,
+              "equalRecordSha256": "20a2afbd8be96a137d7efd6a582831382571ff0e0243c2f6dacab6719953a59d"
+            },
+            {
+              "baselineSeconds": 9.42982883300283,
+              "optimizedSeconds": 7.837626415999694,
+              "recordCount": 8,
+              "equalRecordSha256": "04307705650a14c2c07ea820cc9ecc16b28a6c19c9ac3f96892613e3c35a2fca"
+            },
+            {
+              "baselineSeconds": 9.107664166000177,
+              "optimizedSeconds": 8.110376500000712,
+              "recordCount": 8,
+              "equalRecordSha256": "6c34f10e5d0d4b1a9c037ebcd44bad946701c7c92fa16d7b46192a3d9a1bad00"
+            },
+            {
+              "baselineSeconds": 9.746455208001862,
+              "optimizedSeconds": 8.669853457999125,
+              "recordCount": 8,
+              "equalRecordSha256": "d05bfd015fca43e61b45ef1ec112f7570a9504d5b7f674da7f1ee6a7dfd9421e"
+            },
+            {
+              "baselineSeconds": 10.04810641700169,
+              "optimizedSeconds": 8.109094167000876,
+              "recordCount": 8,
+              "equalRecordSha256": "32950b131775216563df309da4c03fe9819da33fff01f21d2984dc563278778c"
+            },
+            {
+              "baselineSeconds": 9.430609125000046,
+              "optimizedSeconds": 8.40547616600088,
+              "recordCount": 8,
+              "equalRecordSha256": "9f71a8359129e1f331dffd013580ab414f53c24e4f1da73f2caa59c41790ed1b"
+            },
+            {
+              "baselineSeconds": 9.74574366700108,
+              "optimizedSeconds": 8.670430917001795,
+              "recordCount": 8,
+              "equalRecordSha256": "96efd4c353feb1ecb78c42171f7e4df3eb2a88a3e2624625b9d34dbc40935ddc"
+            },
+            {
+              "baselineSeconds": 10.390369125001598,
+              "optimizedSeconds": 8.406068833999598,
+              "recordCount": 8,
+              "equalRecordSha256": "3edac5f87d5458ef1d18d2b850f0e003032b95d382f243ac11f66e7153649d74"
+            },
+            {
+              "baselineSeconds": 10.392736875000992,
+              "optimizedSeconds": 8.944607583001925,
+              "recordCount": 8,
+              "equalRecordSha256": "c450fee78e4f0fd00ba87fff9060c681f973cd12fda06e1be61f7b8b8eb0f965"
+            },
+            {
+              "baselineSeconds": 10.046823207998386,
+              "optimizedSeconds": 8.94448329199804,
+              "recordCount": 8,
+              "equalRecordSha256": "f4367cceb8c428c6361d750a9a9bcf32819d704e696f691966d603fed1f8dcb2"
+            },
+            {
+              "baselineSeconds": 10.729919041001267,
+              "optimizedSeconds": 9.241074249999656,
+              "recordCount": 8,
+              "equalRecordSha256": "425e750b58924b972a6dda69b0f86ce7ecafbf81028b14308f619401d605664c"
+            },
+            {
+              "baselineSeconds": 10.726467709002463,
+              "optimizedSeconds": 9.506425915998989,
+              "recordCount": 8,
+              "equalRecordSha256": "7955aec60e4397a11f0a7b52a4b0b55e017624ea7f835809e15726a4efd43d7e"
+            },
+            {
+              "baselineSeconds": 11.057827541000734,
+              "optimizedSeconds": 9.507531916999142,
+              "recordCount": 8,
+              "equalRecordSha256": "d0b5fe8b2fc0b981a544453b87c287c100d27d9226e269f02876693e9527f159"
+            },
+            {
+              "baselineSeconds": 11.68087129199921,
+              "optimizedSeconds": 9.780512540997734,
+              "recordCount": 8,
+              "equalRecordSha256": "a63d68d2834a36e8cdc43021d2e53229f39a588f77bc1cb4d990717ec1c42b18"
+            },
+            {
+              "baselineSeconds": 11.355253958001413,
+              "optimizedSeconds": 9.240860124999017,
+              "recordCount": 8,
+              "equalRecordSha256": "66d6767414bbbdf1eb5555d7ebda054337b7ec4c75f10c39c99032fb3838270f"
+            },
+            {
+              "baselineSeconds": 11.057198875001632,
+              "optimizedSeconds": 9.779763292001007,
+              "recordCount": 8,
+              "equalRecordSha256": "aee2ad16b72616d38f945eb0ff31f71eb1b4e4fbddda230d3face1c0c52368ce"
+            },
+            {
+              "baselineSeconds": 11.355008999998972,
+              "optimizedSeconds": 10.040701000001718,
+              "recordCount": 8,
+              "equalRecordSha256": "f1c62582740622014c4d41980a2fe8f0b07e1785104cfa0fe31d312a4192d8e5"
+            },
+            {
+              "baselineSeconds": 11.681513666997489,
+              "optimizedSeconds": 10.043222333999438,
+              "recordCount": 8,
+              "equalRecordSha256": "ddd4b74d6c44f75ed7ef937a327b719b5c4fa10dec97c65f329bd1e53ea26327"
+            },
+            {
+              "baselineSeconds": 12.680089749999752,
+              "optimizedSeconds": 10.327194083001814,
+              "recordCount": 8,
+              "equalRecordSha256": "54679006a2c276dff3b1029c5a95f9b29d53ecb9ac1cdef23cc1a03db526fd7d"
+            },
+            {
+              "baselineSeconds": 11.98320962499929,
+              "optimizedSeconds": 10.327119084002334,
+              "recordCount": 8,
+              "equalRecordSha256": "1977effa59a454e2ece4f75512c0165809a690547bab041126efecbdb93addc3"
+            },
+            {
+              "baselineSeconds": 12.334868082998582,
+              "optimizedSeconds": 10.609908792001079,
+              "recordCount": 8,
+              "equalRecordSha256": "cf11d5cfbfbc5e62f8bc17ce141cf01b9d031e5c5712cce81ec4a52d5dfd4ed9"
+            },
+            {
+              "baselineSeconds": 11.98389912499988,
+              "optimizedSeconds": 10.606415499998548,
+              "recordCount": 8,
+              "equalRecordSha256": "a7624e42d001fb6b6d006ca7ed613fa2535fc50b7ac32dbe573bc95c2f74dc03"
+            },
+            {
+              "baselineSeconds": 12.67716320800173,
+              "optimizedSeconds": 11.440534458997718,
+              "recordCount": 8,
+              "equalRecordSha256": "eca663fbae39d47e2a113a4425b189a206514187c147ed0dc0f3a8df5ea0110e"
+            },
+            {
+              "baselineSeconds": 12.333711874998698,
+              "optimizedSeconds": 10.906441874998563,
+              "recordCount": 8,
+              "equalRecordSha256": "c1105f679ec0c7ad201f001ab21d27183bcf895fe813e0f1bf94382e6e069c68"
+            },
+            {
+              "baselineSeconds": 12.99309395799719,
+              "optimizedSeconds": 11.16356475000066,
+              "recordCount": 8,
+              "equalRecordSha256": "54155e72ad623ada38157e034d056706768c98f2e4695d241eb51e7e65b9e83f"
+            },
+            {
+              "baselineSeconds": 12.992581625003368,
+              "optimizedSeconds": 10.906746874999953,
+              "recordCount": 8,
+              "equalRecordSha256": "ff545dcb8b198f8c4ac01f38b2fee67090a84aaa6616c47322e49d16f83b7327"
+            },
+            {
+              "baselineSeconds": 13.654127041998436,
+              "optimizedSeconds": 11.162913666998065,
+              "recordCount": 8,
+              "equalRecordSha256": "df7bdfd9ab226c6f0234def5ebc5c264ab7909773743f2f88691afefe940bec4"
+            },
+            {
+              "baselineSeconds": 13.340974665999966,
+              "optimizedSeconds": 11.439297625001927,
+              "recordCount": 8,
+              "equalRecordSha256": "f2efbcb50f6d2048f29329c69007acf47b6536ec9a1f05d757a9d57491a61f8e"
+            },
+            {
+              "baselineSeconds": 13.339962333000585,
+              "optimizedSeconds": 11.708928542000649,
+              "recordCount": 8,
+              "equalRecordSha256": "d45f49ff5ebb7b902f934eaec0c21fdb782a16c900f625cac21baf75436949c9"
+            },
+            {
+              "baselineSeconds": 13.657051916001365,
+              "optimizedSeconds": 11.706594708000921,
+              "recordCount": 8,
+              "equalRecordSha256": "2dc0e1bbf4d55b460b17febfb6286df1c791b7d4f417a96920cde9f2e991f8fb"
+            },
+            {
+              "baselineSeconds": 14.039940166003362,
+              "optimizedSeconds": 12.004076416000316,
+              "recordCount": 8,
+              "equalRecordSha256": "2563105b1b579cfec03254167da98bc35d009dfc1f3e5f4797dc7dcc641a480f"
+            },
+            {
+              "baselineSeconds": 14.03985845900388,
+              "optimizedSeconds": 11.989822416999232,
+              "recordCount": 8,
+              "equalRecordSha256": "9b5f36c48f4204d4dc27c91e3c673739dedee8dc18ecc8f9c56cb7b7754e6ad1"
+            },
+            {
+              "baselineSeconds": 15.044963958000153,
+              "optimizedSeconds": 12.293419083001936,
+              "recordCount": 8,
+              "equalRecordSha256": "24d0a4664bd360c0b6150f69e261aefd7608587edb7538422435380c297018d0"
+            },
+            {
+              "baselineSeconds": 14.396390624995547,
+              "optimizedSeconds": 12.293013959002565,
+              "recordCount": 8,
+              "equalRecordSha256": "1a4920e58a3c5d16465baf335c537b92dbfd5610f9d4f98d8df187026332f1b1"
+            },
+            {
+              "baselineSeconds": 14.396062791001896,
+              "optimizedSeconds": 12.57394779200331,
+              "recordCount": 8,
+              "equalRecordSha256": "5a79b6ab13114170502c4c3977545cd49e7bee90b81780a0300e21ab4e0e5c1d"
+            },
+            {
+              "baselineSeconds": 14.712348458004271,
+              "optimizedSeconds": 13.384436624997761,
+              "recordCount": 8,
+              "equalRecordSha256": "8b6f34b5713c72e013c09813a3988aed7f327bfbd8b9e1813630539f09383c3d"
+            },
+            {
+              "baselineSeconds": 14.7113842079998,
+              "optimizedSeconds": 13.38245808299689,
+              "recordCount": 8,
+              "equalRecordSha256": "1d2d01f402e0370a47ab5e3eefd364a0a75d94c8943a4de6e339ddad1d644037"
+            },
+            {
+              "baselineSeconds": 15.044229874998564,
+              "optimizedSeconds": 13.125165375000506,
+              "recordCount": 8,
+              "equalRecordSha256": "92731da42bc2357bf13b26360d84f66701a8b661a30478461fe6bb0944da67c2"
+            },
+            {
+              "baselineSeconds": 15.384534290995362,
+              "optimizedSeconds": 12.574265125000238,
+              "recordCount": 8,
+              "equalRecordSha256": "b251d74c14a5516f431bd90f3fad81b17b08b2084bc27259216d667fbaf39eb4"
+            },
+            {
+              "baselineSeconds": 15.385574374999123,
+              "optimizedSeconds": 12.840206166998541,
+              "recordCount": 8,
+              "equalRecordSha256": "aa398834d4ed64fa455727c78a48ec622897c63fe09948ac9f7131fed9efb4b2"
+            },
+            {
+              "baselineSeconds": 15.71601254199777,
+              "optimizedSeconds": 12.871517040999606,
+              "recordCount": 8,
+              "equalRecordSha256": "c210e3d09d2056680ad66c64964dc855cb6ab3bd9601e2f6bc9f23e186e7a8b4"
+            },
+            {
+              "baselineSeconds": 15.690236083002674,
+              "optimizedSeconds": 13.123352791000798,
+              "recordCount": 8,
+              "equalRecordSha256": "7f516743293219a79bfbb318f2461e295d31391987951dc17fcfc7fbc8e04a81"
+            },
+            {
+              "baselineSeconds": 16.027416999997513,
+              "optimizedSeconds": 13.647652083000139,
+              "recordCount": 8,
+              "equalRecordSha256": "8a9b1bd66f1ab0c424a2620623f86c4af88c377df50397d50e2c038902f17dcd"
+            },
+            {
+              "baselineSeconds": 16.657199915996898,
+              "optimizedSeconds": 14.180829958000686,
+              "recordCount": 8,
+              "equalRecordSha256": "51d06e4e499d79cffdb46c402e110981eeb3b855ab33a864e39cc09d4a56c58b"
+            },
+            {
+              "baselineSeconds": 16.334305583004607,
+              "optimizedSeconds": 13.647195416000613,
+              "recordCount": 8,
+              "equalRecordSha256": "8a1b770ef7425192e89f1b054e8a25dbed166fb325dd41eeaa4e0204f35c06c0"
+            },
+            {
+              "baselineSeconds": 16.330272041996068,
+              "optimizedSeconds": 13.901621125001839,
+              "recordCount": 8,
+              "equalRecordSha256": "c5a7745365650fa5d57a05466e7bfb107663e4ded1cb421b421793ee4a7c7659"
+            },
+            {
+              "baselineSeconds": 16.025808124999458,
+              "optimizedSeconds": 13.900817832996836,
+              "recordCount": 8,
+              "equalRecordSha256": "82dd7d9864f488e8e366bca13f29478b311817c37a9f13617c1abd4c4e5f8fd9"
+            },
+            {
+              "baselineSeconds": 16.6564564170003,
+              "optimizedSeconds": 14.180275041999266,
+              "recordCount": 8,
+              "equalRecordSha256": "3ab1c88a5bceb145aa8dd7cf1c6e9947d08ac950da27d12ee61a0a6fb47fdde8"
+            }
+          ]
+        },
+        "burst-long": {
+          "baselineP95Seconds": 16.057384291001654,
+          "optimizedP95Seconds": 14.75014787499822,
+          "p95ReductionFraction": 0.0814102964911908,
+          "baselineWallSeconds": 16.705845666998357,
+          "optimizedWallSeconds": 15.357065167001565,
+          "rows": [
+            {
+              "baselineSeconds": 0.49837879199913004,
+              "optimizedSeconds": 0.3774114159969031,
+              "recordCount": 8,
+              "equalRecordSha256": "42ab6fea712c5d15ecd2a6a2da6b3a0d8c620dcf173edfe3e83ef81aaed79f83"
+            },
+            {
+              "baselineSeconds": 0.49920354200003203,
+              "optimizedSeconds": 0.37752850000106264,
+              "recordCount": 8,
+              "equalRecordSha256": "aaec87420ea01468bfa7ab6cae5cca14173c942d85521ac3783d7dcfbd38e7e7"
+            },
+            {
+              "baselineSeconds": 0.957254583001486,
+              "optimizedSeconds": 0.758252875002654,
+              "recordCount": 8,
+              "equalRecordSha256": "ff3967afbb3f5295c30559f2a1335c30e77d57e714a2a362ac0fb1458ce6545c"
+            },
+            {
+              "baselineSeconds": 0.9544616670027608,
+              "optimizedSeconds": 1.429919542002608,
+              "recordCount": 8,
+              "equalRecordSha256": "ff9f97e63df0a5c645fc65d5bd557f23d7cfdcf011d526acfe238f9f15e657f4"
+            },
+            {
+              "baselineSeconds": 1.4247221250043367,
+              "optimizedSeconds": 2.1615862079997896,
+              "recordCount": 8,
+              "equalRecordSha256": "e8fbd024af31704451f319e4d82f40a011a855064818f352726a4aa6b462aec0"
+            },
+            {
+              "baselineSeconds": 1.8676644580045831,
+              "optimizedSeconds": 0.7551872080002795,
+              "recordCount": 8,
+              "equalRecordSha256": "224d8d5c41df75db7cf6a1da547bd1445c98d81a26047848b8f625a6d877ca43"
+            },
+            {
+              "baselineSeconds": 1.4217084579941002,
+              "optimizedSeconds": 1.0675640410008782,
+              "recordCount": 8,
+              "equalRecordSha256": "5b253dba4392dc0bc7295b2fb617c02696411ba289b9f93b38815b9d53249ebb"
+            },
+            {
+              "baselineSeconds": 1.8657185420015594,
+              "optimizedSeconds": 1.4335485409974353,
+              "recordCount": 8,
+              "equalRecordSha256": "bd3c6c9fe7b5705d93bba70fe6790d1ababc88fe8954d23df6c56d89d87b57ba"
+            },
+            {
+              "baselineSeconds": 2.231696374998137,
+              "optimizedSeconds": 1.0920607920015755,
+              "recordCount": 8,
+              "equalRecordSha256": "7f5184ee3d599db28d617d1d5ea0afb8c150efcd0939e4ccd0f6ac192e5dd24e"
+            },
+            {
+              "baselineSeconds": 2.577083083000616,
+              "optimizedSeconds": 1.8048981669999193,
+              "recordCount": 8,
+              "equalRecordSha256": "79c83819450820cfeeb2005fb44251fae820bb819c29e4aa092123920d209488"
+            },
+            {
+              "baselineSeconds": 2.2322652920047403,
+              "optimizedSeconds": 2.163138040999911,
+              "recordCount": 8,
+              "equalRecordSha256": "4c6f33762c153f80f18dbe8a1d567e5a7a92a43903a7b47f718c95ba1979cff0"
+            },
+            {
+              "baselineSeconds": 2.5763793330042972,
+              "optimizedSeconds": 1.8011194999999134,
+              "recordCount": 8,
+              "equalRecordSha256": "bd082fc13b57a3bdfebff8db5528df4b22ff2095e8705f4f4d508540e0090b84"
+            },
+            {
+              "baselineSeconds": 2.9471294169998146,
+              "optimizedSeconds": 2.453965832999529,
+              "recordCount": 8,
+              "equalRecordSha256": "28195f5bfd29f2abf565a3cc9b77f6ba56d52498cdfec876c80210c5f2adb6ae"
+            },
+            {
+              "baselineSeconds": 2.943735167005798,
+              "optimizedSeconds": 2.456830750001245,
+              "recordCount": 8,
+              "equalRecordSha256": "e00a3245dcfe96bd274821a321a962cf28a9ce3fb6085053ef506ec9e88f64e1"
+            },
+            {
+              "baselineSeconds": 3.276600666999002,
+              "optimizedSeconds": 2.767022291998728,
+              "recordCount": 8,
+              "equalRecordSha256": "38b4380fd96cb9ddaae484a3df98ff49787d6a4db761ccc928c4a82c4f410d6b"
+            },
+            {
+              "baselineSeconds": 3.2774654579989146,
+              "optimizedSeconds": 2.769684082999447,
+              "recordCount": 8,
+              "equalRecordSha256": "6e2ddbf8d8116fbf04bf5f87df842ed44997918b7c80c7e5eb86b3f69754a036"
+            },
+            {
+              "baselineSeconds": 3.66120558300463,
+              "optimizedSeconds": 3.076114833002066,
+              "recordCount": 8,
+              "equalRecordSha256": "b66a7dabc504521fc160cc6ffe15e4ec4d1111f75ccfe2abd6a4002e51647c39"
+            },
+            {
+              "baselineSeconds": 3.6712104999969597,
+              "optimizedSeconds": 3.0775516670000798,
+              "recordCount": 8,
+              "equalRecordSha256": "6c7af401b2ebcb1f49ab11012c06700d1e7514d5a84373d69f5335b06faf3860"
+            },
+            {
+              "baselineSeconds": 4.023471791006159,
+              "optimizedSeconds": 3.3493015419990115,
+              "recordCount": 8,
+              "equalRecordSha256": "8b0542a6fdfc2898e75b0733f2fa893508a56e1720b28707de557af972ed53c2"
+            },
+            {
+              "baselineSeconds": 4.020990458004235,
+              "optimizedSeconds": 3.357077125001524,
+              "recordCount": 8,
+              "equalRecordSha256": "bed663e1cd47de9c3ca8f8f1dfef5b29549c957753515a3450c1be531ef37358"
+            },
+            {
+              "baselineSeconds": 4.3817016660032095,
+              "optimizedSeconds": 3.6431190830007836,
+              "recordCount": 8,
+              "equalRecordSha256": "3fd4491ecfd333d1fa27d8401dd0581d898ed2d5f2d60a35bcb3042569832477"
+            },
+            {
+              "baselineSeconds": 4.699474791996181,
+              "optimizedSeconds": 3.643364958999882,
+              "recordCount": 8,
+              "equalRecordSha256": "248794ef95e916747e452df2349a3df422b02444ac6a03c5a9214fcd53a61361"
+            },
+            {
+              "baselineSeconds": 4.381900499996846,
+              "optimizedSeconds": 3.94560970800012,
+              "recordCount": 8,
+              "equalRecordSha256": "5918067f1f53029e2d417a96e3fe1d1debcc27934fce8e0c4bb901615009b9d8"
+            },
+            {
+              "baselineSeconds": 4.703814458000124,
+              "optimizedSeconds": 4.230275709000125,
+              "recordCount": 8,
+              "equalRecordSha256": "40d970fe64a0d1155bae12d56d6ff43f2a304ff8e56d31744b6cf55cf36e3b5a"
+            },
+            {
+              "baselineSeconds": 5.043709666999348,
+              "optimizedSeconds": 3.9455721659978735,
+              "recordCount": 8,
+              "equalRecordSha256": "0d58d5be7a73618de6efa986c5450d8d7ea32bc259c1c63b5a9864bc8f13d33b"
+            },
+            {
+              "baselineSeconds": 5.044531832994835,
+              "optimizedSeconds": 4.229825291000452,
+              "recordCount": 8,
+              "equalRecordSha256": "a6ceb10d9a9ae13c618715c500c67ecca0ba04f239c3d927da9afd8d6d7d2530"
+            },
+            {
+              "baselineSeconds": 5.36010204199556,
+              "optimizedSeconds": 4.513323584000318,
+              "recordCount": 8,
+              "equalRecordSha256": "6d016f9176ef8b05f70bdac81942ca9b5bea4b5dea94e5f0bb36519e984fbe03"
+            },
+            {
+              "baselineSeconds": 5.359227333996387,
+              "optimizedSeconds": 4.510316750001948,
+              "recordCount": 8,
+              "equalRecordSha256": "fde18c7196810cdd5716eca0093b21d80191cf1ebd4bf6f852acdfd50f2412d7"
+            },
+            {
+              "baselineSeconds": 5.696237957999983,
+              "optimizedSeconds": 4.784410250002111,
+              "recordCount": 8,
+              "equalRecordSha256": "725d2c8e0cc3c82cf9f57dd4db77c138b06ada6b41beb6877ac001fe3d936c7e"
+            },
+            {
+              "baselineSeconds": 5.6952695840009255,
+              "optimizedSeconds": 4.7922026659980475,
+              "recordCount": 8,
+              "equalRecordSha256": "cadbb96e3e791f8b8506cc5adcc5e9e3cc17af55a1a31751e488757477073503"
+            },
+            {
+              "baselineSeconds": 6.0281902920032735,
+              "optimizedSeconds": 5.129235874999722,
+              "recordCount": 8,
+              "equalRecordSha256": "cc9a1c26d53147c1f16216ecbf3c89b2a8dd0d413166bc5ac3d619639bbaa704"
+            },
+            {
+              "baselineSeconds": 6.025352666998515,
+              "optimizedSeconds": 5.435309958000289,
+              "recordCount": 8,
+              "equalRecordSha256": "d1b48d4c6a63a626bb661c4495b0f9753101cca66de01c19ef89458b1d2de328"
+            },
+            {
+              "baselineSeconds": 6.340734333003638,
+              "optimizedSeconds": 5.1255467499977385,
+              "recordCount": 8,
+              "equalRecordSha256": "bb6e6a24a38ed878985b22ac5276236a250c5f4afb06eba931c15a3c4802fb5b"
+            },
+            {
+              "baselineSeconds": 6.3276594589988235,
+              "optimizedSeconds": 5.439010291996965,
+              "recordCount": 8,
+              "equalRecordSha256": "3d860bbb73c94f3c501e1798d0ab17b5970a8f04374d91b64abb7ef13f42842d"
+            },
+            {
+              "baselineSeconds": 6.647356041998137,
+              "optimizedSeconds": 5.752996084000188,
+              "recordCount": 8,
+              "equalRecordSha256": "944a9ef20ea088e431a67aab88de716aac6d54cdbc3c5a9428c1acf86c37eb33"
+            },
+            {
+              "baselineSeconds": 6.646859458996914,
+              "optimizedSeconds": 5.7497892920000595,
+              "recordCount": 8,
+              "equalRecordSha256": "06714fc881d2d93f2a09e7bddb4255cb17c7882b8088ccfc371c036db562d769"
+            },
+            {
+              "baselineSeconds": 6.953133290997357,
+              "optimizedSeconds": 6.061394125001243,
+              "recordCount": 8,
+              "equalRecordSha256": "f9992a6aaa4905703c2a78a6534031d2f108d2b6bcdf96e6fd94a31192724585"
+            },
+            {
+              "baselineSeconds": 6.956792166995001,
+              "optimizedSeconds": 6.065024915998947,
+              "recordCount": 8,
+              "equalRecordSha256": "1157fde982358d9c30c399284f34b6af94e87fbd81e3818dd9cda2a98ac855f5"
+            },
+            {
+              "baselineSeconds": 7.268981541994435,
+              "optimizedSeconds": 6.374779875000968,
+              "recordCount": 8,
+              "equalRecordSha256": "ad58baf8a861f2cb9082be42dc2971a950f563295066f5e0f0c5c7db53b6a0a7"
+            },
+            {
+              "baselineSeconds": 7.269425874997978,
+              "optimizedSeconds": 6.371688041999732,
+              "recordCount": 8,
+              "equalRecordSha256": "642161998ea48ab99cad7e8f6b7e92dcf743ce8712ce1172a6639851a470f70a"
+            },
+            {
+              "baselineSeconds": 7.586810957996931,
+              "optimizedSeconds": 7.038434334001067,
+              "recordCount": 8,
+              "equalRecordSha256": "ddc13832d541c0335b4a29b56e23e44fde6c83f92b9e4374f1e9279bb9a13b59"
+            },
+            {
+              "baselineSeconds": 7.583864207997976,
+              "optimizedSeconds": 6.709987709000416,
+              "recordCount": 8,
+              "equalRecordSha256": "0d94e610af1c23e84ce2b4b128cc1ef0ec9a4a94765b5ddcd68a7fb2efddea27"
+            },
+            {
+              "baselineSeconds": 7.903039457996783,
+              "optimizedSeconds": 6.712617749999481,
+              "recordCount": 8,
+              "equalRecordSha256": "93d491694c5a1abd66bc96e54ed12a69c1d2ded6614c85ab13846301c1b4d16b"
+            },
+            {
+              "baselineSeconds": 7.904282041999977,
+              "optimizedSeconds": 7.037985999999364,
+              "recordCount": 8,
+              "equalRecordSha256": "dca48ce28dea4b1b1d78222c848458b63536b68ac09ece1a052ee4b1256bce3f"
+            },
+            {
+              "baselineSeconds": 8.219537083001342,
+              "optimizedSeconds": 7.346792958000151,
+              "recordCount": 8,
+              "equalRecordSha256": "f8bd2283f61748cad27adf240ed90136e07c2d75cb8672ad585c95f32234566e"
+            },
+            {
+              "baselineSeconds": 8.220150833003572,
+              "optimizedSeconds": 7.346702957998787,
+              "recordCount": 8,
+              "equalRecordSha256": "9a418395255194626ca1baa311ccd0d362853c88c24fc3a5486cbf2d9cf773a3"
+            },
+            {
+              "baselineSeconds": 8.511074041998654,
+              "optimizedSeconds": 7.629546666998067,
+              "recordCount": 8,
+              "equalRecordSha256": "d092b29d713b1c1cd164cbe53e7192ed2800ab803976b548ecfd2696cfa6a2f0"
+            },
+            {
+              "baselineSeconds": 8.51114241599862,
+              "optimizedSeconds": 7.630452875000628,
+              "recordCount": 8,
+              "equalRecordSha256": "42a41f5a6d7b66ff270bf647c2ca617ce8881a661e4bcfcfda92df1c7daf3fbd"
+            },
+            {
+              "baselineSeconds": 8.833186042000307,
+              "optimizedSeconds": 7.913134458998684,
+              "recordCount": 8,
+              "equalRecordSha256": "5b7da5ee0db6cdf03b7b7bb274cd71c13cc82b291e8250425de89feb8dc3cc1e"
+            },
+            {
+              "baselineSeconds": 9.146655707998434,
+              "optimizedSeconds": 7.915523540999857,
+              "recordCount": 8,
+              "equalRecordSha256": "7e08ccb9842bd6722a626efb36a83747700e2c65125545c88fdd014a23196b84"
+            },
+            {
+              "baselineSeconds": 8.833712167004705,
+              "optimizedSeconds": 8.20541591700021,
+              "recordCount": 8,
+              "equalRecordSha256": "8244780f49d26ddd13cce5d3008a61e380a577dbe4f20e109139a49a3f61a329"
+            },
+            {
+              "baselineSeconds": 9.143556415998319,
+              "optimizedSeconds": 8.505163916001038,
+              "recordCount": 8,
+              "equalRecordSha256": "9d953688ecbf939b1a61a0bef951c80971356fb7ccc3b3e21eb88834063df09b"
+            },
+            {
+              "baselineSeconds": 9.479226374998689,
+              "optimizedSeconds": 8.505602624998573,
+              "recordCount": 8,
+              "equalRecordSha256": "6c8bc51e726eaaea0de8143be182690d7bff6464ac071b222206cacc0acae09b"
+            },
+            {
+              "baselineSeconds": 9.48066458300309,
+              "optimizedSeconds": 8.204584624996642,
+              "recordCount": 8,
+              "equalRecordSha256": "b74e7eafd45fa21f8a9151c3d07fd68861d334bf846e8bfe75e432541526c137"
+            },
+            {
+              "baselineSeconds": 9.824478458998783,
+              "optimizedSeconds": 9.094207292000647,
+              "recordCount": 8,
+              "equalRecordSha256": "a7733ae752bf3c8edbdae021cd34f7acd6f2e1dd2e2216f00eedb831ae2579ab"
+            },
+            {
+              "baselineSeconds": 9.824210667000443,
+              "optimizedSeconds": 8.79781366699899,
+              "recordCount": 8,
+              "equalRecordSha256": "705b9f43e2707509d5c5267248a319b228c5fa93764f22db462810c244d6a7b9"
+            },
+            {
+              "baselineSeconds": 10.16134895900177,
+              "optimizedSeconds": 8.796686459001648,
+              "recordCount": 8,
+              "equalRecordSha256": "8a92f6eec7eb7330043ab380415862db8e41c0cea2052ff16d3477820cacc406"
+            },
+            {
+              "baselineSeconds": 10.160469458998705,
+              "optimizedSeconds": 9.098769500000344,
+              "recordCount": 8,
+              "equalRecordSha256": "b4ec176fab91ee8cedb7b88be3545740a741f3442abdd11bdf0c2bcd9557905b"
+            },
+            {
+              "baselineSeconds": 10.458200624998426,
+              "optimizedSeconds": 9.40033004200086,
+              "recordCount": 8,
+              "equalRecordSha256": "52a35908328697158c2def2f7713f279ed65ae1f7ca5f8049e90ea2b75a5d654"
+            },
+            {
+              "baselineSeconds": 10.4585305829969,
+              "optimizedSeconds": 9.403130292001151,
+              "recordCount": 8,
+              "equalRecordSha256": "b32de4f51cb0e4fe3ac1f7ae4c0ffa8fc016753af494e40f0e9918c24accb1f5"
+            },
+            {
+              "baselineSeconds": 10.767911832997925,
+              "optimizedSeconds": 9.712905333999515,
+              "recordCount": 8,
+              "equalRecordSha256": "cf20f7afdf2d8b74a7fcdef066837a8f46e6226d910c7caa2d93b17abf9c75b9"
+            },
+            {
+              "baselineSeconds": 10.767039833001036,
+              "optimizedSeconds": 9.710069791999558,
+              "recordCount": 8,
+              "equalRecordSha256": "3116fec94bb43d2681cd8c78d0646cdfc45bc1cf8fe4e8ecfaf2660ba95505af"
+            },
+            {
+              "baselineSeconds": 11.075759999999718,
+              "optimizedSeconds": 10.334182791997591,
+              "recordCount": 8,
+              "equalRecordSha256": "14cba8762af60d866979bfb9f30baec3cec4c621805a9a7293b56dd881f4a308"
+            },
+            {
+              "baselineSeconds": 11.073666791002324,
+              "optimizedSeconds": 10.031830208001338,
+              "recordCount": 8,
+              "equalRecordSha256": "951acce642ab1f2e0e4e315b7d7953e001edc6c13558e56ed33e24721a7f5f97"
+            },
+            {
+              "baselineSeconds": 11.391838541996549,
+              "optimizedSeconds": 10.62444620899987,
+              "recordCount": 8,
+              "equalRecordSha256": "ab4026e6b5d77cd9d03e2aad587ab8d022414eafc477f894e72bd60891d68241"
+            },
+            {
+              "baselineSeconds": 11.389257125003496,
+              "optimizedSeconds": 10.034594417000335,
+              "recordCount": 8,
+              "equalRecordSha256": "6a1efb00f53dd762483508c2fa3f991afc7db38b629823f966870a1b9c88dc65"
+            },
+            {
+              "baselineSeconds": 11.689993874999345,
+              "optimizedSeconds": 10.330104958000447,
+              "recordCount": 8,
+              "equalRecordSha256": "532ff6cc2ab5c4363774ff32ed14517433a244bd274865768ee392218b3df2bf"
+            },
+            {
+              "baselineSeconds": 11.690273000000161,
+              "optimizedSeconds": 10.62175845800084,
+              "recordCount": 8,
+              "equalRecordSha256": "66ea1fa8bb8a8ef1f2f3f450f0e9eb7c0cbe712e8f3f0b6cf8b567f15aa62597"
+            },
+            {
+              "baselineSeconds": 12.01212341599603,
+              "optimizedSeconds": 10.903698500002065,
+              "recordCount": 8,
+              "equalRecordSha256": "f0dbfc0a47767f0990c6c13a4e32e9222fc056dac5ca3b22452bcf568fd0ca6b"
+            },
+            {
+              "baselineSeconds": 12.309716791998653,
+              "optimizedSeconds": 10.904380959000264,
+              "recordCount": 8,
+              "equalRecordSha256": "29014ad386e1967fa3e9476bde44209fe50342f2ef640dcddc115d561d0fdb2b"
+            },
+            {
+              "baselineSeconds": 12.01293962499767,
+              "optimizedSeconds": 11.19393399999899,
+              "recordCount": 8,
+              "equalRecordSha256": "b12e28e6155eae13014a2b295a690312c7d773763c8715caee84a22078e071a5"
+            },
+            {
+              "baselineSeconds": 12.30827408299956,
+              "optimizedSeconds": 11.187589334000222,
+              "recordCount": 8,
+              "equalRecordSha256": "810e173218b1239f45276c7482220115ff7f773713296ee08d0a0ecb8236fe7a"
+            },
+            {
+              "baselineSeconds": 12.97827587500069,
+              "optimizedSeconds": 11.49130266699649,
+              "recordCount": 8,
+              "equalRecordSha256": "44c7bae27157cd3dae4396d9b10c9b71bac1b3c5d4281e573e5bb9d8eefced58"
+            },
+            {
+              "baselineSeconds": 12.619788457996037,
+              "optimizedSeconds": 11.487898291998135,
+              "recordCount": 8,
+              "equalRecordSha256": "3ae4c8ca35deb2a4dd5e38c4e3e481a17b9ee9c4d6ae5bb9e63dab797748bb5d"
+            },
+            {
+              "baselineSeconds": 12.618497082999966,
+              "optimizedSeconds": 11.777938584000367,
+              "recordCount": 8,
+              "equalRecordSha256": "75edf65a62b3c47f6add51a3fc9a8e69f6c09b51ba6f9cc42fffa388f2d1d6ab"
+            },
+            {
+              "baselineSeconds": 12.977501749999647,
+              "optimizedSeconds": 11.779195041002822,
+              "recordCount": 8,
+              "equalRecordSha256": "529c3f28f36f2288bd28af31e401487fe987f61ed63b28be20252180a26cc9e1"
+            },
+            {
+              "baselineSeconds": 13.302204542000254,
+              "optimizedSeconds": 12.07776154199746,
+              "recordCount": 8,
+              "equalRecordSha256": "acfd65bd50732515f43c351305f7fb031b94943c56e6e7742ee02942bf1809cd"
+            },
+            {
+              "baselineSeconds": 13.641551749999053,
+              "optimizedSeconds": 12.078330207998079,
+              "recordCount": 8,
+              "equalRecordSha256": "c870fd2f0ad2888a671a65ba099bb976640681eb71eec0d9e71be2dd31b63863"
+            },
+            {
+              "baselineSeconds": 13.958417458998156,
+              "optimizedSeconds": 12.36821858300027,
+              "recordCount": 8,
+              "equalRecordSha256": "ae224005637d234f10f540576721275bee65b27d6a810931745db4e7686f17e4"
+            },
+            {
+              "baselineSeconds": 13.305235415995412,
+              "optimizedSeconds": 12.36797099999967,
+              "recordCount": 8,
+              "equalRecordSha256": "451653ba9c82744fb9947e4ac6fa7b423ccfabef6f4f62f4470595f487d3ee4c"
+            },
+            {
+              "baselineSeconds": 13.641001459000108,
+              "optimizedSeconds": 12.684549166999204,
+              "recordCount": 8,
+              "equalRecordSha256": "a2a83661f046cbae6b9ee8f031bf8560a2051589f9405c949e2c396c74623cd6"
+            },
+            {
+              "baselineSeconds": 14.249488125002244,
+              "optimizedSeconds": 12.971474541001953,
+              "recordCount": 8,
+              "equalRecordSha256": "da3f57d3c15f3b74f276c09c32f4fa481337273b32ea7a636449af9304b34e98"
+            },
+            {
+              "baselineSeconds": 13.956864790998225,
+              "optimizedSeconds": 12.692643375001353,
+              "recordCount": 8,
+              "equalRecordSha256": "c3ded1775ca4cc61ce8ea62d809b313253eb72fe713363e65f438fc8aa4eff74"
+            },
+            {
+              "baselineSeconds": 14.550829499996325,
+              "optimizedSeconds": 12.971429125002032,
+              "recordCount": 8,
+              "equalRecordSha256": "2e683a0586369107fcce2c52e5f76afb07739e0dec6d413acdefb16566714f40"
+            },
+            {
+              "baselineSeconds": 14.249650790996384,
+              "optimizedSeconds": 13.27576895799939,
+              "recordCount": 8,
+              "equalRecordSha256": "973bcfeb335a52fb22a09bf1b35157588231d3034effdeeb6a3940ed1496441a"
+            },
+            {
+              "baselineSeconds": 14.550950125005329,
+              "optimizedSeconds": 13.566178417000629,
+              "recordCount": 8,
+              "equalRecordSha256": "7e65a3eda999aae199617a6250664966c3efa35c969e0ae87c0077bb4277229e"
+            },
+            {
+              "baselineSeconds": 14.845093125004496,
+              "optimizedSeconds": 13.853000125000108,
+              "recordCount": 8,
+              "equalRecordSha256": "447e6036d894726dd371e1fd8c427e085815b5121898e66cf5cf9c7fe0e6355a"
+            },
+            {
+              "baselineSeconds": 14.845637375001388,
+              "optimizedSeconds": 13.273216707999381,
+              "recordCount": 8,
+              "equalRecordSha256": "3c5fb439efa94bc8cbb1f37c241067c670ccd94b44ee36eeef3bab4ee6a1973f"
+            },
+            {
+              "baselineSeconds": 15.134594709001249,
+              "optimizedSeconds": 13.564711374998296,
+              "recordCount": 8,
+              "equalRecordSha256": "0fb298c2b3242da47fbb804a9341fea9384faed3c12f3d81f5af60a3211c2e3a"
+            },
+            {
+              "baselineSeconds": 15.134325875005743,
+              "optimizedSeconds": 13.855426082998747,
+              "recordCount": 8,
+              "equalRecordSha256": "10efc1ff9c42ece703a9c9bc4a367e4d6ab7e0e4dd0d560cb2c9deb6ced1bbd6"
+            },
+            {
+              "baselineSeconds": 15.439215040998533,
+              "optimizedSeconds": 14.183445999999094,
+              "recordCount": 8,
+              "equalRecordSha256": "869bd2476b105ac9fbd2463c07a79ed2a7d01fd83e236d59c6394ebaf0e08678"
+            },
+            {
+              "baselineSeconds": 15.438855249994958,
+              "optimizedSeconds": 14.459691083000507,
+              "recordCount": 8,
+              "equalRecordSha256": "387180d15b721a41df471a18a78d5c48f6f176e8cfe3e7a9de19285110f57b1f"
+            },
+            {
+              "baselineSeconds": 15.759584958999767,
+              "optimizedSeconds": 14.184116749998793,
+              "recordCount": 8,
+              "equalRecordSha256": "d20f591de487163cc43bcf6e6ca05a8c4b3347438490b984c70a7187c789061d"
+            },
+            {
+              "baselineSeconds": 15.759353916000691,
+              "optimizedSeconds": 14.459421333998762,
+              "recordCount": 8,
+              "equalRecordSha256": "6b26ef388449e262be1b4ac0939e42e08290956c1d0b4d0d27c8dd40d9e1644d"
+            },
+            {
+              "baselineSeconds": 16.378716833001818,
+              "optimizedSeconds": 14.75068066699896,
+              "recordCount": 8,
+              "equalRecordSha256": "0365bfb611a19d60284755d6fb2c692dd67992bead7d3f1bf82b3ebd4dbbca89"
+            },
+            {
+              "baselineSeconds": 16.057384291001654,
+              "optimizedSeconds": 15.04872158299986,
+              "recordCount": 8,
+              "equalRecordSha256": "ccd2efc58e14a1230112d4e548b1cc8379d3d7f65af6b1cab73391b63922a833"
+            },
+            {
+              "baselineSeconds": 16.05982395799947,
+              "optimizedSeconds": 14.75014787499822,
+              "recordCount": 8,
+              "equalRecordSha256": "44743443717565159ca819653c9c78900c25cdd4ea251f777218e9e9bdc15cc6"
+            },
+            {
+              "baselineSeconds": 16.379459583004063,
+              "optimizedSeconds": 15.047505541999271,
+              "recordCount": 8,
+              "equalRecordSha256": "783d548eebee4d86523e96369b4613202a39cd835e4973f73dbf1fe1653e72a6"
+            },
+            {
+              "baselineSeconds": 16.687366332997044,
+              "optimizedSeconds": 15.34122812500209,
+              "recordCount": 8,
+              "equalRecordSha256": "d8a6cabdd8c2c1c011f3d1fdeabaefd51256a8fceb37d761d7e03becce558069"
+            },
+            {
+              "baselineSeconds": 16.687220667001384,
+              "optimizedSeconds": 15.341352875002485,
+              "recordCount": 8,
+              "equalRecordSha256": "2447ee8bbacb753315d1b58ef3dd5d7f98e58e8ce00babf628d1fc031be69b79"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "memory": {
+    "optimized-shared": {
+      "physicalFootprintBytes": 1713754048,
+      "physicalPeakBytes": 3004680832
+    },
+    "shared-baseline": {
+      "physicalFootprintBytes": 1681477592,
+      "physicalPeakBytes": 3377204152
+    }
+  },
+  "limits": [
+    "Two orders on one 16GB Mac with other apps and global service active",
+    "No claim of stable sequential or longer-input improvement",
+    "First-round footprint invocation invalid; only corrected reverse-order memory is used"
+  ],
+  "adapterSha256": "e223daad4279479b58f59755b3e74b20fee93d2c5f87f7cbd3976489969379ad",
+  "globalDeployment": {
+    "status": {
+      "ok": true,
+      "pid": 78324,
+      "ready": true,
+      "initializationError": null
+    },
+    "queries": [
+      {
+        "query": "按函数定位资源检索延迟并核验完整结果，部署验收甲",
+        "seconds": 4.838579541996296,
+        "count": 8,
+        "pid": 78324,
+        "queryPid": 78324,
+        "prefilter": true
+      },
+      {
+        "query": "核对模型缓存和进程内存，部署验收乙",
+        "seconds": 2.5801895420008805,
+        "count": 8,
+        "pid": 78324,
+        "queryPid": 78324,
+        "prefilter": true
+      },
+      {
+        "query": "search concurrent worker performance deployment verification gamma",
+        "seconds": 1.0193018749996554,
+        "count": 8,
+        "pid": 78324,
+        "queryPid": 78324,
+        "prefilter": true
+      },
+      {
+        "query": "诊断图检索慢的根因并检查候选召回，部署验收丁",
+        "seconds": 0.9414804589978303,
+        "count": 8,
+        "pid": 78324,
+        "queryPid": 78324,
+        "prefilter": true
+      }
+    ],
+    "routerReturnedCandidates": true,
+    "macProfileIntegrationPassed": true
+  },
+  "verification": {
+    "keywordTests": 6,
+    "workerTests": 22,
+    "resourceTests": 9,
+    "queryCacheTests": 3,
+    "realLibraryEquivalenceQueries": 10,
+    "fullGatePassed": 14,
+    "fullGateTotal": 15,
+    "fullGateFailure": "preexisting deleted historical version file; document-integrity",
+    "governancePassed": true,
+    "skillsValidated": 25
+  }
+}

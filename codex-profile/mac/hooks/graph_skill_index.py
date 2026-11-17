@@ -673,10 +673,95 @@ def _specialize_query_facts(function):
     def facts(query):
         scope = {'query': query, 'q': query.lower()}
         return tuple(eval(expression, function.__globals__, scope) for expression in expressions)
-    definition.body.insert(0, ast.parse('__facts = __query_facts(query)').body[0])
-    namespace = dict(function.__globals__, __query_facts=facts)
-    exec(compile(ast.fix_missing_locations(tree), '<specialized-keyword>', 'exec'), namespace)
-    specialized = namespace[function.__name__]
+    # Geographic classification is pure but upstream computes it even when
+    # neither geographic intent is present. Inline that local expression so
+    # normal short-circuit evaluation can avoid the irrelevant tool work.
+    geographic = next((node for node in definition.body if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == 'is_geo_distance_tool'
+                for target in node.targets)), None)
+    if geographic is not None:
+        class LazyGeographic(ast.NodeTransformer):
+            def visit_Name(self, node):
+                return deepcopy(geographic.value) if node.id == 'is_geo_distance_tool' and isinstance(node.ctx, ast.Load) else node
+        definition.body.remove(geographic)
+        definition = LazyGeographic().visit(definition)
+        tree.body[0] = definition
+
+    def fact_index(node):
+        if (isinstance(node, ast.Subscript) and isinstance(node.value, ast.Name)
+                and node.value.id == '__facts' and isinstance(node.slice, ast.Constant)):
+            return node.slice.value
+        return None
+
+    def boolean_facts(node):
+        index = fact_index(node)
+        if index is not None:
+            return {index}
+        if isinstance(node, ast.BoolOp):
+            return set().union(*(boolean_facts(value) for value in node.values))
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not):
+            return boolean_facts(node.operand)
+        return set()
+
+    indices = sorted(set().union(*(boolean_facts(node.test) for node in ast.walk(definition) if isinstance(node, ast.If))))
+
+    @lru_cache(maxsize=256)
+    def variant(mask):
+        known = dict(zip(indices, mask))
+        def condition(node):
+            index = fact_index(node)
+            if index in known:
+                return ast.copy_location(ast.Constant(known[index]), node)
+            if isinstance(node, ast.BoolOp):
+                values = []
+                for value in node.values:
+                    value = condition(value)
+                    if isinstance(value, ast.Constant) and isinstance(value.value, bool):
+                        if value.value == isinstance(node.op, ast.Or):
+                            values.append(value)
+                            break
+                        continue
+                    values.append(value)
+                if not values:
+                    return ast.Constant(isinstance(node.op, ast.And))
+                return values[0] if len(values) == 1 else ast.BoolOp(op=node.op, values=values)
+            if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not):
+                operand = condition(node.operand)
+                if isinstance(operand, ast.Constant) and isinstance(operand.value, bool):
+                    return ast.Constant(not operand.value)
+                node.operand = operand
+            return node
+        class PruneGuards(ast.NodeTransformer):
+            def visit_If(self, node):
+                node.test = condition(node.test)
+                if isinstance(node.test, ast.Constant) and isinstance(node.test.value, bool):
+                    result = []
+                    for item in (node.body if node.test.value else node.orelse):
+                        rewritten = self.visit(item)
+                        result.extend(rewritten if isinstance(rewritten, list) else [rewritten])
+                    return result
+                return self.generic_visit(node)
+        compiled_tree = PruneGuards().visit(deepcopy(tree))
+        body = compiled_tree.body[0]
+        # Only these pure local constructions may be dropped when all their
+        # consumers were pruned. Do not perform general dead-code elimination.
+        loaded = {node.id for node in ast.walk(body) if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load)}
+        body.body = [node for node in body.body if not (isinstance(node, ast.Assign)
+            and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id in {'q', 'tool_text'} and node.targets[0].id not in loaded)]
+        body.args.args.insert(0, ast.arg(arg='__facts'))
+        namespace = dict(function.__globals__)
+        exec(compile(ast.fix_missing_locations(compiled_tree), '<specialized-keyword>', 'exec'), namespace)
+        return namespace[function.__name__]
+
+    @lru_cache(maxsize=256)
+    def prepared(query):
+        values = facts(query)
+        return variant(tuple(bool(values[index]) for index in indices)), values
+
+    def specialized(query, *args):
+        implementation, values = prepared(query)
+        return implementation(values, query, *args)
     specialized.__wrapped__ = function
     specialized.query_cache = facts
     return specialized

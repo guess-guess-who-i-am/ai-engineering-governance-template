@@ -11,6 +11,46 @@ adapter = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(adapter)
 
 class KeywordAccelerationTests(unittest.TestCase):
+    def test_specialization_preserves_nested_guards_and_non_boolean_facts(self):
+        def fixture(query, tool_name, tool):
+            q = query.lower()
+            words = re.findall(r'[가-힣]+', query)
+            if 'outer' in q:
+                if 'inner' in q:
+                    return words
+                else:
+                    return q
+            if re.search(r'needle', q) and tool_name:
+                return words
+            return tool_name
+        specialized = adapter._specialize_query_facts(fixture)
+        for query in ('outer inner 주문', 'outer', 'needle 조회', '', 'NEEDLE', '中文'):
+            for name in ('', 'name'):
+                self.assertEqual(specialized(query, name, None), fixture(query, name, None))
+        for number in range(300):
+            query = f'query {number}'
+            self.assertEqual(specialized(query, 'name', None), fixture(query, 'name', None))
+        self.assertLessEqual(specialized.query_cache.cache_info().currsize, 256)
+
+    def test_unrelated_queries_do_not_classify_geography_for_every_candidate(self):
+        from graph_tool_call.retrieval.keyword import BM25Scorer
+        from graph_tool_call.core.tool import ToolSchema
+        from graph_tool_call.retrieval.engine import RetrievalEngine
+        tools = {f'search_{i}': ToolSchema(name=f'search_{i}', description='search documents geographic distance') for i in range(300)}
+        original = BM25Scorer._semantic_phrase_multiplier
+        queries = ['search documents 核验完整结果', 'geo distance between cities', 'hypotenuse', '주문 목록 조회']
+        expected = {(q, n): original(q, n, t) for q in queries for n, t in tools.items()}
+        try:
+            adapter._accelerate_keyword_scoring(RetrievalEngine(None, tools))
+            with patch.object(BM25Scorer, '_is_geographic_distance_tool', wraps=BM25Scorer._is_geographic_distance_tool) as classify:
+                for n, t in tools.items():
+                    self.assertEqual(BM25Scorer._semantic_phrase_multiplier(queries[0], n, t), expected[queries[0], n])
+                self.assertEqual(classify.call_count, 0, 'irrelevant tool classification must be removed, not repeated 300 times')
+            for (q, n), value in expected.items():
+                self.assertEqual(BM25Scorer._semantic_phrase_multiplier(q, n, tools[n]), value, (q, n))
+        finally:
+            adapter._restore_keyword_interpretation()
+
     def test_all_phrase_intents_preserve_candidate_multipliers(self):
         from graph_tool_call.retrieval.keyword import BM25Scorer
         from graph_tool_call.core.tool import ToolSchema, ToolParameter

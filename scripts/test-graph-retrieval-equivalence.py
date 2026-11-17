@@ -34,7 +34,7 @@ def main():
         engine.set_embedding_index(original_index)
         original_index._provider = original_provider
         begun = time.perf_counter()
-        baseline = indexer.result_records(graph.retrieve_with_scores(query, top_k=8, max_graph_depth=2))
+        baseline = indexer.result_records(graph.retrieve_with_scores(query, top_k=8, max_graph_depth=2), graph)
         baseline_ms = (time.perf_counter() - begun) * 1000
         engine._keyword_match = optimized_keyword
         original_index._provider = cached_provider
