@@ -8,7 +8,7 @@
 - Size: 400,520
 - Completion: 进行中
 - Problem: 如何把仓库治理配置安装成 macOS 全局 Codex 行为，并让并发、Hook、路由和全部 Skill 真正可用？
-- Approach: IDE与Codex共用用户级配置、Skill正文、专家原包及GraphToolCall常驻服务；默认入口元数据和项目指令按Codex有效配置发现。独立就绪操作通常成批5–8路，危险或共享写入串行，失败回压；20仅为硬上限。
+- Approach: IDE与Codex共用用户级配置、Skill正文、专家原包及GraphToolCall常驻服务；默认入口元数据和项目指令按Codex有效配置发现。固定提醒每三轮注入，界面保持极简，省去提示性、防御性与科普性文案。独立就绪操作通常成批5–8路，危险或共享写入串行，失败回压；20仅为硬上限。
 - Input: 仓库中的 macOS profile、用户 Codex 目录和现有非敏感配置。
 - Output: 全局安装源与194部署验收保留在路由分支；docs/COMPLETE_194_DEPLOYMENT_20261108.zh.md；main恢复证据：https://github.com/guess-guess-who-i-am/ai-engineering-governance-template/pull/31
 - Metrics: 一键部署后检查无漂移；全部全局 Skill 与 MCP 可路由；调度测试证明4路真实重叠、依赖顺序正确、失败/超时回压、危险任务串行且峰值不超过20；macOS 全链路测试通过。

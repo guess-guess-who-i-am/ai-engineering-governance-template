@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "publishedAt": "2026-10-29T06:36:42.189Z",
-  "runtimeSourceSha256": "1e10c8730f213cf92796ed9fd6d03f84fc589cf31853e779c4cd5f113fe87f3a",
-  "translationSha256": "cb11f38eb7a703deda839860f1a0ba34dc817d17f158faab93c361413921aa8b",
-  "ruleCount": 76,
+  "publishedAt": "2026-11-21T09:59:00.992Z",
+  "runtimeSourceSha256": "54f41ae0b1b7f5f0dc6ba7960a76a167b5bba5e1e4def67247eb3d463fd85b42",
+  "translationSha256": "2c2b6bb528d78226560d6d767023a5f0d6965d693ef44704c1743d8c10bcd117",
+  "ruleCount": 78,
   "routeCounts": {
-    "alwaysOn": 40,
+    "alwaysOn": 42,
     "method-research-evidence": 9,
     "method-engineering-execution": 6,
     "method-evaluation-gates": 10,

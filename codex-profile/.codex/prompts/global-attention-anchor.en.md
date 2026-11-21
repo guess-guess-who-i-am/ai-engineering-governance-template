@@ -1,5 +1,7 @@
 # Always-on reminders — user's original wording translated into English
 
+- Stop using those text prompts when setting up the interface; they are completely unnecessary. What is needed is extreme simplicity.
+- There is no need for defensive statements, and there is no need for educational statements.
 - Treat the user's most recently stated explicit requirements as the current objective. If a plan from an earlier turn conflicts with the latest requirements, do not continue executing the old plan.
 - Before execution, check the actual project state required to complete the current task; do not rely solely on memory or assumptions.
 - Do not retain backward compatibility. Delete obsolete things directly; do not add compatibility layers, write migrations, or leave fallbacks.
